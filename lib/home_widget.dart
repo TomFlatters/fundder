@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/feed_controller.dart';
 import 'placeholder_widget.dart';
+import 'feed_controller.dart';
 
 class Home extends StatefulWidget {
  @override
@@ -11,7 +13,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final List<Widget> _children = [
-   PlaceholderWidget(Colors.white),
+   FeedController(Colors.white),
    PlaceholderWidget(Colors.deepOrange),
    PlaceholderWidget(Colors.deepOrange),
    PlaceholderWidget(Colors.deepOrange),
@@ -19,9 +21,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My Flutter App'),
-      ),
       body: _children[_currentIndex], // new
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
