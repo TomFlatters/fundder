@@ -14,5 +14,8 @@ class Wrapper extends StatelessWidget {
     // return either Home or Authenticate widget (depending on auth status)
     return (user!=null) ? Home() : Authenticate();
 
+    // ADRIAN: if you comment out the above line and uncomment the below line you won't need to login to see the home widget
+    // return Home();
+
   }
 }
