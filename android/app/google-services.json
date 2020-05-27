@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "256734528568",
+    "firebase_url": "https://fundder-c4a64.firebaseio.com",
+    "project_id": "fundder-c4a64",
+    "storage_bucket": "fundder-c4a64.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:256734528568:android:633cf0106f679c816a52cd",
+        "android_client_info": {
+          "package_name": "com.example.fundder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "256734528568-6r5ic6a5tk417ki1t58gaipbhe68t8h4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhuUx15zrI27m5LJKPvT8_7oCR1jyUyH0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "256734528568-6r5ic6a5tk417ki1t58gaipbhe68t8h4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "256734528568-0jo2ar8d8hj0n0dbkisurv3ph37u2s65.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fundder"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
