@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/feed_controller.dart';
 import 'placeholder_widget.dart';
 import 'feed_controller.dart';
+import 'search_controller.dart';
 
 class Home extends StatefulWidget {
  @override
@@ -14,7 +15,7 @@ class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final List<Widget> _children = [
    FeedController(Colors.white),
-   PlaceholderWidget(Colors.deepOrange),
+   SearchController(),
    PlaceholderWidget(Colors.deepOrange),
    PlaceholderWidget(Colors.deepOrange),
    PlaceholderWidget(Colors.green)];
