@@ -25,7 +25,8 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(
           textTheme: TextTheme(
             
-          )
+          ),
+          elevation: 0
         )
       )
     );
