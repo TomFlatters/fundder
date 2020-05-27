@@ -31,6 +31,7 @@ dependencies:
   cupertino_icons: ^0.1.3
   flappy_search_bar: ^1.4.1
   google_fonts: ^1.1.0
+  percent_indicator: ^2.1.1
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +50,9 @@ flutter:
           style: italic
         - asset: fonts/Muli-Bold.ttf
           weight: 700
+
+  assets:
+     - assets/images/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

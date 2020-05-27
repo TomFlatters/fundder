@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'home_widget.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,6 +15,7 @@ class MyApp extends StatelessWidget {
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         primaryColor: Colors.white,
+        scaffoldBackgroundColor: HexColor("CCCCCC"),
         primaryTextTheme: TextTheme(
           headline6: TextStyle(
             fontWeight: FontWeight.bold,
