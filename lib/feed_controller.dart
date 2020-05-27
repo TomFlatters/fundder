@@ -11,7 +11,8 @@ FeedController(this.color);
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Feed'),
+          centerTitle: true,
+          title: Text('Feed',style: TextStyle(fontWeight: FontWeight.bold)),
           bottom: TabBar(
             tabs: [
               Tab(text: 'Do'),
