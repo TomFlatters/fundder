@@ -16,6 +16,12 @@ class MyApp extends StatelessWidget {
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         primaryColor: Colors.white,
+        primaryTextTheme: TextTheme(
+          headline6: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20
+          )
+        ),
         tabBarTheme: TabBarTheme(
           indicator: UnderlineTabIndicator(
             borderSide: BorderSide(width: 2.0, color: HexColor("A3D165")) 
@@ -23,9 +29,6 @@ class MyApp extends StatelessWidget {
         ),
         fontFamily: 'Muli',
         appBarTheme: AppBarTheme(
-          textTheme: TextTheme(
-            
-          ),
           elevation: 0
         )
       )
