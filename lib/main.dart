@@ -4,6 +4,7 @@ import 'package:fundder/wrapper.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
+import 'home_widget.dart';
 
 void main() {
   runApp(MyApp());
