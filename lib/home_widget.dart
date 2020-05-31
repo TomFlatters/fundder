@@ -5,6 +5,7 @@ import 'feed_controller.dart';
 import 'search_controller.dart';
 import 'liked_controller.dart';
 import 'profile_controller.dart';
+import 'add_post_controller.dart';
 
 class Home extends StatefulWidget {
  @override
@@ -73,19 +74,8 @@ Route _createRoute() {
   return PageRouteBuilder(
     pageBuilder: (c, a1, a2) => Page2(),
     transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 100),
+    transitionDuration: Duration(milliseconds: 300),
   );
-}
-
-class Page2 extends StatelessWidget {
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Text('Page 2'),
-      ),
-    );
-  }
 }
 
 class HexColor extends Color {
