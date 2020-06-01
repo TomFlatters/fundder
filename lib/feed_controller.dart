@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'view_post_controller.dart';
+import 'share_post_controller.dart';
 
-class FeedController extends StatelessWidget {
- final Color color;
- final List<String> entries = <String>['A', 'B', 'C'];
-final List<int> colorCodes = <int>[600, 500, 100];
+class FeedController extends StatefulWidget {
+  @override
+  _FeedState createState() => _FeedState();
+  final Color color;
+  FeedController(this.color);
+}
 
-FeedController(this.color);
+class _FeedState extends State<FeedController> {
+  
+  final List<String> entries = <String>['A', 'B', 'C'];
+  final List<int> colorCodes = <int>[600, 500, 100];
+
+
 
  @override
  Widget build(BuildContext context) {
@@ -28,7 +37,8 @@ FeedController(this.color);
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           itemCount: entries.length,
           itemBuilder: (BuildContext context, int index) {
-            return Container(
+            return GestureDetector(
+              child: Container(
               color: Colors.white,
               child: Container(
                 margin: EdgeInsets.all(10.0),
@@ -162,10 +172,7 @@ FeedController(this.color);
                                 )
                               ]
                             ),
-                            onPressed: (){
-                              final snackBar = SnackBar(content: Text("Tap"));
-                              Scaffold.of(context).showSnackBar(snackBar);
-                            },
+                            onPressed: () {Navigator.of(context).push(_openShare());},
                           ),
                         )
                       ]
@@ -174,7 +181,9 @@ FeedController(this.color);
                   ],
                 )
               )
-            );
+            ),
+            onTap: () {Navigator.of(context).push(_createRoute());}
+            ,);
           },
           separatorBuilder: (BuildContext context, int index){
             return SizedBox(
@@ -185,6 +194,22 @@ FeedController(this.color);
       ),
     );
  }
+}
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (c, a1, a2) => ViewPost(),
+    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
+    transitionDuration: Duration(milliseconds: 300),
+  );
+}
+
+Route _openShare() {
+  return PageRouteBuilder(
+    pageBuilder: (c, a1, a2) => SharePost(),
+    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
+    transitionDuration: Duration(milliseconds: 300),
+  );
 }
 
 class HexColor extends Color {
