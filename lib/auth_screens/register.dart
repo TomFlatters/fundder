@@ -21,9 +21,9 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.brown[100],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.brown[400],
+        backgroundColor: Colors.white,
         elevation: 0.0,
         title: Text('Register for Fundder')
         ),
@@ -57,7 +57,7 @@ class _RegisterState extends State<Register> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   // the form is valid when ALL the form key validations return null
-                  RaisedButton(
+                  FlatButton(
                     onPressed: () async {
                       if(_formKey.currentState.validate()){
                         if(_formKey.currentState.validate()){
@@ -72,7 +72,7 @@ class _RegisterState extends State<Register> {
                     },
                     child: Text('Sign in')),
                   SizedBox(width: 30.0),
-                  RaisedButton(
+                  FlatButton(
                     onPressed: () async {
                       if(_formKey.currentState.validate()){
                         dynamic result = await _auth.registerWithEmailAndPassword(email, password);

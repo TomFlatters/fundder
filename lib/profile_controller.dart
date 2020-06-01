@@ -14,12 +14,11 @@ Widget build(BuildContext context) {
         centerTitle: true,
         title: Text('Profile'),
         actions: <Widget>[
-          FlatButton.icon(
+          FlatButton(
             onPressed: () async {
               await _auth.signOut();
             }, 
-            icon: Icon(Icons.person), 
-            label: Text('Log Out'))
+            child: Text('Log Out'))
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:flappy_search_bar/search_bar_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 
@@ -27,6 +28,7 @@ class SearchController extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SearchBar<Post>(
+            hintText: 'search accounts',
             onSearch: search,
             minimumChars: 1,
             onItemFound: (Post post, int index) {
