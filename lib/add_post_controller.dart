@@ -60,6 +60,7 @@ class _Page2State extends State<Page2> {
                           fontSize: 17,
                         ),),
                   ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
                     shrinkWrap: true,
                     itemCount: whoDoes.length,
@@ -126,6 +127,7 @@ class _Page2State extends State<Page2> {
                           fontSize: 17,
                         ),),
                   ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
                     shrinkWrap: true,
                     itemCount: charities.length,
