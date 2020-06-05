@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/services/auth.dart';
 import 'feed.dart';
+import 'edit_profile_controller.dart';
+import 'view_followers_controller.dart';
 
 class ProfileController extends StatelessWidget {
 
@@ -23,6 +25,7 @@ Widget build(BuildContext context) {
         ],
       ),
       body: ListView(
+        shrinkWrap: true,
         children: <Widget>[
           Container(
             margin: EdgeInsets.only(top: 20, bottom:10),
@@ -46,7 +49,7 @@ Widget build(BuildContext context) {
             height: 50,
             child: Row(
               children: <Widget>[
-                Expanded(
+                Expanded( child:GestureDetector(
                   child: Column( children: <Widget>[
                   Container(
                     alignment: Alignment.topCenter,
@@ -61,9 +64,10 @@ Widget build(BuildContext context) {
                     alignment: Alignment.bottomCenter,
                     child: Text("Following"),
                   )),
-                  ],)
-                ),
-                Expanded(
+                  ],),
+                  onTap: () {Navigator.of(context).push(_viewFollowers());},
+                )),
+                Expanded( child:GestureDetector(
                   child: Column( children: <Widget>[
                   Container(
                     alignment: Alignment.topCenter,
@@ -78,8 +82,9 @@ Widget build(BuildContext context) {
                     alignment: Alignment.bottomCenter,
                     child: Text("Followers"),
                   )),
-                  ],)
-                ),
+                  ],),
+                  onTap: () {Navigator.of(context).push(_editProfile());},
+                )),
                 Expanded(
                   child: Column( children: <Widget>[
                   Container(
@@ -117,7 +122,7 @@ Widget build(BuildContext context) {
                   ),
                 ),
               ),
-            onTap: (){
+            onTap: (){ Navigator.of(context).push(_editProfile());
             }
           ), DefaultTabController(
             length: 2,
@@ -125,14 +130,15 @@ Widget build(BuildContext context) {
             child: Column(
               children: [
                 TabBar(tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')]),
-                Container(
-                    height: 300.0, 
-                    child: TabBarView(
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: 1000),
+                  child: TabBarView(
                       children: [
-                        Center(child: Text('Home here')),
-                        Center(child: Text('News here')),
+                        FeedView('user', Colors.black),
+                        FeedView('user', Colors.black),
                         ],
-                    ))
+                    )
+                )
               ],
             ), 
           )
@@ -140,4 +146,20 @@ Widget build(BuildContext context) {
       ),
     );
  }
+}
+
+Route _editProfile() {
+  return PageRouteBuilder(
+    pageBuilder: (c, a1, a2) => EditProfile(),
+    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
+    transitionDuration: Duration(milliseconds: 300),
+  );
+}
+
+Route _viewFollowers() {
+  return PageRouteBuilder(
+    pageBuilder: (c, a1, a2) => ViewFollowers(),
+    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
+    transitionDuration: Duration(milliseconds: 300),
+  );
 }

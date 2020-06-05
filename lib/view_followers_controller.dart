@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
 import 'helper_classes.dart';
 
-class SharePost extends StatefulWidget {
+class ViewFollowers extends StatefulWidget {
   @override
-  _SharePostState createState() => _SharePostState();
+  _ViewFollowersState createState() => _ViewFollowersState();
 }
 
-class _SharePostState extends State<SharePost> {
+class _ViewFollowersState extends State<ViewFollowers> {
 
   final List<String> whoDoes = <String>["A specific person",'Myself','Anyone'];
   final List<String> charities = <String>["Cancer Research",'British Heart Foundation','Oxfam'];
@@ -19,7 +19,7 @@ class _SharePostState extends State<SharePost> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Share Post"),
+        title: Text("View Followers"),
         actions: <Widget>[
           new IconButton(
             icon: new Icon(Icons.close), 
@@ -38,7 +38,7 @@ class _SharePostState extends State<SharePost> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: <Widget>[
-                  Text('This is where we share posts. Appears after post submission or on press of share button',style: TextStyle(
+                  Text('This is where you can see who user is following and who is following them',style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 17,
                         ),),
