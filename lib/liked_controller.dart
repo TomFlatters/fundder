@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'helper_classes.dart';
+import 'view_post_controller.dart';
 
 class LikedController extends StatelessWidget {
 
-   final List<String> entries = <String>['A', 'B', 'C'];
+   final List<String> entries = <String>['username_long started following you', 'username liked your post', 'username donated to your fundraiser'];
+   final List<String> buttons = <String>['Follow back', 'View', 'View'];
 
 LikedController();
 
@@ -12,16 +14,16 @@ LikedController();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Liked'),
+        title: Text('Activity'),
       ),
       body: ListView.separated(
           padding: const EdgeInsets.symmetric(vertical: 10.0),
-          itemCount: entries.length,
+          itemCount: 12,
           itemBuilder: (BuildContext context, int index) {
             return Container(
               color: Colors.white,
               child: Container(
-                margin: EdgeInsets.all(10.0),
+                margin: EdgeInsets.symmetric(horizontal:10),
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -43,124 +45,42 @@ LikedController();
                               margin: EdgeInsets.all(10.0),            
                             )
                           )
-                        ), Align(
+                        ), Expanded(child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Profile ${entries[index]}'
+                            '${entries[index%3]}'
                           )
-                        ), Expanded(
+                        )
+                        ), Container(
+                          width: 110,
                           child: Align(
                           alignment: Alignment.centerRight,
-                          child: Container(
-                            margin: EdgeInsets.all(10.0),
-                            child: Text(
-                            'For Charity ${entries[index]}'
-                            )
+                          child: GestureDetector(
+                            child: Container(
+                              width: 110,
+                              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                              margin: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey, width: 1),
+                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                              ),
+                              child: Text(
+                                "${buttons[index%3]}",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              onTap: () {Navigator.of(context).push(_createRoute());},
                           )
                           )
                         ),
                         ],
                       ),
-                    ), Container(
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.all(10),
-                      child: Text(
-                        'I want somebody to do xyzlkklsadfljsdfl jsadfsadf; dsfdfjsladfsljfdsa;dfsa'
-                      )
-                    ), Container(
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.all(10),
-                      child: Text(
-                        '£${(index+15)/4} raised of £${index+10} target',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold
-                        ),
-                      )
-                    ), Container(
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                      child: LinearPercentIndicator(
-                        
-                        lineHeight: 7,
-                        percent: ((index+15)/4)/(index+10),
-                        backgroundColor: HexColor('CCCCCC'),
-                        progressColor: HexColor("A3D165"),
-                      ),
-                      ), Container(
-                      height: 30,
-                      child: Row(children: <Widget>[
-                        Expanded(
-                          child: FlatButton(
-                            child: Row(
-                              children:[
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  padding: const EdgeInsets.all(0.0), child: Image.asset('assets/images/like.png'),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Text('$index',textAlign: TextAlign.left,)
-                                  )
-                                )
-                              ]
-                            ),
-                            onPressed: (){
-                              final snackBar = SnackBar(content: Text("Tap"));
-                              Scaffold.of(context).showSnackBar(snackBar);
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: FlatButton(
-                            child: Row(
-                              children:[
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  padding: const EdgeInsets.all(0.0), child: Image.asset('assets/images/comment.png'),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Text('$index',textAlign: TextAlign.left,)
-                                  )
-                                )
-                              ]
-                            ),
-                            onPressed: (){
-                              final snackBar = SnackBar(content: Text("Tap"));
-                              Scaffold.of(context).showSnackBar(snackBar);
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: FlatButton(
-                            child: Row(
-                              children:[
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  padding: const EdgeInsets.all(0.0), child: Image.asset('assets/images/share.png'),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Text('Share',textAlign: TextAlign.left,)
-                                  )
-                                )
-                              ]
-                            ),
-                            onPressed: (){
-                              final snackBar = SnackBar(content: Text("Tap"));
-                              Scaffold.of(context).showSnackBar(snackBar);
-                            },
-                          ),
-                        )
-                      ]
-                      ),
-                    )
+                    ),
                   ],
                 )
               )
@@ -176,14 +96,10 @@ LikedController();
  }
 }
 
-class HexColor extends Color {
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
-    }
-    return int.parse(hexColor, radix: 16);
-  }
-
-  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (c, a1, a2) => ViewPost(),
+    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
+    transitionDuration: Duration(milliseconds: 300),
+  );
 }

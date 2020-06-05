@@ -2,22 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'view_post_controller.dart';
 import 'share_post_controller.dart';
+import 'helper_classes.dart';
 
+class FeedView extends StatefulWidget {
 
-
-class FeedView extends StatelessWidget {
-  const FeedView(this.feedChoice, this.colorChoice);
+  @override
+  _FeedViewState createState() => _FeedViewState();
 
   final Color colorChoice;
   final String feedChoice;
+  const FeedView(this.feedChoice, this.colorChoice);
 
-  
+}
+
+class _FeedViewState extends State<FeedView> {
+
+  ScrollPhysics physics;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.feedChoice == 'user') {
+      physics = NeverScrollableScrollPhysics();
+      print('user');
+    } else {
+      physics = AlwaysScrollableScrollPhysics();
+      print('nonuser');
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     final List<String> entries = <String>['A', 'B', 'C'];
     return ListView.separated(
-      physics: NeverScrollableScrollPhysics(),
+      physics: physics,
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       itemCount: entries.length,
@@ -89,7 +109,7 @@ class FeedView extends StatelessWidget {
                     lineHeight: 7,
                     percent: ((index+15)/4)/(index+10),
                     backgroundColor: HexColor('CCCCCC'),
-                    progressColor: colorChoice,
+                    progressColor: widget.colorChoice,
                   ),
                   ), Container(
                   height: 30,
@@ -193,16 +213,4 @@ Route _openShare() {
     transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
     transitionDuration: Duration(milliseconds: 300),
   );
-}
-
-class HexColor extends Color {
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
-    }
-    return int.parse(hexColor, radix: 16);
-  }
-
-  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }

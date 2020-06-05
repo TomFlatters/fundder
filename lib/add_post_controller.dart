@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
 import 'share_post_controller.dart';
+import 'helper_classes.dart';
 
 class Page2 extends StatefulWidget {
   @override
@@ -177,17 +178,6 @@ class _Page2State extends State<Page2> {
   }
 }
 
-class HexColor extends Color {
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
-    }
-    return int.parse(hexColor, radix: 16);
-  }
-
-  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
-}
 
 Route _openShare() {
   return PageRouteBuilder(
