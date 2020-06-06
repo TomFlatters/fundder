@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'view_post_controller.dart';
-import 'share_post_controller.dart';
+import 'share_post_view.dart';
 import 'helper_classes.dart';
 
 class FeedView extends StatefulWidget {
@@ -177,7 +177,7 @@ class _FeedViewState extends State<FeedView> {
                             )
                           ]
                         ),
-                        onPressed: () {Navigator.of(context).push(_openShare());},
+                        onPressed: () {_showShare();},
                       ),
                     )
                   ]
@@ -197,19 +197,22 @@ class _FeedViewState extends State<FeedView> {
       },
     );
   }
+
+  void _showShare() {
+    showModalBottomSheet(
+      context: context, 
+      builder: (context) {
+        return SharePost();
+      }
+      );
+  }
+
+  
 }
 
 Route _createRoute() {
   return PageRouteBuilder(
     pageBuilder: (c, a1, a2) => ViewPost(),
-    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
-}
-
-Route _openShare() {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => SharePost(),
     transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
     transitionDuration: Duration(milliseconds: 300),
   );

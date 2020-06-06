@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
-import 'share_post_controller.dart';
 import 'helper_classes.dart';
+import 'view_post_controller.dart';
 
 class Page2 extends StatefulWidget {
   @override
@@ -168,7 +168,7 @@ class _Page2State extends State<Page2> {
                 ],)
             ),Container(
               height: 50,
-                child: FlatButton(child: Text('Submit', style: TextStyle(color: Colors.white),), onPressed: (){Navigator.of(context).pushReplacement(_openShare());}),
+                child: FlatButton(child: Text('Submit', style: TextStyle(color: Colors.white),), onPressed: (){Navigator.of(context).pushReplacement(_viewPost());}),
                 color: HexColor("EB8258"),
                 width: MediaQuery.of(context).size.width,
               ),
@@ -179,9 +179,9 @@ class _Page2State extends State<Page2> {
 }
 
 
-Route _openShare() {
+Route _viewPost() {
   return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => SharePost(),
+    pageBuilder: (c, a1, a2) => ViewPost(),
     transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
     transitionDuration: Duration(milliseconds: 300),
   );
