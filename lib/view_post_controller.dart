@@ -3,6 +3,7 @@ import 'helper_classes.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'share_post_view.dart';
 import 'donate_page_controller.dart';
+import 'comment_view_controller.dart';
 
 class ViewPost extends StatefulWidget {
   @override
@@ -127,10 +128,7 @@ class _ViewPostState extends State<ViewPost> {
                                 )
                               ]
                             ),
-                            onPressed: (){
-                              final snackBar = SnackBar(content: Text("Tap"));
-                              Scaffold.of(context).showSnackBar(snackBar);
-                            },
+                            onPressed: () {Navigator.of(context).push(_showComments());},
                           ),
                         ),
                         Expanded(
@@ -223,6 +221,14 @@ class _ViewPostState extends State<ViewPost> {
 Route _openDonate() {
   return PageRouteBuilder(
     pageBuilder: (c, a1, a2) => DonatePage(),
+    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
+    transitionDuration: Duration(milliseconds: 300),
+  );
+}
+
+Route _showComments() {
+  return PageRouteBuilder(
+    pageBuilder: (c, a1, a2) => CommentPage(),
     transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
     transitionDuration: Duration(milliseconds: 300),
   );

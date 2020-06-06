@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'helper_classes.dart';
 import 'view_post_controller.dart';
+import 'other_user_profile.dart';
 
 class LikedController extends StatelessWidget {
 
@@ -31,19 +32,24 @@ LikedController();
                       child: Row(
                         children: <Widget>[Align(
                           alignment: Alignment.centerLeft,
-                          child: AspectRatio(
-                            aspectRatio: 1/1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: new DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: new NetworkImage(
-                                      "https://i.imgur.com/BoN9kdC.png")
-                                )
-                              ),
-                              margin: EdgeInsets.all(10.0),            
-                            )
+                            child: GestureDetector(
+                              child: AspectRatio(
+                              aspectRatio: 1/1,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: new DecorationImage(
+                                    fit: BoxFit.fill,
+                                    image: new NetworkImage(
+                                        "https://i.imgur.com/BoN9kdC.png")
+                                  )
+                                ),
+                                margin: EdgeInsets.all(10.0),            
+                              )
+                            ),
+                          onTap: (){
+                            Navigator.of(context).push(_viewUser());
+                          },
                           )
                         ), Expanded(child: Align(
                           alignment: Alignment.centerLeft,
@@ -74,7 +80,11 @@ LikedController();
                                   ),
                                 ),
                               ),
-                              onTap: () {Navigator.of(context).push(_createRoute());},
+                              onTap: () {if (index%3 == 0) {
+                                Navigator.of(context).push(_viewUser());}
+                              else{
+                                Navigator.of(context).push(_viewPost());
+                              }},
                           )
                           )
                         ),
@@ -96,9 +106,17 @@ LikedController();
  }
 }
 
-Route _createRoute() {
+Route _viewPost() {
   return PageRouteBuilder(
     pageBuilder: (c, a1, a2) => ViewPost(),
+    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
+    transitionDuration: Duration(milliseconds: 300),
+  );
+}
+
+Route _viewUser() {
+  return PageRouteBuilder(
+    pageBuilder: (c, a1, a2) => ViewUser(),
     transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
     transitionDuration: Duration(milliseconds: 300),
   );
