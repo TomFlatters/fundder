@@ -13,7 +13,7 @@ class FeedView extends StatefulWidget {
 
   final Color colorChoice;
   final String feedChoice;
-  const FeedView(this.feedChoice, this.colorChoice);
+  FeedView(this.feedChoice, this.colorChoice);
 
 }
 
@@ -33,7 +33,17 @@ class _FeedViewState extends State<FeedView> {
     }
   }
 
-
+  @override
+  void didUpdateWidget(FeedView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.feedChoice == 'user') {
+      physics = NeverScrollableScrollPhysics();
+      print('user');
+    } else {
+      physics = AlwaysScrollableScrollPhysics();
+      print('nonuser');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +51,14 @@ class _FeedViewState extends State<FeedView> {
     return ListView.separated(
       physics: physics,
       shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.only(top: 10.0),
       itemCount: entries.length,
       itemBuilder: (BuildContext context, int index) {
         return GestureDetector(
           child: Container(
           color: Colors.white,
           child: Container(
-            margin: EdgeInsets.all(10.0),
+            margin: EdgeInsets.only(left: 10.0, right: 10, top:10),
             child: Column(
               children: <Widget>[
                 Container(
@@ -184,7 +194,17 @@ class _FeedViewState extends State<FeedView> {
                     )
                   ]
                   ),
-                )
+                ), Container(
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.all(10),
+                  child: Text(
+                    'x hours ago',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    )
+                    ),
+                  )
               ],
             )
           )

@@ -3,12 +3,39 @@ import 'package:fundder/services/auth.dart';
 import 'feed.dart';
 import 'edit_profile_controller.dart';
 import 'view_followers_controller.dart';
+import 'profile_actions_view.dart';
 
-class ProfileController extends StatelessWidget {
+class ProfileController extends StatefulWidget {
+  @override
+  _ProfileState createState() => _ProfileState();
+  ProfileController();
+}
 
-ProfileController();
+class _ProfileState extends State<ProfileController> with SingleTickerProviderStateMixin {
 
 final AuthService _auth = AuthService();
+
+TabController _tabController;
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
+    super.initState();
+  }
+
+  _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      setState(() {});
+    }
+  }
+
 
 @override
 Widget build(BuildContext context) {
@@ -18,10 +45,11 @@ Widget build(BuildContext context) {
         title: Text('Name'),
         actions: <Widget>[
           FlatButton(
-            onPressed: () async {
+            onPressed: () /*async {
               await _auth.signOut();
-            }, 
-            child: Text('Log Out'))
+            }*/ {_showOptions();}, 
+            child: Icon(Icons.view_headline)
+          )
         ],
       ),
       body: ListView(
@@ -83,7 +111,7 @@ Widget build(BuildContext context) {
                     child: Text("Followers"),
                   )),
                   ],),
-                  onTap: () {Navigator.of(context).push(_editProfile());},
+                  onTap: () {Navigator.of(context).push(_viewFollowers());},
                 )),
                 Expanded(
                   child: Column( children: <Widget>[
@@ -129,8 +157,13 @@ Widget build(BuildContext context) {
             initialIndex: 0,
             child: Column(
               children: [
-                TabBar(tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')]),
-                ConstrainedBox(
+                TabBar(
+                  tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')],
+                  controller: _tabController,
+                  ),
+                  [FeedView('user', Colors.black),
+                  FeedView('user', Colors.blue),][_tabController.index]
+                /*ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 1000),
                   child: TabBarView(
                       children: [
@@ -138,7 +171,7 @@ Widget build(BuildContext context) {
                         FeedView('user', Colors.black),
                         ],
                     )
-                )
+                )*/
               ],
             ), 
           )
@@ -146,6 +179,15 @@ Widget build(BuildContext context) {
       ),
     );
  }
+
+  void _showOptions() {
+  showModalBottomSheet(
+    context: context, 
+    builder: (context) {
+      return ProfileActions();
+    }
+    );
+  }
 }
 
 Route _editProfile() {
