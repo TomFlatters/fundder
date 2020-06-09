@@ -58,7 +58,7 @@ class _FeedViewState extends State<FeedView> {
           child: Container(
           color: Colors.white,
           child: Container(
-            margin: EdgeInsets.only(left: 10.0, right: 10, top:10),
+            margin: EdgeInsets.only(left: 0, right: 0, top:0),
             child: Column(
               children: <Widget>[
                 Container(
@@ -127,6 +127,12 @@ class _FeedViewState extends State<FeedView> {
                     progressColor: widget.colorChoice,
                   ),
                   ), Container(
+                      child: FittedBox(
+                        child: Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                        fit: BoxFit.fill,
+                      ),
+                      margin: EdgeInsets.symmetric(vertical: 10.0),
+                      ), Container(
                   height: 30,
                   child: Row(children: <Widget>[
                     Expanded(

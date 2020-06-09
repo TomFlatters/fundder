@@ -18,12 +18,14 @@ class SearchController extends StatefulWidget {
 class _SearchState extends State<SearchController> with SingleTickerProviderStateMixin {
 
   TabController _tabController;
+  final SearchBarController<Post> _searchBarController = SearchBarController();
   final List searchType = ["tags","users"];
   SearchBar<Post> searchBar;
 
   @override
   void dispose() {
     _tabController.dispose();
+
     super.dispose();
   }
 
@@ -36,6 +38,7 @@ class _SearchState extends State<SearchController> with SingleTickerProviderStat
 
   _handleTabSelection() {
       setState(() {});
+      _searchBarController.replayLastSearch();
       print("called");
   }
 
@@ -53,27 +56,32 @@ class _SearchState extends State<SearchController> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: SearchBar<Post>(
-            header: DefaultTabController(
-              length: 2,
-              initialIndex: 0,
-              child: TabBar(
-                tabs: [Tab(text: 'Tags'), Tab(text: 'Users')],
-                controller: _tabController,
-                ),
-              ), 
-            hintText: 'search accounts',
-            onSearch: search,
-            minimumChars: 0,
-            onItemFound: (Post post, int index) {
-              return ListTile(
-                title: Text(post.title),
-                subtitle: Text(post.description),
-              );
-            },
-          ),
+        child: SearchBar<Post>(
+          searchBarPadding: EdgeInsets.symmetric(horizontal: 10),
+          searchBarController: _searchBarController,
+          header: DefaultTabController(
+            length: 2,
+            initialIndex: 0,
+            child: TabBar(
+              tabs: [Tab(text: 'Tags'), Tab(text: 'Users')],
+              controller: _tabController,
+              ),
+            ), 
+          hintText: 'search accounts',
+          onSearch: search,
+          minimumChars: 0,
+          onItemFound: (Post post, int index) {
+            return ListTile(
+              leading: CircleAvatar(
+                radius: 20.0,
+                backgroundImage:
+                    NetworkImage("https://i.imgur.com/BoN9kdC.png"),
+                backgroundColor: Colors.transparent,
+              ),
+              title: Text(post.title),
+              subtitle: Text(post.description),
+            );
+          },
         ),
       ),
     );
