@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
 import 'helper_classes.dart';
 import 'view_post_controller.dart';
+import 'home_widget.dart' as main;
 
 class Page2 extends StatefulWidget {
   @override
@@ -168,7 +169,9 @@ class _Page2State extends State<Page2> {
                 ],)
             ),Container(
               height: 50,
-                child: FlatButton(child: Text('Submit', style: TextStyle(color: Colors.white),), onPressed: (){Navigator.of(context).pushReplacement(_viewPost());}),
+                child: FlatButton(child: Text('Submit', style: TextStyle(color: Colors.white),), 
+                onPressed: (){
+                  Navigator.of(context).pushReplacement(_viewPost());}),
                 color: HexColor("EB8258"),
                 width: MediaQuery.of(context).size.width,
               ),
