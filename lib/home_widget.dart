@@ -6,6 +6,7 @@ import 'search_controller.dart';
 import 'liked_controller.dart';
 import 'profile_controller.dart';
 import 'add_post_controller.dart';
+import 'helper_classes.dart';
 
 class Home extends StatefulWidget {
  @override
@@ -25,7 +26,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _children[_currentIndex], // new
+      body: _children[_currentIndex], // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: HexColor("A3D165"), //hexcolor method is custom at bottom
@@ -48,7 +49,7 @@ class _HomeState extends State<Home> {
             title: Text('Profile'),
           ),
           new BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
+            icon: Icon(Icons.notifications_none),
             title: Text('Profile'),
           ),
           new BottomNavigationBarItem(
@@ -77,16 +78,3 @@ Route _createRoute() {
     transitionDuration: Duration(milliseconds: 300),
   );
 }
-
-class HexColor extends Color {
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
-    }
-    return int.parse(hexColor, radix: 16);
-  }
-
-  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
-}
-
