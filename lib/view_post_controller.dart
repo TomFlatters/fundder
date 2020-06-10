@@ -154,6 +154,16 @@ class _ViewPostState extends State<ViewPost> {
                       ]
                       ),
                     ), Container(
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  child: Text(
+                    'x hours ago',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    )
+                    ),
+                  ), Container(
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       child: Text(
