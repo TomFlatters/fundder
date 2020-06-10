@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:fundder/services/auth.dart';
 import 'feed.dart';
 import 'edit_profile_controller.dart';
 import 'view_followers_controller.dart';
-import 'profile_actions_view.dart';
 
-class ProfileController extends StatefulWidget {
+class ViewUser extends StatefulWidget {
   @override
-  _ProfileState createState() => _ProfileState();
-  ProfileController();
+ _ViewUserState createState() => _ViewUserState();
+  ViewUser();
 }
 
-class _ProfileState extends State<ProfileController> with SingleTickerProviderStateMixin {
+class _ViewUserState extends State<ViewUser> with SingleTickerProviderStateMixin {
 
-final AuthService _auth = AuthService();
 
 TabController _tabController;
 
@@ -44,13 +41,12 @@ Widget build(BuildContext context) {
         centerTitle: true,
         title: Text('Name'),
         actions: <Widget>[
-          FlatButton(
-            onPressed: () /*async {
-              await _auth.signOut();
-            }*/ {_showOptions();}, 
-            child: Icon(Icons.view_headline)
-          )
+          new IconButton(
+            icon: new Icon(Icons.close), 
+            onPressed: () => Navigator.of(context).pop(null),
+            )
         ],
+        leading: new Container(),
       ),
       body: ListView(
         shrinkWrap: true,
@@ -141,7 +137,7 @@ Widget build(BuildContext context) {
                 borderRadius: BorderRadius.all(Radius.circular(5)),
               ),
               child: Text(
-                "Edit Profile",
+                "Follow",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -150,7 +146,7 @@ Widget build(BuildContext context) {
                   ),
                 ),
               ),
-            onTap: (){ Navigator.of(context).push(_editProfile());
+            onTap: (){
             }
           ), DefaultTabController(
             length: 2,
@@ -179,15 +175,6 @@ Widget build(BuildContext context) {
       ),
     );
  }
-
-  void _showOptions() {
-  showModalBottomSheet(
-    context: context, 
-    builder: (context) {
-      return ProfileActions();
-    }
-    );
-  }
 }
 
 Route _editProfile() {

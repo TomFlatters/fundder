@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/main.dart';
+import 'helper_classes.dart';
 
-class SharePostScreen extends StatefulWidget {
+class EditProfile extends StatefulWidget {
   @override
-  _SharePostState createState() => _SharePostState();
+  _EditProfileState createState() => _EditProfileState();
 }
 
-class _SharePostState extends State<SharePostScreen> {
+class _EditProfileState extends State<EditProfile> {
 
   final List<String> whoDoes = <String>["A specific person",'Myself','Anyone'];
   final List<String> charities = <String>["Cancer Research",'British Heart Foundation','Oxfam'];
@@ -17,7 +19,7 @@ class _SharePostState extends State<SharePostScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Share Post"),
+        title: Text("Edit Profile"),
         actions: <Widget>[
           new IconButton(
             icon: new Icon(Icons.close), 
@@ -36,7 +38,7 @@ class _SharePostState extends State<SharePostScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: <Widget>[
-                  Text('This is where we share posts. Appears after post submission or on press of share button',style: TextStyle(
+                  Text('This is where the user can edit their profile.',style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 17,
                         ),),
