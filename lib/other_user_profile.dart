@@ -3,9 +3,36 @@ import 'feed.dart';
 import 'edit_profile_controller.dart';
 import 'view_followers_controller.dart';
 
-class ViewUser extends StatelessWidget {
+class ViewUser extends StatefulWidget {
+  @override
+ _ViewUserState createState() => _ViewUserState();
+  ViewUser();
+}
 
-ViewUser();
+class _ViewUserState extends State<ViewUser> with SingleTickerProviderStateMixin {
+
+
+TabController _tabController;
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
+    super.initState();
+  }
+
+  _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      setState(() {});
+    }
+  }
+
 
 @override
 Widget build(BuildContext context) {
@@ -80,7 +107,7 @@ Widget build(BuildContext context) {
                     child: Text("Followers"),
                   )),
                   ],),
-                  onTap: () {Navigator.of(context).push(_editProfile());},
+                  onTap: () {Navigator.of(context).push(_viewFollowers());},
                 )),
                 Expanded(
                   child: Column( children: <Widget>[
@@ -101,7 +128,7 @@ Widget build(BuildContext context) {
                 ),
               ],
             )
-          ), GestureDetector(
+          ),  GestureDetector(
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
               margin: EdgeInsets.only(left: 70, right:70, bottom: 20),
@@ -119,15 +146,20 @@ Widget build(BuildContext context) {
                   ),
                 ),
               ),
-            onTap: (){ Navigator.of(context).push(_editProfile());
+            onTap: (){
             }
-          ),DefaultTabController(
+          ), DefaultTabController(
             length: 2,
             initialIndex: 0,
             child: Column(
               children: [
-                TabBar(tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')]),
-                ConstrainedBox(
+                TabBar(
+                  tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')],
+                  controller: _tabController,
+                  ),
+                  [FeedView('user', Colors.black),
+                  FeedView('user', Colors.blue),][_tabController.index]
+                /*ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 1000),
                   child: TabBarView(
                       children: [
@@ -135,7 +167,7 @@ Widget build(BuildContext context) {
                         FeedView('user', Colors.black),
                         ],
                     )
-                )
+                )*/
               ],
             ), 
           )
