@@ -5,7 +5,7 @@ import 'other_user_profile.dart';
 
 class LikedController extends StatelessWidget {
 
-   final List<String> entries = <String>['username_long started following you', 'username liked your post', 'username donated to your fundraiser'];
+   final List<String> entries = <String>['started following you', 'liked your post', 'donated to your fundraiser'];
    final List<String> buttons = <String>['Follow back', 'View', 'View'];
 
 LikedController();
@@ -28,7 +28,7 @@ LikedController();
                 child: Column(
                   children: <Widget>[
                     Container(
-                      height: 60,
+                      height: 64,
                       child: Row(
                         children: <Widget>[Align(
                           alignment: Alignment.centerLeft,
@@ -53,8 +53,18 @@ LikedController();
                           )
                         ), Expanded(child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            '${entries[index%3]}'
+                          child: RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                color: Colors.black,
+                                fontFamily: 'Muli',
+                              ),
+                              children: [
+                                TextSpan(text: 'username ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: '${entries[index%3]}'),
+                              ]
+                            )
                           )
                         )
                         ), Container(
@@ -98,7 +108,7 @@ LikedController();
           },
           separatorBuilder: (BuildContext context, int index){
             return SizedBox(
-              height: 10,
+              height: 2,
             );
           },
         ),
