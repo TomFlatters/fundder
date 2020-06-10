@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/services/database.dart';
 
 class AuthService {
 
@@ -47,6 +48,9 @@ class AuthService {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = result.user;
+      // create a new (firestore) document for the user with corresponding uid
+      await DatabaseService(uid: user.uid).updateUserData(email, null, null);
+      // ADD: user sets username
       return _userFromFirebaseUser(user);
     } catch(e) {
       print(e.toString());
