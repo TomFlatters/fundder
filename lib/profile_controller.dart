@@ -162,7 +162,7 @@ Widget build(BuildContext context) {
                   controller: _tabController,
                   ),
                   [FeedView('user', Colors.black),
-                  FeedView('user', Colors.blue),][_tabController.index]
+                  FeedView('nonuser', Colors.blue),][_tabController.index]
                 /*ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 1000),
                   child: TabBarView(

@@ -32,7 +32,7 @@ class _HomeState extends State<Home> {
       ),// new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: HexColor("A3D165"), //hexcolor method is custom at bottom
+        selectedItemColor: Colors.black, //hexcolor method is custom at bottom
         iconSize: 30,
         showSelectedLabels: false,
         showUnselectedLabels: false,

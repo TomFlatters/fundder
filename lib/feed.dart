@@ -118,18 +118,19 @@ class _FeedViewState extends State<FeedView> {
                   )
                 ), Container(
                   alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  margin: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                   child: LinearPercentIndicator(
-                    
-                    lineHeight: 7,
+                    linearStrokeCap: LinearStrokeCap.butt,
+                    lineHeight: 5,
                     percent: ((index+15)/4)/(index+10),
                     backgroundColor: HexColor('CCCCCC'),
                     progressColor: widget.colorChoice,
                   ),
                   ), Container(
-                      child: FittedBox(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.width*9/16,
                         child: Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
-                        fit: BoxFit.fill,
                       ),
                       margin: EdgeInsets.symmetric(vertical: 10.0),
                       ), Container(

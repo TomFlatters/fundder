@@ -31,8 +31,10 @@ class MyApp extends StatelessWidget {
             )
           ),
           tabBarTheme: TabBarTheme(
+            //labelStyle: TextStyle(fontWeight: FontWeight.bold),
+            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
             indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(width: 2.0, color: HexColor("A3D165")) 
+              borderSide: BorderSide(width: 2.0, color: Colors.grey) 
               )
           ),
           fontFamily: 'Muli',
