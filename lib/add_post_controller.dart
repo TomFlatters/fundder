@@ -23,12 +23,15 @@ class _Page2State extends State<Page2> {
         centerTitle: true,
         title: Text("Create"),
         actions: <Widget>[
-          new IconButton(
-            icon: new Icon(Icons.close), 
-            onPressed: () => Navigator.of(context).pop(null),
+          new FlatButton(
+            child: Text('Submit', style: TextStyle(fontWeight: FontWeight.bold),),
+            onPressed: () {Navigator.of(context).pushReplacement(_viewPost());},
             )
         ],
-        leading: new Container(),
+        leading: new IconButton(
+          icon: new Icon(Icons.close), 
+          onPressed: () => Navigator.of(context).pop(null),
+        ),
       ),
       body:
         ListView(
@@ -61,13 +64,29 @@ class _Page2State extends State<Page2> {
                           fontWeight: FontWeight.bold,
                           fontSize: 17,
                         ),),
-                  ListView.separated(
+                  ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    padding: const EdgeInsets.symmetric(vertical: 5.0),
                     shrinkWrap: true,
                     itemCount: whoDoes.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
+                      return ListTile(
+                        dense: true,
+                        leading: Builder(
+                                builder: (context) {if(selected==index){
+                                return Icon(Icons.check_circle);
+                              }else{
+                                return Icon(Icons.check_circle_outline);
+                              }}),
+                        title: Text(
+                              '${whoDoes[index]}'),
+                        onTap: (){
+                          selected=index;
+                          setState(() {
+                            
+                          });
+                        } ,
+                      );/*GestureDetector(
                         onTap: (){
                           selected=index;
                           setState(() {
@@ -91,13 +110,13 @@ class _Page2State extends State<Page2> {
                             )
                           ],
                           )
-                      );
+                      );*/
                     },
-                    separatorBuilder: (BuildContext context, int index){
+                    /*separatorBuilder: (BuildContext context, int index){
                       return SizedBox(
-                        height: 10,
+                        height: 0,
                       );
-                    },
+                    },*/
                   )
                 ],)
             ), Container(
@@ -128,53 +147,45 @@ class _Page2State extends State<Page2> {
                           fontWeight: FontWeight.bold,
                           fontSize: 17,
                         ),),
-                  ListView.separated(
+                  ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
                     shrinkWrap: true,
                     itemCount: charities.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
+                      return ListTile(
+                        dense: true,
+                        leading: Builder(
+                                builder: (context) {if(charity==index){
+                                return Icon(Icons.check_circle);
+                              }else{
+                                return Icon(Icons.check_circle_outline);
+                              }}),
+                        title: Text(
+                              '${whoDoes[index]}'),
                         onTap: (){
                           charity=index;
                           setState(() {
                             
                           });
-                          },
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              height: 15,
-                              margin: EdgeInsets.symmetric(horizontal:10),
-                              child: Builder(
-                                builder: (context) {if(charity==index){
-                                return Image.asset('assets/images/bullet_full.png');
-                              }else{
-                                return Image.asset('assets/images/bullet_outline.png');
-                              }
-                                }),
-                            ), Text(
-                              '${charities[index]}'
-                            )
-                          ],
-                          )
+                        } ,
                       );
-                    },
-                    separatorBuilder: (BuildContext context, int index){
+                    }
+                    /*separatorBuilder: (BuildContext context, int index){
                       return SizedBox(
                         height: 10,
                       );
-                    },
+                    },*/
                   )
                 ],)
-            ),Container(
+            ),/*Container(
               height: 50,
                 child: FlatButton(child: Text('Submit', style: TextStyle(color: Colors.white),), 
                 onPressed: (){
                   Navigator.of(context).pushReplacement(_viewPost());}),
                 color: HexColor("EB8258"),
                 width: MediaQuery.of(context).size.width,
-              ),
+              ),*/
           ], 
           ),
     );
