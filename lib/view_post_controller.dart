@@ -79,12 +79,13 @@ class _ViewPostState extends State<ViewPost> {
                         ],
                       ),
                     ), Container(
-                      child: FittedBox(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.width*9/16,
                         child: Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
-                        fit: BoxFit.fill,
                       ),
                       margin: EdgeInsets.symmetric(vertical: 10.0),
-                    ), Container(
+                      ), Container(
                       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                       height: 30,
                       child: Row(children: <Widget>[
@@ -173,16 +174,16 @@ class _ViewPostState extends State<ViewPost> {
                         ),
                       )
                     ), Container(
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      child: LinearPercentIndicator(
-                        
-                        lineHeight: 7,
-                        percent: 5/15,
-                        backgroundColor: HexColor('CCCCCC'),
-                        progressColor: HexColor("A3D165"),
-                      ),
-                    ), Container(
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: LinearPercentIndicator(
+                    linearStrokeCap: LinearStrokeCap.butt,
+                    lineHeight: 5,
+                    percent: 0.5,
+                    backgroundColor: HexColor('CCCCCC'),
+                    progressColor: HexColor('A3D165'),
+                  ),
+                  ), Container(
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       child: Text(
