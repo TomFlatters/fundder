@@ -108,7 +108,7 @@ LikedController();
           },
           separatorBuilder: (BuildContext context, int index){
             return SizedBox(
-              height: 2,
+              height: 0,
             );
           },
         ),

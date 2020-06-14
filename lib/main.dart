@@ -21,23 +21,25 @@ class MyApp extends StatelessWidget {
         title: 'My Flutter App',
         home: Wrapper(),
         theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           primaryColor: Colors.white,
           primaryTextTheme: TextTheme(
             headline6: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20
+              //fontWeight: FontWeight.w600,
+              fontSize: 20,
+              fontFamily: 'Roboto Mono'
             )
           ),
           tabBarTheme: TabBarTheme(
-            //labelStyle: TextStyle(fontWeight: FontWeight.bold),
-            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+            labelStyle: TextStyle(fontFamily: 'Quicksand', fontWeight: FontWeight.bold),
+            unselectedLabelStyle: TextStyle(fontFamily: 'Quicksand'),
             indicator: UnderlineTabIndicator(
               borderSide: BorderSide(width: 2.0, color: Colors.grey) 
               )
           ),
-          fontFamily: 'Muli',
+          fontFamily: 'Quicksand',
           appBarTheme: AppBarTheme(
             elevation: 0
           )

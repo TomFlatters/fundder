@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fundder/main.dart';
-import 'helper_classes.dart';
 import 'view_post_controller.dart';
-import 'home_widget.dart' as main;
+import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class Page2 extends StatefulWidget {
   @override
@@ -10,22 +11,30 @@ class Page2 extends StatefulWidget {
 }
 
 class _Page2State extends State<Page2> {
-
-  final List<String> whoDoes = <String>["A specific person",'Myself','Anyone'];
-  final List<String> charities = <String>["Cancer Research",'British Heart Foundation','Oxfam'];
-  int selected = -1;
-  int charity = -1;
-
+  int _current = 0;
+  CarouselController _carouselController = CarouselController();
+  final List<Widget> screens = [
+   DefineDescription(),
+   ChoosePerson(),
+   SetMoney(),
+   ChooseCharity(),
+   ImageUpload()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Create"),
+        title: Text("Create Fundder"),
         actions: <Widget>[
           new FlatButton(
-            child: Text('Submit', style: TextStyle(fontWeight: FontWeight.bold),),
-            onPressed: () {Navigator.of(context).pushReplacement(_viewPost());},
+            child: _current == 4
+                    ? Text('Submit', style: TextStyle(fontWeight: FontWeight.bold))
+                    : Text('Next', style: TextStyle(fontWeight: FontWeight.bold)),
+            onPressed: _current == 4 
+            ? () {Navigator.of(context).pushReplacement(_viewPost());}
+            : () {/*Navigator.of(context).pushReplacement(_viewPost());*/
+            _carouselController.nextPage(
+            duration: Duration(milliseconds: 300), curve: Curves.linear);},
             )
         ],
         leading: new IconButton(
@@ -33,36 +42,113 @@ class _Page2State extends State<Page2> {
           onPressed: () => Navigator.of(context).pop(null),
         ),
       ),
-      body:
-        ListView(
-          children: <Widget>[
-            Container(
+      body: Builder(
+        builder: (context) {
+          final double height = MediaQuery.of(context).size.height;
+          return CarouselSlider(
+            carouselController: _carouselController,
+            options: CarouselOptions(
+              onPageChanged: (index, reason) {
+                setState(() {
+                  _current = index;
+                });
+              },
+              enableInfiniteScroll: false,
+              height: height,
+              viewportFraction: 1.0,
+              enlargeCenterPage: false,
+              // autoPlay: false,
+            ),
+            items: screens,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class DefineDescription extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        Container(
+          color: Colors.white,
+          margin: EdgeInsets.symmetric(vertical: 5),
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, 
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.symmetric(vertical:10),
+                child: Text('Title of Challenge',style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),),
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Write a title'
+                )
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical:10),
+                child: Text('Subtitle',style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: InputDecoration(
+                  hintText: 'This will appear under the title in the feed'
+                )
+              ),
+             Container(
+                margin: EdgeInsets.symmetric(vertical:10),
+                child: Text('Description',style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: InputDecoration(
+                  hintText: 'A long description for detailed view'
+                )
+              )
+            ])
+        )]
+        
+      );
+  }
+}
+
+class ChoosePerson extends StatefulWidget {
+  @override
+  _ChoosePersonState createState() => _ChoosePersonState();
+}
+
+class _ChoosePersonState extends State<ChoosePerson> {
+  int selected = -1;
+  final List<String> whoDoes = <String>["A specific person",'Myself','Anyone'];
+  final List<String> subWho = <String>["Does not have to be a Fundder user",'Raise money for your own challenge','Will be public and anyone will be able to accept the challenge'];
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        Container(
               color: Colors.white,
               margin: EdgeInsets.symmetric(vertical: 5),
               padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: <Widget>[
-                  Text('What is the challenge:',style: TextStyle(
+                  Text('Who do you want to do it',style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 17,
-                        ),),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Write a title'
-                    )
-                  )
-                ])
-            ), Container(
-              color: Colors.white,
-              margin: EdgeInsets.symmetric(vertical: 5),
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start, 
-                children: <Widget>[
-                  Text('Who do I want to do it',style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17,
+                          fontSize: 18,
                         ),),
                   ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
@@ -80,46 +166,30 @@ class _Page2State extends State<Page2> {
                               }}),
                         title: Text(
                               '${whoDoes[index]}'),
+                        subtitle: Text('${subWho[index]}'),
                         onTap: (){
                           selected=index;
                           setState(() {
                             
                           });
                         } ,
-                      );/*GestureDetector(
-                        onTap: (){
-                          selected=index;
-                          setState(() {
-                            
-                          });
-                          },
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              height: 15,
-                              margin: EdgeInsets.symmetric(horizontal:10),
-                              child: Builder(
-                                builder: (context) {if(selected==index){
-                                return Image.asset('assets/images/bullet_full.png');
-                              }else{
-                                return Image.asset('assets/images/bullet_outline.png');
-                              }
-                                }),
-                            ), Text(
-                              '${whoDoes[index]}'
-                            )
-                          ],
-                          )
-                      );*/
-                    },
-                    /*separatorBuilder: (BuildContext context, int index){
-                      return SizedBox(
-                        height: 0,
                       );
-                    },*/
+                    },
                   )
                 ],)
-            ), Container(
+            ),]
+        
+      );
+  }
+}
+
+class SetMoney extends StatelessWidget {
+  final moneyController = MoneyMaskedTextController(decimalSeparator: '.', thousandSeparator: ',');
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        Container(
               color: Colors.white,
               margin: EdgeInsets.symmetric(vertical: 5),
               padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
@@ -128,22 +198,54 @@ class _Page2State extends State<Page2> {
                 children: <Widget>[
                   Text('What is the target amount:',style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 17,
+                          fontSize: 18,
                         ),),
-                  TextField(
+                  Row(
+                    children: [Text('£',
+                    style: TextStyle(
+                          fontWeight: FontWeight.w100,
+                          fontFamily: 'Roboto Mono',
+                          fontSize:45,
+                        ),
+                        ), Expanded( child: TextField(
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w100,
+                          fontFamily: 'Roboto Mono',
+                          fontSize:45,
+                        ),
+                    controller: moneyController,
                     decoration: InputDecoration(
                       hintText: 'Amount in £'
-                    )
+                    ))),]
                   )
                 ])
-            ), Container(
+            ),]
+        
+      );
+  }
+}
+
+class ChooseCharity extends StatefulWidget {
+  @override
+  _ChooseCharityState createState() => _ChooseCharityState();
+}
+
+class _ChooseCharityState extends State<ChooseCharity> {
+  final List<String> charities = <String>["Cancer Research",'British Heart Foundation','Oxfam'];
+  int charity = -1;
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        Container(
               color: Colors.white,
               margin: EdgeInsets.symmetric(vertical: 5),
               padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: <Widget>[
-                  Text('Who do I want to do it',style: TextStyle(
+                  Text('Which charity are you raising for?',style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 17,
                         ),),
@@ -162,7 +264,7 @@ class _Page2State extends State<Page2> {
                                 return Icon(Icons.check_circle_outline);
                               }}),
                         title: Text(
-                              '${whoDoes[index]}'),
+                              '${charities[index]}'),
                         onTap: (){
                           charity=index;
                           setState(() {
@@ -171,25 +273,77 @@ class _Page2State extends State<Page2> {
                         } ,
                       );
                     }
-                    /*separatorBuilder: (BuildContext context, int index){
-                      return SizedBox(
-                        height: 10,
-                      );
-                    },*/
                   )
                 ],)
-            ),/*Container(
-              height: 50,
-                child: FlatButton(child: Text('Submit', style: TextStyle(color: Colors.white),), 
-                onPressed: (){
-                  Navigator.of(context).pushReplacement(_viewPost());}),
-                color: HexColor("EB8258"),
-                width: MediaQuery.of(context).size.width,
-              ),*/
-          ], 
+            ),]
+        
+      );
+  }
+}
+
+class ImageUpload extends StatefulWidget {
+  @override
+  _ImageUploadState createState() => _ImageUploadState();
+}
+
+class _ImageUploadState extends State<ImageUpload> {
+
+  PickedFile imageFile;
+  final picker = ImagePicker();
+
+  _openGallery() async {
+    imageFile = await picker.getImage(source: ImageSource.gallery);
+    this.setState(() { });
+  }
+
+  _openCamera() async {
+    imageFile = await picker.getImage(source: ImageSource.camera);
+    this.setState(() { });
+  }
+
+  Future<void> _showChoiceDialog(BuildContext context) {
+    return showDialog(context: context, builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Make a choice'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              GestureDetector(
+                child: Text("Gallery"),
+                onTap: (){
+                  _openGallery();
+                },
+                ),
+              Padding(padding: EdgeInsets.all(8)),
+              GestureDetector(
+                child: Text("Camera"),
+                onTap: (){
+                  _openCamera();
+                },
+                ),
+            ]
           ),
+          ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        Center(child: Text('No image selected')),
+        Center(child: FlatButton(
+          child: Text('Select Image'),
+          onPressed: (){
+            _showChoiceDialog(context);
+          },
+        ))
+      ]
     );
   }
+
+
 }
 
 

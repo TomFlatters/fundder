@@ -86,7 +86,10 @@ class _FeedViewState extends State<FeedView> {
                     ), Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Profile ${entries[index]}'
+                        'Profile ${entries[index]}',
+                        /*style: TextStyle(
+                          fontFamily: 'Roboto Mono'
+                        ),*/
                       )
                     ), Expanded(
                       child: Align(
