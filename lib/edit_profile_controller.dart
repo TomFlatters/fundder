@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
 import 'helper_classes.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class EditProfile extends StatefulWidget {
   @override
@@ -46,15 +47,26 @@ Widget build(BuildContext context) {
                 )
               ),
             ),
-          ), Center(
-            child: GestureDetector(
-              child: Text("Change profile photo",
-              style: TextStyle(
-                color: Colors.blue,
-              ),),
-              onTap: (){_changePic();},
-            ),
-          ),
+          ), GestureDetector(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+              margin: EdgeInsets.only(left: 70, right:70, bottom: 20, top:20),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey, width: 1),
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              child: Text(
+                "Change profile picture",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              onTap: () {_changePic();},
+        ),
           ListView.separated(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -125,25 +137,25 @@ class ChangePic extends StatelessWidget{
     return ListView(
       children: <Widget>[
         ListTile(
-          leading: null,
+          leading: Icon(FontAwesome.trash_o),
           title: Text('Remove Current Photo'),
           onTap: () async {
             },
         ),
         ListTile(
-          leading: null,
+          leading: Icon(FontAwesome5Brands.facebook_square),
           title: Text('Import from Facebook'),
           onTap: () {
             },
         ),
                 ListTile(
-          leading: null,
+          leading: Icon(FontAwesome.camera),
           title: Text('Take Photo'),
           onTap: () {
             },
         ),
                 ListTile(
-          leading: null,
+          leading: Icon(FontAwesome.image),
           title: Text('Choose From Library'),
           onTap: () {
             },

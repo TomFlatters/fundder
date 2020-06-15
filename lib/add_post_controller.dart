@@ -4,6 +4,7 @@ import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class Page2 extends StatefulWidget {
   @override
@@ -390,27 +391,27 @@ ListView _buildBottomNavigationMenu(context) {
 return ListView(
   children: <Widget>[
     ListTile(
-      leading: null,
+      leading: Icon(FontAwesome.trash_o),
       title: Text('Remove Current Photo'),
       onTap: () async {
         _removePhoto();
         },
     ),
     ListTile(
-      leading: null,
+      leading: Icon(FontAwesome5Brands.facebook_square),
       title: Text('Import from Facebook'),
       onTap: () {
         },
     ),
             ListTile(
-      leading: null,
+      leading: Icon(FontAwesome.camera),
       title: Text('Take Photo'),
       onTap: () {
         _openCamera();
         },
     ),
             ListTile(
-      leading: null,
+      leading: Icon(FontAwesome.image),
       title: Text('Choose From Library'),
       onTap: () {
         _openGallery();
