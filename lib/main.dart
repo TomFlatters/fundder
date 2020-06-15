@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
               borderSide: BorderSide(width: 2.0, color: Colors.grey) 
               )
           ),
-          fontFamily: 'Quicksand',
+          fontFamily: 'Muli',
           appBarTheme: AppBarTheme(
             elevation: 0
           )

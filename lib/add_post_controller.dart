@@ -82,6 +82,7 @@ class DefineDescription extends StatelessWidget {
               Container(
                 margin: EdgeInsets.symmetric(vertical:10),
                 child: Text('Title of Challenge',style: TextStyle(
+                      fontFamily: 'Quicksand',
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),),
@@ -94,6 +95,7 @@ class DefineDescription extends StatelessWidget {
               Container(
                 margin: EdgeInsets.symmetric(vertical:10),
                 child: Text('Subtitle',style: TextStyle(
+                      fontFamily: 'Quicksand',
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),),
@@ -108,6 +110,7 @@ class DefineDescription extends StatelessWidget {
              Container(
                 margin: EdgeInsets.symmetric(vertical:10),
                 child: Text('Description',style: TextStyle(
+                      fontFamily: 'Quicksand',
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),),
@@ -147,6 +150,7 @@ class _ChoosePersonState extends State<ChoosePerson> {
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: <Widget>[
                   Text('Who do you want to do it',style: TextStyle(
+                          fontFamily: 'Quicksand',
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),),
@@ -197,6 +201,7 @@ class SetMoney extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: <Widget>[
                   Text('What is the target amount:',style: TextStyle(
+                          fontFamily: 'Quicksand',
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),),
@@ -246,8 +251,9 @@ class _ChooseCharityState extends State<ChooseCharity> {
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: <Widget>[
                   Text('Which charity are you raising for?',style: TextStyle(
+                          fontFamily: 'Quicksand',
                           fontWeight: FontWeight.bold,
-                          fontSize: 17,
+                          fontSize: 18,
                         ),),
                   ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
@@ -301,51 +307,120 @@ class _ImageUploadState extends State<ImageUpload> {
     this.setState(() { });
   }
 
-  Future<void> _showChoiceDialog(BuildContext context) {
-    return showDialog(context: context, builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Make a choice'),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              GestureDetector(
-                child: Text("Gallery"),
-                onTap: (){
-                  _openGallery();
-                },
-                ),
-              Padding(padding: EdgeInsets.all(8)),
-              GestureDetector(
-                child: Text("Camera"),
-                onTap: (){
-                  _openCamera();
-                },
-                ),
-            ]
-          ),
-          ),
-      );
-    });
+  _removePhoto() {
+    imageFile = null;
+    this.setState(() { });
+  }
+
+  Widget _decideImageView() {
+    if (imageFile == null) {
+      return Center( child: Text('No image selected'));
+    } else {
+      return Image.file(File(imageFile.path));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
-        Center(child: Text('No image selected')),
-        Center(child: FlatButton(
-          child: Text('Select Image'),
-          onPressed: (){
-            _showChoiceDialog(context);
-          },
-        ))
+        Container(
+          color: Colors.white,
+          margin: EdgeInsets.symmetric(vertical: 5),
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          child: Text('Add a photo to make your Fundder more recognisable',style: TextStyle(
+                          fontFamily: 'Quicksand',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),),
+        ),
+        Container (
+          child: _decideImageView(),
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.width*9/16,
+        ),
+        GestureDetector(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+              margin: EdgeInsets.only(left: 70, right:70, bottom: 20, top:20),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey, width: 1),
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              child: Text(
+                "Select Image",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              onTap: () {_changePic();},
+        ),
       ]
     );
   }
 
 
+void _changePic() {
+  showModalBottomSheet(
+    context: context, 
+    builder: (context) {
+      return Container(
+      color: Color(0xFF737373),
+      height: 350,
+      child: Container(
+        child: _buildBottomNavigationMenu(context),
+        decoration: BoxDecoration(
+          color: Theme.of(context).canvasColor,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(10),
+            topRight: const Radius.circular(10),
+            ),
+        ),
+      ),
+    );
+    }
+  );
 }
 
+ListView _buildBottomNavigationMenu(context) {
+return ListView(
+  children: <Widget>[
+    ListTile(
+      leading: null,
+      title: Text('Remove Current Photo'),
+      onTap: () async {
+        _removePhoto();
+        },
+    ),
+    ListTile(
+      leading: null,
+      title: Text('Import from Facebook'),
+      onTap: () {
+        },
+    ),
+            ListTile(
+      leading: null,
+      title: Text('Take Photo'),
+      onTap: () {
+        _openCamera();
+        },
+    ),
+            ListTile(
+      leading: null,
+      title: Text('Choose From Library'),
+      onTap: () {
+        _openGallery();
+        },
+    ),
+  ],
+  );
+  }
+
+}
 
 Route _viewPost() {
   return PageRouteBuilder(
