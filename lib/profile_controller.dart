@@ -4,6 +4,7 @@ import 'feed.dart';
 import 'edit_profile_controller.dart';
 import 'view_followers_controller.dart';
 import 'profile_actions_view.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -48,7 +49,7 @@ Widget build(BuildContext context) {
             onPressed: () /*async {
               await _auth.signOut();
             }*/ {_showOptions();}, 
-            child: Icon(Icons.view_headline)
+            child: Icon(AntDesign.ellipsis1),
           )
         ],
       ),

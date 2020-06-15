@@ -7,6 +7,8 @@ import 'liked_controller.dart';
 import 'profile_controller.dart';
 import 'add_post_controller.dart';
 import 'helper_classes.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:titled_navigation_bar/titled_navigation_bar.dart';
 
 class Home extends StatefulWidget {
  @override
@@ -32,36 +34,54 @@ class _HomeState extends State<Home> {
       ),// new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black, //hexcolor method is custom at bottom
-        iconSize: 30,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Color.fromRGBO(0, 0, 0, 0.5), //hexcolor method is custom at bottom
+        iconSize: 26,
         onTap: onTabTapped, // new
         currentIndex: _currentIndex, // new
         items: [
           new BottomNavigationBarItem(
-            icon: Icon(Icons.format_align_right),
-            title: Text('Home'),
+            icon: Icon(
+              AntDesign.home,
+              ),
+            title: showIndicator(_currentIndex == 0),
           ),
           new BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            title: Text('Messages'),
+            icon: Icon(
+              AntDesign.search1,
+              ),
+            title: showIndicator(_currentIndex == 1),
           ),
           new BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            title: Text('Profile'),
+            icon: Icon(
+              AntDesign.plussquareo,
+              ),
+            title: showIndicator(_currentIndex == 2),
           ),
           new BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_none),
-            title: Text('Profile'),
+            icon: Icon(
+              AntDesign.hearto,
+              ),
+            title: showIndicator(_currentIndex == 3),
           ),
           new BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            title: Text('Profile')
+            icon: Icon(
+              AntDesign.user,
+              ),
+            title: showIndicator(_currentIndex == 4),
           )
         ],
       ),
     );
+  }
+
+  Widget showIndicator(bool show) {
+  return show
+      ? Padding(
+          padding: const EdgeInsets.only(top: 4, bottom: 0),
+          child: Icon(Icons.brightness_1, size: 4, color: Colors.black),
+        )
+      : SizedBox(height: 8);
   }
   
   void onTabTapped(int index) {

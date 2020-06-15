@@ -57,7 +57,7 @@ class _SearchState extends State<SearchController> with SingleTickerProviderStat
     return Scaffold(
       body: SafeArea(
         child: SearchBar<Post>(
-          searchBarPadding: EdgeInsets.symmetric(horizontal: 10),
+          searchBarPadding: EdgeInsets.symmetric(horizontal: 20),
           searchBarController: _searchBarController,
           header: DefaultTabController(
             length: 2,
