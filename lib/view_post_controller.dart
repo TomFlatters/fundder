@@ -4,6 +4,8 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'share_post_view.dart';
 import 'donate_page_controller.dart';
 import 'comment_view_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'shared/loading.dart';
 
 class ViewPost extends StatefulWidget {
   @override
@@ -82,7 +84,11 @@ class _ViewPostState extends State<ViewPost> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.width*9/16,
-                        child: Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                        child: CachedNetworkImage(
+                          imageUrl: "https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg",
+                          placeholder: (context, url) => Loading(),
+                          errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),//Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
                       ),
                       margin: EdgeInsets.symmetric(vertical: 10.0),
                       ), Container(
@@ -181,7 +187,7 @@ class _ViewPostState extends State<ViewPost> {
                     lineHeight: 5,
                     percent: 0.5,
                     backgroundColor: HexColor('CCCCCC'),
-                    progressColor: HexColor('A3D165'),
+                    progressColor: HexColor('ff6b6c'),
                   ),
                   ), Container(
                       alignment: Alignment.centerLeft,
@@ -189,12 +195,15 @@ class _ViewPostState extends State<ViewPost> {
                       child: Text(
                         'This is a longer description of whatever the fuck they are doing'
                       )
-                    ), GestureDetector(
+                    ), Padding(padding: EdgeInsets.all(20),),
+                    GestureDetector(
                       child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                        margin: EdgeInsets.only(left: 70, right:70, bottom: 20),
+                        width: 250,
+                        padding: EdgeInsets.symmetric(vertical: 12, /*horizontal: 30*/),
+                        margin: EdgeInsets.only(left: 50, right:50, bottom: 20),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1),
+                          color: HexColor('ff6b6c'),
+                          border: Border.all(color: HexColor('ff6b6c'), width: 1),
                           borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
                         child: Text(
@@ -203,7 +212,7 @@ class _ViewPostState extends State<ViewPost> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                              color: Colors.black,
+                              color: Colors.white,
                             ),
                           ),
                         ),

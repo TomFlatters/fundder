@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'feed.dart';
 import 'helper_classes.dart';
+import 'do_challenge.dart';
 
 class FeedController extends StatefulWidget {
   @override
@@ -15,7 +16,7 @@ class FeedController extends StatefulWidget {
 class _FeedState extends State<FeedController> with SingleTickerProviderStateMixin {
   
   final List<String> entries = <String>['A', 'B', 'C'];
-  final List<String> colors = <String>['A3D165','D3C939','EB8258'];
+  final List<String> colors = <String>['ff6b6c','E63946','ff6b6c'];
   int index = 0;
   //bool colorChanged = true;
 
@@ -71,11 +72,11 @@ class _FeedState extends State<FeedController> with SingleTickerProviderStateMix
             ],
           ),
         ),
-        body: //FeedView('Do', HexColor('A3D165'))
+        body: //FeedView('Do', HexColor('ff6b6c'))
         TabBarView(
           controller: _tabController,
           children: [
-          FeedView("Do", HexColor(colors[0])),
+          DoChallenge(),
           FeedView("Fund", HexColor(colors[1])),
           FeedView("Done", HexColor(colors[2])),
         ]),

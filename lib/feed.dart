@@ -5,6 +5,8 @@ import 'share_post_view.dart';
 import 'helper_classes.dart';
 import 'comment_view_controller.dart';
 import 'other_user_profile.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'shared/loading.dart';
 
 class FeedView extends StatefulWidget {
 
@@ -133,7 +135,11 @@ class _FeedViewState extends State<FeedView> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.width*9/16,
-                        child: Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                        child: CachedNetworkImage(
+                          imageUrl: "https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg",
+                          placeholder: (context, url) => Loading(),
+                          errorWidget: (context, url, error) => Icon(Icons.error),
+                        ),//Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
                       ),
                       margin: EdgeInsets.symmetric(vertical: 10.0),
                       ), Container(
