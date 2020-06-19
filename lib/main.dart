@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           primaryColor: Colors.white,
+          accentColor: HexColor('b8b8d1'),
           primaryTextTheme: TextTheme(
             headline6: TextStyle(
               //fontWeight: FontWeight.w600,

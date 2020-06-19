@@ -24,11 +24,28 @@ class _SignInState extends State<SignIn> {
         elevation: 0.0,
         title: Text('Sign in to Fundder')
         ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-        child: Form(
-          child: 
-            Column(children: <Widget>[
+        body: Container(
+          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+          child: Form(
+            child: 
+              Column(children: <Widget>[
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 40),
+                  color: Colors.white,
+                  child: Center(
+                    child: Container(
+                        // Use the properties stored in the State class.
+                        width: 150,
+                        height: 150,
+                        child: Image.asset('assets/images/fundder_loading.png'),
+                        // Define how long the animation should take.
+                        // Provide an optional curve to make the animation feel smoother.
+                      ),/*SpinKitChasingDots(
+                            color: Color(0xffA3D165),
+                            size: 50.0,
+                        ),*/
+                  ),
+                ),
               SizedBox(height: 20.0),
               TextFormField(
                 onChanged: (val) {
