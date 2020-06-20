@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
 import 'helper_classes.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class SharePost extends StatelessWidget{
   @override
@@ -25,43 +26,54 @@ class SharePost extends StatelessWidget{
     return ListView(
       children: <Widget>[
         ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/007-messenger.png')),
+          title: Container(
+            margin: EdgeInsets.only(left:10),
+            child: Text('Share to:',style: TextStyle(
+                          fontFamily: 'Quicksand',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),),
+          ),
+          onTap: (){},
+        ),
+        ListTile(
+          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.facebook_messenger)),
           title: Text('Messenger'),
           onTap: (){},
         ), ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/009-link.png')),
+          leading: Container(width:30, height:30, child: Icon(FontAwesome.link)),
           title: Text('Copy Link'),
           onTap: (){},
         ),ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/003-snapchat.png')),
+          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.snapchat_ghost)),
           title: Text('Snapchat'),
           onTap: (){},
         ),ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/004-whatsapp.png')),
+          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.whatsapp)),
           title: Text('Whatsapp'),
           onTap: (){},
         ),ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/004-whatsapp.png')),
+          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.whatsapp)),
           title: Text('Whatsapp status'),
           onTap: (){},
         ),ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/005-instagram.png')),
+          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.instagram)),
           title: Text('Instagram'),
           onTap: (){},
         ),ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/005-instagram.png')),
+          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.instagram)),
           title: Text('Instagram Stories'),
           onTap: (){},
         ),ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/008-comment.png')),
+          leading: Container(width:30, height:30, child: Icon(AntDesign.message1)),
           title: Text('SMS'),
           onTap: (){},
         ),ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/001-facebook.png')),
+          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.facebook_square)),
           title: Text('Facebook'),
           onTap: (){},
         ),ListTile(
-          leading: Container(width:30, height:30, child: Image.asset('assets/images/006-twitter.png')),
+          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.twitter)),
           title: Text('Twitter'),
           onTap: (){},
         ),
