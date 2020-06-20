@@ -4,6 +4,8 @@ import 'feed.dart';
 import 'edit_profile_controller.dart';
 import 'view_followers_controller.dart';
 import 'profile_actions_view.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -48,7 +50,7 @@ Widget build(BuildContext context) {
             onPressed: () /*async {
               await _auth.signOut();
             }*/ {_showOptions();}, 
-            child: Icon(Icons.view_headline)
+            child: Icon(AntDesign.ellipsis1),
           )
         ],
       ),
@@ -65,8 +67,7 @@ Widget build(BuildContext context) {
                 shape: BoxShape.circle,
                 image: new DecorationImage(
                   fit: BoxFit.fill,
-                  image:  new NetworkImage(
-                    "https://i.imgur.com/BoN9kdC.png")
+                  image: CachedNetworkImageProvider("https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg"),
                 )
               ),
             ),
@@ -162,7 +163,7 @@ Widget build(BuildContext context) {
                   controller: _tabController,
                   ),
                   [FeedView('user', Colors.black),
-                  FeedView('user', Colors.blue),][_tabController.index]
+                  FeedView('nonuser', Colors.blue),][_tabController.index]
                 /*ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 1000),
                   child: TabBarView(

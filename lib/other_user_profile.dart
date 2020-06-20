@@ -177,14 +177,6 @@ Widget build(BuildContext context) {
  }
 }
 
-Route _editProfile() {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => EditProfile(),
-    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
-}
-
 Route _viewFollowers() {
   return PageRouteBuilder(
     pageBuilder: (c, a1, a2) => ViewFollowers(),
