@@ -42,7 +42,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.width*9/16,
                 child: CachedNetworkImage(
-                    imageUrl: "https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg",
+                    imageUrl: "https://images.jg-cdn.com/image/b410179a-2042-4c6b-903b-df106b48fc3c.jpg",
                     placeholder: (context, url) => Loading(),
                     errorWidget: (context, url, error) => Icon(Icons.error),
                 ),//Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
@@ -93,7 +93,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                       alignment: Alignment.topLeft,
                       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       child: Text(
-                        'Shave your balls for Botswana',
+                        'Do a challenge for cancer research',
                         style: TextStyle(
                           fontFamily: 'Roboto Mono',
                           fontSize: 16,
