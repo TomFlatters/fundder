@@ -3,6 +3,7 @@ import 'package:fundder/services/auth.dart';
 import 'package:fundder/shared/constants.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:fundder/helper_classes.dart';
+import 'sign_in.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -17,10 +18,12 @@ class _RegisterState extends State<Register> {
 
   // is the screen loading? show loading widget if so
   bool loading = false;
+  bool passwordsMatch = false;
 
   // text field state
   String email = '';
   String password = '';
+  String username = '';
 
   String error = '';
 
@@ -42,14 +45,15 @@ class _RegisterState extends State<Register> {
           ),
         centerTitle: true,*/
         ),
-      body: Container(
+      body: SingleChildScrollView(
+        child: Container(
         padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
         child: Form(
           key: _formKey,
           child: 
             Column(children: <Widget>[
               Container(
-                  margin: EdgeInsets.symmetric(vertical: 40),
+                  margin: EdgeInsets.symmetric(vertical: 20),
                   color: Colors.white,
                   child: Center(
                     child: Container(
@@ -65,6 +69,16 @@ class _RegisterState extends State<Register> {
                         ),*/
                   ),
                 ),
+              SizedBox(height: 20.0),
+              TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: 'Username'),
+                validator: (val) => val.isEmpty ? 'Enter a username' : null,
+                onChanged: (val) {
+                  setState(() {
+                    username = val;
+                  });
+                },
+              ),
               SizedBox(height: 20.0),
               TextFormField(
                 decoration: textInputDecoration.copyWith(hintText: 'Email'),
@@ -87,6 +101,18 @@ class _RegisterState extends State<Register> {
                 },
               ),
               SizedBox(height: 20.0),
+              TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: 'Confirm password'),
+                validator: (val) => val == password ? 'Passwords do not match' : null,
+                obscureText: true,
+                onChanged: (val) {
+                  if (val == password) {
+                    passwordsMatch = true;
+                  } else {
+                    passwordsMatch = false;
+                  }
+                },
+              ),
                 /*Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -148,45 +174,12 @@ class _RegisterState extends State<Register> {
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                     ),
                     child: Text(
-                      "Sign In",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  onTap: () async {
-                  if(_formKey.currentState.validate()){
-                        setState(() => loading = true);
-                        dynamic result = await _auth.signInWithEmailAndPassword(email, password);
-                        if (result==null){
-                          setState(() {
-                            error = 'Failed to sign in user';
-                            loading = false;
-                          });
-                        }
-                      }
-                },
-                ),
-                GestureDetector(
-                  child: Container(
-                    width: 250,
-                    padding: EdgeInsets.symmetric(vertical: 12, /*horizontal: 30*/),
-                    margin: EdgeInsets.only(left: 50, right:50, bottom: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: HexColor('ff6b6c'), width: 1),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    child: Text(
                       "Register",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
-                          color: HexColor('ff6b6c'),
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -203,14 +196,56 @@ class _RegisterState extends State<Register> {
                   }
                 },
                 ),
+              GestureDetector(
+                  child: Container(
+                    width: 250,
+                    padding: EdgeInsets.symmetric(vertical: 12, /*horizontal: 30*/),
+                    margin: EdgeInsets.only(left: 50, right:50, bottom: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: HexColor('ff6b6c'), width: 1),
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    child: Text(
+                      "Sign In",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: HexColor('ff6b6c'),
+                        ),
+                      ),
+                    ),
+                  onTap: () {
+                  Navigator.of(context).pushReplacement(_goToSignin());
+                },
+                ),
               SizedBox(height: 12.0),
               Text(
                 error,
-                )
+              )
             ],
           )
         )
-        )
-      );
+      )
+    ));
   }
+}
+
+Route _goToSignin() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => SignIn(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(0.0, 1.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }
