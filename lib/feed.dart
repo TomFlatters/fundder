@@ -89,9 +89,10 @@ class _FeedViewState extends State<FeedView> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Profile ${entries[index]}',
-                        /*style: TextStyle(
-                          fontFamily: 'Roboto Mono'
-                        ),*/
+                        style: TextStyle(
+                          fontFamily: 'Quicksand',
+                          fontWeight: FontWeight.w600,
+                        ),
                       )
                     ), Expanded(
                       child: Align(
@@ -123,10 +124,10 @@ class _FeedViewState extends State<FeedView> {
                   )
                 ), Container(
                   alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  margin: EdgeInsets.only( top: 5, bottom:15),
                   child: LinearPercentIndicator(
                     linearStrokeCap: LinearStrokeCap.butt,
-                    lineHeight: 5,
+                    lineHeight: 3,
                     percent: ((index+15)/4)/(index+10),
                     backgroundColor: HexColor('CCCCCC'),
                     progressColor: widget.colorChoice,

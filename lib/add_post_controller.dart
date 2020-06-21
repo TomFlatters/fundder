@@ -138,7 +138,7 @@ class ChoosePerson extends StatefulWidget {
 class _ChoosePersonState extends State<ChoosePerson> {
   int selected = -1;
   final List<String> whoDoes = <String>["A specific person",'Myself','Anyone'];
-  final List<String> subWho = <String>["Does not have to be a Fundder user",'Raise money for your own challenge','Will be public and anyone will be able to accept the challenge'];
+  final List<String> subWho = <String>["Does not have to be a Fundder user",'Raise money for your own challenge','Will be public and anyone will be able to accept the challenge. This appears in the custom challenges in the do tab in the Feed'];
   @override
   Widget build(BuildContext context) {
     return ListView(
