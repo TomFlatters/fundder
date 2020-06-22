@@ -44,6 +44,7 @@ class _SearchState extends State<SearchController> with SingleTickerProviderStat
       print("called");
   }
 
+  // Call search function here. search is the term to be searched.
   Future<List<Post>> search(String search) async {
   await Future.delayed(Duration(seconds: 2));
   return List.generate(search.length, (int index) {
