@@ -23,7 +23,7 @@ class _DoChallengeState extends State<DoChallenge> {
   @override
   Widget build(BuildContext context) {
     final List<String> entries = <String>['Active', 'Past'];
-    final List<String> active = ['Shave your balls for Botswana'];
+    final List<String> active = ['Do a challenge for cancer research'];
     final List<String> past = ['Run 5, Donate £5, Nominate 5', 'ALS Ice Bucket'];
     final List<List> entries2 = <List>[active,past];
 

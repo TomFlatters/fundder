@@ -65,7 +65,11 @@ class _ViewPostState extends State<ViewPost> {
                         ), Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Profile 1'
+                            'Profile 1',
+                            style: TextStyle(
+                              fontFamily: 'Quicksand',
+                              fontWeight: FontWeight.w600,
+                            ),
                           )
                         ), Expanded(
                           child: Align(
@@ -181,10 +185,10 @@ class _ViewPostState extends State<ViewPost> {
                       )
                     ), Container(
                   alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  margin: EdgeInsets.only( top: 5, bottom:15, left: 10, right:10),
                   child: LinearPercentIndicator(
                     linearStrokeCap: LinearStrokeCap.butt,
-                    lineHeight: 5,
+                    lineHeight: 3,
                     percent: 0.5,
                     backgroundColor: HexColor('CCCCCC'),
                     progressColor: HexColor('ff6b6c'),
