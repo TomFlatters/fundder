@@ -40,7 +40,7 @@ class DatabaseService {
         likes: doc.data['likes'],
         comments: doc.data['comments'],
         subtitle: doc.data['subtitle'],
-        // timestamp: doc.data['timestamp'],
+        timestamp: doc.data['timestamp'],
       );
     }).toList();
   }

@@ -9,14 +9,13 @@ class Post {
   final List likes;
   final comments;
   final String subtitle;
-  // final timestamp; 
+  final timestamp;
 
   Post({ 
     this.author, this.title, this.charity,
     this.amountRaised, this.targetAmount, 
     this.subtitle, this.likes,
-    this.comments
-    // this.timestamp
+    this.comments, this.timestamp
     });
 
 }
