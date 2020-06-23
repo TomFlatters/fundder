@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/shared/helper_functions.dart';
 import 'helper_classes.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'models/post.dart';
 import 'share_post_view.dart';
 import 'donate_page_controller.dart';
 import 'comment_view_controller.dart';
@@ -8,23 +10,25 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 
 class ViewPost extends StatefulWidget {
+  
+  final Post postData;
+  ViewPost({ this.postData });
+
   @override
   _ViewPostState createState() => _ViewPostState();
 }
 
 class _ViewPostState extends State<ViewPost> {
 
-  final List<String> whoDoes = <String>["A specific person",'Myself','Anyone'];
-  final List<String> charities = <String>["Cancer Research",'British Heart Foundation','Oxfam'];
-  int selected = -1;
-  int charity = -1;
-
   @override
   Widget build(BuildContext context) {
+    print("View post controller");
+    Post postData = widget.postData;
+    print(howLongAgo(postData.timestamp));
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Post Title"),
+        title: Text(postData.title),
         actions: <Widget>[
           new IconButton(
             icon: new Icon(Icons.close), 
@@ -65,7 +69,7 @@ class _ViewPostState extends State<ViewPost> {
                         ), Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Profile 1',
+                            postData.author,
                             style: TextStyle(
                               fontFamily: 'Quicksand',
                               fontWeight: FontWeight.w600,
@@ -77,7 +81,7 @@ class _ViewPostState extends State<ViewPost> {
                           child: Container(
                             margin: EdgeInsets.all(10.0),
                             child: Text(
-                            'For Charity 1'
+                              postData.charity
                             )
                           )
                           )
@@ -111,7 +115,7 @@ class _ViewPostState extends State<ViewPost> {
                                 Expanded(
                                   child: Container(
                                     margin: EdgeInsets.only(left: 10),
-                                    child: Text('${10}',textAlign: TextAlign.left,)
+                                    child: Text(postData.likes.length.toString(),textAlign: TextAlign.left,)
                                   )
                                 )
                               ]
@@ -134,7 +138,7 @@ class _ViewPostState extends State<ViewPost> {
                                 Expanded(
                                   child: Container(
                                     margin: EdgeInsets.only(left: 10),
-                                    child: Text('${5}',textAlign: TextAlign.left,)
+                                    child: Text(postData.comments.length.toString(),textAlign: TextAlign.left,)
                                   )
                                 )
                               ]
@@ -168,7 +172,7 @@ class _ViewPostState extends State<ViewPost> {
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Text(
-                    'x hours ago',
+                    howLongAgo(postData.timestamp),
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -178,7 +182,7 @@ class _ViewPostState extends State<ViewPost> {
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       child: Text(
-                        '£${5} raised of £${15} target',
+                        '£${postData.amountRaised} raised of £${postData.targetAmount} target',
                         style: TextStyle(
                           fontWeight: FontWeight.bold
                         ),
@@ -189,7 +193,7 @@ class _ViewPostState extends State<ViewPost> {
                   child: LinearPercentIndicator(
                     linearStrokeCap: LinearStrokeCap.butt,
                     lineHeight: 3,
-                    percent: 0.5,
+                    percent: double.parse(postData.amountRaised)/double.parse(postData.targetAmount),
                     backgroundColor: HexColor('CCCCCC'),
                     progressColor: HexColor('ff6b6c'),
                   ),
@@ -197,7 +201,7 @@ class _ViewPostState extends State<ViewPost> {
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       child: Text(
-                        'This is a longer description of whatever the fuck they are doing'
+                        postData.subtitle
                       )
                     ), Padding(padding: EdgeInsets.all(20),),
                     GestureDetector(

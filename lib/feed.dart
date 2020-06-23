@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
+import 'package:fundder/shared/helper_functions.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'models/post.dart';
@@ -227,7 +228,7 @@ class _FeedViewState extends State<FeedView> {
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.all(10),
                             child: Text(
-                              'x hours ago',
+                              howLongAgo(postData.timestamp),
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
@@ -238,7 +239,7 @@ class _FeedViewState extends State<FeedView> {
                       )
                     )
                   ),
-                  onTap: () {Navigator.of(context).push(_createRoute());}
+                  onTap: () {Navigator.of(context).push(_createRoute(postData));}
                   ,);
                 },
                 separatorBuilder: (BuildContext context, int index){
@@ -272,9 +273,10 @@ Route _showComments() {
   );
 }
 
-Route _createRoute() {
+// Create route is called when user clicks on a post.
+Route _createRoute(Post postData) {
   return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => ViewPost(),
+    pageBuilder: (c, a1, a2) => ViewPost(postData: postData),
     transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
     transitionDuration: Duration(milliseconds: 300),
   );
