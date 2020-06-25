@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
@@ -13,7 +12,7 @@ import 'comment_view_controller.dart';
 import 'other_user_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
-import 'services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FeedView extends StatefulWidget {
 
@@ -68,6 +67,7 @@ class _FeedViewState extends State<FeedView> {
             if (!snapshot.hasData){
               return Text("No data...");
             } else {
+              
               return ListView.separated(
                 physics: physics,
                 shrinkWrap: true,
