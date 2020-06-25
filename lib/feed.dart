@@ -67,7 +67,6 @@ class _FeedViewState extends State<FeedView> {
             if (!snapshot.hasData){
               return Text("No data...");
             } else {
-              
               return ListView.separated(
                 physics: physics,
                 shrinkWrap: true,
@@ -92,14 +91,7 @@ class _FeedViewState extends State<FeedView> {
                                   child: AspectRatio(
                                     aspectRatio: 1/1,
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                          fit: BoxFit.fill,
-                                          image: new NetworkImage(
-                                              "https://i.imgur.com/BoN9kdC.png")
-                                        )
-                                      ),
+                                      child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 40),
                                       margin: EdgeInsets.all(10.0),            
                                     )
                                   ),
@@ -245,7 +237,9 @@ class _FeedViewState extends State<FeedView> {
                       )
                     )
                   ),
-                  onTap: () {Navigator.of(context).push(_createRoute(postData));}
+                  onTap: () {
+                    print(postData);
+                    Navigator.of(context).push(_createRoute(postData));}
                   ,);
                 },
                 separatorBuilder: (BuildContext context, int index){

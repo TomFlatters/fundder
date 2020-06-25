@@ -7,8 +7,7 @@ class DatabaseService {
 
   // initiate the class with the user id
   final String uid;
-  final String user;
-  DatabaseService({ this.uid, this.user });
+  DatabaseService({ this.uid});
 
   // Get Firestore collection reference
   final CollectionReference userCollection = Firestore.instance.collection('users');
@@ -50,18 +49,6 @@ class DatabaseService {
   Stream<List<Post>> get posts {
     return postsCollection.snapshots().map(_postsDataFromSnapshot);
   }
-
-  /*User _userDataFromSnapshot(QuerySnapshot snapshot) {
-    return User(
-      uid: doc.data['uid'],
-      username: ,
-      email: ,
-      bio: ,
-      followers: ,
-      following: ,
-      gender: 
-    );
-  }*/
   
 
 }
