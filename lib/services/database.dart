@@ -7,7 +7,8 @@ class DatabaseService {
 
   // initiate the class with the user id
   final String uid;
-  DatabaseService({ this.uid });
+  final String user;
+  DatabaseService({ this.uid, this.user });
 
   // Get Firestore collection reference
   final CollectionReference userCollection = Firestore.instance.collection('users');
