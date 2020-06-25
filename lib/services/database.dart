@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/models/user.dart';
 
@@ -48,6 +49,18 @@ class DatabaseService {
   Stream<List<Post>> get posts {
     return postsCollection.snapshots().map(_postsDataFromSnapshot);
   }
+
+  /*User _userDataFromSnapshot(QuerySnapshot snapshot) {
+    return User(
+      uid: doc.data['uid'],
+      username: ,
+      email: ,
+      bio: ,
+      followers: ,
+      following: ,
+      gender: 
+    );
+  }*/
   
 
 }

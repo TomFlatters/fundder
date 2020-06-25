@@ -14,12 +14,12 @@ class Page2 extends StatefulWidget {
 class _Page2State extends State<Page2> {
   int _current = 0;
   CarouselController _carouselController = CarouselController();
-  final List<Widget> screens = [
+  /*final List<Widget> screens = [
    DefineDescription(),
    ChoosePerson(),
    SetMoney(),
    ChooseCharity(),
-   ImageUpload()];
+   ImageUpload()];*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,11 +60,75 @@ class _Page2State extends State<Page2> {
               enlargeCenterPage: false,
               // autoPlay: false,
             ),
-            items: screens,
+            items: [
+   _defineDescription(),
+   ChoosePerson(),
+   SetMoney(),
+   ChooseCharity(),
+   ImageUpload()],
           );
         },
       ),
     );
+  }
+
+  Widget _defineDescription() {
+    return ListView(
+      children: <Widget>[
+        Container(
+          color: Colors.white,
+          margin: EdgeInsets.symmetric(vertical: 5),
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, 
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.symmetric(vertical:10),
+                child: Text('Title of Challenge',style: TextStyle(
+                      fontFamily: 'Quicksand',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),),
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Write a title'
+                )
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical:10),
+                child: Text('Subtitle',style: TextStyle(
+                      fontFamily: 'Quicksand',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: InputDecoration(
+                  hintText: 'This will appear under the title in the feed'
+                )
+              ),
+             Container(
+                margin: EdgeInsets.symmetric(vertical:10),
+                child: Text('Description',style: TextStyle(
+                      fontFamily: 'Quicksand',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),),
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: InputDecoration(
+                  hintText: 'A long description for detailed view'
+                )
+              )
+            ])
+        )]
+        
+      );
   }
 }
 
@@ -274,10 +338,8 @@ class _ChooseCharityState extends State<ChooseCharity> {
                               '${charities[index]}'),
                         onTap: (){
                           charity=index;
-                          setState(() {
-                            
-                          });
-                        } ,
+                          setState(() {});
+                        },
                       );
                     }
                   )

@@ -77,8 +77,8 @@ class _FeedState extends State<FeedController> with SingleTickerProviderStateMix
           controller: _tabController,
           children: [
           DoChallenge(),
-          FeedView("Fund", HexColor(colors[1])),
-          FeedView("Done", HexColor(colors[2])),
+          FeedView("Fund", null, HexColor(colors[1])),
+          FeedView("Done", null, HexColor(colors[2])),
         ]),
     );
  }
