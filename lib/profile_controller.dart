@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/services/auth.dart';
 import 'feed.dart';
@@ -6,6 +8,10 @@ import 'view_followers_controller.dart';
 import 'profile_actions_view.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fundder/models/user.dart';
+import 'package:fundder/services/database.dart';
+import 'models/post.dart';
+import 'package:provider/provider.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -18,6 +24,11 @@ class _ProfileState extends State<ProfileController> with SingleTickerProviderSt
 final AuthService _auth = AuthService();
 
 TabController _tabController;
+String _username = "Username";
+String _name = "Name";
+String _uid;
+String _email = "Email";
+
 
   @override
   void dispose() {
@@ -29,7 +40,20 @@ TabController _tabController;
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
+    _retrieveUser();
     super.initState();
+  }
+
+  void _retrieveUser() async {
+    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance.collection("users").document(firebaseUser.uid).get().then((value){
+      setState(() {
+        _uid = firebaseUser.uid;
+        _name = value.data["name"];
+        _username = value.data["username"];
+        _email = value.data["email"];
+      });
+    });
   }
 
   _handleTabSelection() {
@@ -41,10 +65,11 @@ TabController _tabController;
 
 @override
 Widget build(BuildContext context) {
+  final user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Name'),
+        title: Text(_username),
         actions: <Widget>[
           FlatButton(
             onPressed: () /*async {
@@ -72,7 +97,7 @@ Widget build(BuildContext context) {
               ),
             ),
           ), Center(
-            child: Text("@username"),
+            child: Text(_name),
           ), Container(
             margin: EdgeInsets.symmetric(horizontal:50, vertical: 20),
             height: 50,
@@ -162,8 +187,8 @@ Widget build(BuildContext context) {
                   tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')],
                   controller: _tabController,
                   ),
-                  [FeedView('user', Colors.black),
-                  FeedView('nonuser', Colors.blue),][_tabController.index]
+                  [FeedView('user', _username, Colors.black),
+                  FeedView('user', _username, Colors.blue),][_tabController.index]
                 /*ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 1000),
                   child: TabBarView(

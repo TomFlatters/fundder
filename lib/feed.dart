@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
@@ -12,6 +13,7 @@ import 'comment_view_controller.dart';
 import 'other_user_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
+import 'services/database.dart';
 
 class FeedView extends StatefulWidget {
 
@@ -20,7 +22,8 @@ class FeedView extends StatefulWidget {
 
   final Color colorChoice;
   final String feedChoice;
-  FeedView(this.feedChoice, this.colorChoice);
+  final String identifier;
+  FeedView(this.feedChoice, this.identifier, this.colorChoice);
 
 }
 
@@ -56,9 +59,12 @@ class _FeedViewState extends State<FeedView> {
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     return new StreamBuilder(
-          stream: DatabaseService(uid: user.uid).posts,
+          stream: widget.feedChoice == 'user'
+            ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
+            : Firestore.instance.collection("posts").snapshots(),
           builder: (context, snapshot) {
-            print(snapshot.data);
+            List posts = _postsDataFromSnapshot(snapshot.data);
+            print(posts);
             if (!snapshot.hasData){
               return Text("No data...");
             } else {
@@ -66,9 +72,9 @@ class _FeedViewState extends State<FeedView> {
                 physics: physics,
                 shrinkWrap: true,
                 padding: const EdgeInsets.only(top: 10.0),
-                itemCount: snapshot.data.length,
+                itemCount: posts.length,
                 itemBuilder: (BuildContext context, int index) {
-                  Post postData = snapshot.data[index];
+                  Post postData = posts[index];
                   print(postData);
                   return GestureDetector(
                     child: Container(
@@ -260,6 +266,23 @@ class _FeedViewState extends State<FeedView> {
         return SharePost();
       }
       );
+  }
+
+  List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc){
+      // print(doc.data['timestamp'].toString());
+      return Post(
+        author: doc.data['author'],
+        title: doc.data['title'],
+        charity: doc.data['charity'],
+        amountRaised: doc.data['amountRaised'],
+        targetAmount: doc.data['targetAmount'],
+        likes: doc.data['likes'],
+        comments: doc.data['comments'],
+        subtitle: doc.data['subtitle'],
+        timestamp: doc.data['timestamp'],
+      );
+    }).toList();
   }
 
   

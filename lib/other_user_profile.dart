@@ -157,8 +157,8 @@ Widget build(BuildContext context) {
                   tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')],
                   controller: _tabController,
                   ),
-                  [FeedView('user', Colors.black),
-                  FeedView('user', Colors.blue),][_tabController.index]
+                  [FeedView('user', 'adrikoz', Colors.black),
+                  FeedView('user', 'adrikoz', Colors.blue),][_tabController.index]
                 /*ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 1000),
                   child: TabBarView(
