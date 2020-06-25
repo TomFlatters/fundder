@@ -55,14 +55,7 @@ class _ViewPostState extends State<ViewPost> {
                           child: AspectRatio(
                             aspectRatio: 1/1,
                             child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: new DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: new NetworkImage(
-                                      "https://i.imgur.com/BoN9kdC.png")
-                                )
-                              ),
+                              child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 40),
                               margin: EdgeInsets.all(10.0),            
                             )
                           )

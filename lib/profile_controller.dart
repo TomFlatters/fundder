@@ -12,6 +12,7 @@ import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
 import 'models/post.dart';
 import 'package:provider/provider.dart';
+import 'helper_classes.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -86,15 +87,8 @@ Widget build(BuildContext context) {
             margin: EdgeInsets.only(top: 20, bottom:10),
             alignment: Alignment.center,
             child: Container(
-              height: 90,
-              width: 90,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: new DecorationImage(
-                  fit: BoxFit.fill,
-                  image: CachedNetworkImageProvider("https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg"),
-                )
-              ),
+              child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 90),
+              margin: EdgeInsets.all(10.0),            
             ),
           ), Center(
             child: Text(_name),
