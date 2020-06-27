@@ -22,9 +22,12 @@ class _ViewPostState extends State<ViewPost> {
 
   @override
   Widget build(BuildContext context) {
-    print("View post controller");
+    // print("View post controller");
     Post postData = widget.postData;
-    print(howLongAgo(postData.timestamp));
+    print(postData.title);
+    print(postData);
+    print(postData.imageUrl);
+    // print(howLongAgo(postData.timestamp));
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -93,7 +96,7 @@ class _ViewPostState extends State<ViewPost> {
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.width*9/16,
                         child: CachedNetworkImage(
-                          imageUrl: "https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg",
+                          imageUrl: (postData.imageUrl != null) ? postData.imageUrl : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
                           placeholder: (context, url) => Loading(),
                           errorWidget: (context, url, error) => Icon(Icons.error),
                       ),//Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
@@ -193,7 +196,7 @@ class _ViewPostState extends State<ViewPost> {
                   child: LinearPercentIndicator(
                     linearStrokeCap: LinearStrokeCap.butt,
                     lineHeight: 3,
-                    percent: double.parse(postData.amountRaised)/double.parse(postData.targetAmount),
+                    percent: postData.percentRaised(),
                     backgroundColor: HexColor('CCCCCC'),
                     progressColor: HexColor('ff6b6c'),
                   ),

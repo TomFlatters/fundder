@@ -58,7 +58,7 @@ class _FeedViewState extends State<FeedView> {
     return new StreamBuilder(
           stream: DatabaseService(uid: user.uid).posts,
           builder: (context, snapshot) {
-            print(snapshot.data);
+            // print(snapshot.data);
             if (!snapshot.hasData){
               return Text("No data...");
             } else {
@@ -69,7 +69,7 @@ class _FeedViewState extends State<FeedView> {
                 itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext context, int index) {
                   Post postData = snapshot.data[index];
-                  print(postData);
+                  // print(postData);
                   return GestureDetector(
                     child: Container(
                     color: Colors.white,
@@ -141,7 +141,7 @@ class _FeedViewState extends State<FeedView> {
                             child: LinearPercentIndicator(
                               linearStrokeCap: LinearStrokeCap.butt,
                               lineHeight: 5,
-                              percent: double.parse(postData.amountRaised)/double.parse(postData.targetAmount),
+                              percent: postData.percentRaised(),
                               backgroundColor: HexColor('CCCCCC'),
                               progressColor: widget.colorChoice,
                             ),
@@ -150,7 +150,7 @@ class _FeedViewState extends State<FeedView> {
                                   width: MediaQuery.of(context).size.width,
                                   height: MediaQuery.of(context).size.width*9/16,
                                   child: CachedNetworkImage(
-                                    imageUrl: "https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg",
+                                    imageUrl: (postData.imageUrl != null) ? postData.imageUrl : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
                                     placeholder: (context, url) => Loading(),
                                     errorWidget: (context, url, error) => Icon(Icons.error),
                                   ),//Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
