@@ -4,14 +4,15 @@ import 'package:fundder/models/post.dart';
 import 'package:fundder/models/user.dart';
 
 class DatabaseService {
-
   // initiate the class with the user id
   final String uid;
-  DatabaseService({ this.uid});
+  DatabaseService({this.uid});
 
   // Get Firestore collection reference
-  final CollectionReference userCollection = Firestore.instance.collection('users');
-  final CollectionReference postsCollection = Firestore.instance.collection('posts');
+  final CollectionReference userCollection =
+      Firestore.instance.collection('users');
+  final CollectionReference postsCollection =
+      Firestore.instance.collection('posts');
 
   // Update User
   Future updateUserData(String email, String username, String name) async {
@@ -30,7 +31,7 @@ class DatabaseService {
 
   // Get posts list stream is mapped to the Post object
   List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.documents.map((doc){
+    return snapshot.documents.map((doc) {
       // print(doc.data['timestamp'].toString());
       return Post(
         author: doc.data['author'],
@@ -45,10 +46,9 @@ class DatabaseService {
       );
     }).toList();
   }
+
   // Get list of posts
   Stream<List<Post>> get posts {
     return postsCollection.snapshots().map(_postsDataFromSnapshot);
   }
-  
-
 }

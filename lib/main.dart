@@ -6,8 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
 import 'home_widget.dart';
 import 'helper_classes.dart';
+import 'routes/routes.dart';
 
 void main() {
+  FluroRouter.setupRouter();
   runApp(MyApp());
 }
 
@@ -18,6 +20,8 @@ class MyApp extends StatelessWidget {
       // listen to the stream specified by value
       value: AuthService().user,
       child: MaterialApp(
+          initialRoute: '/',
+          onGenerateRoute: FluroRouter.router.generator,
           title: 'My Flutter App',
           home: Wrapper(),
           theme: ThemeData(
