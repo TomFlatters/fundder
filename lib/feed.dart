@@ -53,6 +53,7 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
+    print(MediaQuery.of(context).size.width);
     final user = Provider.of<User>(context);
     return new StreamBuilder(
         stream: widget.feedChoice == 'user'
@@ -258,7 +259,8 @@ class _FeedViewState extends State<FeedView> {
                           ))),
                   onTap: () {
                     print(postData);
-                    Navigator.of(context).push(_createRoute(postData));
+                    //Navigator.of(context).push(_createRoute(postData));
+                    Navigator.pushNamed(context, '/post/' + postData.id);
                   },
                 );
               },
@@ -282,7 +284,7 @@ class _FeedViewState extends State<FeedView> {
 
   List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
-      // print(doc.data['timestamp'].toString());
+      //print(doc.data);
       return Post(
         author: doc.data['author'],
         title: doc.data['title'],
@@ -293,6 +295,7 @@ class _FeedViewState extends State<FeedView> {
         comments: doc.data['comments'],
         subtitle: doc.data['subtitle'],
         timestamp: doc.data['timestamp'],
+        id: doc.documentID,
       );
     }).toList();
   }
@@ -310,7 +313,7 @@ Route _showComments() {
 // Create route is called when user clicks on a post.
 Route _createRoute(Post postData) {
   return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => ViewPost(postData: postData),
+    pageBuilder: (c, a1, a2) => ViewPost(postData: postData.id),
     transitionsBuilder: (c, anim, a2, child) =>
         FadeTransition(opacity: anim, child: child),
     transitionDuration: Duration(milliseconds: 300),

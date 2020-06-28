@@ -1,6 +1,4 @@
-
 class Post {
-
   final String author;
   final String title;
   final String charity;
@@ -10,12 +8,17 @@ class Post {
   final comments;
   final String subtitle;
   final timestamp;
+  final String id;
 
-  Post({ 
-    this.author, this.title, this.charity,
-    this.amountRaised, this.targetAmount, 
-    this.subtitle, this.likes,
-    this.comments, this.timestamp
-    });
-
+  Post(
+      {this.author,
+      this.title,
+      this.charity,
+      this.amountRaised,
+      this.targetAmount,
+      this.subtitle,
+      this.likes,
+      this.comments,
+      this.timestamp,
+      this.id});
 }
