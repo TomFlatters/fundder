@@ -11,15 +11,15 @@ import '../comment_view_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../shared/loading.dart';
 
-class ViewPost extends StatefulWidget {
+class TestPost extends StatefulWidget {
   final String postData;
-  ViewPost({this.postData});
+  TestPost({this.postData});
 
   @override
-  _ViewPostState createState() => _ViewPostState();
+  _TestPostState createState() => _TestPostState();
 }
 
-class _ViewPostState extends State<ViewPost> {
+class _TestPostState extends State<TestPost> {
   Post post;
 
   @override
