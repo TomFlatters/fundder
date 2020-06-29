@@ -13,5 +13,5 @@ class User {
   // construct them into the object here
   User({ this.uid, this.username, this.email, 
   this.bio, this.followers, 
-  this.following, this.gender});
+  this.following, this.gender });
 }

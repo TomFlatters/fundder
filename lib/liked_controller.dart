@@ -40,7 +40,7 @@ LikedController();
                                   margin: EdgeInsets.all(10.0),            
                                 )
                               ),
-                              onTap: () {Navigator.of(context).push(_viewUser());},
+                              onTap: () {Navigator.of(context).push(_viewUser('hkKCaiUeWUYhKwRLA0zDOoEuKxW2'));},
                             )
                         ), Expanded(child: Align(
                           alignment: Alignment.centerLeft,
@@ -82,7 +82,7 @@ LikedController();
                                 ),
                               ),
                               onTap: () {if (index%3 == 0) {
-                                Navigator.of(context).push(_viewUser());}
+                                Navigator.of(context).push(_viewUser('hkKCaiUeWUYhKwRLA0zDOoEuKxW2'));}
                               else{
                                 Navigator.of(context).push(_viewPost());
                               }},
@@ -115,9 +115,9 @@ Route _viewPost() {
   );
 }
 
-Route _viewUser() {
+Route _viewUser(String uid) {
   return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => ViewUser(),
+    pageBuilder: (c, a1, a2) => ViewUser(uid: uid),
     transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
     transitionDuration: Duration(milliseconds: 300),
   );
