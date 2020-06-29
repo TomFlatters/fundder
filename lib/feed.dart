@@ -12,6 +12,7 @@ import 'comment_view_controller.dart';
 import 'other_user_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FeedView extends StatefulWidget {
 
@@ -20,7 +21,9 @@ class FeedView extends StatefulWidget {
 
   final Color colorChoice;
   final String feedChoice;
-  FeedView(this.feedChoice, this.colorChoice);
+  final String identifier;
+  final Stream<List<Post>> postsStream;
+  FeedView(this.feedChoice, this.identifier, this.colorChoice, this.postsStream);
 
 }
 
@@ -54,9 +57,11 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
     return new StreamBuilder(
-          stream: DatabaseService(uid: user.uid).posts,
+          stream: widget.postsStream,
+          // widget.feedChoice == 'user'
+          //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
+          //   : Firestore.instance.collection("posts").snapshots(),
           builder: (context, snapshot) {
             // print(snapshot.data);
             if (!snapshot.hasData){
@@ -86,14 +91,7 @@ class _FeedViewState extends State<FeedView> {
                                   child: AspectRatio(
                                     aspectRatio: 1/1,
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                          fit: BoxFit.fill,
-                                          image: new NetworkImage(
-                                              "https://i.imgur.com/BoN9kdC.png")
-                                        )
-                                      ),
+                                      child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 40),
                                       margin: EdgeInsets.all(10.0),            
                                     )
                                   ),
@@ -239,7 +237,9 @@ class _FeedViewState extends State<FeedView> {
                       )
                     )
                   ),
-                  onTap: () {Navigator.of(context).push(_createRoute(postData));}
+                  onTap: () {
+                    print(postData);
+                    Navigator.of(context).push(_createRoute(postData));}
                   ,);
                 },
                 separatorBuilder: (BuildContext context, int index){
@@ -260,6 +260,23 @@ class _FeedViewState extends State<FeedView> {
         return SharePost();
       }
       );
+  }
+
+  List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc){
+      // print(doc.data['timestamp'].toString());
+      return Post(
+        author: doc.data['author'],
+        title: doc.data['title'],
+        charity: doc.data['charity'],
+        amountRaised: doc.data['amountRaised'],
+        targetAmount: doc.data['targetAmount'],
+        likes: doc.data['likes'],
+        comments: doc.data['comments'],
+        subtitle: doc.data['subtitle'],
+        timestamp: doc.data['timestamp'],
+      );
+    }).toList();
   }
 
   

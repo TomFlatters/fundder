@@ -2,9 +2,12 @@
 // feed.dart controls the actual feed content
 
 import 'package:flutter/material.dart';
+import 'package:fundder/services/database.dart';
+import 'package:provider/provider.dart';
 import 'feed.dart';
 import 'helper_classes.dart';
 import 'do_challenge.dart';
+import 'models/user.dart';
 
 class FeedController extends StatefulWidget {
   @override
@@ -58,6 +61,7 @@ class _FeedState extends State<FeedController> with SingleTickerProviderStateMix
 
  @override
  Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -77,8 +81,8 @@ class _FeedState extends State<FeedController> with SingleTickerProviderStateMix
           controller: _tabController,
           children: [
           DoChallenge(),
-          FeedView("Fund", HexColor(colors[1])),
-          FeedView("Done", HexColor(colors[2])),
+          FeedView("Fund", null, HexColor(colors[1]), DatabaseService(uid: user.uid).posts),
+          FeedView("Done", null, HexColor(colors[2]), DatabaseService(uid: user.uid).posts),
         ]),
     );
  }
