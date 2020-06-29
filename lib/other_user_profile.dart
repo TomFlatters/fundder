@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/services/database.dart';
+import 'package:provider/provider.dart';
 import 'feed.dart';
 import 'edit_profile_controller.dart';
+import 'models/user.dart';
 import 'view_followers_controller.dart';
+import 'helper_classes.dart';
 
 class ViewUser extends StatefulWidget {
   @override
  _ViewUserState createState() => _ViewUserState();
-  ViewUser();
+
+  final String uid;
+  ViewUser({ this.uid });
 }
 
 class _ViewUserState extends State<ViewUser> with SingleTickerProviderStateMixin {
 
-
-TabController _tabController;
+  TabController _tabController;
 
   @override
   void dispose() {
@@ -33,9 +38,9 @@ TabController _tabController;
     }
   }
 
-
 @override
 Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -55,16 +60,8 @@ Widget build(BuildContext context) {
             margin: EdgeInsets.only(top: 20, bottom:10),
             alignment: Alignment.center,
             child: Container(
-              height: 90,
-              width: 90,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: new DecorationImage(
-                  fit: BoxFit.fill,
-                  image:  new NetworkImage(
-                    "https://i.imgur.com/BoN9kdC.png")
-                )
-              ),
+              child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 90),
+              margin: EdgeInsets.all(10.0),            
             ),
           ), Center(
             child: Text("@username"),
@@ -157,8 +154,8 @@ Widget build(BuildContext context) {
                   tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')],
                   controller: _tabController,
                   ),
-                  [FeedView('user', Colors.black),
-                  FeedView('user', Colors.blue),][_tabController.index]
+                  [FeedView('user', 'adrikoz', Colors.black, DatabaseService(uid: user.uid).postsByUser(widget.uid)),
+                  FeedView('user', 'adrikoz', Colors.blue, DatabaseService(uid: user.uid).postsByUser(widget.uid)),][_tabController.index]
                 /*ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: 1000),
                   child: TabBarView(

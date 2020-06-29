@@ -36,16 +36,8 @@ Widget build(BuildContext context) {
             margin: EdgeInsets.only(top: 20, bottom:10),
             alignment: Alignment.center,
             child: Container(
-              height: 90,
-              width: 90,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: new DecorationImage(
-                  fit: BoxFit.fill,
-                  image:  new NetworkImage(
-                    "https://i.imgur.com/BoN9kdC.png")
-                )
-              ),
+              child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 90),
+              margin: EdgeInsets.all(10.0),            
             ),
           ), GestureDetector(
             child: Container(

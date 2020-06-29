@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,7 +11,7 @@ class DatabaseService {
 
   // initiate the class with the user id
   final String uid;
-  DatabaseService({ this.uid });
+  DatabaseService({ this.uid});
 
   // Get Firestore collection reference
   final CollectionReference userCollection = Firestore.instance.collection('users');
@@ -60,6 +61,11 @@ class DatabaseService {
     return postsCollection.orderBy("timestamp", descending: true).limit(10).snapshots().map(_postsDataFromSnapshot);
   }
 
+  // Get list of posts
+  Stream<List<Post>> postsByUser(id) {
+    return postsCollection.where("author", isEqualTo: id).orderBy("timestamp", descending: true).limit(10).snapshots().map(_postsDataFromSnapshot);
+  }
+
   // Upload post and return the document id
   Future uploadPost(Post post) async {
     return await postsCollection.add({
@@ -82,6 +88,7 @@ class DatabaseService {
     });
   }
 
+  // Get a post from Firestore given a known id
   Future getPostById(String documentId) async {
     String formattedId = documentId.substring(1, documentId.length-1);
     DocumentReference docRef = postsCollection.document(formattedId);

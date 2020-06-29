@@ -73,23 +73,14 @@ class _ViewFollowersState extends State<ViewFollowers> with SingleTickerProvider
                         alignment: Alignment.centerLeft,
                           child: GestureDetector(
                             child: AspectRatio(
-                            aspectRatio: 1/1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: new DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: new NetworkImage(
-                                      "https://i.imgur.com/BoN9kdC.png")
-                                )
-                              ),
-                              margin: EdgeInsets.all(10.0),            
-                            )
-                          ),
-                        onTap: (){
-                          Navigator.of(context).push(_viewUser());
-                        },
-                        )
+                              aspectRatio: 1/1,
+                              child: Container(
+                                child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 40),
+                                margin: EdgeInsets.all(10.0),            
+                              )
+                            ),
+                            onTap: () {Navigator.of(context).push(_viewUser());},
+                          )
                       ), Expanded(child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(

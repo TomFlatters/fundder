@@ -19,7 +19,6 @@ class Page2 extends StatefulWidget {
 class _Page2State extends State<Page2> {
   int _current = 0;
   CarouselController _carouselController = CarouselController();
-
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
@@ -311,10 +310,8 @@ class _Page2State extends State<Page2> {
                               '${charities[index]}'),
                         onTap: (){
                           charity=index;
-                          setState(() {
-                            
-                          });
-                        } ,
+                          setState(() {});
+                        },
                       );
                     }
                   )
