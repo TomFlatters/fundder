@@ -23,7 +23,7 @@ class _ViewPostState extends State<ViewPost> {
 
   @override
   void initState() {
-    print(widget.postData);
+    //print(widget.postData);
     _getPost();
     super.initState();
   }
@@ -53,7 +53,7 @@ class _ViewPostState extends State<ViewPost> {
   Widget build(BuildContext context) {
     print("View post controller");
     Post postData = post;
-    print(howLongAgo(postData.timestamp));
+    //print(howLongAgo(postData.timestamp));
     return (postData == null)
         ? Loading()
         : Scaffold(
@@ -176,8 +176,13 @@ class _ViewPostState extends State<ViewPost> {
                                               )))
                                     ]),
                                     onPressed: () {
-                                      Navigator.of(context)
-                                          .push(_showComments());
+                                      /*Navigator.of(context)
+                                          .push(_showComments());*/
+                                      Navigator.pushNamed(
+                                          context,
+                                          '/post/' +
+                                              widget.postData +
+                                              '/comments');
                                     },
                                   ),
                                 ),
@@ -271,7 +276,9 @@ class _ViewPostState extends State<ViewPost> {
                                   ),
                                 ),
                                 onTap: () {
-                                  Navigator.of(context).push(_openDonate());
+                                  /*Navigator.of(context).push(_openDonate());*/
+                                  Navigator.pushNamed(context,
+                                      '/post/' + widget.postData + '/donate');
                                 }),
                           ],
                         )))
@@ -287,22 +294,4 @@ class _ViewPostState extends State<ViewPost> {
           return SharePost();
         });
   }
-}
-
-Route _openDonate() {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => DonatePage(),
-    transitionsBuilder: (c, anim, a2, child) =>
-        FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
-}
-
-Route _showComments() {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => CommentPage(),
-    transitionsBuilder: (c, anim, a2, child) =>
-        FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
 }
