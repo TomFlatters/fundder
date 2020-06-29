@@ -17,6 +17,20 @@ class DatabaseService {
   final CollectionReference userCollection = Firestore.instance.collection('users');
   final CollectionReference postsCollection = Firestore.instance.collection('posts');
 
+  // -------------
+  // 1. User CRUD:
+  // -------------
+
+  // Create: Users are created upon registration.
+  // TBC by refactor
+
+  // Read: user information by the id used to instantiate the DatabaseService
+  Future<User> readUserData() async {
+    DocumentSnapshot userData = await userCollection.document(uid).get();
+    User fetchedUser = _userDataFromSnapshot(userData);
+    return fetchedUser;
+  }
+
   // Update User
   Future updateUserData(String email, String username, String name) async {
     // create or update the document with this uid
@@ -32,7 +46,20 @@ class DatabaseService {
     return userCollection.snapshots();
   }
 
-  // Given a document return a Post type
+  // Given a document return a User type object
+  User _userDataFromSnapshot(DocumentSnapshot doc){
+    return User(
+          uid: doc.data['uid'],
+          username: doc.data['username'],
+          email: doc.data['email'],
+          bio: doc.data['bio'],
+          followers: doc.data['followers'],
+          following: doc.data['following'],
+          gender: doc.data['gender'],
+        );
+  }
+
+  // Given a document return a Post type object
   Post _makePost(DocumentSnapshot doc){
     return Post(
         author: doc.data['author'],
@@ -51,17 +78,16 @@ class DatabaseService {
   // Get posts list stream is mapped to the Post object
   List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((DocumentSnapshot doc){
-      // print(doc.data['timestamp'].toString());
       return _makePost(doc);
     }).toList();
   }
 
-  // Get list of posts
+  // Get list of posts ordered by time
   Stream<List<Post>> get posts {
     return postsCollection.orderBy("timestamp", descending: true).limit(10).snapshots().map(_postsDataFromSnapshot);
   }
 
-  // Get list of posts
+  // Get list of posts for given author
   Stream<List<Post>> postsByUser(id) {
     return postsCollection.where("author", isEqualTo: id).orderBy("timestamp", descending: true).limit(10).snapshots().map(_postsDataFromSnapshot);
   }
