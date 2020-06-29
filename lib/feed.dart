@@ -101,8 +101,10 @@ class _FeedViewState extends State<FeedView> {
                                                 margin: EdgeInsets.all(10.0),
                                               )),
                                           onTap: () {
-                                            Navigator.of(context)
-                                                .push(_viewUser());
+                                            //Navigator.of(context)
+                                            //.push(_viewUser());
+                                            Navigator.pushNamed(
+                                                context, '/username');
                                           },
                                         )),
                                     Align(
@@ -215,8 +217,13 @@ class _FeedViewState extends State<FeedView> {
                                                 )))
                                       ]),
                                       onPressed: () {
-                                        Navigator.of(context)
-                                            .push(_showComments());
+                                        /*Navigator.of(context)
+                                            .push(_showComments());*/
+                                        Navigator.pushNamed(
+                                            context,
+                                            '/post/' +
+                                                postData.id +
+                                                '/comments');
                                       },
                                     ),
                                   ),
@@ -259,7 +266,6 @@ class _FeedViewState extends State<FeedView> {
                           ))),
                   onTap: () {
                     print(postData);
-                    //Navigator.of(context).push(_createRoute(postData));
                     Navigator.pushNamed(context, '/post/' + postData.id);
                   },
                 );
@@ -299,32 +305,4 @@ class _FeedViewState extends State<FeedView> {
       );
     }).toList();
   }
-}
-
-Route _showComments() {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => CommentPage(),
-    transitionsBuilder: (c, anim, a2, child) =>
-        FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
-}
-
-// Create route is called when user clicks on a post.
-Route _createRoute(Post postData) {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => ViewPost(postData: postData.id),
-    transitionsBuilder: (c, anim, a2, child) =>
-        FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
-}
-
-Route _viewUser() {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => ViewUser(),
-    transitionsBuilder: (c, anim, a2, child) =>
-        FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
 }

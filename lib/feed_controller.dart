@@ -13,10 +13,10 @@ class FeedController extends StatefulWidget {
   FeedController(this.color);
 }
 
-class _FeedState extends State<FeedController> with SingleTickerProviderStateMixin {
-  
+class _FeedState extends State<FeedController>
+    with SingleTickerProviderStateMixin {
   final List<String> entries = <String>['A', 'B', 'C'];
-  final List<String> colors = <String>['ff6b6c','E63946','ff6b6c'];
+  final List<String> colors = <String>['ff6b6c', 'E63946', 'ff6b6c'];
   int index = 0;
   //bool colorChanged = true;
 
@@ -39,9 +39,7 @@ class _FeedState extends State<FeedController> with SingleTickerProviderStateMix
     if (_tabController.indexIsChanging) {
       //index = _tabController.index;
       //colorChanged = false;
-      setState(() {
-        
-      });
+      setState(() {});
     }
     print(_tabController.animation.value);
   }
@@ -54,32 +52,31 @@ class _FeedState extends State<FeedController> with SingleTickerProviderStateMix
     print(_tabController.animation.value);
   }*/
 
-
-
- @override
- Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text('Feed'),
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: HexColor(colors[_tabController.index]),
-            tabs: [
-              Tab(text: 'Do'),
-              Tab(text: 'Fund'),
-              Tab(text: 'Done'),
-            ],
-          ),
-        ),
-        body: //FeedView('Do', HexColor('ff6b6c'))
-        TabBarView(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Feed'),
+        bottom: TabBar(
           controller: _tabController,
-          children: [
-          DoChallenge(),
-          FeedView("Fund", null, HexColor(colors[1])),
-          FeedView("Done", null, HexColor(colors[2])),
-        ]),
+          indicatorColor: HexColor(colors[_tabController.index]),
+          tabs: [
+            Tab(text: 'Do'),
+            Tab(text: 'Fund'),
+            Tab(text: 'Done'),
+          ],
+        ),
+      ),
+      body: //FeedView('Do', HexColor('ff6b6c'))
+          TabBarView(
+              physics: NeverScrollableScrollPhysics(),
+              controller: _tabController,
+              children: [
+            DoChallenge(),
+            FeedView("Fund", null, HexColor(colors[1])),
+            FeedView("Done", null, HexColor(colors[2])),
+          ]),
     );
- }
+  }
 }
