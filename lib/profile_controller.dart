@@ -20,8 +20,8 @@ class ProfileController extends StatefulWidget {
   ProfileController();
 }
 
-class _ProfileState extends State<ProfileController>
-    with SingleTickerProviderStateMixin {
+class _ProfileState extends State<ProfileController> with SingleTickerProviderStateMixin {
+  
   final AuthService _auth = AuthService();
 
   TabController _tabController;
@@ -65,132 +65,116 @@ class _ProfileState extends State<ProfileController>
       setState(() {});
     }
   }
-
-  @override
-  Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(_username),
-        actions: <Widget>[
-          FlatButton(
-            onPressed:
-                () /*async {
-              await _auth.signOut();
-            }*/
-                {
-              _showOptions();
-            },
-            child: Icon(AntDesign.ellipsis1),
-          )
-        ],
-      ),
-      body: ListView(shrinkWrap: true, children: <Widget>[
+@override
+Widget build(BuildContext context) { 
+  final user = Provider.of<User>(context);
+  // print(user.uid);
+  return Scaffold(
+    appBar: AppBar(
+      centerTitle: true,
+      title: Text(_username),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () /*async {
+            await _auth.signOut();
+          }*/ {_showOptions();}, 
+          child: Icon(AntDesign.ellipsis1),
+        )
+      ],
+    ),
+    body: ListView(
+      shrinkWrap: true,
+      children: <Widget>[
         Container(
-          margin: EdgeInsets.only(top: 20, bottom: 10),
+          margin: EdgeInsets.only(top: 20, bottom:10),
           alignment: Alignment.center,
           child: Container(
             child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 90),
-            margin: EdgeInsets.all(10.0),
+            margin: EdgeInsets.all(10.0),            
           ),
-        ),
-        Center(
+        ), Center(
           child: Text(_name),
-        ),
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-            height: 50,
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                    child: GestureDetector(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.topCenter,
-                        child: Text("54",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            )),
-                      ),
-                      Expanded(
-                          child: Container(
-                        alignment: Alignment.bottomCenter,
-                        child: Text("Following"),
-                      )),
-                    ],
+        ), Container(
+          margin: EdgeInsets.symmetric(horizontal:50, vertical: 20),
+          height: 50,
+          child: Row(
+            children: <Widget>[
+              Expanded( child:GestureDetector(
+                child: Column( children: <Widget>[
+                Container(
+                  alignment: Alignment.topCenter,
+                  child: Text("54", 
+                    style: TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold,
+                    )
                   ),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/username/followers');
-                  },
+                ),
+                Expanded( child:Container(
+                  alignment: Alignment.bottomCenter,
+                  child: Text("Following"),
                 )),
-                Expanded(
-                    child: GestureDetector(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.topCenter,
-                        child: Text("106",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            )),
-                      ),
-                      Expanded(
-                          child: Container(
-                        alignment: Alignment.bottomCenter,
-                        child: Text("Followers"),
-                      )),
-                    ],
+                ],),
+                onTap: () {Navigator.of(context).push(_viewFollowers());},
+              )),
+              Expanded( child:GestureDetector(
+                child: Column( children: <Widget>[
+                Container(
+                  alignment: Alignment.topCenter,
+                  child: Text("106", 
+                    style: TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold,
+                    )
                   ),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/username/followers');
-                  },
+                ),
+                Expanded( child:Container(
+                  alignment: Alignment.bottomCenter,
+                  child: Text("Followers"),
                 )),
-                Expanded(
-                    child: Column(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.topCenter,
-                      child: Text("£54",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          )),
-                    ),
-                    Expanded(
-                        child: Container(
-                      alignment: Alignment.bottomCenter,
-                      child: Text("Raised"),
-                    )),
-                  ],
+                ],),
+                onTap: () {Navigator.of(context).push(_viewFollowers());},
+              )),
+              Expanded(
+                child: Column( children: <Widget>[
+                Container(
+                  alignment: Alignment.topCenter,
+                  child: Text("£54", 
+                    style: TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold,
+                    )
+                  ),
+                ),
+                Expanded( child:Container(
+                  alignment: Alignment.bottomCenter,
+                  child: Text("Raised"),
                 )),
-              ],
-            )),
-        GestureDetector(
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-              margin: EdgeInsets.only(left: 70, right: 70, bottom: 20),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 1),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                ],)
               ),
-              child: Text(
-                "Edit Profile",
-                textAlign: TextAlign.center,
-                style: TextStyle(
+            ],
+          )
+        ),  GestureDetector(
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            margin: EdgeInsets.only(left: 70, right:70, bottom: 20),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1),
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
+            child: Text(
+              "Edit Profile",
+              textAlign: TextAlign.center,
+              style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                   color: Colors.black,
                 ),
               ),
             ),
-            onTap: () {
-              Navigator.pushNamed(context, '/account/edit');
-            }),
-        DefaultTabController(
+          onTap: (){ Navigator.pushNamed(context, '/account/edit');
+          }
+        ), DefaultTabController(
           length: 2,
           initialIndex: 0,
           child: Column(
@@ -198,17 +182,25 @@ class _ProfileState extends State<ProfileController>
               TabBar(
                 tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')],
                 controller: _tabController,
-              ),
-              [
-                FeedView('user', _username, Colors.black),
-                FeedView('user', _username, Colors.blue),
-              ][_tabController.index]
+                ),
+                [FeedView('user', _username, Colors.black, DatabaseService(uid: user.uid).postsByUser(user.uid)),
+                FeedView('user', _username, Colors.blue, DatabaseService(uid: user.uid).postsByUser(user.uid)),][_tabController.index]
+              /*ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: 1000),
+                child: TabBarView(
+                    children: [
+                      FeedView('user', Colors.black),
+                      FeedView('user', Colors.black),
+                      ],
+                  )
+              )*/
             ],
-          ),
+          ), 
         )
-      ]),
-    );
-  }
+      ]
+    ),
+  );
+ }
 
   void _showOptions() {
     showModalBottomSheet(

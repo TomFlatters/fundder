@@ -8,17 +8,19 @@ class Post {
   final comments;
   final String subtitle;
   final timestamp;
-  final String id;
+  String imageUrl;
 
-  Post(
-      {this.author,
-      this.title,
-      this.charity,
-      this.amountRaised,
-      this.targetAmount,
-      this.subtitle,
-      this.likes,
-      this.comments,
-      this.timestamp,
-      this.id});
+  Post({ 
+    this.author, this.title, this.charity,
+    this.amountRaised, this.targetAmount, 
+    this.subtitle, this.likes,
+    this.comments, this.timestamp, this.imageUrl
+    });
+
+  double percentRaised(){
+    var raised = double.parse(amountRaised.contains(",") ? amountRaised.replaceAll(",", "") : amountRaised);
+    var target = double.parse(targetAmount.contains(",") ? targetAmount.replaceAll(",", "") : targetAmount);
+    return raised/target;
+  }
+
 }
