@@ -11,8 +11,8 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:titled_navigation_bar/titled_navigation_bar.dart';
 
 class Home extends StatefulWidget {
- @override
- State<StatefulWidget> createState() {
+  @override
+  State<StatefulWidget> createState() {
     return _HomeState();
   }
 }
@@ -20,22 +20,24 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final List<Widget> screens = [
-   FeedController(Colors.white),
-   SearchController(),
-   PlaceholderWidget(Colors.deepOrange),
-   LikedController(),
-   ProfileController()];
+    FeedController(Colors.white),
+    SearchController(),
+    PlaceholderWidget(Colors.deepOrange),
+    LikedController(),
+    ProfileController()
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
         children: screens,
-      ),// new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
+      ), // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.black,
-        unselectedItemColor: Color.fromRGBO(0, 0, 0, 0.5), //hexcolor method is custom at bottom
+        unselectedItemColor:
+            Color.fromRGBO(0, 0, 0, 0.5), //hexcolor method is custom at bottom
         iconSize: 26,
         onTap: onTabTapped, // new
         currentIndex: _currentIndex, // new
@@ -43,31 +45,31 @@ class _HomeState extends State<Home> {
           new BottomNavigationBarItem(
             icon: Icon(
               AntDesign.home,
-              ),
+            ),
             title: showIndicator(_currentIndex == 0),
           ),
           new BottomNavigationBarItem(
             icon: Icon(
               AntDesign.search1,
-              ),
+            ),
             title: showIndicator(_currentIndex == 1),
           ),
           new BottomNavigationBarItem(
             icon: Icon(
               AntDesign.plussquareo,
-              ),
+            ),
             title: showIndicator(_currentIndex == 2),
           ),
           new BottomNavigationBarItem(
             icon: Icon(
               AntDesign.hearto,
-              ),
+            ),
             title: showIndicator(_currentIndex == 3),
           ),
           new BottomNavigationBarItem(
             icon: Icon(
               AntDesign.user,
-              ),
+            ),
             title: showIndicator(_currentIndex == 4),
           )
         ],
@@ -76,43 +78,21 @@ class _HomeState extends State<Home> {
   }
 
   Widget showIndicator(bool show) {
-  return show
-      ? Padding(
-          padding: const EdgeInsets.only(top: 4, bottom: 0),
-          child: Icon(Icons.brightness_1, size: 4, color: Colors.black),
-        )
-      : SizedBox(height: 8);
+    return show
+        ? Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 0),
+            child: Icon(Icons.brightness_1, size: 4, color: Colors.black),
+          )
+        : SizedBox(height: 8);
   }
-  
+
   void onTabTapped(int index) {
-    if(index!=2){setState(() {
-     _currentIndex = index;
-     });
+    if (index != 2) {
+      setState(() {
+        _currentIndex = index;
+      });
     } else {
-      Navigator.of(context).push(_createRoute());
+      Navigator.pushNamed(context, '/addpost');
     }
   }
-}
-
-Route _createRoute() {
-  /*return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => Page2(),
-    transitionsBuilder: (c, anim, a2, child) => FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );*/
-    return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => Page2(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
-      var end = Offset.zero;
-      var curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
 }
