@@ -18,7 +18,9 @@ howLongAgo(timestamp){
   else if (timeElapsed.inSeconds>0){
     return timeElapsed.inSeconds.toString() + " second(s) ago";
   }
-  else {
+  else if (timeElapsed.inMicroseconds>0) {
+    return "Just now";
+  } else {
     return "Unknown date of post";
   }
 }

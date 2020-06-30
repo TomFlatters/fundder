@@ -2,9 +2,12 @@
 // feed.dart controls the actual feed content
 
 import 'package:flutter/material.dart';
+import 'package:fundder/services/database.dart';
+import 'package:provider/provider.dart';
 import 'feed.dart';
 import 'helper_classes.dart';
 import 'do_challenge.dart';
+import 'models/user.dart';
 
 class FeedController extends StatefulWidget {
   @override
@@ -52,31 +55,22 @@ class _FeedState extends State<FeedController>
     print(_tabController.animation.value);
   }*/
 
-  @override
-  Widget build(BuildContext context) {
+
+
+ @override
+ Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text('Feed'),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: HexColor(colors[_tabController.index]),
-          tabs: [
-            Tab(text: 'Do'),
-            Tab(text: 'Fund'),
-            Tab(text: 'Done'),
-          ],
-        ),
-      ),
-      body: //FeedView('Do', HexColor('ff6b6c'))
-          TabBarView(
-              physics: NeverScrollableScrollPhysics(),
-              controller: _tabController,
-              children: [
-            DoChallenge(),
-            FeedView("Fund", null, HexColor(colors[1])),
-            FeedView("Done", null, HexColor(colors[2])),
-          ]),
+          children: [
+          DoChallenge(),
+          FeedView("Fund", null, HexColor(colors[1]), DatabaseService(uid: user.uid).posts),
+          FeedView("Done", null, HexColor(colors[2]), DatabaseService(uid: user.uid).posts),
+        ]),
     );
   }
 }
