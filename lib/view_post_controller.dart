@@ -9,6 +9,7 @@ import 'comment_view_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'services/database.dart';
 
 class ViewPost extends StatefulWidget {
   final String postData;
@@ -25,6 +26,12 @@ class _ViewPostState extends State<ViewPost> {
   void initState() {
     //print(widget.postData);
     _getPost();
+    /*DatabaseService(uid: user.uid).getPostById(widget.postData)
+                    .then((post) => {
+                      setState(() {
+                        post = post;
+                      })
+                    });*/
     super.initState();
   }
 

@@ -61,7 +61,8 @@ class _AddPostState extends State<AddPost> {
                                   ))
                                   .then((postId) => {
                                         print("The doc id is " +
-                                            postId.toString()),
+                                            postId.toString().substring(1,
+                                                postId.toString().length - 1)),
 
                                         // if the post is successfully added, view the post
                                         /*DatabaseService(uid: user.uid).getPostById(postId.toString())
@@ -69,8 +70,13 @@ class _AddPostState extends State<AddPost> {
                       Navigator.of(context)
                         .pushReplacement(_viewPost(post))
                     })*/
-                                        Navigator.pushReplacementNamed(context,
-                                            '/post/' + postId.toString())
+                                        Navigator.pushReplacementNamed(
+                                            context,
+                                            '/post/' +
+                                                postId.toString().substring(
+                                                    1,
+                                                    postId.toString().length -
+                                                        1)) //the substring is very important as postId.toString() is in brackets
                                       })
                             });
                   }
