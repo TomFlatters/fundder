@@ -142,7 +142,7 @@ class _DoChallengeState extends State<DoChallenge> {
                     ],
                   ))),
           onTap: () {
-            Navigator.of(context).push(_createRoute());
+            Navigator.pushNamed(context, '/challenge/' + '123');
           },
         );
       },
@@ -153,13 +153,4 @@ class _DoChallengeState extends State<DoChallenge> {
       },
     );
   }
-}
-
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => ChallengeDetail(),
-    transitionsBuilder: (c, anim, a2, child) =>
-        FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
 }

@@ -10,6 +10,9 @@ import 'shared/loading.dart';
 
 class ChallengeDetail extends StatefulWidget {
   @override
+  final String challengeId;
+  ChallengeDetail({this.challengeId});
+
   _ChallengeDetailState createState() => _ChallengeDetailState();
 }
 
@@ -146,7 +149,8 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                             ),
                           ),
                           onTap: () {
-                            Navigator.of(context).push(_openDonate());
+                            Navigator.pushNamed(context,
+                                '/challenge/' + widget.challengeId + '/steps');
                           }),
                       GestureDetector(
                           child: Container(
@@ -174,7 +178,8 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                             ),
                           ),
                           onTap: () {
-                            Navigator.of(context).push(_openDonate());
+                            Navigator.pushNamed(context,
+                                '/challenge/' + widget.challengeId + '/steps');
                           }),
                     ],
                   )))
@@ -182,13 +187,4 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
       ),
     );
   }
-}
-
-Route _openDonate() {
-  return PageRouteBuilder(
-    pageBuilder: (c, a1, a2) => StepsPage(),
-    transitionsBuilder: (c, anim, a2, child) =>
-        FadeTransition(opacity: anim, child: child),
-    transitionDuration: Duration(milliseconds: 300),
-  );
 }
