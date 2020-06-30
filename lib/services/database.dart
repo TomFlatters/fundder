@@ -48,20 +48,20 @@ class DatabaseService {
   }
 
   // Given a document return a User type object
-  User _userDataFromSnapshot(DocumentSnapshot doc){
+  User _userDataFromSnapshot(DocumentSnapshot doc) {
     return User(
-          uid: doc.data['uid'],
-          username: doc.data['username'],
-          email: doc.data['email'],
-          bio: doc.data['bio'],
-          followers: doc.data['followers'],
-          following: doc.data['following'],
-          gender: doc.data['gender'],
-        );
+      uid: doc.data['uid'],
+      username: doc.data['username'],
+      email: doc.data['email'],
+      bio: doc.data['bio'],
+      followers: doc.data['followers'],
+      following: doc.data['following'],
+      gender: doc.data['gender'],
+    );
   }
 
   // Given a document return a Post type object
-  Post _makePost(DocumentSnapshot doc){
+  Post _makePost(DocumentSnapshot doc) {
     return Post(
         author: doc.data['author'],
         title: doc.data['title'],
@@ -73,69 +73,75 @@ class DatabaseService {
         subtitle: doc.data['subtitle'],
         timestamp: doc.data['timestamp'],
         imageUrl: doc.data['imageUrl'],
-      );
+        id: doc.documentID);
   }
 
   // Get posts list stream is mapped to the Post object
   List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.documents.map((DocumentSnapshot doc){
+    return snapshot.documents.map((DocumentSnapshot doc) {
       return _makePost(doc);
     }).toList();
   }
 
   // Get list of posts ordered by time
   Stream<List<Post>> get posts {
-    return postsCollection.orderBy("timestamp", descending: true).limit(10).snapshots().map(_postsDataFromSnapshot);
+    return postsCollection
+        .orderBy("timestamp", descending: true)
+        .limit(10)
+        .snapshots()
+        .map(_postsDataFromSnapshot);
   }
 
   // Get list of posts for given author
   Stream<List<Post>> postsByUser(id) {
-    return postsCollection.where("author", isEqualTo: id).orderBy("timestamp", descending: true).limit(10).snapshots().map(_postsDataFromSnapshot);
+    return postsCollection
+        .where("author", isEqualTo: id)
+        .orderBy("timestamp", descending: true)
+        .limit(10)
+        .snapshots()
+        .map(_postsDataFromSnapshot);
   }
 
   // Upload post and return the document id
   Future uploadPost(Post post) async {
-    return await postsCollection.add({
-        "author": post.author,
-        "title": post.title,
-        "charity": post.charity,
-        "amountRaised": post.amountRaised,
-        "targetAmount": post.targetAmount,
-        "likes": post.likes,
-        "comments": post.comments,
-        "subtitle": post.subtitle,
-        "timestamp": post.timestamp,
-        "imageUrl": post.imageUrl,
-    })
-    .then((DocumentReference docRef) => {
-      docRef.documentID.toString()
-    })
-    .catchError((error) => {
-      print(error)
-    });
+    return await postsCollection
+        .add({
+          "author": post.author,
+          "title": post.title,
+          "charity": post.charity,
+          "amountRaised": post.amountRaised,
+          "targetAmount": post.targetAmount,
+          "likes": post.likes,
+          "comments": post.comments,
+          "subtitle": post.subtitle,
+          "timestamp": post.timestamp,
+          "imageUrl": post.imageUrl,
+        })
+        .then((DocumentReference docRef) => {docRef.documentID.toString()})
+        .catchError((error) => {print(error)});
   }
 
   // Get a post from Firestore given a known id
   Future getPostById(String documentId) async {
-    String formattedId = documentId.substring(1, documentId.length-1);
+    String formattedId = documentId.substring(1, documentId.length - 1);
     DocumentReference docRef = postsCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
-        print(doc);
-        if (doc.exists) {
-            print("Document data:" + doc.data.toString());
-            return _makePost(doc);
-        } else {
-            // doc.data() will be undefined in this case
-            print("Error - the post you are looking for doesn't exist.");
-            return null;
-        }
-    }).catchError((error) {
-        print("Error getting document: " + error);
+      print(doc);
+      if (doc.exists) {
+        print("Document data:" + doc.data.toString());
+        return _makePost(doc);
+      } else {
+        // doc.data() will be undefined in this case
+        print("Error - the post you are looking for doesn't exist.");
         return null;
+      }
+    }).catchError((error) {
+      print("Error getting document: " + error);
+      return null;
     });
   }
 
-  // Storage ref: 
+  // Storage ref:
   // Images are stored as <root>/images/<uid>/<milliseconds-from-epoch>
   // BE AWARE: this convention will cause a naming conflict if one user uploads multiple images at the exact same time
   final StorageReference storageRef = FirebaseStorage().ref().child("images/");
@@ -147,7 +153,7 @@ class DatabaseService {
     // await the task uploaded
     var storageTaskSnapshot = await uploadTask.onComplete;
     // then return the downloadURL
-    if(storageTaskSnapshot != null){
+    if (storageTaskSnapshot != null) {
       var downloadUrl = await imageRef.getDownloadURL();
       return downloadUrl.toString();
     }

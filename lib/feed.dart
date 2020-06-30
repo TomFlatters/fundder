@@ -22,7 +22,8 @@ class FeedView extends StatefulWidget {
   final String feedChoice;
   final String identifier;
   final Stream<List<Post>> postsStream;
-  FeedView(this.feedChoice, this.identifier, this.colorChoice, this.postsStream);
+  FeedView(
+      this.feedChoice, this.identifier, this.colorChoice, this.postsStream);
 }
 
 class _FeedViewState extends State<FeedView> {
@@ -55,50 +56,54 @@ class _FeedViewState extends State<FeedView> {
   @override
   Widget build(BuildContext context) {
     return new StreamBuilder(
-          stream: widget.postsStream,
-          // widget.feedChoice == 'user'
-          //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
-          //   : Firestore.instance.collection("posts").snapshots(),
-          builder: (context, snapshot) {
-            // print(snapshot.data);
-            if (!snapshot.hasData){
-              return Text("No data...");
-            } else {
-              return ListView.separated(
-                physics: physics,
-                shrinkWrap: true,
-                padding: const EdgeInsets.only(top: 10.0),
-                itemCount: snapshot.data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  Post postData = snapshot.data[index];
-                  // print(postData);
-                  return GestureDetector(
-                    child: Container(
-                    color: Colors.white,
-                    child: Container(
-                      margin: EdgeInsets.only(left: 0, right: 0, top:0),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            height: 60,
-                            child: Row(
-                              children: <Widget>[Align(
-                                alignment: Alignment.centerLeft,
-                                child: GestureDetector(
-                                  child: AspectRatio(
-                                    aspectRatio: 1/1,
-                                    child: Container(
-                                      child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 40),
-                                      margin: EdgeInsets.all(10.0),            
-                                    )
-                                  ),
-                                  onTap: () {Navigator.of(context).push(_viewUser());},
-                                )
-                              ), Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  postData.author
-                                  /*style: TextStyle(
+        stream: widget.postsStream,
+        // widget.feedChoice == 'user'
+        //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
+        //   : Firestore.instance.collection("posts").snapshots(),
+        builder: (context, snapshot) {
+          // print(snapshot.data);
+          if (!snapshot.hasData) {
+            return Text("No data...");
+          } else {
+            return ListView.separated(
+              physics: physics,
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(top: 10.0),
+              itemCount: snapshot.data.length,
+              itemBuilder: (BuildContext context, int index) {
+                Post postData = snapshot.data[index];
+                // print(postData);
+                return GestureDetector(
+                  child: Container(
+                      color: Colors.white,
+                      child: Container(
+                          margin: EdgeInsets.only(left: 0, right: 0, top: 0),
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                height: 60,
+                                child: Row(
+                                  children: <Widget>[
+                                    Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: GestureDetector(
+                                          child: AspectRatio(
+                                              aspectRatio: 1 / 1,
+                                              child: Container(
+                                                child: ProfilePic(
+                                                    "https://i.imgur.com/BoN9kdC.png",
+                                                    40),
+                                                margin: EdgeInsets.all(10.0),
+                                              )),
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, '/username');
+                                          },
+                                        )),
+                                    Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(postData.author
+                                            /*style: TextStyle(
                                     fontFamily: 'Roboto Mono'
                                   ),*/
                                             )),
@@ -118,7 +123,8 @@ class _FeedViewState extends State<FeedView> {
                                   child: Text(postData.subtitle)),
                               Container(
                                   alignment: Alignment.centerLeft,
-                                  margin: EdgeInsets.all(10),
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 10),
                                   child: Text(
                                     '£${postData.amountRaised} raised of £${postData.targetAmount} target',
                                     style:
@@ -126,36 +132,27 @@ class _FeedViewState extends State<FeedView> {
                                   )),
                               Container(
                                 alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 0, vertical: 10),
+                                margin: EdgeInsets.only(
+                                    top: 5, bottom: 15, left: 0, right: 0),
                                 child: LinearPercentIndicator(
                                   linearStrokeCap: LinearStrokeCap.butt,
-                                  lineHeight: 5,
+                                  lineHeight: 3,
                                   percent: double.parse(postData.amountRaised) /
                                       double.parse(postData.targetAmount),
                                   backgroundColor: HexColor('CCCCCC'),
-                                  progressColor: widget.colorChoice,
+                                  progressColor: HexColor('ff6b6c'),
                                 ),
                               ),
-                            )
-                          ), Container(
-                            alignment: Alignment.centerLeft,
-                            margin: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                            child: LinearPercentIndicator(
-                              linearStrokeCap: LinearStrokeCap.butt,
-                              lineHeight: 5,
-                              percent: postData.percentRaised(),
-                              backgroundColor: HexColor('CCCCCC'),
-                              progressColor: widget.colorChoice,
-                            ),
-                            ), Container(
+                              Container(
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width,
                                   height: MediaQuery.of(context).size.width *
                                       9 /
                                       16,
                                   child: CachedNetworkImage(
-                                    imageUrl: (postData.imageUrl != null) ? postData.imageUrl : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
+                                    imageUrl: (postData.imageUrl != null)
+                                        ? postData.imageUrl
+                                        : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
                                     placeholder: (context, url) => Loading(),
                                     errorWidget: (context, url, error) =>
                                         Icon(Icons.error),
