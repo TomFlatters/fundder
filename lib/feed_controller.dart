@@ -55,10 +55,8 @@ class _FeedState extends State<FeedController>
     print(_tabController.animation.value);
   }*/
 
-
-
- @override
- Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
@@ -66,11 +64,22 @@ class _FeedState extends State<FeedController>
         title: Text('Feed'),
         bottom: TabBar(
           controller: _tabController,
-          children: [
-          DoChallenge(),
-          FeedView("Fund", null, HexColor(colors[1]), DatabaseService(uid: user.uid).posts),
-          FeedView("Done", null, HexColor(colors[2]), DatabaseService(uid: user.uid).posts),
-        ]),
+          indicatorColor: HexColor(colors[_tabController.index]),
+          tabs: [
+            Tab(text: 'Do'),
+            Tab(text: 'Fund'),
+            Tab(text: 'Done'),
+          ],
+        ),
+      ),
+      body: //FeedView('Do', HexColor('ff6b6c'))
+          TabBarView(controller: _tabController, children: [
+        DoChallenge(),
+        FeedView("Fund", null, HexColor(colors[1]),
+            DatabaseService(uid: user.uid).posts),
+        FeedView("Done", null, HexColor(colors[2]),
+            DatabaseService(uid: user.uid).posts),
+      ]),
     );
   }
 }

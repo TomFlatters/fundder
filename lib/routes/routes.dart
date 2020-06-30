@@ -24,7 +24,9 @@ class FluroRouter {
           DonatePage(postData: params['id'][0]));
   static Handler _viewOtherProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ViewUser());
+          ViewUser(
+            uid: 'hkKCaiUeWUYhKwRLA0zDOoEuKxW2',
+          ));
   static Handler _followersHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ViewFollowers());
