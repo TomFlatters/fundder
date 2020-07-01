@@ -10,6 +10,7 @@ import 'package:fundder/challenge_steps_view.dart';
 import 'package:fundder/view_followers_controller.dart';
 import 'package:fundder/profile_controller.dart';
 import 'package:fundder/edit_profile_controller.dart';
+import 'package:fundder/feed_controller.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -42,6 +43,9 @@ class FluroRouter {
   static Handler _challengeStepsHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           StepsPage(challengeId: params['id'][0]));
+  static Handler _feedHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          FeedController());
 
   static void setupRouter() {
     router.define(
@@ -81,5 +85,6 @@ class FluroRouter {
       '/challenge/:id/steps',
       handler: _challengeStepsHandler,
     );
+    router.define('/feed', handler: _feedHandler);
   }
 }
