@@ -8,12 +8,12 @@ import 'feed.dart';
 import 'helper_classes.dart';
 import 'do_challenge.dart';
 import 'models/user.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'web_pages/menu_item.dart';
 
 class FeedController extends StatefulWidget {
   @override
   _FeedState createState() => _FeedState();
-  final Color color;
-  FeedController(this.color);
 }
 
 class _FeedState extends State<FeedController>
