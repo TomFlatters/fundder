@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/auth_screens/register.dart';
+import 'package:fundder/helper_classes.dart';
 
 class DefaultButton extends StatelessWidget {
   final String text;
@@ -15,10 +17,11 @@ class DefaultButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(25),
       child: FlatButton(
         padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-        color: Colors.black,
+        color: HexColor('ff6b6c'),
         onPressed: press,
         child: Text(
-          text.toUpperCase(),
+          text,
+          style: TextStyle(color: Colors.white),
         ),
       ),
     );

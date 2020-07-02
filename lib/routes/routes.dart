@@ -11,6 +11,10 @@ import 'package:fundder/view_followers_controller.dart';
 import 'package:fundder/profile_controller.dart';
 import 'package:fundder/edit_profile_controller.dart';
 import 'package:fundder/feed_controller.dart';
+import 'package:fundder/web_pages/feed_web.dart';
+import 'package:fundder/web_pages/about_page.dart';
+import 'package:fundder/web_pages/login_web.dart';
+import 'package:fundder/web_pages/logging_out.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -43,9 +47,21 @@ class FluroRouter {
   static Handler _challengeStepsHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           StepsPage(challengeId: params['id'][0]));
+
+  // Web handlers
+
   static Handler _feedHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          FeedController());
+          WebFeed());
+  static Handler _aboutHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          AboutPage());
+  static Handler _webLoginHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          LoginWeb());
+  static Handler _loggingOutHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          LoginWeb());
 
   static void setupRouter() {
     router.define(
@@ -85,6 +101,14 @@ class FluroRouter {
       '/challenge/:id/steps',
       handler: _challengeStepsHandler,
     );
-    router.define('/feed', handler: _feedHandler);
+
+    // Web routes
+    router.define('/web/feed', handler: _feedHandler);
+    router.define('/about', handler: _aboutHandler);
+    router.define('/web/search', handler: _aboutHandler);
+    router.define('/web/activity', handler: _aboutHandler);
+    router.define('/web/profile', handler: _aboutHandler);
+    router.define('/web/login', handler: _webLoginHandler);
+    router.define('/web/logging_out', handler: _loggingOutHandler);
   }
 }

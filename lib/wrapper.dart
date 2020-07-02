@@ -4,14 +4,14 @@ import 'package:fundder/home_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_pages/fund_web.dart';
+import 'web_pages/feed_web.dart';
 
 class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget _isOnWeb() {
       if (kIsWeb) {
-        return FundWeb();
+        return WebFeed();
       } else {
         return Home();
       }
