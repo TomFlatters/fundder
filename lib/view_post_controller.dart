@@ -24,36 +24,15 @@ class _ViewPostState extends State<ViewPost> {
 
   @override
   void initState() {
-    //print(widget.postData);
     _getPost();
-    /*DatabaseService(uid: user.uid).getPostById(widget.postData)
-                    .then((post) => {
-                      setState(() {
-                        post = post;
-                      })
-                    });*/
     super.initState();
   }
 
   void _getPost() async {
-    Firestore.instance.document('posts/' + widget.postData).get().then((doc) {
-      setState(() {
-        if (doc != null) {
-          post = Post(
-            author: doc.data['author'],
-            title: doc.data['title'],
-            charity: doc.data['charity'],
-            amountRaised: doc.data['amountRaised'],
-            targetAmount: doc.data['targetAmount'],
-            likes: doc.data['likes'],
-            comments: doc.data['comments'],
-            subtitle: doc.data['subtitle'],
-            timestamp: doc.data['timestamp'],
-            imageUrl: doc.data['imageUrl'],
-            id: doc.documentID,
-          );
-        }
-      });
+    DatabaseService().getPostById(widget.postData).then((p) {
+      setState((){
+        post = p;
+        });
     });
   }
 
@@ -61,7 +40,6 @@ class _ViewPostState extends State<ViewPost> {
   Widget build(BuildContext context) {
     print("View post controller");
     Post postData = post;
-    //print(howLongAgo(postData.timestamp));
     return (postData == null)
         ? Loading()
         : Scaffold(
