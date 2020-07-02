@@ -132,7 +132,8 @@ class DatabaseService {
 
   // Get a post from Firestore given a known id
   Future getPostById(String documentId) async {
-    String formattedId = documentId.substring(1, documentId.length - 1);
+    String formattedId = (documentId[0]=="{" && documentId[-1]=="}") ? documentId.substring(1, documentId.length - 1) : documentId;
+    print(formattedId);
     DocumentReference docRef = postsCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
       print(doc);
@@ -174,7 +175,8 @@ class DatabaseService {
   
   // Get a post from Firestore given a known id
   Future getTemplateById(String documentId) async {
-    String formattedId = documentId.substring(1, documentId.length - 1);
+    String formattedId = (documentId[0]=="{" && documentId[-1]=="}") ? documentId.substring(1, documentId.length - 1) : documentId;
+    print(formattedId);
     DocumentReference docRef = templatesCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
       print(doc);
