@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fundder/models/post.dart';
+import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,8 @@ class DatabaseService {
       Firestore.instance.collection('users');
   final CollectionReference postsCollection =
       Firestore.instance.collection('posts');
+  final CollectionReference templatesCollection =
+      Firestore.instance.collection('templates');
 
   // -------------
   // 1. User CRUD:
@@ -139,6 +142,25 @@ class DatabaseService {
       print("Error getting document: " + error);
       return null;
     });
+  }
+
+  Future uploadTemplate(Template t) async {
+    return await templatesCollection
+        .add({
+          "author": t.author,
+          "title": t.title,
+          "charity": t.charity,
+          "amountRaised": t.amountRaised,
+          "targetAmount": t.targetAmount,
+          "likes": t.likes,
+          "comments": t.comments,
+          "subtitle": t.subtitle,
+          "timestamp": t.timestamp,
+          "imageUrl": t.imageUrl,
+          "whoDoes": t.whoDoes
+        })
+        .then((DocumentReference docRef) => {docRef.documentID.toString()})
+        .catchError((error) => {print(error)});
   }
 
   // Storage ref:
