@@ -99,7 +99,7 @@ class _AddPostState extends State<AddPost> {
                                         // if the post is successfully added, view the post
                                         Navigator.pushReplacementNamed(
                                             context,
-                                            '/post/' +
+                                            '/template/' +
                                                 templateId.toString().substring(
                                                     1,
                                                     templateId.toString().length -

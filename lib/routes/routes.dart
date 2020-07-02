@@ -16,6 +16,9 @@ class FluroRouter {
   static Handler _postHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ViewPost(postData: params['id'][0]));
+    static Handler _templateHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ViewPost(postData: params['id'][0]));
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(postData: params['id'][0]));
@@ -44,6 +47,11 @@ class FluroRouter {
           StepsPage(challengeId: params['id'][0]));
 
   static void setupRouter() {
+    router.define(
+      '/template/:id',
+      handler: _templateHandler,
+      transitionType: TransitionType.fadeIn,
+    );
     router.define(
       '/post/:id',
       handler: _postHandler,
