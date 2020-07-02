@@ -7,6 +7,7 @@ import 'view_post_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/models/post.dart';
+import 'package:fundder/models/template.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -76,7 +77,34 @@ class _AddPostState extends State<AddPost> {
                                         })
                               }else{
                                 // Create a template
-                                print("Creating a template")
+                                print("Creating a template"),
+                                DatabaseService(uid: user.uid)
+                                .uploadTemplate(new Template(
+                                      title: titleController.text.toString(),
+                                      subtitle:
+                                          subtitleController.text.toString(),
+                                      author: user.uid,
+                                      charity: charities[charity],
+                                      likes: [],
+                                      comments: {},
+                                      timestamp: DateTime.now(),
+                                      amountRaised: "0",
+                                      targetAmount:
+                                          moneyController.text.toString(),
+                                      imageUrl: downloadUrl,
+                                      whoDoes: whoDoes[selected],
+                                    ))
+                                .then((templateId) => {
+                                        print("The doc id is " + templateId.toString().substring(1, templateId.toString().length - 1)),
+                                        // if the post is successfully added, view the post
+                                        Navigator.pushReplacementNamed(
+                                            context,
+                                            '/post/' +
+                                                templateId.toString().substring(
+                                                    1,
+                                                    templateId.toString().length -
+                                                        1)) //the substring is very important as postId.toString() is in brackets
+                                })
                               }});}
                 : () {
                     /*Navigator.of(context).pushReplacement(_viewPost());*/
