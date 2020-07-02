@@ -63,6 +63,12 @@ class DatabaseService {
     );
   }
 
+
+
+  // -------------
+  // 2. Posts CRUD:
+  // -------------
+
   // Given a document return a Post type object
   Post _makePost(DocumentSnapshot doc) {
     return Post(
@@ -144,6 +150,48 @@ class DatabaseService {
     });
   }
 
+  // ------------------
+  // 3. Templates CRUD:
+  // ------------------
+
+  // Given a document return a Template type object
+  Template _makeTemplate(DocumentSnapshot doc) {
+    return Template(
+        author: doc.data['author'],
+        title: doc.data['title'],
+        charity: doc.data['charity'],
+        amountRaised: doc.data['amountRaised'],
+        targetAmount: doc.data['targetAmount'],
+        likes: doc.data['likes'],
+        comments: doc.data['comments'],
+        subtitle: doc.data['subtitle'],
+        timestamp: doc.data['timestamp'],
+        imageUrl: doc.data['imageUrl'],
+        id: doc.documentID,
+        whoDoes: doc.data['whoeDoes']
+        );
+  }
+  
+  // Get a post from Firestore given a known id
+  Future getTemplateById(String documentId) async {
+    String formattedId = documentId.substring(1, documentId.length - 1);
+    DocumentReference docRef = templatesCollection.document(formattedId);
+    return await docRef.get().then((DocumentSnapshot doc) {
+      print(doc);
+      if (doc.exists) {
+        print("Document data:" + doc.data.toString());
+        return _makeTemplate(doc);
+      } else {
+        // doc.data() will be undefined in this case
+        print("Error - the post you are looking for doesn't exist.");
+        return null;
+      }
+    }).catchError((error) {
+      print("Error getting document: " + error);
+      return null;
+    });
+  }
+
   Future uploadTemplate(Template t) async {
     return await templatesCollection
         .add({
@@ -162,6 +210,10 @@ class DatabaseService {
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
   }
+
+  // -----------------------------------
+  // 4. Firebase Storage (image upload):
+  // -----------------------------------
 
   // Storage ref:
   // Images are stored as <root>/images/<uid>/<milliseconds-from-epoch>
