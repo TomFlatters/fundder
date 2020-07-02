@@ -15,5 +15,17 @@ class Template extends Post {
       timestamp,
       imageUrl,
       id,
-      this.whoDoes});
+      this.whoDoes}) : super(
+        author:author,
+        title:title,
+        charity:charity,
+        amountRaised:amountRaised,
+        targetAmount:targetAmount,
+        subtitle:subtitle,
+        likes:likes,
+        comments:comments,
+        timestamp:timestamp,
+        imageUrl:imageUrl,
+        id:id,
+      );
 }
