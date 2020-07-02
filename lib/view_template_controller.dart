@@ -11,15 +11,15 @@ import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'services/database.dart';
 
-class ViewPost extends StatefulWidget {
+class ViewTemplate extends StatefulWidget {
   final String templateData;
-  ViewPost({this.templateData});
+  ViewTemplate({this.templateData});
 
   @override
-  _ViewPostState createState() => _ViewPostState();
+  _ViewTemplateState createState() => _ViewTemplateState();
 }
 
-class _ViewPostState extends State<ViewPost> {
+class _ViewTemplateState extends State<ViewTemplate> {
   Template template;
 
   @override
