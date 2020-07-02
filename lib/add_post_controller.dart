@@ -125,7 +125,6 @@ class _AddPostState extends State<AddPost> {
   // _defineDescription state:
   final titleController = TextEditingController();
   final subtitleController = TextEditingController();
-  final descriptionController = TextEditingController();
 
   Widget _defineDescription() {
     return ListView(children: <Widget>[
@@ -168,23 +167,6 @@ class _AddPostState extends State<AddPost> {
                     decoration: InputDecoration(
                         hintText:
                             'This will appear under the title in the feed')),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Description',
-                    style: TextStyle(
-                      fontFamily: 'Quicksand',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                TextField(
-                    controller: descriptionController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                        hintText: 'A long description for detailed view'))
               ]))
     ]);
   }
