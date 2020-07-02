@@ -223,8 +223,7 @@ class _ViewPostState extends State<ViewPost> {
                               child: LinearPercentIndicator(
                                 linearStrokeCap: LinearStrokeCap.butt,
                                 lineHeight: 3,
-                                percent: double.parse(postData.amountRaised) /
-                                    double.parse(postData.targetAmount),
+                                percent: postData.percentRaised(),
                                 backgroundColor: HexColor('CCCCCC'),
                                 progressColor: HexColor('ff6b6c'),
                               ),

@@ -130,15 +130,15 @@ class DatabaseService {
         .catchError((error) => {print(error)});
   }
 
-  // Get a post from Firestore given a known id
+  // Get a post from Firestore given a known id: if the post id is bracketted these are automatically removed
   Future getPostById(String documentId) async {
-    String formattedId = (documentId[0]=="{" && documentId[-1]=="}") ? documentId.substring(1, documentId.length - 1) : documentId;
-    print(formattedId);
+    String formattedId = (documentId.substring(0,1)=="{" && documentId.substring(documentId.length-1)=="}") ? documentId.substring(1, documentId.length - 1) : documentId;
+    print('Formatted data: '+formattedId);
     DocumentReference docRef = postsCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
       print(doc);
       if (doc.exists) {
-        print("Document data:" + doc.data.toString());
+        print("Document data: " + doc.data.toString());
         return _makePost(doc);
       } else {
         // doc.data() will be undefined in this case
@@ -155,7 +155,7 @@ class DatabaseService {
   // 3. Templates CRUD:
   // ------------------
 
-  // Given a document return a Template type object
+  // Given a document return a Template object
   Template _makeTemplate(DocumentSnapshot doc) {
     return Template(
         author: doc.data['author'],
@@ -173,9 +173,9 @@ class DatabaseService {
         );
   }
   
-  // Get a post from Firestore given a known id
+  // Get a post from Firestore given a known id: if the id is bracketed these are automatically removed
   Future getTemplateById(String documentId) async {
-    String formattedId = (documentId[0]=="{" && documentId[-1]=="}") ? documentId.substring(1, documentId.length - 1) : documentId;
+    String formattedId = (documentId.substring(0,1)=="{" && documentId.substring(documentId.length-1)=="}") ? documentId.substring(1, documentId.length - 1) : documentId;
     print(formattedId);
     DocumentReference docRef = templatesCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
