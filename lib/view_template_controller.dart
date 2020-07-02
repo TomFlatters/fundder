@@ -24,37 +24,15 @@ class _ViewTemplateState extends State<ViewTemplate> {
 
   @override
   void initState() {
-    //print(widget.templateData);
-    _getPost();
-    /*DatabaseService(uid: user.uid).getPostById(widget.templateData)
-                    .then((post) => {
-                      setState(() {
-                        post = post;
-                      })
-                    });*/
+    _getTemplate();
     super.initState();
   }
 
-  void _getPost() async {
-    Firestore.instance.document('templates/' + widget.templateData).get().then((doc) {
-      setState(() {
-        if (doc != null) {
-          template = Template(
-            author: doc.data['author'],
-            title: doc.data['title'],
-            charity: doc.data['charity'],
-            amountRaised: doc.data['amountRaised'],
-            targetAmount: doc.data['targetAmount'],
-            likes: doc.data['likes'],
-            comments: doc.data['comments'],
-            subtitle: doc.data['subtitle'],
-            timestamp: doc.data['timestamp'],
-            imageUrl: doc.data['imageUrl'],
-            id: doc.documentID,
-            whoDoes: doc.data['whoDoes']
-          );
-        }
-      });
+  void _getTemplate() async {
+    DatabaseService().getTemplateById(widget.templateData).then((t) {
+      setState((){
+        template = t;
+        });
     });
   }
 
@@ -62,7 +40,6 @@ class _ViewTemplateState extends State<ViewTemplate> {
   Widget build(BuildContext context) {
     print("View template controller");
     Template templateData = template;
-    //print(howLongAgo(templateData.timestamp));
     return (templateData == null)
         ? Loading()
         : Scaffold(
