@@ -64,8 +64,6 @@ class _AddPostState extends State<AddPost> {
                                       imageUrl: downloadUrl,
                                     ))
                                     .then((postId) => {
-                                          print("The doc id is " + postId.toString().substring(1, postId.toString().length - 1)),
-                                          
                                           // if the post is successfully added, view the post
                                           Navigator.pushReplacementNamed(
                                               context,
@@ -91,7 +89,6 @@ class _AddPostState extends State<AddPost> {
                                       whoDoes: whoDoes[selected],
                                     ))
                                 .then((templateId) => {
-                                        print("The doc id is " + templateId.toString().substring(1, templateId.toString().length - 1)),
                                         // if the post is successfully added, view the post
                                         Navigator.pushReplacementNamed(
                                             context,
