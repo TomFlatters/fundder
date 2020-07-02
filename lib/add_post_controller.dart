@@ -69,11 +69,7 @@ class _AddPostState extends State<AddPost> {
                                           // if the post is successfully added, view the post
                                           Navigator.pushReplacementNamed(
                                               context,
-                                              '/post/' +
-                                                  postId.toString().substring(
-                                                      1,
-                                                      postId.toString().length -
-                                                          1)) //the substring is very important as postId.toString() is in brackets
+                                              '/post/' + postId.toString())
                                         })
                               }else{
                                 // Create a template
@@ -99,7 +95,7 @@ class _AddPostState extends State<AddPost> {
                                         // if the post is successfully added, view the post
                                         Navigator.pushReplacementNamed(
                                             context,
-                                            '/template/' + templateId.toString()) //the substring is very important as postId.toString() is in brackets
+                                            '/template/' + templateId.toString())
                                 })
                               }});}
                 : () {
