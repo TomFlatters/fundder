@@ -99,11 +99,7 @@ class _AddPostState extends State<AddPost> {
                                         // if the post is successfully added, view the post
                                         Navigator.pushReplacementNamed(
                                             context,
-                                            '/template/' +
-                                                templateId.toString().substring(
-                                                    1,
-                                                    templateId.toString().length -
-                                                        1)) //the substring is very important as postId.toString() is in brackets
+                                            '/template/' + templateId.toString()) //the substring is very important as postId.toString() is in brackets
                                 })
                               }});}
                 : () {
