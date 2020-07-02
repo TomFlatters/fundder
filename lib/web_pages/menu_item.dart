@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MenuItem extends StatelessWidget {
-  final String title;
+  final Widget title;
   final Function press;
   const MenuItem({
     Key key,
@@ -15,13 +15,7 @@ class MenuItem extends StatelessWidget {
       onTap: press,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: Text(
-          title.toUpperCase(),
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: title,
       ),
     );
   }
