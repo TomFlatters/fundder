@@ -10,6 +10,7 @@ import 'package:fundder/challenge_steps_view.dart';
 import 'package:fundder/view_followers_controller.dart';
 import 'package:fundder/profile_controller.dart';
 import 'package:fundder/edit_profile_controller.dart';
+import 'package:fundder/view_template_controller.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -18,7 +19,7 @@ class FluroRouter {
           ViewPost(postData: params['id'][0]));
     static Handler _templateHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ViewPost(postData: params['id'][0]));
+          ViewTemplate(templateData: params['id'][0]));
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(postData: params['id'][0]));
