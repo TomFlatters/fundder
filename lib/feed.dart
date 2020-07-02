@@ -260,7 +260,6 @@ class _FeedViewState extends State<FeedView> {
                             ],
                           ))),
                   onTap: () {
-                    print(postData);
                     Navigator.pushNamed(context, '/post/' + postData.id);
                   },
                 );
