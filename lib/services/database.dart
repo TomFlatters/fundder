@@ -63,8 +63,6 @@ class DatabaseService {
     );
   }
 
-
-
   // -------------
   // 2. Posts CRUD:
   // -------------
@@ -132,8 +130,11 @@ class DatabaseService {
 
   // Get a post from Firestore given a known id: if the post id is bracketted these are automatically removed
   Future getPostById(String documentId) async {
-    String formattedId = (documentId.substring(0,1)=="{" && documentId.substring(documentId.length-1)=="}") ? documentId.substring(1, documentId.length - 1) : documentId;
-    print('Formatted data: '+formattedId);
+    String formattedId = (documentId.substring(0, 1) == "{" &&
+            documentId.substring(documentId.length - 1) == "}")
+        ? documentId.substring(1, documentId.length - 1)
+        : documentId;
+    print('Formatted data: ' + formattedId);
     DocumentReference docRef = postsCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
       print(doc);
@@ -169,13 +170,18 @@ class DatabaseService {
         timestamp: doc.data['timestamp'],
         imageUrl: doc.data['imageUrl'],
         id: doc.documentID,
-        whoDoes: doc.data['whoeDoes']
-        );
+        whoDoes: doc.data['whoeDoes'],
+        acceptedBy: doc.data['acceptedBy'],
+        completedBy: doc.data['completedBy'],
+        active: doc.data['active']);
   }
-  
+
   // Get a post from Firestore given a known id: if the id is bracketed these are automatically removed
   Future getTemplateById(String documentId) async {
-    String formattedId = (documentId.substring(0,1)=="{" && documentId.substring(documentId.length-1)=="}") ? documentId.substring(1, documentId.length - 1) : documentId;
+    String formattedId = (documentId.substring(0, 1) == "{" &&
+            documentId.substring(documentId.length - 1) == "}")
+        ? documentId.substring(1, documentId.length - 1)
+        : documentId;
     print(formattedId);
     DocumentReference docRef = templatesCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
@@ -207,7 +213,10 @@ class DatabaseService {
           "subtitle": t.subtitle,
           "timestamp": t.timestamp,
           "imageUrl": t.imageUrl,
-          "whoDoes": t.whoDoes
+          "whoDoes": t.whoDoes,
+          "acceptedBy": t.acceptedBy,
+          "completedBy": t.completedBy,
+          "active": t.active
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
