@@ -1,9 +1,17 @@
 import 'package:fundder/models/post.dart';
 
 class Template extends Post {
-    String whoDoes;
+  // the user can choose if a specific person or anyone can use this template
+  String whoDoes;
 
-    Template(
+  // each template should record who has accepted and completed the challenge,
+  List<String> acceptedBy;
+  List<String> completedBy;
+
+  // we also record whether the challenge is "active" or not
+  bool active;
+
+  Template(
       {author,
       title,
       charity,
@@ -15,17 +23,21 @@ class Template extends Post {
       timestamp,
       imageUrl,
       id,
-      this.whoDoes}) : super(
-        author:author,
-        title:title,
-        charity:charity,
-        amountRaised:amountRaised,
-        targetAmount:targetAmount,
-        subtitle:subtitle,
-        likes:likes,
-        comments:comments,
-        timestamp:timestamp,
-        imageUrl:imageUrl,
-        id:id,
-      );
+      this.whoDoes,
+      this.acceptedBy,
+      this.completedBy,
+      this.active})
+      : super(
+          author: author,
+          title: title,
+          charity: charity,
+          amountRaised: amountRaised,
+          targetAmount: targetAmount,
+          subtitle: subtitle,
+          likes: likes,
+          comments: comments,
+          timestamp: timestamp,
+          imageUrl: imageUrl,
+          id: id,
+        );
 }
