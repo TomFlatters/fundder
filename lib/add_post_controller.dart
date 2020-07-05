@@ -44,57 +44,66 @@ class _AddPostState extends State<AddPost> {
                               print("Successful image upload"),
                               print(downloadUrl),
 
-                              // Check for the TYPE of the challenge (who they want to do it), 
+                              // Check for the TYPE of the challenge (who they want to do it),
                               // create a Template or Post accordingly
-                              if(whoDoes[selected]=="Myself"){
-                                // Create a post from the state and image url, and add that post to firebase
-                                DatabaseService(uid: user.uid)
-                                    .uploadPost(new Post(
-                                      title: titleController.text.toString(),
-                                      subtitle:
-                                          subtitleController.text.toString(),
-                                      author: user.uid,
-                                      charity: charities[charity],
-                                      likes: [],
-                                      comments: {},
-                                      timestamp: DateTime.now(),
-                                      amountRaised: "0",
-                                      targetAmount:
-                                          moneyController.text.toString(),
-                                      imageUrl: downloadUrl,
-                                    ))
-                                    .then((postId) => {
-                                          // if the post is successfully added, view the post
-                                          Navigator.pushReplacementNamed(
-                                              context,
-                                              '/post/' + postId.toString())
-                                        })
-                              }else{
-                                // Create a template
-                                print("Creating a template"),
-                                DatabaseService(uid: user.uid)
-                                .uploadTemplate(new Template(
-                                      title: titleController.text.toString(),
-                                      subtitle:
-                                          subtitleController.text.toString(),
-                                      author: user.uid,
-                                      charity: charities[charity],
-                                      likes: [],
-                                      comments: {},
-                                      timestamp: DateTime.now(),
-                                      amountRaised: "0",
-                                      targetAmount:
-                                          moneyController.text.toString(),
-                                      imageUrl: downloadUrl,
-                                      whoDoes: whoDoes[selected],
-                                    ))
-                                .then((templateId) => {
-                                        // if the post is successfully added, view the post
-                                        Navigator.pushReplacementNamed(
-                                            context,
-                                            '/template/' + templateId.toString())
-                                })
-                              }});}
+                              if (whoDoes[selected] == "Myself")
+                                {
+                                  // Create a post from the state and image url, and add that post to firebase
+                                  DatabaseService(uid: user.uid)
+                                      .uploadPost(new Post(
+                                        title: titleController.text.toString(),
+                                        subtitle:
+                                            subtitleController.text.toString(),
+                                        author: user.uid,
+                                        charity: charities[charity],
+                                        likes: [],
+                                        comments: {},
+                                        timestamp: DateTime.now(),
+                                        amountRaised: "0",
+                                        targetAmount:
+                                            moneyController.text.toString(),
+                                        imageUrl: downloadUrl,
+                                      ))
+                                      .then((postId) => {
+                                            // if the post is successfully added, view the post
+                                            Navigator.pushReplacementNamed(
+                                                context,
+                                                '/post/' + postId.toString())
+                                          })
+                                }
+                              else
+                                {
+                                  // Create a template
+                                  print("Creating a template"),
+                                  DatabaseService(uid: user.uid)
+                                      .uploadTemplate(new Template(
+                                          title:
+                                              titleController.text.toString(),
+                                          subtitle: subtitleController.text
+                                              .toString(),
+                                          author: user.uid,
+                                          charity: charities[charity],
+                                          likes: [],
+                                          comments: {},
+                                          timestamp: DateTime.now(),
+                                          amountRaised: "0",
+                                          targetAmount:
+                                              moneyController.text.toString(),
+                                          imageUrl: downloadUrl,
+                                          whoDoes: whoDoes[selected],
+                                          acceptedBy: [],
+                                          completedBy: [],
+                                          active: true))
+                                      .then((templateId) => {
+                                            // if the post is successfully added, view the post
+                                            Navigator.pushReplacementNamed(
+                                                context,
+                                                '/template/' +
+                                                    templateId.toString())
+                                          })
+                                }
+                            });
+                  }
                 : () {
                     /*Navigator.of(context).pushReplacement(_viewPost());*/
                     _carouselController.nextPage(
