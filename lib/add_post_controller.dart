@@ -168,25 +168,7 @@ class _AddPostState extends State<AddPost> {
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: InputDecoration(
-                        hintText:
-                            'This will appear under the title in the feed')),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Description',
-                    style: TextStyle(
-                      fontFamily: 'Quicksand',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                TextField(
-                    controller: descriptionController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                        hintText: 'A long description for detailed view'))
+                        hintText: 'This will appear under the title')),
               ]))
     ]);
   }

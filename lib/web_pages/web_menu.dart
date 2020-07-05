@@ -5,6 +5,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/services/auth.dart';
+import 'package:fundder/extensions/hover_extensions.dart';
 
 class WebMenu extends StatelessWidget {
   final AuthService _auth = AuthService();
@@ -25,9 +26,9 @@ class WebMenu extends StatelessWidget {
               "assets/images/Fundder_logo.png",
               height: 50,
               alignment: Alignment.topCenter,
-            ),
+            ).showCursorOnHover,
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/about');
+              Navigator.pushNamed(context, '/about');
             },
           ),
           SizedBox(width: 10),
@@ -41,14 +42,16 @@ class WebMenu extends StatelessWidget {
               AntDesign.home,
             ),
             press: () {
-              Navigator.pushReplacementNamed(context, '/web/feed');
+              Navigator.pushNamed(context, '/web/feed');
             },
           ),
           MenuItem(
             title: Icon(
               AntDesign.search1,
             ),
-            press: () {},
+            press: () {
+              Navigator.pushNamed(context, '/web/search');
+            },
           ),
           MenuItem(
             title: Icon(
@@ -62,22 +65,28 @@ class WebMenu extends StatelessWidget {
             title: Icon(
               AntDesign.hearto,
             ),
-            press: () {},
+            press: () {
+              Navigator.pushNamed(context, '/web/activity');
+            },
           ),
           MenuItem(
             title: Icon(
               AntDesign.user,
             ),
-            press: () {},
+            press: () {
+              Navigator.pushNamed(context, '/web/profile');
+            },
           ),
           DefaultButton(
             text: user != null ? "Log out" : "Login / Register",
             press: () async {
               if (user != null) {
-                await _auth.signOut();
+                await _auth.signOut().then((value) {
+                  Navigator.pushNamed(context, '/web/login');
+                });
                 /*Navigator.pushReplacementNamed(context, '/web/logging_out');*/
               } else {
-                Navigator.pushReplacementNamed(context, '/web/login');
+                Navigator.pushNamed(context, '/web/login');
               }
             },
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/extensions/hover_extensions.dart';
 
 class MenuItem extends StatelessWidget {
   final Widget title;
@@ -17,6 +18,6 @@ class MenuItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: title,
       ),
-    );
+    ).showCursorOnHover;
   }
 }
