@@ -38,10 +38,19 @@ class _WebFeedState extends State<WebFeed> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final user = Provider.of<User>(context);
-    /*if (user == null) {
-      Navigator.pushNamed(context, '/web/login');
-      return Text("Redirecting");
-    } else*/
+    if (user == null) {
+      Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
+      return Scaffold(
+        body: Text(
+          "Redirecting",
+          style: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 20,
+              color: Colors.black,
+              decoration: null),
+        ),
+      );
+    } else
     // This size provide us total height and width  of our screen
     {
       return Scaffold(

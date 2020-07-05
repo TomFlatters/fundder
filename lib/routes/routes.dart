@@ -15,6 +15,9 @@ import 'package:fundder/web_pages/feed_web.dart';
 import 'package:fundder/web_pages/about_page.dart';
 import 'package:fundder/web_pages/login_web.dart';
 import 'package:fundder/web_pages/logging_out.dart';
+import 'package:fundder/search_controller.dart';
+import 'package:fundder/liked_controller.dart';
+import 'package:fundder/profile_controller.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -62,6 +65,15 @@ class FluroRouter {
   static Handler _loggingOutHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           LoginWeb());
+  static Handler _searchHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          SearchController());
+  static Handler _activityHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          LikedController());
+  static Handler _profileHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ProfileController());
 
   static void setupRouter() {
     router.define(
@@ -103,12 +115,40 @@ class FluroRouter {
     );
 
     // Web routes
-    router.define('/web/feed', handler: _feedHandler);
-    router.define('/about', handler: _aboutHandler);
-    router.define('/web/search', handler: _aboutHandler);
-    router.define('/web/activity', handler: _aboutHandler);
-    router.define('/web/profile', handler: _aboutHandler);
-    router.define('/web/login', handler: _webLoginHandler);
-    router.define('/web/logging_out', handler: _loggingOutHandler);
+    router.define(
+      '/web/feed',
+      handler: _feedHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+    router.define(
+      '/about',
+      handler: _aboutHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+    router.define(
+      '/web/search',
+      handler: _searchHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+    router.define(
+      '/web/activity',
+      handler: _activityHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+    router.define(
+      '/web/profile',
+      handler: _profileHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+    router.define(
+      '/web/login',
+      handler: _webLoginHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+    router.define(
+      '/web/logging_out',
+      handler: _loggingOutHandler,
+      transitionType: TransitionType.fadeIn,
+    );
   }
 }

@@ -17,7 +17,7 @@ class _LoggingOutState extends State<LoggingOut> {
     final user = Provider.of<User>(context);
     if (user == null) {
       Future.delayed(Duration.zero, () {
-        Navigator.pushReplacementNamed(context, '/web/login');
+        Navigator.pushNamed(context, '/web/login');
       });
     }
     return Text('Logging Out...');

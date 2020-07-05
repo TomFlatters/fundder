@@ -19,15 +19,13 @@ class ProfilePic extends StatelessWidget {
 
   ProfilePic(this.url, this.size);
 
-   @override
+  @override
   Widget build(BuildContext context) {
-  return CircleAvatar(
-    radius: size/2,
-    backgroundImage:
-      CachedNetworkImageProvider(url),
-    backgroundColor: Colors.transparent,
-  );
-
-}
-
+    return CircleAvatar(
+      radius: size / 2,
+      backgroundImage: AssetImage(url),
+      //CachedNetworkImageProvider(url),
+      backgroundColor: Colors.transparent,
+    );
+  }
 }

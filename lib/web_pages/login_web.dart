@@ -13,20 +13,35 @@ class LoginWeb extends StatefulWidget {
 class _LoginWebState extends State<LoginWeb> {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     Size size = MediaQuery.of(context).size;
-
-    // This size provide us total height and width  of our screen
-    return StreamProvider<User>.value(
-      value: AuthService().user,
-      child: Container(
-        height: size.height,
-        // it will take full width
-        width: size.width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[WebMenu(), Expanded(child: Authenticate())],
+    if (user != null) {
+      Future.microtask(() => Navigator.pushNamed(context, '/web/feed'));
+      return Scaffold(
+        body: Text(
+          "Redirecting",
+          style: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 20,
+              color: Colors.black,
+              decoration: null),
         ),
-      ),
-    );
+      );
+    } else
+    // This size provide us total height and width  of our screen
+    {
+      // This size provide us total height and width  of our screen
+      return Scaffold(
+        body: Container(
+          height: size.height,
+          // it will take full width
+          width: size.width,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[WebMenu(), Expanded(child: Authenticate())],
+          ),
+        ),
+      );
+    }
   }
 }
