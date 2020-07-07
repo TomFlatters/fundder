@@ -7,6 +7,7 @@ import 'package:fundder/models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/extensions/hover_extensions.dart';
+import 'temparary_upload_page.dart';
 
 class WebMenu extends StatelessWidget {
   final int selected;
@@ -91,7 +92,7 @@ class WebMenu extends StatelessWidget {
                           : HexColor('#80000000')),
                   press: () {
                     if (user != null) {
-                      Navigator.pushNamed(context, '/addpost');
+                      Navigator.pushNamed(context, '/web/addpost');
                     } else {
                       Navigator.pushNamed(context, '/web/login');
                     }
