@@ -38,7 +38,7 @@ class _LoginWebState extends State<LoginWeb> {
           width: size.width,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[WebMenu(), Expanded(child: Authenticate())],
+            children: <Widget>[WebMenu(-1), Expanded(child: Authenticate())],
           ),
         ),
       );

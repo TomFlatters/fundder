@@ -102,7 +102,7 @@ class _ViewPostState extends State<ViewPost> {
                     leading: new Container(),
                   ),
             body: Column(children: [
-              kIsWeb == true ? WebMenu() : Container(),
+              kIsWeb == true ? WebMenu(-1) : Container(),
               Expanded(
                 child: ListView(
                   children: <Widget>[

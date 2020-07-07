@@ -84,22 +84,27 @@ class FluroRouter {
     router.define(
       '/post/:id/comments',
       handler: _commentHandler,
+      transitionType: TransitionType.fadeIn,
     );
     router.define(
       '/post/:id/donate',
       handler: _donateHandler,
+      transitionType: TransitionType.fadeIn,
     );
     router.define(
       '/username',
       handler: _viewOtherProfileHandler,
+      transitionType: TransitionType.fadeIn,
     );
     router.define(
       '/username/followers',
       handler: _followersHandler,
+      transitionType: TransitionType.fadeIn,
     );
     router.define(
       '/account/edit',
       handler: _editProfileHandler,
+      transitionType: TransitionType.fadeIn,
     );
     router.define(
       '/addpost',
@@ -108,10 +113,12 @@ class FluroRouter {
     router.define(
       '/challenge/:id',
       handler: _challengeDetailHandler,
+      transitionType: TransitionType.fadeIn,
     );
     router.define(
       '/challenge/:id/steps',
       handler: _challengeStepsHandler,
+      transitionType: TransitionType.fadeIn,
     );
 
     // Web routes

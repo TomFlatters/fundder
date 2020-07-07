@@ -15,7 +15,7 @@ class MenuItem extends StatelessWidget {
     return GestureDetector(
       onTap: press,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: title,
       ),
     ).showCursorOnHover;

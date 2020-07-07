@@ -4,6 +4,8 @@ import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
+import 'package:provider/provider.dart';
+import 'models/user.dart';
 
 class Post {
   final String title;
@@ -120,48 +122,65 @@ class _SearchState extends State<SearchController>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(children: [
-          kIsWeb == true ? WebMenu() : Container(),
-          Expanded(
-            child: SearchBar<Post>(
-              searchBarPadding: EdgeInsets.symmetric(horizontal: 20),
-              searchBarController: _searchBarController,
-              header: DefaultTabController(
-                length: 2,
-                initialIndex: 0,
-                child: TabBar(
-                  tabs: [Tab(text: 'Tags'), Tab(text: 'Users')],
-                  controller: _tabController,
+    final user = Provider.of<User>(context);
+    if (user == null && kIsWeb == true) {
+      Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
+      return Scaffold(
+        body: Text(
+          "Redirecting",
+          style: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 20,
+              color: Colors.black,
+              decoration: null),
+        ),
+      );
+    } else
+    // This size provide us total height and width  of our screen
+    {
+      return Scaffold(
+        body: SafeArea(
+          child: Column(children: [
+            kIsWeb == true ? WebMenu(2) : Container(),
+            Expanded(
+              child: SearchBar<Post>(
+                searchBarPadding: EdgeInsets.symmetric(horizontal: 20),
+                searchBarController: _searchBarController,
+                header: DefaultTabController(
+                  length: 2,
+                  initialIndex: 0,
+                  child: TabBar(
+                    tabs: [Tab(text: 'Tags'), Tab(text: 'Users')],
+                    controller: _tabController,
+                  ),
                 ),
-              ),
-              hintText: 'search accounts',
-              onSearch: search,
-              minimumChars: 0,
-              onItemFound: (Post post, int index) {
-                return ListTile(
-                  leading: _decideLeading(),
-                  title: Text(post.title),
-                  subtitle: Text(post.description),
-                );
-              },
+                hintText: 'search accounts',
+                onSearch: search,
+                minimumChars: 0,
+                onItemFound: (Post post, int index) {
+                  return ListTile(
+                    leading: _decideLeading(),
+                    title: Text(post.title),
+                    subtitle: Text(post.description),
+                  );
+                },
 
-              //suggestions: [Post('previous 1','previous 1'),Post('previous 2','previous 2'),Post('previous 3','previous 3')],
+                //suggestions: [Post('previous 1','previous 1'),Post('previous 2','previous 2'),Post('previous 3','previous 3')],
 
-              emptyWidget: _trendingList(),
+                emptyWidget: _trendingList(),
 
-              /*buildSuggestion: (Post post, int index) {
+                /*buildSuggestion: (Post post, int index) {
                 return ListTile(
                   leading: _decideLeading(),
                   title: Text(post.title),
                   subtitle: Text(post.description),
                 );
               },*/
+              ),
             ),
-          ),
-        ]),
-      ),
-    );
+          ]),
+        ),
+      );
+    }
   }
 }

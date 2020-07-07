@@ -21,6 +21,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  universal_html: ^1.2.1
   flutter:
     sdk: flutter
   firebase_analytics: ^5.0.2

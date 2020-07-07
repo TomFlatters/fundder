@@ -7,6 +7,8 @@ import 'edit_profile_controller.dart';
 import 'models/user.dart';
 import 'view_followers_controller.dart';
 import 'helper_classes.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'web_pages/web_menu.dart';
 
 class ViewUser extends StatefulWidget {
   @override

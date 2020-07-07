@@ -14,7 +14,7 @@ class AboutPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            WebMenu(),
+            WebMenu(0),
             // It will cover 1/3 of free spaces
             Text('This is the about page')
             // it will cover 2/3 of free spaces
