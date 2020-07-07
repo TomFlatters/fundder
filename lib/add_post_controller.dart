@@ -10,8 +10,7 @@ import 'package:fundder/models/post.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:provider/provider.dart';
-import 'models/user.dart';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AddPost extends StatefulWidget {

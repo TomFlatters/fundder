@@ -18,6 +18,7 @@ import 'package:fundder/web_pages/logging_out.dart';
 import 'package:fundder/search_controller.dart';
 import 'package:fundder/liked_controller.dart';
 import 'package:fundder/profile_controller.dart';
+import 'package:fundder/web_pages/temparary_upload_page.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -74,6 +75,9 @@ class FluroRouter {
   static Handler _profileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ProfileController());
+  static Handler _tempAddPostHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          TemporaryUpload());
 
   static void setupRouter() {
     router.define(
@@ -155,6 +159,11 @@ class FluroRouter {
     router.define(
       '/web/logging_out',
       handler: _loggingOutHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+    router.define(
+      '/web/addpost',
+      handler: _tempAddPostHandler,
       transitionType: TransitionType.fadeIn,
     );
   }

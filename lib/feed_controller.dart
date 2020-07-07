@@ -8,8 +8,6 @@ import 'feed.dart';
 import 'helper_classes.dart';
 import 'do_challenge.dart';
 import 'models/user.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_pages/menu_item.dart';
 
 class FeedController extends StatefulWidget {
   @override
