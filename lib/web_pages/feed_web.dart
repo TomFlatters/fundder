@@ -61,10 +61,10 @@ class _WebFeedState extends State<WebFeed> with SingleTickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              WebMenu(),
+              WebMenu(1),
               Expanded(
                   child: Container(
-                      width: 400,
+                      constraints: BoxConstraints(minWidth: 100, maxWidth: 400),
                       child: DefaultTabController(
                         length: 3,
                         initialIndex: 0,
