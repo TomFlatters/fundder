@@ -10,6 +10,7 @@ import 'do_challenge_detail.dart';
 import 'shared/loading.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class DoChallenge extends StatefulWidget {
   @override
@@ -99,13 +100,16 @@ class _DoChallengeState extends State<DoChallenge> {
                                   child: AspectRatio(
                                     aspectRatio: 1 / 1,
                                     child: Container(
-                                      child: CachedNetworkImage(
-                                        imageUrl: '${array3[index]}',
-                                        placeholder: (context, url) =>
-                                            Loading(),
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                      ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                                      child: kIsWeb == true
+                                          ? Image.network(array3[index])
+                                          : CachedNetworkImage(
+                                              imageUrl: '${array3[index]}',
+                                              placeholder: (context, url) =>
+                                                  Loading(),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.error),
+                                            ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
                                     ),
                                   )),
                             ),

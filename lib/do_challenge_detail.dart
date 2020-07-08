@@ -57,12 +57,16 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.width * 9 / 16,
-                  child: CachedNetworkImage(
-                    imageUrl:
-                        'https://i.pinimg.com/originals/99/d9/fa/99d9fa7c22ca5ca5856cf4dd30db692e.jpg',
-                    placeholder: (context, url) => Loading(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                  ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                  child: kIsWeb == true
+                      ? Image.network(
+                          'https://i.pinimg.com/originals/99/d9/fa/99d9fa7c22ca5ca5856cf4dd30db692e.jpg')
+                      : CachedNetworkImage(
+                          imageUrl:
+                              'https://i.pinimg.com/originals/99/d9/fa/99d9fa7c22ca5ca5856cf4dd30db692e.jpg',
+                          placeholder: (context, url) => Loading(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
                 ),
                 margin: EdgeInsets.symmetric(vertical: 10.0),
               ),
