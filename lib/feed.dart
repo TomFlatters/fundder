@@ -29,25 +29,6 @@ class FeedView extends StatefulWidget {
 class _FeedViewState extends State<FeedView> {
   ScrollPhysics physics;
 
-  final List<String> charities = <String>['Cancer Research', 'Cancer Research'];
-  final List<String> users = <String>['samsam', 'dk_david'];
-  final List<String> descriptions = <String>[
-    'I will film myself eating an entire Christmas turkey without using my hands',
-    '£50 and I will live as a mountain goat this Saturday (24hrs)'
-  ];
-  final List<String> images = <String>[
-    'https://i.pinimg.com/originals/59/8c/60/598c60cf76ebd106784116ca040e558d.jpg',
-    'https://i.pinimg.com/originals/72/8f/6e/728f6e7683ca126c324fead153e7d115.jpg'
-  ];
-  final List<String> profilePics = <String>[
-    'assets/images/Sam_Luxa.png',
-    'assets/images/David_Kim.jpg'
-  ];
-  final List<double> amountRaised = <double>[0, 65.78];
-  final List<double> amountAimed = <double>[100, 100];
-  final List<int> likes = <int>[0, 135];
-  final List<int> comments = <int>[0, 11];
-
   @override
   void initState() {
     super.initState();
@@ -88,7 +69,7 @@ class _FeedViewState extends State<FeedView> {
               physics: physics,
               shrinkWrap: true,
               padding: const EdgeInsets.only(top: 10.0),
-              itemCount: 2,
+              itemCount: snapshot.data.length,
               itemBuilder: (BuildContext context, int index) {
                 Post postData = snapshot.data[index];
                 // print(postData);
@@ -110,7 +91,8 @@ class _FeedViewState extends State<FeedView> {
                                               aspectRatio: 1 / 1,
                                               child: Container(
                                                 child: ProfilePic(
-                                                    profilePics[index], 40),
+                                                    "https://i.imgur.com/BoN9kdC.png",
+                                                    40),
                                                 margin: EdgeInsets.all(10.0),
                                               )),
                                           onTap: () {
@@ -120,7 +102,7 @@ class _FeedViewState extends State<FeedView> {
                                         )),
                                     Align(
                                         alignment: Alignment.centerLeft,
-                                        child: Text(users[index]
+                                        child: Text(postData.author
                                             /*style: TextStyle(
                                     fontFamily: 'Roboto Mono'
                                   ),*/
@@ -131,20 +113,20 @@ class _FeedViewState extends State<FeedView> {
                                             child: Container(
                                                 margin: EdgeInsets.all(10.0),
                                                 child:
-                                                    Text(charities[index])))),
+                                                    Text(postData.charity)))),
                                   ],
                                 ),
                               ),
                               Container(
                                   alignment: Alignment.centerLeft,
                                   margin: EdgeInsets.all(10),
-                                  child: Text(descriptions[index])),
+                                  child: Text(postData.subtitle)),
                               Container(
                                   alignment: Alignment.centerLeft,
                                   margin: EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 10),
                                   child: Text(
-                                    '£${amountRaised[index]} raised of £${amountAimed[index]} target',
+                                    '£${postData.amountRaised} raised of £${postData.targetAmount} target',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )),
@@ -155,8 +137,7 @@ class _FeedViewState extends State<FeedView> {
                                 child: LinearPercentIndicator(
                                   linearStrokeCap: LinearStrokeCap.butt,
                                   lineHeight: 3,
-                                  percent:
-                                      amountRaised[index] / amountAimed[index],
+                                  percent: postData.percentRaised(),
                                   backgroundColor: HexColor('CCCCCC'),
                                   progressColor: HexColor('ff6b6c'),
                                 ),
@@ -169,12 +150,12 @@ class _FeedViewState extends State<FeedView> {
                                       16,
                                   child: CachedNetworkImage(
                                     imageUrl: (postData.imageUrl != null)
-                                        ? images[index]
+                                        ? postData.imageUrl
                                         : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
                                     placeholder: (context, url) => Loading(),
                                     errorWidget: (context, url, error) =>
                                         Icon(Icons.error),
-                                  ),
+                                  ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
                                 ),
                                 margin: EdgeInsets.symmetric(vertical: 10.0),
                               ),
@@ -196,7 +177,8 @@ class _FeedViewState extends State<FeedView> {
                                                 margin:
                                                     EdgeInsets.only(left: 10),
                                                 child: Text(
-                                                  likes[index].toString(),
+                                                  postData.likes.length
+                                                      .toString(),
                                                   textAlign: TextAlign.left,
                                                 )))
                                       ]),
@@ -223,7 +205,8 @@ class _FeedViewState extends State<FeedView> {
                                                 margin:
                                                     EdgeInsets.only(left: 10),
                                                 child: Text(
-                                                  comments[index].toString(),
+                                                  postData.comments.length
+                                                      .toString(),
                                                   textAlign: TextAlign.left,
                                                 )))
                                       ]),
@@ -267,7 +250,7 @@ class _FeedViewState extends State<FeedView> {
                               Container(
                                 alignment: Alignment.centerLeft,
                                 margin: EdgeInsets.all(10),
-                                child: Text('1 min ago',
+                                child: Text(howLongAgo(postData.timestamp),
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,
@@ -276,7 +259,6 @@ class _FeedViewState extends State<FeedView> {
                             ],
                           ))),
                   onTap: () {
-                    print(postData);
                     Navigator.pushNamed(context, '/post/' + postData.id);
                   },
                 );

@@ -28,10 +28,10 @@ class _ProfileState extends State<ProfileController>
   final AuthService _auth = AuthService();
 
   TabController _tabController;
-  String _username = "samsam";
-  String _name = "Sam Jones";
+  String _username = "Username";
+  String _name = "Name";
   String _uid;
-  String _email = "sam@gmail.com";
+  String _email = "Email";
 
   @override
   void dispose() {
@@ -43,7 +43,7 @@ class _ProfileState extends State<ProfileController>
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
-    //_retrieveUser();
+    _retrieveUser();
     super.initState();
   }
 
@@ -115,12 +115,12 @@ class _ProfileState extends State<ProfileController>
                 margin: EdgeInsets.only(top: 20, bottom: 10),
                 alignment: Alignment.center,
                 child: Container(
-                  child: ProfilePic("assets/images/Sam_Luxa.png", 90),
+                  child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 90),
                   margin: EdgeInsets.all(10.0),
                 ),
               ),
               Center(
-                child: Text('Sam Jones'),
+                child: Text(_name),
               ),
               Container(
                   margin: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
