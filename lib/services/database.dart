@@ -123,7 +123,7 @@ class DatabaseService {
 
   // Get a post from Firestore given a known id
   Future getPostById(String documentId) async {
-    String formattedId = documentId.substring(1, documentId.length - 1);
+    String formattedId = documentId.substring(0, documentId.length);
     DocumentReference docRef = postsCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
       print(doc);

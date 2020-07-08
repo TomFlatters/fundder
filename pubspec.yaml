@@ -21,6 +21,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  universal_html: ^1.2.1
   flutter:
     sdk: flutter
   firebase_analytics: ^5.0.2
@@ -51,6 +52,7 @@ dependencies:
 
   percent_indicator: ^2.1.1
   fluro: ^1.6.3
+  image_picker_web: ^1.0.9
 
 dev_dependencies:
   flutter_test:
