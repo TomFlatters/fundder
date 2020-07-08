@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
@@ -137,8 +138,7 @@ class _FeedViewState extends State<FeedView> {
                                 child: LinearPercentIndicator(
                                   linearStrokeCap: LinearStrokeCap.butt,
                                   lineHeight: 3,
-                                  percent: double.parse(postData.amountRaised) /
-                                      double.parse(postData.targetAmount),
+                                  percent: postData.percentRaised(),
                                   backgroundColor: HexColor('CCCCCC'),
                                   progressColor: HexColor('ff6b6c'),
                                 ),
@@ -149,14 +149,17 @@ class _FeedViewState extends State<FeedView> {
                                   height: MediaQuery.of(context).size.width *
                                       9 /
                                       16,
-                                  child: CachedNetworkImage(
-                                    imageUrl: (postData.imageUrl != null)
-                                        ? postData.imageUrl
-                                        : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-                                    placeholder: (context, url) => Loading(),
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.error),
-                                  ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                                  child: kIsWeb == true
+                                      ? Image.network(postData.imageUrl)
+                                      : CachedNetworkImage(
+                                          imageUrl: (postData.imageUrl != null)
+                                              ? postData.imageUrl
+                                              : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
+                                          placeholder: (context, url) =>
+                                              Loading(),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
+                                        ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
                                 ),
                                 margin: EdgeInsets.symmetric(vertical: 10.0),
                               ),
@@ -260,7 +263,6 @@ class _FeedViewState extends State<FeedView> {
                             ],
                           ))),
                   onTap: () {
-                    print(postData);
                     Navigator.pushNamed(context, '/post/' + postData.id);
                   },
                 );

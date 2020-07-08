@@ -12,8 +12,6 @@ import 'models/user.dart';
 class FeedController extends StatefulWidget {
   @override
   _FeedState createState() => _FeedState();
-  final Color color;
-  FeedController(this.color);
 }
 
 class _FeedState extends State<FeedController>
