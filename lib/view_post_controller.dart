@@ -23,29 +23,9 @@ class ViewPost extends StatefulWidget {
 
 class _ViewPostState extends State<ViewPost> {
   Post post;
-
-  final List<String> charities = <String>['Cancer Research', 'Cancer Research'];
-  final List<String> users = <String>['samsam', 'dk_david'];
-  final List<String> descriptions = <String>[
-    'I will film myself eating an entire Christmas turkey without using my hands',
-    '£50 and I will live as a mountain goat this Saturday (24hrs)'
-  ];
-  final List<String> images = <String>[
-    'https://i.pinimg.com/originals/59/8c/60/598c60cf76ebd106784116ca040e558d.jpg',
-    'https://i.pinimg.com/originals/72/8f/6e/728f6e7683ca126c324fead153e7d115.jpg'
-  ];
-  final List<String> profilePics = <String>[
-    'assets/images/Sam_Luxa.png',
-    'assets/images/David_Kim.jpg'
-  ];
-  final List<double> amountRaised = <double>[0, 65.78];
-  final List<double> amountAimed = <double>[100, 100];
-  final List<int> likes = <int>[0, 135];
-  final List<int> comments = <int>[0, 11];
-
   @override
   void initState() {
-    //print(widget.postData);
+    print("'" + widget.postData + "'");
     _getPost();
     /*DatabaseService(uid: user.uid).getPostById(widget.postData)
                     .then((post) => {
@@ -57,25 +37,9 @@ class _ViewPostState extends State<ViewPost> {
   }
 
   void _getPost() async {
-    Firestore.instance.document('posts/' + widget.postData).get().then((doc) {
+    DatabaseService().getPostById(widget.postData).then((p) {
       setState(() {
-        if (doc != null) {
-          post = Post(
-            author: 'samsam',
-            title: 'No Hands Turkey',
-            charity: 'Cancer Research',
-            amountRaised: '0',
-            targetAmount: '100',
-            likes: null,
-            comments: [],
-            subtitle:
-                'I will film myself eating an entire Christmas turkey without using my hands',
-            //timestamp: doc.data['timestamp'],
-            imageUrl:
-                'https://i.pinimg.com/originals/59/8c/60/598c60cf76ebd106784116ca040e558d.jpg',
-            id: doc.documentID,
-          );
-        }
+        post = p;
       });
     });
   }
@@ -123,7 +87,7 @@ class _ViewPostState extends State<ViewPost> {
                                               aspectRatio: 1 / 1,
                                               child: Container(
                                                 child: ProfilePic(
-                                                    "assets/images/Sam_Luxa.png",
+                                                    "https://i.imgur.com/BoN9kdC.png",
                                                     40),
                                                 margin: EdgeInsets.all(10.0),
                                               ))),
@@ -183,7 +147,8 @@ class _ViewPostState extends State<ViewPost> {
                                                   margin:
                                                       EdgeInsets.only(left: 10),
                                                   child: Text(
-                                                    '0',
+                                                    postData.likes.length
+                                                        .toString(),
                                                     textAlign: TextAlign.left,
                                                   )))
                                         ]),
@@ -210,7 +175,8 @@ class _ViewPostState extends State<ViewPost> {
                                                   margin:
                                                       EdgeInsets.only(left: 10),
                                                   child: Text(
-                                                    '0'.toString(),
+                                                    postData.comments.length
+                                                        .toString(),
                                                     textAlign: TextAlign.left,
                                                   )))
                                         ]),
@@ -255,7 +221,7 @@ class _ViewPostState extends State<ViewPost> {
                                   alignment: Alignment.centerLeft,
                                   margin: EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
-                                  child: Text('1 min ago',
+                                  child: Text(howLongAgo(postData.timestamp),
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey,
@@ -277,9 +243,7 @@ class _ViewPostState extends State<ViewPost> {
                                   child: LinearPercentIndicator(
                                     linearStrokeCap: LinearStrokeCap.butt,
                                     lineHeight: 3,
-                                    percent:
-                                        double.parse(postData.amountRaised) /
-                                            double.parse(postData.targetAmount),
+                                    percent: postData.percentRaised(),
                                     backgroundColor: HexColor('CCCCCC'),
                                     progressColor: HexColor('ff6b6c'),
                                   ),
