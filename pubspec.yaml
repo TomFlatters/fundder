@@ -50,7 +50,7 @@ dependencies:
   # State management
   provider: ^3.1.0
 
-  percent_indicator: ^2.1.1
+  percent_indicator: ^2.1.5
   fluro: ^1.6.3
   image_picker_web: ^1.0.9
 
