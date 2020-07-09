@@ -25,7 +25,8 @@ class Post {
       this.id});
 
   double percentRaised() {
-    double processAmount(String s) => double.parse(s.contains(",") ? s.replaceAll(",", "") : amountRaised);
+    double processAmount(String s) =>
+        double.parse(s.contains(",") ? s.replaceAll(",", "") : amountRaised);
     return processAmount(amountRaised) / processAmount(targetAmount);
   }
 }

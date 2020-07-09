@@ -22,24 +22,42 @@ class ViewPost extends StatefulWidget {
 }
 
 class _ViewPostState extends State<ViewPost> {
-  Post post;
+  Post postData;
+
   @override
   void initState() {
-    print("'" + widget.postData + "'");
-    _getPost();
-    /*DatabaseService(uid: user.uid).getPostById(widget.postData)
-                    .then((post) => {
-                      setState(() {
-                        post = post;
-                      })
-                    });*/
+    //print(widget.postData);
+    //_getPost();
+    DatabaseService(uid: widget.postData)
+        .getPostById(widget.postData)
+        .then((post) => {
+              setState(() {
+                print("set state");
+                print(post);
+                postData = post;
+              })
+            });
     super.initState();
   }
 
   void _getPost() async {
-    DatabaseService().getPostById(widget.postData).then((p) {
+    DatabaseService().getPostById(widget.postData).then((doc) {
       setState(() {
-        post = p;
+        if (doc != null) {
+          postData = Post(
+            author: doc.data['author'],
+            title: doc.data['title'],
+            charity: doc.data['charity'],
+            amountRaised: doc.data['amountRaised'],
+            targetAmount: doc.data['targetAmount'],
+            likes: doc.data['likes'],
+            comments: doc.data['comments'],
+            subtitle: doc.data['subtitle'],
+            timestamp: doc.data['timestamp'],
+            imageUrl: doc.data['imageUrl'],
+            id: doc.documentID,
+          );
+        }
       });
     });
   }
@@ -47,7 +65,6 @@ class _ViewPostState extends State<ViewPost> {
   @override
   Widget build(BuildContext context) {
     print("View post controller");
-    Post postData = post;
     //print(howLongAgo(postData.timestamp));
     return (postData == null)
         ? Loading()

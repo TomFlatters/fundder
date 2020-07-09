@@ -123,7 +123,8 @@ class DatabaseService {
 
   // Get a post from Firestore given a known id
   Future getPostById(String documentId) async {
-    String formattedId = documentId.substring(0, documentId.length);
+    String formattedId = documentId.substring(0,
+        documentId.length); // I think this needs to be changed for older posts
     DocumentReference docRef = postsCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
       print(doc);
@@ -157,5 +158,53 @@ class DatabaseService {
       var downloadUrl = await imageRef.getDownloadURL();
       return downloadUrl.toString();
     }
+  }
+
+  Future updatePostData(Post post) async {
+    // create or update the document with this uid
+    return await postsCollection.document(post.id).setData({
+      "author": post.author,
+      "title": post.title,
+      "charity": post.charity,
+      "amountRaised": post.amountRaised,
+      "targetAmount": post.targetAmount,
+      "likes": post.likes,
+      "comments": post.comments,
+      "subtitle": post.subtitle,
+      "timestamp": post.timestamp,
+      "imageUrl": post.imageUrl,
+    });
+  }
+
+  Future addCommentToPost(Map comment, String postId) async {
+    return await postsCollection.document(postId).collection("comments").add({
+      "author": comment["author"],
+      "text": comment["text"],
+      "timestamp": comment["timestamp"]
+    });
+  }
+
+  Stream<List<Map>> commentsByDocId(postId) {
+    return postsCollection
+        .document(postId)
+        .collection("comments")
+        .orderBy("timestamp", descending: true)
+        .snapshots()
+        .map(_commentsDataFromSnapshot);
+  }
+
+  // Get comments likst Stream
+  List<Map> _commentsDataFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((DocumentSnapshot doc) {
+      return _makeComment(doc);
+    }).toList();
+  }
+
+  Map _makeComment(DocumentSnapshot doc) {
+    return {
+      "author": doc.data["author"],
+      "text": doc.data["text"],
+      "timestamp": doc.data["timestamp"]
+    };
   }
 }
