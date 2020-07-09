@@ -204,7 +204,7 @@ class _FeedViewState extends State<FeedView> {
                                           child: Image.asset(
                                               'assets/images/comment.png'),
                                         ),
-                                        Expanded(
+                                        /*Expanded(
                                             child: Container(
                                                 margin:
                                                     EdgeInsets.only(left: 10),
@@ -212,7 +212,7 @@ class _FeedViewState extends State<FeedView> {
                                                   postData.comments.length
                                                       .toString(),
                                                   textAlign: TextAlign.left,
-                                                )))
+                                                )))*/
                                       ]),
                                       onPressed: () {
                                         /*Navigator.of(context)

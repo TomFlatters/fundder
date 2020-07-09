@@ -61,28 +61,26 @@ class _AddPostState extends State<AddPost> {
                                 print("Successful image upload"),
                                 print(downloadUrl),
 
-                                // create post from the state and image url, and add that post to firebase
-                                DatabaseService(uid: user.uid)
-                                    .uploadPost(new Post(
-                                      title: titleController.text.toString(),
-                                      subtitle:
-                                          subtitleController.text.toString(),
-                                      author: user.uid,
-                                      charity: charities[charity],
-                                      likes: [],
-                                      comments: {},
-                                      timestamp: DateTime.now(),
-                                      amountRaised: "0",
-                                      targetAmount:
-                                          moneyController.text.toString(),
-                                      imageUrl: downloadUrl,
-                                    ))
-                                    .then((postId) => {
-                                          print("The doc id is " +
-                                              postId.toString().substring(
-                                                  1,
-                                                  postId.toString().length -
-                                                      1)),
+                              // create post from the state and image url, and add that post to firebase
+                              DatabaseService(uid: user.uid)
+                                  .uploadPost(new Post(
+                                    title: titleController.text.toString(),
+                                    subtitle:
+                                        subtitleController.text.toString(),
+                                    author: user.uid,
+                                    charity: charities[charity],
+                                    likes: [],
+                                    comments: [],
+                                    timestamp: DateTime.now(),
+                                    amountRaised: "0",
+                                    targetAmount:
+                                        moneyController.text.toString(),
+                                    imageUrl: downloadUrl,
+                                  ))
+                                  .then((postId) => {
+                                        print("The doc id is " +
+                                            postId.toString().substring(1,
+                                                postId.toString().length - 1)),
 
                                           // if the post is successfully added, view the post
                                           /*DatabaseService(uid: user.uid).getPostById(postId.toString())
