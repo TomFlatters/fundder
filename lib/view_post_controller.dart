@@ -12,6 +12,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'services/database.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
+import 'package:provider/provider.dart';
+import 'models/user.dart';
 
 class ViewPost extends StatefulWidget {
   final String postData;
@@ -64,6 +66,7 @@ class _ViewPostState extends State<ViewPost> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     print("View post controller");
     //print(howLongAgo(postData.timestamp));
     return (postData == null)
@@ -161,8 +164,12 @@ class _ViewPostState extends State<ViewPost> {
                                             width: 20,
                                             height: 20,
                                             padding: const EdgeInsets.all(0.0),
-                                            child: Image.asset(
-                                                'assets/images/like.png'),
+                                            child: postData.likes
+                                                    .contains(user.uid)
+                                                ? Image.asset(
+                                                    'assets/images/like_selected.png')
+                                                : Image.asset(
+                                                    'assets/images/like.png'),
                                           ),
                                           Expanded(
                                               child: Container(
@@ -175,10 +182,15 @@ class _ViewPostState extends State<ViewPost> {
                                                   )))
                                         ]),
                                         onPressed: () {
-                                          final snackBar =
-                                              SnackBar(content: Text("Tap"));
-                                          Scaffold.of(context)
-                                              .showSnackBar(snackBar);
+                                          if (postData.likes
+                                                  .contains(user.uid) ==
+                                              true) {
+                                            DatabaseService(uid: user.uid)
+                                                .removeLikefromPost(postData);
+                                          } else {
+                                            DatabaseService(uid: user.uid)
+                                                .addLiketoPost(postData);
+                                          }
                                         },
                                       ),
                                     ),
