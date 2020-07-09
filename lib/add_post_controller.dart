@@ -52,7 +52,7 @@ class _AddPostState extends State<AddPost> {
                                     author: user.uid,
                                     charity: charities[charity],
                                     likes: [],
-                                    comments: {},
+                                    comments: [],
                                     timestamp: DateTime.now(),
                                     amountRaised: "0",
                                     targetAmount:
