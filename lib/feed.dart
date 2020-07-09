@@ -132,24 +132,18 @@ class _FeedViewState extends State<FeedView> {
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )),
-                              kIsWeb == true
-                                  ? Container()
-                                  : Container(
-                                      alignment: Alignment.centerLeft,
-                                      height: 3,
-                                      margin: EdgeInsets.only(
-                                          top: 5,
-                                          bottom: 15,
-                                          left: 0,
-                                          right: 0),
-                                      child: LinearPercentIndicator(
-                                        linearStrokeCap: LinearStrokeCap.butt,
-                                        lineHeight: 3,
-                                        percent: postData.percentRaised(),
-                                        backgroundColor: HexColor('CCCCCC'),
-                                        progressColor: HexColor('ff6b6c'),
-                                      ),
-                                    ),
+                              Container(
+                                //alignment: Alignment.centerLeft,
+                                margin: EdgeInsets.only(
+                                    top: 5, bottom: 15, left: 0, right: 0),
+                                child: LinearPercentIndicator(
+                                  linearStrokeCap: LinearStrokeCap.butt,
+                                  lineHeight: 3,
+                                  percent: postData.percentRaised(),
+                                  backgroundColor: HexColor('CCCCCC'),
+                                  progressColor: HexColor('ff6b6c'),
+                                ),
+                              ),
                               Container(
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width,
