@@ -7,6 +7,7 @@ import 'services/database.dart';
 import 'models/user.dart';
 import 'package:provider/provider.dart';
 import 'shared/helper_functions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CommentPage extends StatefulWidget {
   final String postData;
@@ -53,16 +54,22 @@ class _CommentPageState extends State<CommentPage> {
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     return new StreamBuilder(
-        stream: DatabaseService(uid: user.uid).commentsByDocId(widget.postData),
+        stream:
+            /*Firestore.instance
+            .collection('posts')
+            .document(widget.postData)
+            .snapshots(),*/
+
+            DatabaseService(uid: user.uid).commentsByDocId(widget.postData),
         // widget.feedChoice == 'user'
         //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
         //   : Firestore.instance.collection("posts").snapshots(),
         builder: (context, snapshot) {
-          // print(snapshot.data);
           if (!snapshot.hasData) {
             comments = [];
           } else {
-            comments = snapshot.data;
+            //print("snapshot data" + snapshot.data);
+            comments = snapshot.data["comments"];
           }
           print('comments: ' + comments.toString());
           return Scaffold(
