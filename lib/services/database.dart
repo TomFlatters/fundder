@@ -64,17 +64,6 @@ class DatabaseService {
         profilePic: doc.data['profilePic']);
   }
 
-  String _userPicFromUid(String uid) {
-    userCollection.document(uid).get().then((value) {
-      String profilePic = value.data["profilePic"];
-      if (profilePic == null) {
-        profilePic =
-            'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-      }
-      return value.data["profilePic"];
-    });
-  }
-
   // Given a document return a Post type object
   Post _makePost(DocumentSnapshot doc) {
     return Post(

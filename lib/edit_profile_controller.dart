@@ -72,7 +72,7 @@ class _EditProfileState extends State<EditProfile> {
         actions: <Widget>[
           new IconButton(
             icon: new Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(null),
+            onPressed: () => Navigator.of(context).pop(setState(() {})),
           )
         ],
         leading: new Container(),
@@ -170,22 +170,27 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ),
                 onTap: () {
-                  final String fileLocation = _uid +
-                      "/" +
-                      DateTime.now().microsecondsSinceEpoch.toString();
-                  DatabaseService(uid: _uid)
-                      .uploadImage(File(imageFile.path), fileLocation)
-                      .then((downloadUrl) => {
-                            print("Successful image upload"),
-                            print(downloadUrl),
+                  if (imageFile != null) {
+                    final String fileLocation = _uid +
+                        "/" +
+                        DateTime.now().microsecondsSinceEpoch.toString();
+                    DatabaseService(uid: _uid)
+                        .uploadImage(File(imageFile.path), fileLocation)
+                        .then((downloadUrl) => {
+                              print("Successful image upload"),
+                              print(downloadUrl),
 
-                            // create post from the state and image url, and add that post to firebase
-                            DatabaseService(uid: _uid).updateUserData(
-                                emailEntry.text,
-                                _username,
-                                nameEntry.text,
-                                downloadUrl)
-                          });
+                              // create post from the state and image url, and add that post to firebase
+                              DatabaseService(uid: _uid).updateUserData(
+                                  emailEntry.text,
+                                  _username,
+                                  nameEntry.text,
+                                  downloadUrl)
+                            });
+                  } else {
+                    DatabaseService(uid: _uid).updateUserData(emailEntry.text,
+                        _username, nameEntry.text, _profilePic);
+                  }
                 },
               ),
             ]),
