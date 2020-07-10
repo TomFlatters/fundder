@@ -26,11 +26,17 @@ class ProfilePic extends StatefulWidget {
 }
 
 class _ProfilePicState extends State<ProfilePic> {
-  String url;
+  String url =
+      'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
 
   @override
   void initState() {
-    _retrieveUser();
+    if (widget.uid != null) {
+      print("profile pic instantiated with uid " + widget.uid);
+      _retrieveUser();
+    } else {
+      print("no uid provided");
+    }
     super.initState();
   }
 
@@ -52,9 +58,7 @@ class _ProfilePicState extends State<ProfilePic> {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: widget.size / 2,
-      backgroundImage: CachedNetworkImageProvider(url == null
-          ? 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283'
-          : url),
+      backgroundImage: CachedNetworkImageProvider(url),
       backgroundColor: Colors.transparent,
     );
   }
