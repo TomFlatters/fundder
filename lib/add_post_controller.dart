@@ -56,7 +56,7 @@ class _AddPostState extends State<AddPost> {
                           "/" +
                           DateTime.now().microsecondsSinceEpoch.toString();
                       DatabaseService(uid: user.uid)
-                          .uploadImage(imageFile, fileLocation)
+                          .uploadImage(File(imageFile.path), fileLocation)
                           .then((downloadUrl) => {
                                 print("Successful image upload"),
                                 print(downloadUrl),

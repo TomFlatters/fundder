@@ -32,6 +32,7 @@ class _ProfileState extends State<ProfileController>
   String _name = "Name";
   String _uid;
   String _email = "Email";
+  String _profilePic;
 
   @override
   void dispose() {
@@ -57,8 +58,15 @@ class _ProfileState extends State<ProfileController>
       setState(() {
         _uid = firebaseUser.uid;
         _name = value.data["name"];
-        _username = value.data["username"];
-        _email = value.data["email"];
+        _username = firebaseUser.uid;
+        _email = firebaseUser.email;
+        _profilePic = value.data["profilePic"];
+        if (_profilePic == null) {
+          _profilePic =
+              'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+          DatabaseService(uid: _uid)
+              .updateUserData(_email, _username, _name, _profilePic);
+        }
       });
     });
   }
@@ -93,7 +101,7 @@ class _ProfileState extends State<ProfileController>
             ? null
             : AppBar(
                 centerTitle: true,
-                title: Text('samsam'),
+                title: Text(_username),
                 actions: <Widget>[
                   FlatButton(
                     onPressed:
@@ -115,7 +123,7 @@ class _ProfileState extends State<ProfileController>
                 margin: EdgeInsets.only(top: 20, bottom: 10),
                 alignment: Alignment.center,
                 child: Container(
-                  child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 90),
+                  child: ProfilePic(_uid, 90),
                   margin: EdgeInsets.all(10.0),
                 ),
               ),
@@ -226,8 +234,12 @@ class _ProfileState extends State<ProfileController>
                     [
                       FeedView('user', _username, Colors.black,
                           DatabaseService(uid: user.uid).postsByUser(user.uid)),
-                      FeedView('user', _username, Colors.blue,
-                          DatabaseService(uid: user.uid).postsByUser(user.uid)),
+                      FeedView(
+                          'user',
+                          _username,
+                          Colors.blue,
+                          DatabaseService(uid: user.uid)
+                              .postsLikedByUser(user.uid)),
                     ][_tabController.index]
                     /*ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: 1000),

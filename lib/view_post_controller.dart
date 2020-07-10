@@ -107,7 +107,7 @@ class _ViewPostState extends State<ViewPost> {
                                               aspectRatio: 1 / 1,
                                               child: Container(
                                                 child: ProfilePic(
-                                                    "https://i.imgur.com/BoN9kdC.png",
+                                                    "hkKCaiUeWUYhKwRLA0zDOoEuKxW2",
                                                     40),
                                                 margin: EdgeInsets.all(10.0),
                                               ))),
