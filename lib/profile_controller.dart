@@ -97,163 +97,185 @@ class _ProfileState extends State<ProfileController>
     } else
     // This size provide us total height and width  of our screen
     {
-      return Scaffold(
-        appBar: kIsWeb == true
-            ? null
-            : AppBar(
-                centerTitle: true,
-                title: Text(_username),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed:
-                        () /*async {
+      return new StreamBuilder(
+          stream: Firestore.instance
+              .collection('users')
+              .document(user.uid)
+              .snapshots(),
+          // widget.feedChoice == 'user'
+          //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
+          //   : Firestore.instance.collection("posts").snapshots(),
+          builder: (context, snapshot) {
+            // print(snapshot.data);
+            if (snapshot.hasData) {
+              _name = snapshot.data["name"];
+              _email = snapshot.data["email"];
+              _profilePic = snapshot.data["profilePic"];
+              print("has data");
+            }
+
+            return Scaffold(
+              appBar: kIsWeb == true
+                  ? null
+                  : AppBar(
+                      centerTitle: true,
+                      title: Text(_username),
+                      actions: <Widget>[
+                        FlatButton(
+                          onPressed:
+                              () /*async {
             await _auth.signOut();
           }*/
-                        {
-                      _showOptions();
-                    },
-                    child: Icon(AntDesign.ellipsis1),
-                  )
-                ],
-              ),
-        body: _uid == null
-            ? Loading()
-            : Column(children: [
-                kIsWeb == true ? WebMenu(5) : Container(),
-                Expanded(
-                  child: ListView(shrinkWrap: true, children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(top: 20, bottom: 10),
-                      alignment: Alignment.center,
-                      child: Container(
-                        child: ProfilePic(_uid, 90),
-                        margin: EdgeInsets.all(10.0),
-                      ),
+                              {
+                            _showOptions();
+                          },
+                          child: Icon(AntDesign.ellipsis1),
+                        )
+                      ],
                     ),
-                    Center(
-                      child: Text(_name),
-                    ),
-                    Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                        height: 50,
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                                child: GestureDetector(
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    alignment: Alignment.topCenter,
-                                    child: Text("54",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        )),
-                                  ),
-                                  Expanded(
-                                      child: Container(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Text("Following"),
-                                  )),
-                                ],
-                              ),
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, '/username/followers');
-                              },
-                            )),
-                            Expanded(
-                                child: GestureDetector(
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    alignment: Alignment.topCenter,
-                                    child: Text("106",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        )),
-                                  ),
-                                  Expanded(
-                                      child: Container(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Text("Followers"),
-                                  )),
-                                ],
-                              ),
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, '/username/followers');
-                              },
-                            )),
-                            Expanded(
-                                child: Column(
-                              children: <Widget>[
-                                Container(
-                                  alignment: Alignment.topCenter,
-                                  child: Text("£54",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      )),
-                                ),
-                                Expanded(
-                                    child: Container(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text("Raised"),
-                                )),
-                              ],
-                            )),
-                          ],
-                        )),
-                    GestureDetector(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 12),
-                          margin:
-                              EdgeInsets.only(left: 70, right: 70, bottom: 20),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey, width: 1),
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                          ),
-                          child: Text(
-                            "Edit Profile",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Colors.black,
+              body: _uid == null
+                  ? Loading()
+                  : Column(children: [
+                      kIsWeb == true ? WebMenu(5) : Container(),
+                      Expanded(
+                        child: ListView(shrinkWrap: true, children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(top: 20, bottom: 10),
+                            alignment: Alignment.center,
+                            child: Container(
+                              child: ProfilePic(_uid, 90),
+                              margin: EdgeInsets.all(10.0),
                             ),
                           ),
-                        ),
-                        onTap: () {
-                          Navigator.pushNamed(context, '/account/edit');
-                        }),
-                    DefaultTabController(
-                      length: 2,
-                      initialIndex: 0,
-                      child: Column(
-                        children: [
-                          TabBar(
-                            tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')],
-                            controller: _tabController,
+                          Center(
+                            child: Text(_name),
                           ),
-                          [
-                            FeedView(
-                                'user',
-                                _username,
-                                Colors.black,
-                                DatabaseService(uid: user.uid)
-                                    .postsByUser(user.uid)),
-                            FeedView(
-                                'user',
-                                _username,
-                                Colors.blue,
-                                DatabaseService(uid: user.uid)
-                                    .postsLikedByUser(user.uid)),
-                          ][_tabController.index]
-                          /*ConstrainedBox(
+                          Container(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 50, vertical: 20),
+                              height: 50,
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                      child: GestureDetector(
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                          alignment: Alignment.topCenter,
+                                          child: Text("54",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              )),
+                                        ),
+                                        Expanded(
+                                            child: Container(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Text("Following"),
+                                        )),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, '/username/followers');
+                                    },
+                                  )),
+                                  Expanded(
+                                      child: GestureDetector(
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                          alignment: Alignment.topCenter,
+                                          child: Text("106",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              )),
+                                        ),
+                                        Expanded(
+                                            child: Container(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Text("Followers"),
+                                        )),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, '/username/followers');
+                                    },
+                                  )),
+                                  Expanded(
+                                      child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        alignment: Alignment.topCenter,
+                                        child: Text("£54",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            )),
+                                      ),
+                                      Expanded(
+                                          child: Container(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Text("Raised"),
+                                      )),
+                                    ],
+                                  )),
+                                ],
+                              )),
+                          GestureDetector(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 12),
+                                margin: EdgeInsets.only(
+                                    left: 70, right: 70, bottom: 20),
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.grey, width: 1),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                ),
+                                child: Text(
+                                  "Edit Profile",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.pushNamed(context, '/account/edit');
+                              }),
+                          DefaultTabController(
+                            length: 2,
+                            initialIndex: 0,
+                            child: Column(
+                              children: [
+                                TabBar(
+                                  tabs: [
+                                    Tab(text: 'Posts'),
+                                    Tab(text: 'Liked')
+                                  ],
+                                  controller: _tabController,
+                                ),
+                                [
+                                  FeedView(
+                                      'user',
+                                      _username,
+                                      Colors.black,
+                                      DatabaseService(uid: user.uid)
+                                          .postsByUser(user.uid)),
+                                  FeedView(
+                                      'user',
+                                      _username,
+                                      Colors.blue,
+                                      DatabaseService(uid: user.uid)
+                                          .postsLikedByUser(user.uid)),
+                                ][_tabController.index]
+                                /*ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: 1000),
                 child: TabBarView(
                     children: [
@@ -262,13 +284,14 @@ class _ProfileState extends State<ProfileController>
                       ],
                   )
               )*/
-                        ],
+                              ],
+                            ),
+                          )
+                        ]),
                       ),
-                    )
-                  ]),
-                ),
-              ]),
-      );
+                    ]),
+            );
+          });
     }
   }
 

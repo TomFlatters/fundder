@@ -21,7 +21,6 @@ class ProfilePic extends StatefulWidget {
 
   final String uid;
   final double size;
-
   ProfilePic(this.uid, this.size);
 }
 
@@ -38,6 +37,17 @@ class _ProfilePicState extends State<ProfilePic> {
       print("no uid provided");
     }
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(ProfilePic oldwidget) {
+    super.didUpdateWidget(oldwidget);
+    if (widget.uid != null) {
+      print("profile pic instantiated with uid " + widget.uid);
+      _retrieveUser();
+    } else {
+      print("no uid provided");
+    }
   }
 
   void _retrieveUser() async {
