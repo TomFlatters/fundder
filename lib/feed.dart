@@ -93,8 +93,7 @@ class _FeedViewState extends State<FeedView> {
                                               aspectRatio: 1 / 1,
                                               child: Container(
                                                 child: ProfilePic(
-                                                    "https://i.imgur.com/BoN9kdC.png",
-                                                    40),
+                                                    postData.author, 40),
                                                 margin: EdgeInsets.all(10.0),
                                               )),
                                           onTap: () {

@@ -174,8 +174,7 @@ class _CommentPageState extends State<CommentPage> {
                   child: AspectRatio(
                       aspectRatio: 1 / 1,
                       child: Container(
-                        child:
-                            ProfilePic("https://i.imgur.com/BoN9kdC.png", 40),
+                        child: ProfilePic(user.uid, 40),
                         margin: EdgeInsets.all(20.0),
                       )),
                 ),

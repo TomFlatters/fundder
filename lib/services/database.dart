@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -33,12 +34,14 @@ class DatabaseService {
   }
 
   // Update User
-  Future updateUserData(String email, String username, String name) async {
+  Future updateUserData(
+      String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
     return await userCollection.document(uid).setData({
       'email': email,
       'username': username,
       'name': name,
+      'profilePic': profilePic
     });
   }
 
@@ -50,14 +53,26 @@ class DatabaseService {
   // Given a document return a User type object
   User _userDataFromSnapshot(DocumentSnapshot doc) {
     return User(
-      uid: doc.data['uid'],
-      username: doc.data['username'],
-      email: doc.data['email'],
-      bio: doc.data['bio'],
-      followers: doc.data['followers'],
-      following: doc.data['following'],
-      gender: doc.data['gender'],
-    );
+        uid: doc.data['uid'],
+        name: doc.data['name'],
+        username: doc.data['username'],
+        email: doc.data['email'],
+        bio: doc.data['bio'],
+        followers: doc.data['followers'],
+        following: doc.data['following'],
+        gender: doc.data['gender'],
+        profilePic: doc.data['profilePic']);
+  }
+
+  String _userPicFromUid(String uid) {
+    userCollection.document(uid).get().then((value) {
+      String profilePic = value.data["profilePic"];
+      if (profilePic == null) {
+        profilePic =
+            'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+      }
+      return value.data["profilePic"];
+    });
   }
 
   // Given a document return a Post type object
@@ -96,6 +111,15 @@ class DatabaseService {
   Stream<List<Post>> postsByUser(id) {
     return postsCollection
         .where("author", isEqualTo: id)
+        .orderBy("timestamp", descending: true)
+        .limit(10)
+        .snapshots()
+        .map(_postsDataFromSnapshot);
+  }
+
+  Stream<List<Post>> postsLikedByUser(id) {
+    return postsCollection
+        .where("likes", arrayContains: id)
         .orderBy("timestamp", descending: true)
         .limit(10)
         .snapshots()
@@ -148,7 +172,7 @@ class DatabaseService {
   final StorageReference storageRef = FirebaseStorage().ref().child("images/");
 
   // Image upload
-  Future uploadImage(PickedFile file, String location) async {
+  Future uploadImage(File file, String location) async {
     var imageRef = storageRef.child(location);
     var uploadTask = imageRef.putFile(File(file.path));
     // await the task uploaded
