@@ -15,6 +15,8 @@ class HexColor extends Color {
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }
 
+// This is called from the feed to retrieve the profile pic from uid rather than url
+
 class ProfilePic extends StatefulWidget {
   @override
   _ProfilePicState createState() => _ProfilePicState();
@@ -68,6 +70,23 @@ class _ProfilePicState extends State<ProfilePic> {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: widget.size / 2,
+      backgroundImage: CachedNetworkImageProvider(url),
+      backgroundColor: Colors.transparent,
+    );
+  }
+}
+
+// This is called when url of the pic is known
+
+class ProfilePicFromUrl extends StatelessWidget {
+  final String url;
+  final double size;
+  ProfilePicFromUrl(this.url, this.size);
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: size / 2,
       backgroundImage: CachedNetworkImageProvider(url),
       backgroundColor: Colors.transparent,
     );

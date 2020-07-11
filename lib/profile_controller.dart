@@ -143,7 +143,7 @@ class _ProfileState extends State<ProfileController>
                             margin: EdgeInsets.only(top: 20, bottom: 10),
                             alignment: Alignment.center,
                             child: Container(
-                              child: ProfilePic(_uid, 90),
+                              child: ProfilePicFromUrl(_profilePic, 90),
                               margin: EdgeInsets.all(10.0),
                             ),
                           ),

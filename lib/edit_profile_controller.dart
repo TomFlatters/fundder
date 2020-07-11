@@ -89,9 +89,9 @@ class _EditProfileState extends State<EditProfile> {
                           radius: 45,
                           backgroundImage: FileImage(File(imageFile.path)),
                           backgroundColor: Colors.transparent)
-                      : _uid != null
-                          ? ProfilePic(_uid, 90)
-                          : ProfilePic(null, 90),
+                      : _profilePic != null
+                          ? ProfilePicFromUrl(_profilePic, 90)
+                          : ProfilePicFromUrl(null, 90),
                   margin: EdgeInsets.all(10.0),
                 ),
               ),

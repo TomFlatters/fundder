@@ -27,6 +27,8 @@ class _ViewUserState extends State<ViewUser>
   String _name = "Name";
   String _uid;
   String _email = "Email";
+  String _profilePic =
+      'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
 
   @override
   void dispose() {
@@ -53,6 +55,13 @@ class _ViewUserState extends State<ViewUser>
         _uid = widget.uid;
         _name = value.data["name"];
         _username = widget.uid;
+        _profilePic = value.data["profilePic"];
+        if (_profilePic == null) {
+          _profilePic =
+              'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+          DatabaseService(uid: _uid)
+              .updateUserData(_email, _username, _name, _profilePic);
+        }
       });
     });
   }
@@ -93,7 +102,7 @@ class _ViewUserState extends State<ViewUser>
                     margin: EdgeInsets.only(top: 20, bottom: 10),
                     alignment: Alignment.center,
                     child: Container(
-                      child: ProfilePic(widget.uid, 90),
+                      child: ProfilePicFromUrl(_profilePic, 90),
                       margin: EdgeInsets.all(10.0),
                     ),
                   ),
