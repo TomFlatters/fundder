@@ -74,9 +74,9 @@ class _FeedState extends State<FeedController>
           TabBarView(controller: _tabController, children: [
         DoChallenge(),
         FeedView("Fund", null, HexColor(colors[1]),
-            DatabaseService(uid: user.uid).posts),
+            DatabaseService(uid: user.uid).fundPosts),
         FeedView("Done", null, HexColor(colors[2]),
-            DatabaseService(uid: user.uid).posts),
+            DatabaseService(uid: user.uid).donePosts),
       ]),
     );
   }

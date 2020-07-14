@@ -43,13 +43,17 @@ class AuthService {
   }
 
   // register w/ email & password
-  Future registerWithEmailAndPassword(String email, String password) async {
+  Future registerWithEmailPasswordUsername(
+      String email, String password, String username) async {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       FirebaseUser user = result.user;
+      String defaultPic =
+          'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
       // create a new (firestore) document for the user with corresponding uid
-      await DatabaseService(uid: user.uid).updateUserData(email, null, null);
+      await DatabaseService(uid: user.uid)
+          .updateUserData(email, user.uid, null, defaultPic);
       // ADD: user sets username
       return _userFromFirebaseUser(user);
     } catch (e) {

@@ -10,6 +10,7 @@ class Post {
   final timestamp;
   String imageUrl;
   String id;
+  String status;
 
   Post(
       {this.author,
@@ -22,7 +23,8 @@ class Post {
       this.comments,
       this.timestamp,
       this.imageUrl,
-      this.id});
+      this.id,
+      this.status});
 
   double percentRaised() {
     //print("Amount raised1" + amountRaised);
