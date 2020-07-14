@@ -77,7 +77,8 @@ class DatabaseService {
         subtitle: doc.data['subtitle'],
         timestamp: doc.data['timestamp'],
         imageUrl: doc.data['imageUrl'],
-        id: doc.documentID);
+        id: doc.documentID,
+        status: doc.data['status']);
   }
 
   // Get posts list stream is mapped to the Post object
@@ -88,10 +89,20 @@ class DatabaseService {
   }
 
   // Get list of posts ordered by time
-  Stream<List<Post>> get posts {
+  Stream<List<Post>> get fundPosts {
     return postsCollection
         .orderBy("timestamp", descending: true)
         .limit(10)
+        .where('status', isEqualTo: 'fund')
+        .snapshots()
+        .map(_postsDataFromSnapshot);
+  }
+
+  Stream<List<Post>> get donePosts {
+    return postsCollection
+        .orderBy("timestamp", descending: true)
+        .limit(10)
+        .where('status', isEqualTo: 'done')
         .snapshots()
         .map(_postsDataFromSnapshot);
   }
@@ -129,6 +140,7 @@ class DatabaseService {
           "subtitle": post.subtitle,
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
+          'status': post.status
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
@@ -186,6 +198,7 @@ class DatabaseService {
       "subtitle": post.subtitle,
       "timestamp": post.timestamp,
       "imageUrl": post.imageUrl,
+      "status": post.status
     });
   }
 

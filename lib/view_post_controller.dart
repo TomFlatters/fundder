@@ -42,28 +42,6 @@ class _ViewPostState extends State<ViewPost> {
     super.initState();
   }
 
-  void _getPost() async {
-    DatabaseService().getPostById(widget.postData).then((doc) {
-      setState(() {
-        if (doc != null) {
-          postData = Post(
-            author: doc.data['author'],
-            title: doc.data['title'],
-            charity: doc.data['charity'],
-            amountRaised: doc.data['amountRaised'],
-            targetAmount: doc.data['targetAmount'],
-            likes: doc.data['likes'],
-            comments: doc.data['comments'],
-            subtitle: doc.data['subtitle'],
-            timestamp: doc.data['timestamp'],
-            imageUrl: doc.data['imageUrl'],
-            id: doc.documentID,
-          );
-        }
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
@@ -330,6 +308,35 @@ class _ViewPostState extends State<ViewPost> {
                                               widget.postData +
                                               '/donate');
                                     }),
+                                user.uid != postData.author
+                                    ? Container()
+                                    : GestureDetector(
+                                        child: Container(
+                                          width: 250,
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 12, /*horizontal: 30*/
+                                          ),
+                                          margin: EdgeInsets.only(
+                                              left: 50, right: 50, bottom: 20),
+                                          decoration: BoxDecoration(
+                                            color: HexColor('ff6b6c'),
+                                            border: Border.all(
+                                                color: HexColor('ff6b6c'),
+                                                width: 1),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(5)),
+                                          ),
+                                          child: Text(
+                                            "Complete Challenge",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        onTap: () {}),
                               ],
                             )))
                   ],
