@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'helper_classes.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -111,13 +112,13 @@ class _ViewPostState extends State<ViewPost> {
                                     ? Container()
                                     : Container(
                                         child: SizedBox(
-                                          width:
+                                          /*width:
                                               MediaQuery.of(context).size.width,
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .width *
                                               9 /
-                                              16,
+                                              16,*/
                                           child: kIsWeb == true
                                               ? Image.network(postData.imageUrl)
                                               : CachedNetworkImage(
@@ -163,7 +164,8 @@ class _ViewPostState extends State<ViewPost> {
                                         vertical: 10, horizontal: 20),
                                     child: Text(postData.subtitle)),
                                 Padding(
-                                  padding: EdgeInsets.all(20),
+                                  padding: EdgeInsets.only(
+                                      left: 20, right: 20, bottom: 20),
                                 ),
                                 Container(
                                   margin: EdgeInsets.symmetric(
@@ -264,16 +266,35 @@ class _ViewPostState extends State<ViewPost> {
                                     )
                                   ]),
                                 ),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  child: Text(howLongAgo(postData.timestamp),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                      )),
-                                ),
+                                Row(children: [
+                                  Expanded(
+                                    child: Container(
+                                      alignment: Alignment.centerLeft,
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      child:
+                                          Text(howLongAgo(postData.timestamp),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              )),
+                                    ),
+                                  ),
+                                  postData.author != user.uid
+                                      ? Container()
+                                      : FlatButton(
+                                          onPressed: () {
+                                            print('button pressed');
+                                            _showDeleteDialog(postData);
+                                          },
+                                          child: Text('Delete',
+                                              textAlign: TextAlign.right,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              )),
+                                        ),
+                                ]),
                                 GestureDetector(
                                     child: Container(
                                       width: 250,
@@ -344,6 +365,46 @@ class _ViewPostState extends State<ViewPost> {
               ),
             ]),
           );
+  }
+
+  Future<void> _showDeleteDialog(Post post) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Post?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Once you delete this post, all the money donated will be refunded unless you have uploaded proof of challenge completion. This cannot be undone.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Firestore.instance
+                    .collection('posts')
+                    .document(post.id)
+                    .delete()
+                    .then((value) {
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showShare() {
