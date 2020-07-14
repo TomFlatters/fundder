@@ -236,4 +236,12 @@ class DatabaseService {
       "timestamp": doc.data["timestamp"]
     };
   }*/
+
+  Map _makeComment(DocumentSnapshot doc) {
+    return {
+      "author": doc.data["author"],
+      "text": doc.data["text"],
+      "timestamp": doc.data["timestamp"]
+    };
+  }
 }

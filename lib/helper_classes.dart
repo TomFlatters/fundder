@@ -45,7 +45,6 @@ class _ProfilePicState extends State<ProfilePic> {
   void didUpdateWidget(ProfilePic oldwidget) {
     super.didUpdateWidget(oldwidget);
     if (widget.uid != null) {
-      print("profile pic instantiated with uid " + widget.uid);
       _retrieveUser();
     } else {
       print("no uid provided");
