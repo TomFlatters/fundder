@@ -126,17 +126,17 @@ class _AddPostState extends State<AddPost> {
   void _pushPost(String downloadUrl, User user) {
     DatabaseService(uid: user.uid)
         .uploadPost(new Post(
-          title: titleController.text.toString(),
-          subtitle: subtitleController.text.toString(),
-          author: user.uid,
-          charity: charities[charity],
-          likes: [],
-          comments: [],
-          timestamp: DateTime.now(),
-          amountRaised: "0",
-          targetAmount: moneyController.text.toString(),
-          imageUrl: downloadUrl,
-        ))
+            title: titleController.text.toString(),
+            subtitle: subtitleController.text.toString(),
+            author: user.uid,
+            charity: charities[charity],
+            likes: [],
+            comments: [],
+            timestamp: DateTime.now(),
+            amountRaised: "0",
+            targetAmount: moneyController.text.toString(),
+            imageUrl: downloadUrl,
+            status: 'fund'))
         .then((postId) => {
               if (postId == null)
                 {

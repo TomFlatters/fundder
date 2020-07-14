@@ -107,7 +107,7 @@ class _ViewUserState extends State<ViewUser>
                     ),
                   ),
                   Center(
-                    child: Text(_name),
+                    child: Text(_username),
                   ),
                   Container(
                       margin:

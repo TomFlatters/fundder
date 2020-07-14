@@ -108,7 +108,9 @@ class _ProfileState extends State<ProfileController>
           builder: (context, snapshot) {
             // print(snapshot.data);
             if (snapshot.hasData) {
-              _name = snapshot.data["name"];
+              if (snapshot.data['name'] != null) {
+                _name = snapshot.data["name"];
+              }
               _email = snapshot.data["email"];
               _profilePic = snapshot.data["profilePic"];
               print("has data");
@@ -148,7 +150,7 @@ class _ProfileState extends State<ProfileController>
                             ),
                           ),
                           Center(
-                            child: Text(_name),
+                            child: Text(_username),
                           ),
                           Container(
                               margin: EdgeInsets.symmetric(

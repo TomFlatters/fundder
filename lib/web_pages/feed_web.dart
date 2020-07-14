@@ -82,9 +82,9 @@ class _WebFeedState extends State<WebFeed> with SingleTickerProviderStateMixin {
                                 child: [
                               DoChallenge(),
                               FeedView("Fund", null, HexColor('ff6b6c'),
-                                  DatabaseService(uid: user.uid).posts),
+                                  DatabaseService(uid: user.uid).fundPosts),
                               FeedView("Done", null, HexColor('ff6b6c'),
-                                  DatabaseService(uid: user.uid).posts),
+                                  DatabaseService(uid: user.uid).donePosts),
                             ][_tabController.index]),
                           ],
                         ),
