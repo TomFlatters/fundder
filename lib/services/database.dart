@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -33,12 +34,14 @@ class DatabaseService {
   }
 
   // Update User
-  Future updateUserData(String email, String username, String name) async {
+  Future updateUserData(
+      String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
     return await userCollection.document(uid).setData({
       'email': email,
       'username': username,
       'name': name,
+      'profilePic': profilePic
     });
   }
 
@@ -50,14 +53,15 @@ class DatabaseService {
   // Given a document return a User type object
   User _userDataFromSnapshot(DocumentSnapshot doc) {
     return User(
-      uid: doc.data['uid'],
-      username: doc.data['username'],
-      email: doc.data['email'],
-      bio: doc.data['bio'],
-      followers: doc.data['followers'],
-      following: doc.data['following'],
-      gender: doc.data['gender'],
-    );
+        uid: doc.data['uid'],
+        name: doc.data['name'],
+        username: doc.data['username'],
+        email: doc.data['email'],
+        bio: doc.data['bio'],
+        followers: doc.data['followers'],
+        following: doc.data['following'],
+        gender: doc.data['gender'],
+        profilePic: doc.data['profilePic']);
   }
 
   // Given a document return a Post type object
@@ -73,7 +77,8 @@ class DatabaseService {
         subtitle: doc.data['subtitle'],
         timestamp: doc.data['timestamp'],
         imageUrl: doc.data['imageUrl'],
-        id: doc.documentID);
+        id: doc.documentID,
+        status: doc.data['status']);
   }
 
   // Get posts list stream is mapped to the Post object
@@ -84,10 +89,20 @@ class DatabaseService {
   }
 
   // Get list of posts ordered by time
-  Stream<List<Post>> get posts {
+  Stream<List<Post>> get fundPosts {
     return postsCollection
         .orderBy("timestamp", descending: true)
         .limit(10)
+        .where('status', isEqualTo: 'fund')
+        .snapshots()
+        .map(_postsDataFromSnapshot);
+  }
+
+  Stream<List<Post>> get donePosts {
+    return postsCollection
+        .orderBy("timestamp", descending: true)
+        .limit(10)
+        .where('status', isEqualTo: 'done')
         .snapshots()
         .map(_postsDataFromSnapshot);
   }
@@ -96,6 +111,15 @@ class DatabaseService {
   Stream<List<Post>> postsByUser(id) {
     return postsCollection
         .where("author", isEqualTo: id)
+        .orderBy("timestamp", descending: true)
+        .limit(10)
+        .snapshots()
+        .map(_postsDataFromSnapshot);
+  }
+
+  Stream<List<Post>> postsLikedByUser(id) {
+    return postsCollection
+        .where("likes", arrayContains: id)
         .orderBy("timestamp", descending: true)
         .limit(10)
         .snapshots()
@@ -116,6 +140,7 @@ class DatabaseService {
           "subtitle": post.subtitle,
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
+          'status': post.status
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
@@ -148,7 +173,7 @@ class DatabaseService {
   final StorageReference storageRef = FirebaseStorage().ref().child("images/");
 
   // Image upload
-  Future uploadImage(PickedFile file, String location) async {
+  Future uploadImage(File file, String location) async {
     var imageRef = storageRef.child(location);
     var uploadTask = imageRef.putFile(File(file.path));
     // await the task uploaded
@@ -173,6 +198,7 @@ class DatabaseService {
       "subtitle": post.subtitle,
       "timestamp": post.timestamp,
       "imageUrl": post.imageUrl,
+      "status": post.status
     });
   }
 
@@ -223,4 +249,12 @@ class DatabaseService {
       "timestamp": doc.data["timestamp"]
     };
   }*/
+
+  Map _makeComment(DocumentSnapshot doc) {
+    return {
+      "author": doc.data["author"],
+      "text": doc.data["text"],
+      "timestamp": doc.data["timestamp"]
+    };
+  }
 }

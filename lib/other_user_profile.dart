@@ -9,6 +9,8 @@ import 'view_followers_controller.dart';
 import 'helper_classes.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ViewUser extends StatefulWidget {
   @override
@@ -21,6 +23,12 @@ class ViewUser extends StatefulWidget {
 class _ViewUserState extends State<ViewUser>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
+  String _username = "Username";
+  String _name = "Name";
+  String _uid;
+  String _email = "Email";
+  String _profilePic =
+      'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
 
   @override
   void dispose() {
@@ -30,9 +38,32 @@ class _ViewUserState extends State<ViewUser>
 
   @override
   void initState() {
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 1, vsync: this);
     _tabController.addListener(_handleTabSelection);
+    _retrieveUser();
     super.initState();
+  }
+
+  void _retrieveUser() async {
+    //var firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(widget.uid)
+        .get()
+        .then((value) {
+      setState(() {
+        _uid = widget.uid;
+        _name = value.data["name"];
+        _username = widget.uid;
+        _profilePic = value.data["profilePic"];
+        if (_profilePic == null) {
+          _profilePic =
+              'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+          DatabaseService(uid: _uid)
+              .updateUserData(_email, _username, _name, _profilePic);
+        }
+      });
+    });
   }
 
   _handleTabSelection() {
@@ -57,7 +88,7 @@ class _ViewUserState extends State<ViewUser>
               return Scaffold(
                 appBar: AppBar(
                   centerTitle: true,
-                  title: Text(userData.data.username),
+                  title: Text(_username),
                   actions: <Widget>[
                     new IconButton(
                       icon: new Icon(Icons.close),
@@ -71,12 +102,12 @@ class _ViewUserState extends State<ViewUser>
                     margin: EdgeInsets.only(top: 20, bottom: 10),
                     alignment: Alignment.center,
                     child: Container(
-                      child: ProfilePic("https://i.imgur.com/BoN9kdC.png", 90),
+                      child: ProfilePicFromUrl(_profilePic, 90),
                       margin: EdgeInsets.all(10.0),
                     ),
                   ),
                   Center(
-                    child: Text("@" + userData.data.username),
+                    child: Text(_username),
                   ),
                   Container(
                       margin:
@@ -174,12 +205,12 @@ class _ViewUserState extends State<ViewUser>
                       ),
                       onTap: () {}),
                   DefaultTabController(
-                    length: 2,
+                    length: 1,
                     initialIndex: 0,
                     child: Column(
                       children: [
                         TabBar(
-                          tabs: [Tab(text: 'Posts'), Tab(text: 'Liked')],
+                          tabs: [Tab(text: 'Posts') /*, Tab(text: 'Liked')*/],
                           controller: _tabController,
                         ),
                         [
