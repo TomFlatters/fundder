@@ -107,8 +107,7 @@ class _ViewPostState extends State<ViewPost> {
                                               aspectRatio: 1 / 1,
                                               child: Container(
                                                 child: ProfilePic(
-                                                    "hkKCaiUeWUYhKwRLA0zDOoEuKxW2",
-                                                    40),
+                                                    postData.author, 40),
                                                 margin: EdgeInsets.all(10.0),
                                               ))),
                                       Align(
@@ -130,27 +129,63 @@ class _ViewPostState extends State<ViewPost> {
                                     ],
                                   ),
                                 ),
+                                (postData.imageUrl == null)
+                                    ? Container()
+                                    : Container(
+                                        child: SizedBox(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              9 /
+                                              16,
+                                          child: kIsWeb == true
+                                              ? Image.network(postData.imageUrl)
+                                              : CachedNetworkImage(
+                                                  imageUrl: (postData
+                                                              .imageUrl !=
+                                                          null)
+                                                      ? postData.imageUrl
+                                                      : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
+                                                  placeholder: (context, url) =>
+                                                      Loading(),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Icon(Icons.error),
+                                                ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                                        ),
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 10.0),
+                                      ),
                                 Container(
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.width *
-                                        9 /
-                                        16,
-                                    child: kIsWeb == true
-                                        ? Image.network(postData.imageUrl)
-                                        : CachedNetworkImage(
-                                            imageUrl: (postData.imageUrl !=
-                                                    null)
-                                                ? postData.imageUrl
-                                                : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-                                            placeholder: (context, url) =>
-                                                Loading(),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Icon(Icons.error),
-                                          ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                                    alignment: Alignment.centerLeft,
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    child: Text(
+                                      '£${postData.amountRaised} raised of £${postData.targetAmount} target',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  margin: EdgeInsets.only(
+                                      top: 5, bottom: 15, left: 10, right: 10),
+                                  child: LinearPercentIndicator(
+                                    linearStrokeCap: LinearStrokeCap.butt,
+                                    lineHeight: 3,
+                                    percent: postData.percentRaised(),
+                                    backgroundColor: HexColor('CCCCCC'),
+                                    progressColor: HexColor('ff6b6c'),
                                   ),
-                                  margin: EdgeInsets.symmetric(vertical: 10.0),
+                                ),
+                                Container(
+                                    alignment: Alignment.centerLeft,
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    child: Text(postData.subtitle)),
+                                Padding(
+                                  padding: EdgeInsets.all(20),
                                 ),
                                 Container(
                                   margin: EdgeInsets.symmetric(
@@ -260,35 +295,6 @@ class _ViewPostState extends State<ViewPost> {
                                         fontSize: 14,
                                         color: Colors.grey,
                                       )),
-                                ),
-                                Container(
-                                    alignment: Alignment.centerLeft,
-                                    margin: EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    child: Text(
-                                      '£${postData.amountRaised} raised of £${postData.targetAmount} target',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    )),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  margin: EdgeInsets.only(
-                                      top: 5, bottom: 15, left: 10, right: 10),
-                                  child: LinearPercentIndicator(
-                                    linearStrokeCap: LinearStrokeCap.butt,
-                                    lineHeight: 3,
-                                    percent: postData.percentRaised(),
-                                    backgroundColor: HexColor('CCCCCC'),
-                                    progressColor: HexColor('ff6b6c'),
-                                  ),
-                                ),
-                                Container(
-                                    alignment: Alignment.centerLeft,
-                                    margin: EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    child: Text(postData.subtitle)),
-                                Padding(
-                                  padding: EdgeInsets.all(20),
                                 ),
                                 GestureDetector(
                                     child: Container(

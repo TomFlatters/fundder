@@ -143,26 +143,33 @@ class _FeedViewState extends State<FeedView> {
                                   progressColor: HexColor('ff6b6c'),
                                 ),
                               ),
-                              Container(
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.width *
-                                      9 /
-                                      16,
-                                  child: kIsWeb == true
-                                      ? Image.network(postData.imageUrl)
-                                      : CachedNetworkImage(
-                                          imageUrl: (postData.imageUrl != null)
-                                              ? postData.imageUrl
-                                              : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-                                          placeholder: (context, url) =>
-                                              Loading(),
-                                          errorWidget: (context, url, error) =>
-                                              Icon(Icons.error),
-                                        ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
-                                ),
-                                margin: EdgeInsets.symmetric(vertical: 10.0),
-                              ),
+                              (postData.imageUrl == null)
+                                  ? Container()
+                                  : Container(
+                                      child: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                9 /
+                                                16,
+                                        child: kIsWeb == true
+                                            ? Image.network(postData.imageUrl)
+                                            : CachedNetworkImage(
+                                                imageUrl: (postData.imageUrl !=
+                                                        null)
+                                                    ? postData.imageUrl
+                                                    : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
+                                                placeholder: (context, url) =>
+                                                    Loading(),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(Icons.error),
+                                              ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                                      ),
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 10.0),
+                                    ),
                               Container(
                                 height: 30,
                                 child: Row(children: <Widget>[
