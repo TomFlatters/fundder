@@ -146,13 +146,17 @@ class _FeedViewState extends State<FeedView> {
                               (postData.imageUrl == null)
                                   ? Container()
                                   : Container(
+                                      /*constraints: BoxConstraints(
+                                          maxHeight: MediaQuery.of(context)
+                                              .size
+                                              .width),*/
                                       child: SizedBox(
-                                        width:
+                                        /*width:
                                             MediaQuery.of(context).size.width,
                                         height:
                                             MediaQuery.of(context).size.width *
-                                                9 /
-                                                16,
+                                                1 /
+                                                1,*/
                                         child: kIsWeb == true
                                             ? Image.network(postData.imageUrl)
                                             : CachedNetworkImage(
@@ -270,15 +274,33 @@ class _FeedViewState extends State<FeedView> {
                                   )
                                 ]),
                               ),
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.all(10),
-                                child: Text(howLongAgo(postData.timestamp),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    )),
-                              )
+                              Row(children: [
+                                Expanded(
+                                  child: Container(
+                                    alignment: Alignment.centerLeft,
+                                    margin: EdgeInsets.all(10),
+                                    child: Text(howLongAgo(postData.timestamp),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        )),
+                                  ),
+                                ),
+                                postData.author != user.uid
+                                    ? Container()
+                                    : FlatButton(
+                                        onPressed: () {
+                                          print('button pressed');
+                                          _showDeleteDialog(postData);
+                                        },
+                                        child: Text('Delete',
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            )),
+                                      ),
+                              ])
                             ],
                           ))),
                   onTap: () {
@@ -294,6 +316,46 @@ class _FeedViewState extends State<FeedView> {
             );
           }
         });
+  }
+
+  Future<void> _showDeleteDialog(Post post) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Post?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Once you delete this post, all the money donated will be refunded unless you have uploaded proof of challenge completion. This cannot be undone.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Firestore.instance
+                    .collection('posts')
+                    .document(post.id)
+                    .delete()
+                    .then((value) {
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showShare() {
