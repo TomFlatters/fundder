@@ -101,20 +101,19 @@ class _FeedViewState extends State<FeedView> {
                                                 context, '/username');
                                           },
                                         )),
-                                    Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(postData.author
-                                            /*style: TextStyle(
-                                    fontFamily: 'Roboto Mono'
-                                  ),*/
-                                            )),
                                     Expanded(
                                         child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Container(
-                                                margin: EdgeInsets.all(10.0),
-                                                child:
-                                                    Text(postData.charity)))),
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(postData.author,
+                                                style: TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontWeight: FontWeight.w600,
+                                                )))),
+                                    Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Container(
+                                            margin: EdgeInsets.all(10.0),
+                                            child: Text(postData.charity))),
                                   ],
                                 ),
                               ),

@@ -89,22 +89,22 @@ class _ViewPostState extends State<ViewPost> {
                                                     postData.author, 40),
                                                 margin: EdgeInsets.all(10.0),
                                               ))),
-                                      Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            postData.author,
-                                            style: TextStyle(
-                                              fontFamily: 'Quicksand',
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          )),
                                       Expanded(
-                                          child: Align(
-                                              alignment: Alignment.centerRight,
-                                              child: Container(
-                                                  margin: EdgeInsets.all(10.0),
-                                                  child:
-                                                      Text(postData.charity)))),
+                                        child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              postData.author,
+                                              style: TextStyle(
+                                                fontFamily: 'Quicksand',
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            )),
+                                      ),
+                                      Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Container(
+                                              margin: EdgeInsets.all(10.0),
+                                              child: Text(postData.charity))),
                                     ],
                                   ),
                                 ),
@@ -357,7 +357,13 @@ class _ViewPostState extends State<ViewPost> {
                                             ),
                                           ),
                                         ),
-                                        onTap: () {}),
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context,
+                                              '/post/' +
+                                                  widget.postData +
+                                                  '/uploadProof');
+                                        }),
                               ],
                             )))
                   ],
