@@ -74,7 +74,6 @@ class _ViewUserState extends State<ViewUser>
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
     return FutureBuilder<User>(
         future: DatabaseService(uid: widget.uid).readUserData(),
         builder: (BuildContext context, AsyncSnapshot<User> userData) {
@@ -135,8 +134,8 @@ class _ViewUserState extends State<ViewUser>
                               ],
                             ),
                             onTap: () {
-                              Navigator.pushNamed(
-                                  context, '/username/followers');
+                              Navigator.pushNamed(context,
+                                  '/user/' + widget.uid + '/followers');
                             },
                           )),
                           Expanded(
@@ -159,8 +158,8 @@ class _ViewUserState extends State<ViewUser>
                               ],
                             ),
                             onTap: () {
-                              Navigator.pushNamed(
-                                  context, '/username/followers');
+                              Navigator.pushNamed(context,
+                                  '/user/' + widget.uid + '/followers');
                             },
                           )),
                           Expanded(
@@ -218,13 +217,13 @@ class _ViewUserState extends State<ViewUser>
                               'user',
                               'adrikoz',
                               Colors.black,
-                              DatabaseService(uid: user.uid)
+                              DatabaseService(uid: widget.uid)
                                   .postsByUser(widget.uid)),
                           FeedView(
                               'user',
                               'adrikoz',
                               Colors.blue,
-                              DatabaseService(uid: user.uid)
+                              DatabaseService(uid: widget.uid)
                                   .postsByUser(widget.uid)),
                         ][_tabController.index]
                       ],
