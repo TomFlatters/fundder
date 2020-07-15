@@ -21,6 +21,8 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  stripe_payment: ^1.0.7
+
   universal_html: ^1.2.1
   flutter:
     sdk: flutter
