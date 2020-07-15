@@ -5,7 +5,7 @@ import 'helper_classes.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'models/post.dart';
 import 'share_post_view.dart';
-import 'donate_page_controller.dart';
+import 'donation/donate_page_controller.dart';
 import 'comment_view_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
