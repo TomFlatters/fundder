@@ -6,6 +6,9 @@ import 'other_user_profile.dart';
 class ViewFollowers extends StatefulWidget {
   @override
   _ViewFollowersState createState() => _ViewFollowersState();
+
+  final String uid;
+  ViewFollowers({this.uid});
 }
 
 class _ViewFollowersState extends State<ViewFollowers>
@@ -92,7 +95,9 @@ class _ViewFollowersState extends State<ViewFollowers>
                                           )),
                                       onTap: () {
                                         Navigator.pushNamed(
-                                            context, '/username');
+                                            context,
+                                            '/user/' +
+                                                'hkKCaiUeWUYhKwRLA0zDOoEuKxW2');
                                       },
                                     )),
                                 Expanded(

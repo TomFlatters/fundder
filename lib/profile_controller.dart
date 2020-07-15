@@ -178,8 +178,8 @@ class _ProfileState extends State<ProfileController>
                                       ],
                                     ),
                                     onTap: () {
-                                      Navigator.pushNamed(
-                                          context, '/username/followers');
+                                      Navigator.pushNamed(context,
+                                          '/user/' + user.uid + '/followers');
                                     },
                                   )),
                                   Expanded(
@@ -202,8 +202,8 @@ class _ProfileState extends State<ProfileController>
                                       ],
                                     ),
                                     onTap: () {
-                                      Navigator.pushNamed(
-                                          context, '/username/followers');
+                                      Navigator.pushNamed(context,
+                                          '/user/' + user.uid + '/followers');
                                     },
                                   )),
                                   Expanded(

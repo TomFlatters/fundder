@@ -35,11 +35,13 @@ class FluroRouter {
   static Handler _viewOtherProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ViewUser(
-            uid: 'hkKCaiUeWUYhKwRLA0zDOoEuKxW2',
+            uid: params['id'][0],
           ));
   static Handler _followersHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ViewFollowers());
+          ViewFollowers(
+            uid: params['id'][0],
+          ));
   static Handler _editProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           EditProfile());
@@ -100,12 +102,12 @@ class FluroRouter {
       transitionType: TransitionType.fadeIn,
     );
     router.define(
-      '/username',
+      '/user/:id',
       handler: _viewOtherProfileHandler,
       transitionType: TransitionType.fadeIn,
     );
     router.define(
-      '/username/followers',
+      '/user/:id/followers',
       handler: _followersHandler,
       transitionType: TransitionType.fadeIn,
     );

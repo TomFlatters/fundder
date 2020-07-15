@@ -97,8 +97,9 @@ class _FeedViewState extends State<FeedView> {
                                                 margin: EdgeInsets.all(10.0),
                                               )),
                                           onTap: () {
-                                            Navigator.pushNamed(
-                                                context, '/username');
+                                            print('/user/' + postData.author);
+                                            Navigator.pushNamed(context,
+                                                '/user/' + postData.author);
                                           },
                                         )),
                                     Expanded(
