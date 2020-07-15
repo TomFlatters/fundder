@@ -23,7 +23,7 @@ class _DonatePageState extends State<DonatePage> {
 
   payViaNewCard() async {
     var response =
-        await StripeService.payWithNewCard(amount: '15000', currency: 'gbp');
+        await StripeService.payWithNewCard(amount: '777', currency: 'gbp');
     response.success == true
         ? print('twas a success')
         : print('twas not a success');
