@@ -19,6 +19,7 @@ import 'package:fundder/search_controller.dart';
 import 'package:fundder/liked_controller.dart';
 import 'package:fundder/profile_controller.dart';
 import 'package:fundder/web_pages/temparary_upload_page.dart';
+import 'package:fundder/upload_proof_controller.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -51,6 +52,9 @@ class FluroRouter {
   static Handler _challengeStepsHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           StepsPage(challengeId: params['id'][0]));
+  static Handler _uploadProofHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          UploadProofScreen(postId: params['id'][0]));
 
   // Web handlers
 
@@ -122,6 +126,12 @@ class FluroRouter {
     router.define(
       '/challenge/:id/steps',
       handler: _challengeStepsHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+
+    router.define(
+      '/post/:id/uploadProof',
+      handler: _uploadProofHandler,
       transitionType: TransitionType.fadeIn,
     );
 
