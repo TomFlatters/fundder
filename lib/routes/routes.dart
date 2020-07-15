@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/other_user_profile.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
-import 'package:fundder/donate_page_controller.dart';
+import 'package:fundder/donation/donate_page_controller.dart';
 import 'package:fundder/add_post_controller.dart';
 import 'package:fundder/do_challenge_detail.dart';
 import 'package:fundder/challenge_steps_view.dart';
