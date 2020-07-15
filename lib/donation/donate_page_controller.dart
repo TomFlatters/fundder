@@ -3,6 +3,7 @@ import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/donation/money_input_text_widget.dart';
 import 'package:fundder/donation/payment_methods.dart';
 import 'package:fundder/main.dart';
+import 'package:fundder/services/payment_service.dart';
 import '../helper_classes.dart';
 
 class DonatePage extends StatefulWidget {
@@ -14,11 +15,26 @@ class DonatePage extends StatefulWidget {
 }
 
 class _DonatePageState extends State<DonatePage> {
+  @override
+  void initState() {
+    super.initState();
+    StripeService.init();
+  }
+
+  payViaNewCard() async {
+    var response =
+        await StripeService.payWithNewCard(amount: '15000', currency: 'gbp');
+    response.success == true
+        ? print('twas a success')
+        : print('twas not a success');
+  }
+
   Widget moneyInput = moneyInputWidget(
       MoneyMaskedTextController(decimalSeparator: '.', thousandSeparator: ','));
 
   @override
   Widget build(BuildContext context) {
+    print('building donate widget');
     final moneyController = MoneyMaskedTextController(
         decimalSeparator: '.', thousandSeparator: ',');
     ThemeData theme = Theme.of(context);
@@ -54,9 +70,11 @@ class _DonatePageState extends State<DonatePage> {
                     moneyInputWidget(moneyController)
                   ])),
           ListTile(
-            leading: Icon(Icons.add_circle, color: Colors.black),
-            title: Text("Pay via new card"),
-          ),
+              leading: Icon(Icons.add_circle, color: Colors.black),
+              title: Text("Pay via new card"),
+              onTap: () {
+                payViaNewCard();
+              }),
           ListTile(
             leading: Icon(Icons.credit_card, color: Colors.black),
             title: Text("Pay via existing cards"),
