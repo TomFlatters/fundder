@@ -12,7 +12,7 @@ class StripeTransactionResponse {
 class StripeService {
   static String apiBase = 'https://api.stripe.com/v1';
   static String paymentApiUrl = '${StripeService.apiBase}/payment_intents';
-  static String secret = 'your_api_secret';
+  static String secret = '';
   static Map<String, String> headers = {
     'Authorization': 'Bearer ${StripeService.secret}',
     'Content-Type': 'application/x-www-form-urlencoded'
@@ -21,7 +21,7 @@ class StripeService {
   static init() {
     StripePayment.setOptions(StripeOptions(
         publishableKey:
-            "sk_test_51H1vCtEefLDIzK0NarA3HlvO3vtYAOYNDNjtB6JuULS5woYBlzeG9fGsmdyQoXtby0yd0b68dwC0PDfvXlQkw7NU00TIOFSvSQ",
+            "pk_test_51H1vCtEefLDIzK0NQRr58FoSgug99uMlZEeasYcOGzEZlMhW2EPC7Is7pM8uKJmTIAe1RufI46VRZdGTekfORC1Z00wghPK6cR",
         merchantId: "Test",
         androidPayMode: 'test'));
   }
@@ -36,6 +36,7 @@ class StripeService {
       var response = await StripePayment.confirmPaymentIntent(PaymentIntent(
           clientSecret: paymentIntent['client_secret'],
           paymentMethodId: paymentMethod.id));
+      print('about to determine response...');
       if (response.status == 'succeeded') {
         return new StripeTransactionResponse(
             message: 'Transaction successful', success: true);
@@ -44,6 +45,7 @@ class StripeService {
             message: 'Transaction failed', success: false);
       }
     } on PlatformException catch (err) {
+      print(err.toString());
       return StripeService.getPlatformExceptionErrorResult(err);
     } catch (err) {
       return new StripeTransactionResponse(
