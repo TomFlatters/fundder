@@ -45,5 +45,12 @@
 	<string>To allow users to upload photos for their fundraisers</string>
 	<key>NSCameraUsageDescription</key>
 	<string>To allow users to upload photos for their fundraisers</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>To allow users to upload videos for their fundraisers</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+	<key>NSAllowsArbitraryLoads</key>
+	<true/>
+	</dict>
 </dict>
 </plist>
