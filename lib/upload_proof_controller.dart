@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'services/database.dart';
+import 'models/user.dart';
+import 'package:provider/provider.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -53,9 +56,9 @@ class _UploadProofState extends State<UploadProofScreen> {
       await _controller.setVolume(0.0);
     }
     if (isVideo) {
-      final PickedFile file = await _picker.getVideo(
+      _imageFile = await _picker.getVideo(
           source: source, maxDuration: const Duration(seconds: 10));
-      await _playVideo(file);
+      await _playVideo(_imageFile);
     } else {
       /*await _displayPickImageDialog(context,
           (double maxWidth, double maxHeight, int quality)*/
@@ -166,11 +169,65 @@ class _UploadProofState extends State<UploadProofScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     return Scaffold(
         appBar: AppBar(
-          title: Text('Select Image'),
+          centerTitle: true,
+          title: Text("Create Fundder"),
+          actions: <Widget>[
+            new FlatButton(
+                child: Text('Submit',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  print('Submit pressed');
+                  if (_imageFile != null) {
+                    print('not null');
+                    final String fileLocation = user.uid +
+                        "/" +
+                        DateTime.now().microsecondsSinceEpoch.toString();
+                    if (isVideo == true) {
+                      DatabaseService(uid: user.uid)
+                          .uploadVideo(File(_imageFile.path), fileLocation)
+                          .then((downloadUrl) => {
+                                print("Successful image upload"),
+                                print(downloadUrl),
+                                DatabaseService(uid: user.uid)
+                                    .updatePostStatusAndImage(
+                                        widget.postId, downloadUrl, 'done')
+                              });
+                    } else {
+                      DatabaseService(uid: user.uid)
+                          .uploadImage(File(_imageFile.path), fileLocation)
+                          .then((downloadUrl) => {
+                                print("Successful image upload"),
+                                print(downloadUrl),
+                                DatabaseService(uid: user.uid)
+                                    .updatePostStatusAndImage(
+                                        widget.postId, downloadUrl, 'done')
+                              });
+                    }
+                  }
+                })
+          ],
+          leading: new IconButton(
+            icon: new Icon(Icons.close),
+            onPressed: () => Navigator.of(context).pop(null),
+          ),
         ),
         body: ListView(children: [
+          Container(
+            color: Colors.white,
+            margin: EdgeInsets.symmetric(vertical: 5),
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+            child: Text(
+              'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
+              style: TextStyle(
+                fontFamily: 'Quicksand',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ),
           Center(
             child: !kIsWeb && Platform.isAndroid
                 ? FutureBuilder<void>(
