@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:video_player/video_player.dart';
+//import 'package:video_player/video_player.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'services/database.dart';
 import 'models/user.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_video_player/cached_video_player.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -20,8 +21,8 @@ class _UploadProofState extends State<UploadProofScreen> {
   PickedFile _imageFile;
   dynamic _pickImageError;
   bool isVideo = false;
-  VideoPlayerController _controller;
-  VideoPlayerController _toBeDisposed;
+  CachedVideoPlayerController _controller;
+  CachedVideoPlayerController _toBeDisposed;
   String _retrieveDataError;
 
   final ImagePicker _picker = ImagePicker();
@@ -173,7 +174,7 @@ class _UploadProofState extends State<UploadProofScreen> {
     if (file != null && mounted) {
       await _disposeVideoController();
       if (kIsWeb) {
-        _controller = VideoPlayerController.network(file.path);
+        _controller = CachedVideoPlayerController.network(file.path);
         // In web, most browsers won't honor a programmatic call to .play
         // if the video has a sound track (and is not muted).
         // Mute the video so it auto-plays in web!
@@ -181,7 +182,7 @@ class _UploadProofState extends State<UploadProofScreen> {
         // interaction (clicking on a "play" button, for example).
         await _controller.setVolume(0.0);
       } else {
-        _controller = VideoPlayerController.file(File(file.path));
+        _controller = CachedVideoPlayerController.file(File(file.path));
         await _controller.setVolume(1.0);
       }
       await _controller.initialize();
@@ -346,20 +347,15 @@ class _UploadProofState extends State<UploadProofScreen> {
       children: <Widget>[
         ListTile(
           leading: Icon(FontAwesome.trash_o),
-          title: Text('Remove Current Photo'),
+          title: Text('Remove Current Video'),
           onTap: () async {
             _imageFile = null;
             this.setState(() {});
           },
         ),
         ListTile(
-          leading: Icon(FontAwesome5Brands.facebook_square),
-          title: Text('Import from Facebook'),
-          onTap: () {},
-        ),
-        ListTile(
           leading: Icon(FontAwesome.camera),
-          title: Text('Take Photo'),
+          title: Text('Take Video'),
           onTap: () {
             isVideo = true;
             _onImageButtonPressed(ImageSource.camera);
@@ -389,11 +385,6 @@ class _UploadProofState extends State<UploadProofScreen> {
             _imageFile = null;
             this.setState(() {});
           },
-        ),
-        ListTile(
-          leading: Icon(FontAwesome5Brands.facebook_square),
-          title: Text('Import from Facebook'),
-          onTap: () {},
         ),
         ListTile(
           leading: Icon(FontAwesome.camera),
@@ -437,20 +428,17 @@ class _UploadProofState extends State<UploadProofScreen> {
   }
 }
 
-typedef void OnPickImageCallback(
-    double maxWidth, double maxHeight, int quality);
-
 class AspectRatioVideo extends StatefulWidget {
   AspectRatioVideo(this.controller);
 
-  final VideoPlayerController controller;
+  final CachedVideoPlayerController controller;
 
   @override
   AspectRatioVideoState createState() => AspectRatioVideoState();
 }
 
 class AspectRatioVideoState extends State<AspectRatioVideo> {
-  VideoPlayerController get controller => widget.controller;
+  CachedVideoPlayerController get controller => widget.controller;
   bool initialized = false;
 
   void _onVideoControllerUpdate() {
@@ -479,13 +467,27 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
   Widget build(BuildContext context) {
     if (initialized) {
       return Center(
+          child: GestureDetector(
+        onTap: _playPause,
         child: AspectRatio(
-          aspectRatio: controller.value?.aspectRatio,
-          child: VideoPlayer(controller),
+          aspectRatio: controller.value.aspectRatio,
+          child: CachedVideoPlayer(controller),
         ),
-      );
+      ) //)/*AspectRatio(
+          /*aspectRatio: controller.value?.aspectRatio,
+          child: VideoPlayer(controller),*/
+          );
+      //);
     } else {
       return Container();
+    }
+  }
+
+  _playPause() {
+    if (controller.value.isPlaying) {
+      controller.pause();
+    } else {
+      controller.play();
     }
   }
 }
