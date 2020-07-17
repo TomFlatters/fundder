@@ -99,6 +99,7 @@ class DatabaseService {
   }
 
   Stream<List<Post>> get donePosts {
+    print('returning done posts');
     return postsCollection
         .orderBy("timestamp", descending: true)
         .limit(10)

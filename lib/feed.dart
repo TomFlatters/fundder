@@ -14,7 +14,8 @@ import 'other_user_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:video_player/video_player.dart';
+//import 'package:video_player/video_player.dart';
+import 'package:cached_video_player/cached_video_player.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -399,13 +400,15 @@ class VideoItem extends StatefulWidget {
 }
 
 class _VideoItemState extends State<VideoItem> {
-  VideoPlayerController _controller;
+  CachedVideoPlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(widget.url)
+    _controller = CachedVideoPlayerController.network(widget.url)
       ..initialize().then((_) {
+        _controller.play();
+        _controller.setLooping(true);
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
       });
@@ -415,15 +418,21 @@ class _VideoItemState extends State<VideoItem> {
   Widget build(BuildContext context) {
     return Center(
       child: _controller.value.initialized
-          ? Stack(children: [
+          ? /*Stack(children: [
               AspectRatio(
                 aspectRatio: _controller.value.aspectRatio,
                 child: VideoPlayer(_controller),
+              ),*/
+          /*Center(
+                  child: */
+          GestureDetector(
+              onTap: _playPause,
+              child: AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: CachedVideoPlayer(_controller),
               ),
-              Center(
-                  child: GestureDetector(
-                      onTap: _playPause, child: Icon(Icons.play_circle_filled)))
-            ])
+            ) //)
+          //])
           : Container(),
     );
   }

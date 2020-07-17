@@ -55,6 +55,7 @@ dependencies:
   percent_indicator: ^2.1.5
   fluro: ^1.6.3
   video_player: ^0.10.11+2
+  cached_video_player: ^1.0.3
 #image_picker_web: ^1.0.9
 
 dev_dependencies:
