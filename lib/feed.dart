@@ -14,6 +14,7 @@ import 'other_user_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:video_player/video_player.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -151,26 +152,13 @@ class _FeedViewState extends State<FeedView> {
                                               .size
                                               .width),*/
                                       child: SizedBox(
-                                        /*width:
+                                          /*width:
                                             MediaQuery.of(context).size.width,
                                         height:
                                             MediaQuery.of(context).size.width *
                                                 1 /
                                                 1,*/
-                                        child: kIsWeb == true
-                                            ? Image.network(postData.imageUrl)
-                                            : CachedNetworkImage(
-                                                imageUrl: (postData.imageUrl !=
-                                                        null)
-                                                    ? postData.imageUrl
-                                                    : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-                                                placeholder: (context, url) =>
-                                                    Loading(),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        Icon(Icons.error),
-                                              ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
-                                      ),
+                                          child: _previewImageVideo(postData)),
                                       margin:
                                           EdgeInsets.symmetric(vertical: 10.0),
                                     ),
@@ -318,6 +306,23 @@ class _FeedViewState extends State<FeedView> {
         });
   }
 
+  Widget _previewImageVideo(Post postData) {
+    if (postData.imageUrl.contains('video')) {
+      print('initialising video');
+      return VideoItem(postData.imageUrl);
+    } else {
+      return kIsWeb == true
+          ? Image.network(postData.imageUrl)
+          : CachedNetworkImage(
+              imageUrl: (postData.imageUrl != null)
+                  ? postData.imageUrl
+                  : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
+              placeholder: (context, url) => Loading(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            );
+    }
+  }
+
   Future<void> _showDeleteDialog(Post post) async {
     return showDialog<void>(
       context: context,
@@ -382,5 +387,58 @@ class _FeedViewState extends State<FeedView> {
         id: doc.documentID,
       );
     }).toList();
+  }
+}
+
+class VideoItem extends StatefulWidget {
+  final String url;
+
+  VideoItem(this.url);
+  @override
+  _VideoItemState createState() => _VideoItemState();
+}
+
+class _VideoItemState extends State<VideoItem> {
+  VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(widget.url)
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {});
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: _controller.value.initialized
+          ? Stack(children: [
+              AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
+              ),
+              Center(
+                  child: GestureDetector(
+                      onTap: _playPause, child: Icon(Icons.play_circle_filled)))
+            ])
+          : Container(),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
+  _playPause() {
+    if (_controller.value.isPlaying) {
+      _controller.pause();
+    } else {
+      _controller.play();
+    }
   }
 }
