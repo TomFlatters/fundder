@@ -177,7 +177,7 @@ class DatabaseService {
   }
 
   // Get a post from Firestore given a known id: if the id is bracketed these are automatically removed
-  Future getTemplateById(String documentId) async {
+  Future<Template> getTemplateById(String documentId) async {
     String formattedId = (documentId.substring(0, 1) == "{" &&
             documentId.substring(documentId.length - 1) == "}")
         ? documentId.substring(1, documentId.length - 1)
