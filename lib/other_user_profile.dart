@@ -214,12 +214,14 @@ class _ViewUserState extends State<ViewUser>
                         ),
                         [
                           FeedView(
+                              UniqueKey(),
                               'user',
                               'adrikoz',
                               Colors.black,
                               DatabaseService(uid: widget.uid)
                                   .postsByUser(widget.uid)),
                           FeedView(
+                              UniqueKey(),
                               'user',
                               'adrikoz',
                               Colors.blue,

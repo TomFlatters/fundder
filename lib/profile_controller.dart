@@ -265,12 +265,14 @@ class _ProfileState extends State<ProfileController>
                                 ),
                                 [
                                   FeedView(
+                                      UniqueKey(),
                                       'user',
                                       _username,
                                       Colors.black,
                                       DatabaseService(uid: user.uid)
                                           .postsByUser(user.uid)),
                                   FeedView(
+                                      UniqueKey(),
                                       'user',
                                       _username,
                                       Colors.blue,

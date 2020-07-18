@@ -23,6 +23,7 @@ class _WebFeedState extends State<WebFeed> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    print('feed web called');
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabSelection);
     super.initState();
@@ -81,9 +82,17 @@ class _WebFeedState extends State<WebFeed> with SingleTickerProviderStateMixin {
                             Expanded(
                                 child: [
                               DoChallenge(),
-                              FeedView("Fund", null, HexColor('ff6b6c'),
+                              FeedView(
+                                  UniqueKey(),
+                                  "Fund",
+                                  null,
+                                  HexColor('ff6b6c'),
                                   DatabaseService(uid: user.uid).fundPosts),
-                              FeedView("Done", null, HexColor('ff6b6c'),
+                              FeedView(
+                                  UniqueKey(),
+                                  "Done",
+                                  null,
+                                  HexColor('ff6b6c'),
                                   DatabaseService(uid: user.uid).donePosts),
                             ][_tabController.index]),
                           ],

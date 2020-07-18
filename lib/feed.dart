@@ -16,6 +16,8 @@ import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:video_player/video_player.dart';
 import 'package:cached_video_player/cached_video_player.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -26,7 +28,12 @@ class FeedView extends StatefulWidget {
   final String identifier;
   final Stream<List<Post>> postsStream;
   FeedView(
-      this.feedChoice, this.identifier, this.colorChoice, this.postsStream);
+    Key key,
+    this.feedChoice,
+    this.identifier,
+    this.colorChoice,
+    this.postsStream,
+  ) : super(key: key);
 }
 
 class _FeedViewState extends State<FeedView> {
@@ -35,25 +42,40 @@ class _FeedViewState extends State<FeedView> {
   @override
   void initState() {
     super.initState();
-    if (widget.feedChoice == 'user') {
+    if (widget.feedChoice == "user") {
       physics = NeverScrollableScrollPhysics();
-      print('user');
-    } else {
-      physics = AlwaysScrollableScrollPhysics();
-      print('nonuser');
     }
+    // print fcm token
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    _firebaseMessaging.configure(
+      onLaunch: (Map<String, dynamic> message) {
+        print('onLaunch called');
+      },
+      onResume: (Map<String, dynamic> message) {
+        print('onResume called');
+      },
+      onMessage: (Map<String, dynamic> message) {
+        print('onMessage called');
+      },
+    );
+    _firebaseMessaging.subscribeToTopic('all');
+    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
+      sound: true,
+      badge: true,
+      alert: true,
+    ));
+    _firebaseMessaging.onIosSettingsRegistered
+        .listen((IosNotificationSettings settings) {
+      print('Hello');
+    });
+    _firebaseMessaging.getToken().then((token) {
+      print(token); // Print the Token in Console
+    });
   }
 
   @override
   void didUpdateWidget(FeedView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.feedChoice == 'user') {
-      physics = NeverScrollableScrollPhysics();
-      print('user');
-    } else {
-      physics = AlwaysScrollableScrollPhysics();
-      print('nonuser');
-    }
   }
 
   @override
@@ -371,24 +393,6 @@ class _FeedViewState extends State<FeedView> {
           return SharePost();
         });
   }
-
-  List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.documents.map((doc) {
-      //print(doc.data);
-      return Post(
-        author: doc.data['author'],
-        title: doc.data['title'],
-        charity: doc.data['charity'],
-        amountRaised: doc.data['amountRaised'],
-        targetAmount: doc.data['targetAmount'],
-        likes: doc.data['likes'],
-        comments: doc.data['comments'],
-        subtitle: doc.data['subtitle'],
-        timestamp: doc.data['timestamp'],
-        id: doc.documentID,
-      );
-    }).toList();
-  }
 }
 
 class VideoItem extends StatefulWidget {
@@ -416,25 +420,37 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: _controller.value.initialized
-          ? /*Stack(children: [
+    return VisibilityDetector(
+        key: UniqueKey(),
+        onVisibilityChanged: (VisibilityInfo info) {
+          debugPrint("${info.visibleFraction} of my widget is visible");
+          if (info.visibleFraction < 0.3) {
+            _controller.pause();
+          } else {
+            _controller.play();
+          }
+        },
+        child: Center(
+          child: _controller.value.initialized
+              ? /*Stack(children: [
               AspectRatio(
                 aspectRatio: _controller.value.aspectRatio,
                 child: VideoPlayer(_controller),
               ),*/
-          /*Center(
+              /*Center(
                   child: */
-          GestureDetector(
-              onTap: _playPause,
-              child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: CachedVideoPlayer(_controller),
-              ),
-            ) //)
-          //])
-          : Container(),
-    );
+              GestureDetector(
+                  onTap: _playPause,
+                  child: _controller.value.initialized
+                      ? AspectRatio(
+                          aspectRatio: _controller.value.aspectRatio,
+                          child: CachedVideoPlayer(_controller),
+                        )
+                      : Container(),
+                ) //)
+              //])
+              : Container(),
+        ));
   }
 
   @override
