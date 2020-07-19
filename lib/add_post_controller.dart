@@ -90,7 +90,7 @@ class _AddPostState extends State<AddPost> {
                                           targetAmount:
                                               moneyController.text.toString(),
                                           imageUrl: downloadUrl,
-                                          whoDoes: whoDoes[selected],
+                                          whoDoes: whoDoes[selected].toString(),
                                           acceptedBy: [],
                                           completedBy: [],
                                           active: true))
