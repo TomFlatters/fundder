@@ -276,8 +276,9 @@ class _ProfileState extends State<ProfileController>
                                       'user',
                                       _username,
                                       Colors.blue,
-                                      DatabaseService(uid: user.uid)
-                                          .postsLikedByUser(user.uid)),
+                                      /*DatabaseService(uid: user.uid)
+                                          .postsLikedByUser(user.uid)*/
+                                      null),
                                 ][_tabController.index]
                                 /*ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: 1000),

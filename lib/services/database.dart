@@ -118,6 +118,7 @@ class DatabaseService {
         .map(_postsDataFromSnapshot);
   }
 
+/*
   Stream<List<Post>> postsLikedByUser(id) {
     return postsCollection
         .where("likes", arrayContains: id)
@@ -126,6 +127,7 @@ class DatabaseService {
         .snapshots()
         .map(_postsDataFromSnapshot);
   }
+*/
 
   // Upload post and return the document id
   Future uploadPost(Post post) async {
@@ -227,17 +229,21 @@ class DatabaseService {
         .updateData({"imageUrl": downloadUrl, "status": status});
   }
 
+/*
   Future addLiketoPost(Post post) async {
     postsCollection.document(post.id).updateData({
       "likes": FieldValue.arrayUnion([uid])
     });
   }
+*/
 
+  /*
   Future removeLikefromPost(Post post) async {
     postsCollection.document(post.id).updateData({
       "likes": FieldValue.arrayRemove([uid])
     });
   }
+  */
 
   Future addCommentToPost(Map comment, String postId) async {
     /*return await postsCollection.document(postId).collection("comments").add({
