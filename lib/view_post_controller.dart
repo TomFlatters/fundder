@@ -179,33 +179,35 @@ class _ViewPostState extends State<ViewPost> {
                                             width: 20,
                                             height: 20,
                                             padding: const EdgeInsets.all(0.0),
-                                            child: postData.likes
-                                                    .contains(user.uid)
-                                                ? Image.asset(
-                                                    'assets/images/like_selected.png')
-                                                : Image.asset(
+                                            child:
+                                                // postData.likes
+                                                //         .contains(user.uid)
+                                                //     ? Image.asset(
+                                                //         'assets/images/like_selected.png')
+                                                //     :
+                                                Image.asset(
                                                     'assets/images/like.png'),
                                           ),
                                           Expanded(
                                               child: Container(
                                                   margin:
                                                       EdgeInsets.only(left: 10),
-                                                  child: Text(
-                                                    postData.likes.length
-                                                        .toString(),
-                                                    textAlign: TextAlign.left,
-                                                  )))
+                                                  child: Text("777"
+                                                      // postData.likes.length
+                                                      //     .toString(),
+                                                      // textAlign: TextAlign.left,
+                                                      )))
                                         ]),
                                         onPressed: () {
-                                          if (postData.likes
-                                                  .contains(user.uid) ==
-                                              true) {
-                                            DatabaseService(uid: user.uid)
-                                                .removeLikefromPost(postData);
-                                          } else {
-                                            DatabaseService(uid: user.uid)
-                                                .addLiketoPost(postData);
-                                          }
+                                          // if (postData.likes
+                                          //         .contains(user.uid) ==
+                                          //     true) {
+                                          //   DatabaseService(uid: user.uid)
+                                          //       .removeLikefromPost(postData);
+                                          // } else {
+                                          //   DatabaseService(uid: user.uid)
+                                          //       .addLiketoPost(postData);
+                                          // }
                                         },
                                       ),
                                     ),
