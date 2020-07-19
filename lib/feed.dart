@@ -1,3 +1,6 @@
+//!!!!!!!!!!!!!!This file is way way tooooo big
+//really needs to be refactored
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
@@ -107,6 +110,7 @@ class _FeedViewState extends State<FeedView> {
                           child: Column(
                             children: <Widget>[
                               Container(
+                                //author of post
                                 height: 60,
                                 child: Row(
                                   children: <Widget>[
@@ -143,10 +147,12 @@ class _FeedViewState extends State<FeedView> {
                                 ),
                               ),
                               Container(
+                                  //description of post
                                   alignment: Alignment.centerLeft,
                                   margin: EdgeInsets.all(10),
                                   child: Text(postData.subtitle)),
                               Container(
+                                  //target for fundraiser
                                   alignment: Alignment.centerLeft,
                                   margin: EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 10),
@@ -156,6 +162,7 @@ class _FeedViewState extends State<FeedView> {
                                         TextStyle(fontWeight: FontWeight.bold),
                                   )),
                               Container(
+                                //percent indicator for post
                                 //alignment: Alignment.centerLeft,
                                 margin: EdgeInsets.only(
                                     top: 5, bottom: 15, left: 0, right: 0),
@@ -170,6 +177,7 @@ class _FeedViewState extends State<FeedView> {
                               (postData.imageUrl == null)
                                   ? Container()
                                   : Container(
+                                      //image for post IF included
                                       /*constraints: BoxConstraints(
                                           maxHeight: MediaQuery.of(context)
                                               .size
@@ -195,36 +203,38 @@ class _FeedViewState extends State<FeedView> {
                                           width: 20,
                                           height: 20,
                                           padding: const EdgeInsets.all(0.0),
-                                          child: postData.likes
+                                          child:
+                                              /*postData
+                                                  .likes //accessing database to see if liked
                                                   .contains(user.uid)
                                               ? Image.asset(
                                                   'assets/images/like_selected.png')
-                                              : Image.asset(
+                                              : */
+                                              Image.asset(
                                                   'assets/images/like.png'),
                                         ),
                                         Expanded(
                                             child: Container(
                                                 margin:
                                                     EdgeInsets.only(left: 10),
-                                                child: Text(
-                                                  postData.likes.length
+                                                child: Text("777"
+                                                    /*postData.likes.length
                                                       .toString(),
-                                                  textAlign: TextAlign.left,
-                                                )))
+                                                  textAlign: TextAlign.left,*/
+                                                    )))
                                       ]),
                                       onPressed: () {
                                         /*final snackBar = SnackBar(
                                             content: Text("Like passed"));
                                         Scaffold.of(context)
                                             .showSnackBar(snackBar);*/
-                                        if (postData.likes.contains(user.uid) ==
-                                            true) {
-                                          DatabaseService(uid: user.uid)
-                                              .removeLikefromPost(postData);
-                                        } else {
-                                          DatabaseService(uid: user.uid)
-                                              .addLiketoPost(postData);
-                                        }
+                                        //if (postData.likes.contains(user.uid) ==
+                                        //true) {
+                                        //  DatabaseService(uid: user.uid)
+                                        //     .removeLikefromPost(postData);
+                                        // } else {
+                                        //   DatabaseService(uid: user.uid)
+                                        //      .addLiketoPost(postData);
                                       },
                                     ),
                                   ),
