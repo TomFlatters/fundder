@@ -130,7 +130,7 @@ class _AddPostState extends State<AddPost> {
             subtitle: subtitleController.text.toString(),
             author: user.uid,
             charity: charities[charity],
-            likes: [],
+            likes: 0,
             comments: [],
             timestamp: DateTime.now(),
             amountRaised: "0",
