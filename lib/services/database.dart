@@ -170,14 +170,14 @@ class DatabaseService {
         timestamp: doc.data['timestamp'],
         imageUrl: doc.data['imageUrl'],
         id: doc.documentID,
-        whoDoes: doc.data['whoeDoes'],
+        whoDoes: doc.data['whoDoes'],
         acceptedBy: doc.data['acceptedBy'],
         completedBy: doc.data['completedBy'],
         active: doc.data['active']);
   }
 
   // Get a post from Firestore given a known id: if the id is bracketed these are automatically removed
-  Future<Template> getTemplateById(String documentId) async {
+  Future getTemplateById(String documentId) async {
     String formattedId = (documentId.substring(0, 1) == "{" &&
             documentId.substring(documentId.length - 1) == "}")
         ? documentId.substring(1, documentId.length - 1)
