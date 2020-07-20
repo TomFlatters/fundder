@@ -6,13 +6,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
-
-class Post {
-  final String title;
-  final String description;
-
-  Post(this.title, this.description);
-}
+import 'services/database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SearchController extends StatefulWidget {
   @override
@@ -22,10 +17,11 @@ class SearchController extends StatefulWidget {
 
 class _SearchState extends State<SearchController>
     with SingleTickerProviderStateMixin {
+  String uid = '123';
   TabController _tabController;
-  final SearchBarController<Post> _searchBarController = SearchBarController();
+  final SearchBarController<User> _searchBarController = SearchBarController();
   final List searchType = ["#", "users: "];
-  SearchBar<Post> searchBar;
+  SearchBar<User> searchBar;
   final List trending = ['trending 1', 'trending 2', 'trending 3'];
 
   @override
@@ -49,14 +45,19 @@ class _SearchState extends State<SearchController>
   }
 
   // Call search function here. search is the term to be searched.
-  Future<List<Post>> search(String search) async {
-    await Future.delayed(Duration(seconds: 2));
-    return List.generate(search.length, (int index) {
-      return Post(
-        "${searchType[_tabController.index]}$search $index",
-        "Description :$search $index",
-      );
-    });
+  Future<List<User>> search(String search) async {
+    //await Future.delayed(Duration(seconds: 2));
+    return DatabaseService(uid: uid).usersContainingString(search);
+    /*return new StreamBuilder(
+        stream: DatabaseService(uid: user.uid).donePosts, builder: (context, snapshot) {
+          return ListView.separated(
+              physics: physics,
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(top: 10.0),
+              itemCount: snapshot.data.length,
+              itemBuilder: (BuildContext context, int index) {
+                Post postData = snapshot.data[index];
+        });*/
   }
 
   Widget _trendingList() {
@@ -143,7 +144,7 @@ class _SearchState extends State<SearchController>
           child: Column(children: [
             kIsWeb == true ? WebMenu(2) : Container(),
             Expanded(
-              child: SearchBar<Post>(
+              child: SearchBar<User>(
                 searchBarPadding: EdgeInsets.symmetric(horizontal: 20),
                 searchBarController: _searchBarController,
                 header: DefaultTabController(
@@ -157,11 +158,11 @@ class _SearchState extends State<SearchController>
                 hintText: 'search accounts',
                 onSearch: search,
                 minimumChars: 0,
-                onItemFound: (Post post, int index) {
+                onItemFound: (User user, int index) {
                   return ListTile(
                     leading: _decideLeading(),
-                    title: Text(post.title),
-                    subtitle: Text(post.description),
+                    title: Text(user.username),
+                    //subtitle: Text(post.description),
                   );
                 },
 
