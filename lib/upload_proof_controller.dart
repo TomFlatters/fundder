@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter_icons/flutter_icons.dart';
-//import 'package:video_player/video_player.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'services/database.dart';
 import 'models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'shared/loading.dart';
+import 'global widgets/buttons.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -134,49 +134,15 @@ class _UploadProofState extends State<UploadProofScreen> {
                       )
                     : (isVideo ? _previewVideo() : _previewImage()),
               ),
-              GestureDetector(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                  margin:
-                      EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 1),
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  child: Text(
-                    "Select Video",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                onTap: () {
+              EditFundderButton(
+                text: "Select Video",
+                onPressed: () {
                   _changeVideo();
                 },
               ),
-              GestureDetector(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                  margin:
-                      EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 1),
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  child: Text(
-                    "Select Image",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                onTap: () {
+              EditFundderButton(
+                text: "Select Image",
+                onPressed: () {
                   _changePic();
                 },
               ),
