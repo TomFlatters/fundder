@@ -16,6 +16,7 @@ import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
 import 'video_item.dart';
+import 'global widgets/buttons.dart';
 
 class ViewPost extends StatefulWidget {
   final String postData;
@@ -287,33 +288,9 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                               )),
                                         ),
                                 ]),
-                                GestureDetector(
-                                    child: Container(
-                                      width: 250,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 12, /*horizontal: 30*/
-                                      ),
-                                      margin: EdgeInsets.only(
-                                          left: 50, right: 50, bottom: 20),
-                                      decoration: BoxDecoration(
-                                        color: HexColor('ff6b6c'),
-                                        border: Border.all(
-                                            color: HexColor('ff6b6c'),
-                                            width: 1),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5)),
-                                      ),
-                                      child: Text(
-                                        "Donate",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    onTap: () {
+                                PrimaryFundderButton(
+                                    text: 'Donate',
+                                    onPressed: () {
                                       /*Navigator.of(context).push(_openDonate());*/
                                       Navigator.pushNamed(
                                           context,
@@ -324,33 +301,9 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                 user.uid != postData.author ||
                                         postData.status != 'fund'
                                     ? Container()
-                                    : GestureDetector(
-                                        child: Container(
-                                          width: 250,
-                                          padding: EdgeInsets.symmetric(
-                                            vertical: 12, /*horizontal: 30*/
-                                          ),
-                                          margin: EdgeInsets.only(
-                                              left: 50, right: 50, bottom: 20),
-                                          decoration: BoxDecoration(
-                                            color: HexColor('ff6b6c'),
-                                            border: Border.all(
-                                                color: HexColor('ff6b6c'),
-                                                width: 1),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(5)),
-                                          ),
-                                          child: Text(
-                                            "Complete Challenge",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                        onTap: () {
+                                    : PrimaryFundderButton(
+                                        text: 'Complete Challenge',
+                                        onPressed: () {
                                           Navigator.pushNamed(
                                                   context,
                                                   '/post/' +

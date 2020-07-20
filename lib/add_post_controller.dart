@@ -13,6 +13,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'shared/loading.dart';
+import 'global widgets/buttons.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -396,25 +397,9 @@ class _AddPostState extends State<AddPost> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width * 9 / 16,
       ),
-      GestureDetector(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          margin: EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 1),
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-          ),
-          child: Text(
-            "Select Image",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        onTap: () {
+      EditFundderButton(
+        text: "Change profile picture",
+        onPressed: () {
           _changePic();
         },
       ),
