@@ -7,6 +7,7 @@ import 'package:fundder/models/user.dart';
 import 'home_widget.dart';
 import 'helper_classes.dart';
 import 'routes/routes.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() {
   FluroRouter.setupRouter();

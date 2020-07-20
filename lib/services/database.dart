@@ -99,6 +99,7 @@ class DatabaseService {
   }
 
   Stream<List<Post>> get donePosts {
+    print('returning done posts');
     return postsCollection
         .orderBy("timestamp", descending: true)
         .limit(10)
@@ -170,12 +171,28 @@ class DatabaseService {
   // Storage ref:
   // Images are stored as <root>/images/<uid>/<milliseconds-from-epoch>
   // BE AWARE: this convention will cause a naming conflict if one user uploads multiple images at the exact same time
-  final StorageReference storageRef = FirebaseStorage().ref().child("images/");
 
   // Image upload
   Future uploadImage(File file, String location) async {
+    final StorageReference storageRef =
+        FirebaseStorage().ref().child("images/");
     var imageRef = storageRef.child(location);
     var uploadTask = imageRef.putFile(File(file.path));
+    // await the task uploaded
+    var storageTaskSnapshot = await uploadTask.onComplete;
+    // then return the downloadURL
+    if (storageTaskSnapshot != null) {
+      var downloadUrl = await imageRef.getDownloadURL();
+      return downloadUrl.toString();
+    }
+  }
+
+  Future uploadVideo(File file, String location) async {
+    final StorageReference storageRef =
+        FirebaseStorage().ref().child("videos/");
+    StorageReference imageRef = storageRef.child(location);
+    StorageUploadTask uploadTask = imageRef.putFile(
+        File(file.path), StorageMetadata(contentType: 'video/mp4'));
     // await the task uploaded
     var storageTaskSnapshot = await uploadTask.onComplete;
     // then return the downloadURL
@@ -200,6 +217,14 @@ class DatabaseService {
       "imageUrl": post.imageUrl,
       "status": post.status
     });
+  }
+
+  Future updatePostStatusAndImage(
+      String postId, String downloadUrl, String status) async {
+    // create or update the document with this uid
+    return await postsCollection
+        .document(postId)
+        .updateData({"imageUrl": downloadUrl, "status": status});
   }
 
   Future addLiketoPost(Post post) async {
