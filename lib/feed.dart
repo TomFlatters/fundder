@@ -14,6 +14,10 @@ import 'other_user_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:video_player/video_player.dart';
+import 'package:cached_video_player/cached_video_player.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -24,7 +28,12 @@ class FeedView extends StatefulWidget {
   final String identifier;
   final Stream<List<Post>> postsStream;
   FeedView(
-      this.feedChoice, this.identifier, this.colorChoice, this.postsStream);
+    Key key,
+    this.feedChoice,
+    this.identifier,
+    this.colorChoice,
+    this.postsStream,
+  ) : super(key: key);
 }
 
 class _FeedViewState extends State<FeedView> {
@@ -33,25 +42,40 @@ class _FeedViewState extends State<FeedView> {
   @override
   void initState() {
     super.initState();
-    if (widget.feedChoice == 'user') {
+    if (widget.feedChoice == "user") {
       physics = NeverScrollableScrollPhysics();
-      print('user');
-    } else {
-      physics = AlwaysScrollableScrollPhysics();
-      print('nonuser');
     }
+    // print fcm token
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    _firebaseMessaging.configure(
+      onLaunch: (Map<String, dynamic> message) {
+        print('onLaunch called');
+      },
+      onResume: (Map<String, dynamic> message) {
+        print('onResume called');
+      },
+      onMessage: (Map<String, dynamic> message) {
+        print('onMessage called');
+      },
+    );
+    _firebaseMessaging.subscribeToTopic('all');
+    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
+      sound: true,
+      badge: true,
+      alert: true,
+    ));
+    _firebaseMessaging.onIosSettingsRegistered
+        .listen((IosNotificationSettings settings) {
+      print('Hello');
+    });
+    _firebaseMessaging.getToken().then((token) {
+      print(token); // Print the Token in Console
+    });
   }
 
   @override
   void didUpdateWidget(FeedView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.feedChoice == 'user') {
-      physics = NeverScrollableScrollPhysics();
-      print('user');
-    } else {
-      physics = AlwaysScrollableScrollPhysics();
-      print('nonuser');
-    }
   }
 
   @override
@@ -151,26 +175,13 @@ class _FeedViewState extends State<FeedView> {
                                               .size
                                               .width),*/
                                       child: SizedBox(
-                                        /*width:
+                                          /*width:
                                             MediaQuery.of(context).size.width,
                                         height:
                                             MediaQuery.of(context).size.width *
                                                 1 /
                                                 1,*/
-                                        child: kIsWeb == true
-                                            ? Image.network(postData.imageUrl)
-                                            : CachedNetworkImage(
-                                                imageUrl: (postData.imageUrl !=
-                                                        null)
-                                                    ? postData.imageUrl
-                                                    : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-                                                placeholder: (context, url) =>
-                                                    Loading(),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        Icon(Icons.error),
-                                              ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
-                                      ),
+                                          child: _previewImageVideo(postData)),
                                       margin:
                                           EdgeInsets.symmetric(vertical: 10.0),
                                     ),
@@ -318,6 +329,23 @@ class _FeedViewState extends State<FeedView> {
         });
   }
 
+  Widget _previewImageVideo(Post postData) {
+    if (postData.imageUrl.contains('video')) {
+      print('initialising video');
+      return VideoItem(postData.imageUrl);
+    } else {
+      return kIsWeb == true
+          ? Image.network(postData.imageUrl)
+          : CachedNetworkImage(
+              imageUrl: (postData.imageUrl != null)
+                  ? postData.imageUrl
+                  : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
+              placeholder: (context, url) => Loading(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            );
+    }
+  }
+
   Future<void> _showDeleteDialog(Post post) async {
     return showDialog<void>(
       context: context,
@@ -365,22 +393,77 @@ class _FeedViewState extends State<FeedView> {
           return SharePost();
         });
   }
+}
 
-  List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.documents.map((doc) {
-      //print(doc.data);
-      return Post(
-        author: doc.data['author'],
-        title: doc.data['title'],
-        charity: doc.data['charity'],
-        amountRaised: doc.data['amountRaised'],
-        targetAmount: doc.data['targetAmount'],
-        likes: doc.data['likes'],
-        comments: doc.data['comments'],
-        subtitle: doc.data['subtitle'],
-        timestamp: doc.data['timestamp'],
-        id: doc.documentID,
-      );
-    }).toList();
+class VideoItem extends StatefulWidget {
+  final String url;
+
+  VideoItem(this.url);
+  @override
+  _VideoItemState createState() => _VideoItemState();
+}
+
+class _VideoItemState extends State<VideoItem> {
+  CachedVideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = CachedVideoPlayerController.network(widget.url)
+      ..initialize().then((_) {
+        _controller.play();
+        _controller.setLooping(true);
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {});
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return VisibilityDetector(
+        key: UniqueKey(),
+        onVisibilityChanged: (VisibilityInfo info) {
+          debugPrint("${info.visibleFraction} of my widget is visible");
+          if (info.visibleFraction < 0.3) {
+            _controller.pause();
+          } else {
+            _controller.play();
+          }
+        },
+        child: Center(
+          child: _controller.value.initialized
+              ? /*Stack(children: [
+              AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
+              ),*/
+              /*Center(
+                  child: */
+              GestureDetector(
+                  onTap: _playPause,
+                  child: _controller.value.initialized
+                      ? AspectRatio(
+                          aspectRatio: _controller.value.aspectRatio,
+                          child: CachedVideoPlayer(_controller),
+                        )
+                      : Container(),
+                ) //)
+              //])
+              : Container(),
+        ));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
+  _playPause() {
+    if (_controller.value.isPlaying) {
+      _controller.pause();
+    } else {
+      _controller.play();
+    }
   }
 }
