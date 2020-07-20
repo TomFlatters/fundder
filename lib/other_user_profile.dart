@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/shared/loading.dart';
-import 'package:provider/provider.dart';
 import 'feed.dart';
-import 'edit_profile_controller.dart';
 import 'models/user.dart';
-import 'view_followers_controller.dart';
 import 'helper_classes.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_pages/web_menu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'global widgets/buttons.dart';
 
 class ViewUser extends StatefulWidget {
   @override
@@ -182,27 +177,10 @@ class _ViewUserState extends State<ViewUser>
                           )),
                         ],
                       )),
-                  GestureDetector(
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                        margin:
-                            EdgeInsets.only(left: 70, right: 70, bottom: 20),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1),
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                        ),
-                        child: Text(
-                          "Follow",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      onTap: () {}),
+                  EditFundderButton(
+                    text: "Follow",
+                    onPressed: () {},
+                  ),
                   DefaultTabController(
                     length: 1,
                     initialIndex: 0,

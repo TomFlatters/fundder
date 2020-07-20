@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'helper_classes.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'share_post_view.dart';
-import 'donation/donate_page_controller.dart';
-import 'comment_view_controller.dart';
-import 'challenge_steps_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
+import 'global widgets/buttons.dart';
 
 class ChallengeDetail extends StatefulWidget {
   @override
@@ -134,64 +130,18 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                           Padding(
                             padding: EdgeInsets.all(20),
                           ),
-                          GestureDetector(
-                              child: Container(
-                                width: 250,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 12, /*horizontal: 30*/
-                                ),
-                                margin: EdgeInsets.only(
-                                    left: 50, right: 50, bottom: 10),
-                                decoration: BoxDecoration(
-                                  color: HexColor('ff6b6c'),
-                                  border: Border.all(
-                                      color: HexColor('ff6b6c'), width: 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                ),
-                                child: Text(
-                                  "Join Now",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
+                          PrimaryFundderButton(
+                              text: 'Join Now',
+                              onPressed: () {
                                 Navigator.pushNamed(
                                     context,
                                     '/challenge/' +
                                         widget.challengeId +
                                         '/steps');
                               }),
-                          GestureDetector(
-                              child: Container(
-                                width: 250,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 12, /*horizontal: 30*/
-                                ),
-                                margin: EdgeInsets.only(
-                                    left: 50, right: 50, bottom: 20),
-                                decoration: BoxDecoration(
-                                  //color: HexColor('ff6b6c'),
-                                  border: Border.all(
-                                      color: HexColor('ff6b6c'), width: 2),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                ),
-                                child: Text(
-                                  "View Completed",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: HexColor('ff6b6c'),
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
+                          SecondaryFundderButton(
+                              text: 'View Completed',
+                              onPressed: () {
                                 Navigator.pushNamed(
                                     context,
                                     '/challenge/' +
