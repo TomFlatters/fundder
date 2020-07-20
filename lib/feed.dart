@@ -18,6 +18,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'video_item.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -392,78 +393,5 @@ class _FeedViewState extends State<FeedView> {
         builder: (context) {
           return SharePost();
         });
-  }
-}
-
-class VideoItem extends StatefulWidget {
-  final String url;
-
-  VideoItem(this.url);
-  @override
-  _VideoItemState createState() => _VideoItemState();
-}
-
-class _VideoItemState extends State<VideoItem> {
-  CachedVideoPlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = CachedVideoPlayerController.network(widget.url)
-      ..initialize().then((_) {
-        _controller.play();
-        _controller.setLooping(true);
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {});
-      });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return VisibilityDetector(
-        key: UniqueKey(),
-        onVisibilityChanged: (VisibilityInfo info) {
-          debugPrint("${info.visibleFraction} of my widget is visible");
-          if (info.visibleFraction < 0.3) {
-            _controller.pause();
-          } else {
-            _controller.play();
-          }
-        },
-        child: Center(
-          child: _controller.value.initialized
-              ? /*Stack(children: [
-              AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
-              ),*/
-              /*Center(
-                  child: */
-              GestureDetector(
-                  onTap: _playPause,
-                  child: _controller.value.initialized
-                      ? AspectRatio(
-                          aspectRatio: _controller.value.aspectRatio,
-                          child: CachedVideoPlayer(_controller),
-                        )
-                      : Container(),
-                ) //)
-              //])
-              : Container(),
-        ));
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
-  }
-
-  _playPause() {
-    if (_controller.value.isPlaying) {
-      _controller.pause();
-    } else {
-      _controller.play();
-    }
   }
 }
