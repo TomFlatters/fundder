@@ -67,8 +67,12 @@ class DatabaseService {
   // Given a document return a Post type object
   Post _makePost(DocumentSnapshot doc) {
     print("_makePost being run");
+
+    //print("printing noLikes:" + doc["noLikes"]);
     return Post(
-        noLikes: 777,
+        noLikes: (doc.data["noLikes"] == null)
+            ? (doc['likes'].length)
+            : (doc["noLikes"]),
         peopleThatLikedThis: Set(),
         author: doc.data['author'],
         title: doc.data['title'],
