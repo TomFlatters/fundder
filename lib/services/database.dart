@@ -282,4 +282,29 @@ class DatabaseService {
       "timestamp": doc.data["timestamp"]
     };
   }
+
+  Future<List<User>> usersContainingString(String queryText) {
+    return userCollection
+        .orderBy('username', descending: false)
+        .startAt([queryText])
+        .endAt([queryText + '\uf8ff'])
+        .getDocuments()
+        .then((snapshot) {
+          return snapshot.documents.map((DocumentSnapshot doc) {
+            return _userDataFromSnapshot(doc);
+          }).toList();
+        });
+    /*.where('username', isGreaterThanOrEqualTo: queryText)
+        .where('username', isLessThanOrEqualTo: queryText + '\uf8ff')
+        .limit(20)
+        .snapshots()
+        .map(_userDataFromSearch);*/
+  }
+
+  // Get posts list stream is mapped to the Post object
+  List<User> _userDataFromSearch(QuerySnapshot snapshot) {
+    return snapshot.documents.map((DocumentSnapshot doc) {
+      return _userDataFromSnapshot(doc);
+    }).toList();
+  }
 }

@@ -6,18 +6,12 @@ import 'package:fundder/shared/helper_functions.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'models/post.dart';
-import 'view_post_controller.dart';
 import 'share_post_view.dart';
 import 'helper_classes.dart';
-import 'comment_view_controller.dart';
-import 'other_user_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:video_player/video_player.dart';
-import 'package:cached_video_player/cached_video_player.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import 'video_item.dart';
 
 class FeedView extends StatefulWidget {
@@ -84,11 +78,7 @@ class _FeedViewState extends State<FeedView> {
     final user = Provider.of<User>(context);
     return new StreamBuilder(
         stream: widget.postsStream,
-        // widget.feedChoice == 'user'
-        //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
-        //   : Firestore.instance.collection("posts").snapshots(),
         builder: (context, snapshot) {
-          // print(snapshot.data);
           if (!snapshot.hasData) {
             return Text("No data...");
           } else {
