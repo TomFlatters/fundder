@@ -9,7 +9,8 @@ class Post {
   final String charity;
   final String amountRaised;
   final String targetAmount;
-  final int likes;
+  final List likes;
+  final int noLikes;
   final comments;
   final String subtitle;
   final timestamp;
@@ -19,7 +20,8 @@ class Post {
   Set<String> peopleThatLikedThis;
 
   Post(
-      {this.author,
+      {this.noLikes,
+      this.author,
       this.title,
       this.charity,
       this.amountRaised,

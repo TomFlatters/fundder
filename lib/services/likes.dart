@@ -14,13 +14,14 @@ class LikesService {
   final CollectionReference postsCollection =
       Firestore.instance.collection('posts');
 
+  //add user to the liked subcollection of the posts document 'postId'
   Future likePost(String postId) async {
     await postsCollection
         .document(postId)
         .collection('whoLiked')
         .add({uid: true});
-    await postsCollection.document(postId).updateData({
-      'likes': FieldValue.increment(1)
-    }); //increment is apparently a great feature
+    await postsCollection
+        .document(postId)
+        .updateData({'noLikes': FieldValue.increment(1)});
   }
 }
