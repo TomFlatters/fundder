@@ -14,6 +14,8 @@ void main() {
   runApp(MyApp());
 }
 
+RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
           initialRoute: '/',
           onGenerateRoute: FluroRouter.router.generator,
-          title: 'My Flutter App',
+          title: 'Fundder',
+          navigatorObservers: [routeObserver],
           home: Wrapper(),
           theme: ThemeData(
               scaffoldBackgroundColor: Colors.white,
