@@ -66,7 +66,10 @@ class DatabaseService {
 
   // Given a document return a Post type object
   Post _makePost(DocumentSnapshot doc) {
+    print("_makePost being run");
     return Post(
+        noLikes: 777,
+        peopleThatLikedThis: Set(),
         author: doc.data['author'],
         title: doc.data['title'],
         charity: doc.data['charity'],
@@ -83,6 +86,7 @@ class DatabaseService {
 
   // Get posts list stream is mapped to the Post object
   List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
+    print('mapping the posts to Post model');
     return snapshot.documents.map((DocumentSnapshot doc) {
       return _makePost(doc);
     }).toList();
@@ -138,7 +142,7 @@ class DatabaseService {
           "charity": post.charity,
           "amountRaised": post.amountRaised,
           "targetAmount": post.targetAmount,
-          "likes": post.likes,
+          "noLikes": post.noLikes,
           "comments": post.comments,
           "subtitle": post.subtitle,
           "timestamp": post.timestamp,
