@@ -32,6 +32,16 @@ class LikesService {
         .add({postId: true});
   }
 
+  Future unlikePost(String postId) async {
+    //you can only unlike what you've liked, hence there's a document indicating this post is liked
+    CollectionReference myLikes =
+        userCollection.document(uid).collection('I_Liked');
+    var docs = await myLikes.where(postId, isEqualTo: true).getDocuments();
+    var doc = docs.documents[0];
+    var docid = doc.documentID;
+    await myLikes.document(docid).updateData({postId: false});
+  }
+
   //checks whether current user has liked a given post
   Future<bool> hasUserLikedPost(String postId) async {
     CollectionReference myLikes =
