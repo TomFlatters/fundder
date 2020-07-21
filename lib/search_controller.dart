@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flappy_search_bar/search_bar_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
@@ -7,7 +8,7 @@ import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
 import 'services/database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'helper_classes.dart';
 
 class SearchController extends StatefulWidget {
   @override
@@ -19,9 +20,10 @@ class _SearchState extends State<SearchController>
     with SingleTickerProviderStateMixin {
   String uid = '123';
   TabController _tabController;
-  final SearchBarController<User> _searchBarController = SearchBarController();
+  final SearchBarController<DocumentSnapshot> _searchBarController =
+      SearchBarController();
   final List searchType = ["#", "users: "];
-  SearchBar<User> searchBar;
+  SearchBar searchBar;
   final List trending = ['trending 1', 'trending 2', 'trending 3'];
 
   @override
@@ -39,85 +41,19 @@ class _SearchState extends State<SearchController>
   }
 
   _handleTabSelection() {
-    setState(() {});
-    _searchBarController.replayLastSearch();
-    print("called");
+    //setState(() {});
+    if (_tabController.indexIsChanging) {
+      _searchBarController.replayLastSearch();
+    }
+    //print("called");
   }
 
   // Call search function here. search is the term to be searched.
-  Future<List<User>> search(String search) async {
-    //await Future.delayed(Duration(seconds: 2));
-    return DatabaseService(uid: uid).usersContainingString(search);
-    /*return new StreamBuilder(
-        stream: DatabaseService(uid: user.uid).donePosts, builder: (context, snapshot) {
-          return ListView.separated(
-              physics: physics,
-              shrinkWrap: true,
-              padding: const EdgeInsets.only(top: 10.0),
-              itemCount: snapshot.data.length,
-              itemBuilder: (BuildContext context, int index) {
-                Post postData = snapshot.data[index];
-        });*/
-  }
-
-  Widget _trendingList() {
-    return ListView.separated(
-      physics: AlwaysScrollableScrollPhysics(),
-      shrinkWrap: true,
-      padding: const EdgeInsets.only(top: 10.0),
-      itemCount: 1,
-      itemBuilder: (BuildContext context, int index) {
-        return Column(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.all(10),
-              child: Text(
-                'Trending',
-                textAlign: TextAlign.left,
-              ),
-            ),
-            _sectionComponents()
-          ],
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return SizedBox(
-          height: 10,
-        );
-      },
-    );
-  }
-
-  Widget _sectionComponents() {
-    return ListView.separated(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      padding: const EdgeInsets.only(top: 10.0),
-      itemCount: trending.length,
-      itemBuilder: (BuildContext context, int index) {
-        return ListTile(
-          leading: _decideLeading(),
-          title: Text(trending[index]),
-          subtitle: Text(trending[index]),
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return SizedBox(
-          height: 10,
-        );
-      },
-    );
-  }
-
-  Widget _decideLeading() {
+  Future<List<DocumentSnapshot>> search(String search) async {
     if (_tabController.index == 0) {
-      return null;
+      return DatabaseService(uid: uid).usersContainingString(search);
     } else {
-      return CircleAvatar(
-        radius: 20.0,
-        backgroundImage: NetworkImage("https://i.imgur.com/BoN9kdC.png"),
-        backgroundColor: Colors.transparent,
-      );
+      return DatabaseService(uid: uid).postsContainingString(search);
     }
   }
 
@@ -144,39 +80,42 @@ class _SearchState extends State<SearchController>
           child: Column(children: [
             kIsWeb == true ? WebMenu(2) : Container(),
             Expanded(
-              child: SearchBar<User>(
+              child: SearchBar<DocumentSnapshot>(
                 searchBarPadding: EdgeInsets.symmetric(horizontal: 20),
                 searchBarController: _searchBarController,
                 header: DefaultTabController(
                   length: 2,
                   initialIndex: 0,
                   child: TabBar(
-                    tabs: [Tab(text: 'Tags'), Tab(text: 'Users')],
+                    tabs: [Tab(text: 'Users'), Tab(text: 'Posts')],
                     controller: _tabController,
                   ),
                 ),
                 hintText: 'search accounts',
                 onSearch: search,
                 minimumChars: 0,
-                onItemFound: (User user, int index) {
-                  return ListTile(
-                    leading: _decideLeading(),
-                    title: Text(user.username),
-                    //subtitle: Text(post.description),
-                  );
+                onItemFound: (DocumentSnapshot doc, int index) {
+                  // if they are searching for users
+                  if (_tabController.index == 0) {
+                    return ListTile(
+                      leading: ProfilePicFromUrl(doc.data['profilePic'], 40),
+                      title: Text(doc.data['username']),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/user/' + doc.documentID);
+                      },
+                    );
+                    // if they are searching for posts
+                  } else {
+                    return ListTile(
+                      leading: ProfilePic(doc.data['author'], 40),
+                      title: Text(doc.data['subtitle']),
+                      subtitle: Text(doc.data['author']),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/post/' + doc.documentID);
+                      },
+                    );
+                  }
                 },
-
-                //suggestions: [Post('previous 1','previous 1'),Post('previous 2','previous 2'),Post('previous 3','previous 3')],
-
-                emptyWidget: _trendingList(),
-
-                /*buildSuggestion: (Post post, int index) {
-                return ListTile(
-                  leading: _decideLeading(),
-                  title: Text(post.title),
-                  subtitle: Text(post.description),
-                );
-              },*/
               ),
             ),
           ]),
