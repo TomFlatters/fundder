@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
+import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
@@ -83,6 +84,7 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
+    print("feed being built");
     final user = Provider.of<User>(context);
     return new StreamBuilder(
         stream: widget.postsStream,
@@ -101,6 +103,9 @@ class _FeedViewState extends State<FeedView> {
               itemCount: snapshot.data.length,
               itemBuilder: (BuildContext context, int index) {
                 Post postData = snapshot.data[index];
+                final user = Provider.of<User>(context);
+                final LikesService likesService = LikesService(uid: user.uid);
+
                 // print(postData);
                 return GestureDetector(
                   child: Container(
@@ -197,47 +202,50 @@ class _FeedViewState extends State<FeedView> {
                                 height: 30,
                                 child: Row(children: <Widget>[
                                   Expanded(
-                                    child: FlatButton(
-                                      child: Row(children: [
-                                        Container(
-                                          width: 20,
-                                          height: 20,
-                                          padding: const EdgeInsets.all(0.0),
-                                          child:
-                                              /*postData
-                                                  .likes //accessing database to see if liked
-                                                  .contains(user.uid)
-                                              ? Image.asset(
-                                                  'assets/images/like_selected.png')
-                                              : */
-                                              Image.asset(
-                                                  'assets/images/like.png'),
-                                        ),
-                                        Expanded(
-                                            child: Container(
-                                                margin:
-                                                    EdgeInsets.only(left: 10),
-                                                child: Text("777"
-                                                    /*postData.likes.length
-                                                      .toString(),
-                                                  textAlign: TextAlign.left,*/
-                                                    )))
-                                      ]),
-                                      onPressed: () {
-                                        /*final snackBar = SnackBar(
-                                            content: Text("Like passed"));
-                                        Scaffold.of(context)
-                                            .showSnackBar(snackBar);*/
-                                        //if (postData.likes.contains(user.uid) ==
-                                        //true) {
-                                        //  DatabaseService(uid: user.uid)
-                                        //     .removeLikefromPost(postData);
-                                        // } else {
-                                        //   DatabaseService(uid: user.uid)
-                                        //      .addLiketoPost(postData);
-                                      },
-                                    ),
-                                  ),
+                                      //like bar
+                                      child: FutureBuilder(
+                                          future: likesService
+                                              .hasUserLikedPost(postData.id),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.done) {
+                                              return FlatButton(
+                                                child: Row(children: [
+                                                  Container(
+                                                      width: 20,
+                                                      height: 20,
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              0.0),
+                                                      child: (snapshot.data)
+                                                          ? Image.asset(
+                                                              'assets/images/like_selected.png')
+                                                          : Image.asset(
+                                                              'assets/images/like.png')),
+                                                  Expanded(
+                                                      child: Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  left: 10),
+                                                          child: Text(postData
+                                                              .noLikes
+                                                              .toString())))
+                                                ]),
+                                                onPressed: () {
+                                                  print("Like pressed!!!!");
+                                                  if (!snapshot.data) {
+                                                    likesService
+                                                        .likePost(postData.id);
+                                                  } else {
+                                                    likesService.unlikePost(
+                                                        postData.id);
+                                                  }
+                                                },
+                                              );
+                                            } else {
+                                              return Container();
+                                            }
+                                          })),
                                   Expanded(
                                     child: FlatButton(
                                       child: Row(children: [
