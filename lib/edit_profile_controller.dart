@@ -51,7 +51,7 @@ class _EditProfileState extends State<EditProfile> {
         _uid = firebaseUser.uid;
         _name = value.data["name"];
         nameEntry.text = _name;
-        _username = firebaseUser.uid;
+        _username = value.data['username'];
         _email = firebaseUser.email;
         emailEntry.text = _email;
         _profilePic = value.data["profilePic"];
@@ -116,7 +116,7 @@ class _EditProfileState extends State<EditProfile> {
                           child: Text(entries[index])),
                       Expanded(
                         child: index == 1
-                            ? Text(_uid == null ? "username" : _uid)
+                            ? Text(_uid == null ? "username" : _username)
                             : TextField(
                                 controller: controllers[index],
                                 decoration: InputDecoration(

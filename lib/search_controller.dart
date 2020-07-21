@@ -109,7 +109,7 @@ class _SearchState extends State<SearchController>
                     return ListTile(
                       leading: ProfilePic(doc.data['author'], 40),
                       title: Text(doc.data['subtitle']),
-                      subtitle: Text(doc.data['author']),
+                      subtitle: Text(doc.data['authorUsername']),
                       onTap: () {
                         Navigator.pushNamed(context, '/post/' + doc.documentID);
                       },
