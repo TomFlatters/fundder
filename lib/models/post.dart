@@ -10,30 +10,32 @@ class Post {
   final String amountRaised;
   final String targetAmount;
   final List likes;
-  final int noLikes;
+  int noLikes;
   final comments;
   final String subtitle;
   final timestamp;
   String imageUrl;
   String id;
   String status;
-  Set<String> peopleThatLikedThis;
+  final Set<String> peopleThatLikedThis;
 
-  Post(
-      {this.noLikes,
-      this.author,
-      this.title,
-      this.charity,
-      this.amountRaised,
-      this.targetAmount,
-      this.subtitle,
-      this.likes,
-      this.comments,
-      this.timestamp,
-      this.imageUrl,
-      this.id,
-      this.status,
-      this.peopleThatLikedThis});
+  Post({
+    this.noLikes,
+    this.author,
+    this.title,
+    this.charity,
+    this.amountRaised,
+    this.targetAmount,
+    this.subtitle,
+    this.likes,
+    this.comments,
+    this.timestamp,
+    this.imageUrl,
+    this.id,
+    this.status,
+    //why should one avoid initialisation to null
+    this.peopleThatLikedThis,
+  });
 
   double percentRaised() {
     //print("Amount raised1" + amountRaised);
