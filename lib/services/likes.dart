@@ -34,12 +34,17 @@ class LikesService {
 
   Future unlikePost(String postId) async {
     //you can only unlike what you've liked, hence there's a document indicating this post is liked
+    //TODO: make the code safer: what if somehow the user hasn't liked the post.
+    //Then we'd be wrongly decrementing the like counter.
     CollectionReference myLikes =
         userCollection.document(uid).collection('I_Liked');
     var docs = await myLikes.where(postId, isEqualTo: true).getDocuments();
     var doc = docs.documents[0];
     var docid = doc.documentID;
     await myLikes.document(docid).updateData({postId: false});
+    await postsCollection
+        .document(postId)
+        .updateData({'noLikes': FieldValue.increment(-1)});
   }
 
   //checks whether current user has liked a given post
