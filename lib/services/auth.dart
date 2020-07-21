@@ -53,7 +53,7 @@ class AuthService {
           'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
       // create a new (firestore) document for the user with corresponding uid
       await DatabaseService(uid: user.uid)
-          .updateUserData(email, user.uid, null, defaultPic);
+          .updateUserData(email, username, null, defaultPic);
       // ADD: user sets username
       return _userFromFirebaseUser(user);
     } catch (e) {

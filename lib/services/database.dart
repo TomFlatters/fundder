@@ -68,6 +68,7 @@ class DatabaseService {
   Post _makePost(DocumentSnapshot doc) {
     return Post(
         author: doc.data['author'],
+        authorUsername: doc.data['authorUsername'],
         title: doc.data['title'],
         charity: doc.data['charity'],
         amountRaised: doc.data['amountRaised'],
@@ -132,6 +133,7 @@ class DatabaseService {
     return await postsCollection
         .add({
           "author": post.author,
+          "authorUsername": post.authorUsername,
           "title": post.title,
           "charity": post.charity,
           "amountRaised": post.amountRaised,
@@ -206,6 +208,7 @@ class DatabaseService {
     // create or update the document with this uid
     return await postsCollection.document(post.id).setData({
       "author": post.author,
+      "authorUsername": post.authorUsername,
       "title": post.title,
       "charity": post.charity,
       "amountRaised": post.amountRaised,
