@@ -20,7 +20,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final List<Widget> screens = [
-    FeedController(),
+    FeedController(), //i.e. the one from home button
     SearchController(),
     PlaceholderWidget(Colors.white),
     LikedController(),
