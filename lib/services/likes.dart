@@ -11,8 +11,11 @@ class LikesService {
   //initiate the class with user id
   final String uid;
   LikesService({this.uid});
+
   final CollectionReference postsCollection =
       Firestore.instance.collection('posts');
+  final CollectionReference userCollection =
+      Firestore.instance.collection('users');
 
   //add user to the liked subcollection of the posts document 'postId'
   Future likePost(String postId) async {
@@ -23,5 +26,24 @@ class LikesService {
     await postsCollection
         .document(postId)
         .updateData({'noLikes': FieldValue.increment(1)});
+    await userCollection
+        .document(uid)
+        .collection('I_Liked')
+        .add({postId: true});
+  }
+
+  //checks whether current user has liked a given post
+  Future hasUserLikedPost(String postId) async {
+    CollectionReference myLikes =
+        userCollection.document(uid).collection('I_Liked');
+    if (myLikes != null) {
+      var result = await myLikes.where(postId, isEqualTo: true).getDocuments();
+      print("documents retrieved from subcollection myLikes...");
+      result.documents.forEach((res) {
+        print(res.data);
+      });
+    } else {
+      print("The user has not liked anything");
+    }
   }
 }
