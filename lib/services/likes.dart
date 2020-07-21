@@ -37,7 +37,7 @@ class LikesService {
     CollectionReference myLikes =
         userCollection.document(uid).collection('I_Liked');
     if (myLikes != null) {
-      var result = await myLikes.where('lala', isEqualTo: true).getDocuments();
+      var result = await myLikes.where(postId, isEqualTo: true).getDocuments();
       print("documents retrieved from subcollection myLikes...");
       if (result.documents.length == 0) {
         print("no query found!!!!");
