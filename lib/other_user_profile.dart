@@ -49,7 +49,7 @@ class _ViewUserState extends State<ViewUser>
       setState(() {
         _uid = widget.uid;
         _name = value.data["name"];
-        _username = widget.uid;
+        _username = value.data['username'];
         _profilePic = value.data["profilePic"];
         if (_profilePic == null) {
           _profilePic =

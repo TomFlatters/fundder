@@ -56,7 +56,7 @@ class _ProfileState extends State<ProfileController>
       setState(() {
         _uid = firebaseUser.uid;
         _name = value.data["name"];
-        _username = firebaseUser.uid;
+        _username = value.data['username'];
         _email = firebaseUser.email;
         _profilePic = value.data["profilePic"];
         if (_profilePic == null) {

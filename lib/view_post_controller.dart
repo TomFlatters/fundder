@@ -99,7 +99,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                         child: Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              postData.author,
+                                              postData.authorUsername,
                                               style: TextStyle(
                                                 fontFamily: 'Quicksand',
                                                 fontWeight: FontWeight.w600,

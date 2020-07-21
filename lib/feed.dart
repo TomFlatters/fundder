@@ -120,7 +120,7 @@ class _FeedViewState extends State<FeedView> {
                                     Expanded(
                                         child: Align(
                                             alignment: Alignment.centerLeft,
-                                            child: Text(postData.author,
+                                            child: Text(postData.authorUsername,
                                                 style: TextStyle(
                                                   fontFamily: 'Quicksand',
                                                   fontWeight: FontWeight.w600,
