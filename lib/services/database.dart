@@ -109,6 +109,31 @@ class DatabaseService {
         .map(_postsDataFromSnapshot);
   }
 
+  Future<List<Post>> refreshPosts(
+      String status, int limit, Timestamp startTimestamp) {
+    print('limit: ' + limit.toString());
+    return postsCollection
+        .orderBy("timestamp", descending: true)
+        .startAfter([startTimestamp])
+        .limit(limit)
+        .where('status', isEqualTo: status)
+        .getDocuments()
+        .then((snapshot) {
+          print(_postsDataFromSnapshot(snapshot));
+          return _postsDataFromSnapshot(snapshot);
+        });
+  }
+
+  Future<List<Post>> authorPosts(String id) {
+    return postsCollection
+        .where("author", isEqualTo: id)
+        .orderBy("timestamp", descending: true)
+        .getDocuments()
+        .then((snapshot) {
+      return _postsDataFromSnapshot(snapshot);
+    });
+  }
+
   // Get list of posts for given author
   Stream<List<Post>> postsByUser(id) {
     return postsCollection

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/feed_wrapper.dart';
 
 class WebFeed extends StatefulWidget {
   @override
@@ -82,18 +83,8 @@ class _WebFeedState extends State<WebFeed> with SingleTickerProviderStateMixin {
                             Expanded(
                                 child: [
                               DoChallenge(),
-                              FeedView(
-                                  UniqueKey(),
-                                  "Fund",
-                                  null,
-                                  HexColor('ff6b6c'),
-                                  DatabaseService(uid: user.uid).fundPosts),
-                              FeedView(
-                                  UniqueKey(),
-                                  "Done",
-                                  null,
-                                  HexColor('ff6b6c'),
-                                  DatabaseService(uid: user.uid).donePosts),
+                              FeedWrapper("Fund", null, "fund"),
+                              FeedWrapper("Done", null, "done"),
                             ][_tabController.index]),
                           ],
                         ),
