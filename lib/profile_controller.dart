@@ -143,165 +143,151 @@ class _ProfileState extends State<ProfileController>
                     ),
               body: _uid == null
                   ? Loading()
-                  : SmartRefresher(
-                      enablePullDown: true,
-                      enablePullUp: false,
-                      header: WaterDropHeader(),
-                      footer: CustomFooter(
-                        builder: (BuildContext context, LoadStatus mode) {
-                          Widget body;
-                          if (mode == LoadStatus.idle) {
-                            body = Text("pull up load");
-                          } else if (mode == LoadStatus.loading) {
-                            body = CupertinoActivityIndicator();
-                          } else if (mode == LoadStatus.failed) {
-                            body = Text("Load Failed!Click retry!");
-                          } else if (mode == LoadStatus.canLoading) {
-                            body = Text("release to load more");
-                          } else {
-                            body = Text("No more Data");
-                          }
-                          return Container(
-                            height: 55.0,
-                            child: Center(child: body),
-                          );
-                        },
-                      ),
-                      controller: _refreshController,
-                      onRefresh: _onRefresh,
-                      child: Column(children: [
-                        kIsWeb == true ? WebMenu(5) : Container(),
-                        Expanded(
-                          child: ListView(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              children: <Widget>[
-                                Container(
-                                  margin: EdgeInsets.only(top: 20, bottom: 10),
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    child: ProfilePicFromUrl(_profilePic, 90),
-                                    margin: EdgeInsets.all(10.0),
-                                  ),
-                                ),
-                                Center(
-                                  child: Text(_username),
-                                ),
-                                Container(
-                                    margin: EdgeInsets.symmetric(
-                                        horizontal: 50, vertical: 20),
-                                    height: 50,
-                                    child: Row(
+                  : Column(children: [
+                      kIsWeb == true ? WebMenu(5) : Container(),
+                      Expanded(
+                        child: SmartRefresher(
+                          enablePullDown: true,
+                          enablePullUp: false,
+                          header: WaterDropHeader(),
+                          footer: CustomFooter(
+                            builder: (BuildContext context, LoadStatus mode) {
+                              Widget body;
+                              if (mode == LoadStatus.idle) {
+                                body = Text("pull up load");
+                              } else if (mode == LoadStatus.loading) {
+                                body = CupertinoActivityIndicator();
+                              } else if (mode == LoadStatus.failed) {
+                                body = Text("Load Failed!Click retry!");
+                              } else if (mode == LoadStatus.canLoading) {
+                                body = Text("release to load more");
+                              } else {
+                                body = Text("No more Data");
+                              }
+                              return Container(
+                                height: 55.0,
+                                child: Center(child: body),
+                              );
+                            },
+                          ),
+                          controller: _refreshController,
+                          onRefresh: _onRefresh,
+                          child: ListView(shrinkWrap: true, children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(top: 20, bottom: 10),
+                              alignment: Alignment.center,
+                              child: Container(
+                                child: ProfilePicFromUrl(_profilePic, 90),
+                                margin: EdgeInsets.all(10.0),
+                              ),
+                            ),
+                            Center(
+                              child: Text(_username),
+                            ),
+                            Container(
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: 50, vertical: 20),
+                                height: 50,
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                        child: GestureDetector(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            alignment: Alignment.topCenter,
+                                            child: Text("54",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                )),
+                                          ),
+                                          Expanded(
+                                              child: Container(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Text("Following"),
+                                          )),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.pushNamed(context,
+                                            '/user/' + user.uid + '/followers');
+                                      },
+                                    )),
+                                    Expanded(
+                                        child: GestureDetector(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            alignment: Alignment.topCenter,
+                                            child: Text("106",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                )),
+                                          ),
+                                          Expanded(
+                                              child: Container(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Text("Followers"),
+                                          )),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.pushNamed(context,
+                                            '/user/' + user.uid + '/followers');
+                                      },
+                                    )),
+                                    Expanded(
+                                        child: Column(
                                       children: <Widget>[
-                                        Expanded(
-                                            child: GestureDetector(
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                alignment: Alignment.topCenter,
-                                                child: Text("54",
-                                                    style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    )),
-                                              ),
-                                              Expanded(
-                                                  child: Container(
-                                                alignment:
-                                                    Alignment.bottomCenter,
-                                                child: Text("Following"),
+                                        Container(
+                                          alignment: Alignment.topCenter,
+                                          child: Text("£54",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
                                               )),
-                                            ],
-                                          ),
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                                context,
-                                                '/user/' +
-                                                    user.uid +
-                                                    '/followers');
-                                          },
-                                        )),
+                                        ),
                                         Expanded(
-                                            child: GestureDetector(
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                alignment: Alignment.topCenter,
-                                                child: Text("106",
-                                                    style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    )),
-                                              ),
-                                              Expanded(
-                                                  child: Container(
-                                                alignment:
-                                                    Alignment.bottomCenter,
-                                                child: Text("Followers"),
-                                              )),
-                                            ],
-                                          ),
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                                context,
-                                                '/user/' +
-                                                    user.uid +
-                                                    '/followers');
-                                          },
-                                        )),
-                                        Expanded(
-                                            child: Column(
-                                          children: <Widget>[
-                                            Container(
-                                              alignment: Alignment.topCenter,
-                                              child: Text("£54",
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  )),
-                                            ),
-                                            Expanded(
-                                                child: Container(
-                                              alignment: Alignment.bottomCenter,
-                                              child: Text("Raised"),
-                                            )),
-                                          ],
+                                            child: Container(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Text("Raised"),
                                         )),
                                       ],
                                     )),
-                                EditFundderButton(
-                                    text: 'Edit Profile',
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                          context, '/account/edit');
-                                    }),
-                                DefaultTabController(
-                                  length: 2,
-                                  initialIndex: 0,
-                                  child: Column(
-                                    children: [
-                                      TabBar(
-                                        tabs: [
-                                          Tab(text: 'Posts'),
-                                          Tab(text: 'Liked')
-                                        ],
-                                        controller: _tabController,
-                                      ),
-                                      [
-                                        FeedView('feedChoice', 'identifier',
-                                            HexColor('ff6b6c'), postList),
-                                        FeedView('user', _username, Colors.blue,
-                                            postList),
-                                      ][_tabController.index]
+                                  ],
+                                )),
+                            EditFundderButton(
+                                text: 'Edit Profile',
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/account/edit');
+                                }),
+                            DefaultTabController(
+                              length: 2,
+                              initialIndex: 0,
+                              child: Column(
+                                children: [
+                                  TabBar(
+                                    tabs: [
+                                      Tab(text: 'Posts'),
+                                      Tab(text: 'Liked')
                                     ],
+                                    controller: _tabController,
                                   ),
-                                )
-                              ]),
+                                  [
+                                    FeedView('feedChoice', 'identifier',
+                                        HexColor('ff6b6c'), postList),
+                                    FeedView('user', _username, Colors.blue,
+                                        postList),
+                                  ][_tabController.index]
+                                ],
+                              ),
+                            )
+                          ]),
                         ),
-                      ]),
-                    ),
+                      ),
+                    ]),
             );
           });
     }
