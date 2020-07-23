@@ -16,7 +16,7 @@ class _LikeBarState extends State<LikeBar> {
   final String postId;
   _LikeBarState({this.postId});
 
-  FlatButton createHeart(bool hasLiked, Function callBack) {
+  FlatButton createHeart(bool hasLiked, LikesService likesService) {
     return FlatButton(
         child: Container(
             width: 20,
@@ -25,11 +25,16 @@ class _LikeBarState extends State<LikeBar> {
             child: (hasLiked)
                 ? Image.asset('assets/images/like_selected.png')
                 : Image.asset('assets/images/like.png')),
-        onPressed: callBack);
-  }
-
-  void _likePost() {
-    setState() {}
+        onPressed: () {
+          setState(() {
+            print("I'm pressing like!!!!!");
+            if (hasLiked) {
+              likesService.unlikePost(postId);
+            } else {
+              likesService.likePost(postId);
+            }
+          });
+        });
   }
 
   @override
@@ -43,7 +48,7 @@ class _LikeBarState extends State<LikeBar> {
             future: likesService.hasUserLikedPost(postId),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                return createHeart(snapshot.data, _likePost);
+                return createHeart(snapshot.data, likesService);
               } else {
                 return Container();
               }
