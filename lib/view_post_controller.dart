@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'helper_classes.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -166,44 +167,9 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                   height: 30,
                                   child: Row(children: <Widget>[
                                     Expanded(
-                                      child: FlatButton(
-                                        child: Row(children: [
-                                          Container(
-                                            width: 20,
-                                            height: 20,
-                                            padding: const EdgeInsets.all(0.0),
-                                            child:
-                                                // postData.likes
-                                                //         .contains(user.uid)
-                                                //     ? Image.asset(
-                                                //         'assets/images/like_selected.png')
-                                                //     :
-                                                Image.asset(
-                                                    'assets/images/like.png'),
-                                          ),
-                                          Expanded(
-                                              child: Container(
-                                                  margin:
-                                                      EdgeInsets.only(left: 10),
-                                                  child: Text("777"
-                                                      // postData.likes.length
-                                                      //     .toString(),
-                                                      // textAlign: TextAlign.left,
-                                                      )))
-                                        ]),
-                                        onPressed: () {
-                                          // if (postData.likes
-                                          //         .contains(user.uid) ==
-                                          //     true) {
-                                          //   DatabaseService(uid: user.uid)
-                                          //       .removeLikefromPost(postData);
-                                          // } else {
-                                          //   DatabaseService(uid: user.uid)
-                                          //       .addLiketoPost(postData);
-                                          // }
-                                        },
-                                      ),
-                                    ),
+                                        child: LikeBar(
+                                      postId: postData.id,
+                                    )),
                                     Expanded(
                                       child: FlatButton(
                                         child: Row(children: [
