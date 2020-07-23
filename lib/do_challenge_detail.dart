@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
-import 'global widgets/buttons.dart';
+import 'global_widgets/buttons.dart';
 
 class ChallengeDetail extends StatefulWidget {
   @override

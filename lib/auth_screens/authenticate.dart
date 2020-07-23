@@ -5,7 +5,7 @@ import 'package:fundder/services/auth.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:fundder/shared/constants.dart';
 import 'package:fundder/helper_classes.dart';
-import 'package:fundder/global widgets/buttons.dart';
+import 'package:fundder/global_widgets/buttons.dart';
 
 class Authenticate extends StatefulWidget {
   @override

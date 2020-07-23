@@ -8,7 +8,7 @@ import 'models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'shared/loading.dart';
-import 'global widgets/buttons.dart';
+import 'global_widgets/buttons.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;

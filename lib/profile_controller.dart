@@ -13,7 +13,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
 import 'models/user.dart';
 import 'shared/loading.dart';
-import 'global widgets/buttons.dart';
+import 'global_widgets/buttons.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/post.dart';
 import 'package:flutter/cupertino.dart';
