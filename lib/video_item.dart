@@ -6,7 +6,7 @@ import 'shared/loading.dart';
 class VideoItem extends StatefulWidget {
   final String url;
 
-  VideoItem(this.url);
+  VideoItem({Key key, this.url}) : super(key: key);
   @override
   _VideoItemState createState() => _VideoItemState();
 }
@@ -23,7 +23,9 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
         //_controller.play();
         _controller.setLooping(true);
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       });
   }
 
@@ -33,10 +35,12 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
         key: UniqueKey(),
         onVisibilityChanged: (VisibilityInfo info) {
           debugPrint("${info.visibleFraction} of my widget is visible");
-          if (info.visibleFraction < 0.3) {
-            _controller.pause();
-          } else {
-            _controller.play();
+          if (mounted) {
+            if (info.visibleFraction < 0.3) {
+              _controller.pause();
+            } else {
+              _controller.play();
+            }
           }
         },
         child: Center(
