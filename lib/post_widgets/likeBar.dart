@@ -18,7 +18,7 @@ class _LikeBarState extends State<LikeBar> {
 
   FlatButton createHeart(bool hasLiked, LikesService likesService) {
     return FlatButton(
-        padding: EdgeInsets.all(0.0),
+        padding: EdgeInsets.only(left: 10.0),
         child: (hasLiked)
             ? Image.asset('assets/images/like_selected.png')
             : Image.asset('assets/images/like.png'),
@@ -43,7 +43,7 @@ class _LikeBarState extends State<LikeBar> {
       children: <Widget>[
         Container(
           height: 20,
-          width: 20,
+          width: 30,
           child: FutureBuilder(
               future: likesService.hasUserLikedPost(postId),
               builder: (context, snapshot) {
