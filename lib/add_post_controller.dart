@@ -13,6 +13,8 @@ import 'package:flutter_icons/flutter_icons.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'shared/loading.dart';
+import 'global widgets/buttons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -20,12 +22,20 @@ class AddPost extends StatefulWidget {
 }
 
 class _AddPostState extends State<AddPost> {
+  User user;
   bool _submitting = false;
   int _current = 0;
   CarouselController _carouselController = CarouselController();
+
+  @override
+  void initState() {
+    _retrieveUser();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
+    //final user = Provider.of<User>(context);
     if (user == null && kIsWeb == true) {
       Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
       return Scaffold(
@@ -123,12 +133,31 @@ class _AddPostState extends State<AddPost> {
     }
   }
 
+  void _retrieveUser() async {
+    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(firebaseUser.uid)
+        .get()
+        .then((value) {
+      setState(() {
+        user = User(
+            uid: firebaseUser.uid,
+            name: value.data["name"],
+            username: value.data['username'],
+            email: firebaseUser.email,
+            profilePic: value.data["profilePic"]);
+      });
+    });
+  }
+
   void _pushPost(String downloadUrl, User user) {
     DatabaseService(uid: user.uid)
         .uploadPost(new Post(
             title: titleController.text.toString(),
             subtitle: subtitleController.text.toString(),
             author: user.uid,
+            authorUsername: user.username,
             charity: charities[charity],
             noLikes: 0,
             comments: [],
@@ -396,25 +425,9 @@ class _AddPostState extends State<AddPost> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width * 9 / 16,
       ),
-      GestureDetector(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          margin: EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 1),
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-          ),
-          child: Text(
-            "Select Image",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        onTap: () {
+      EditFundderButton(
+        text: "Change profile picture",
+        onPressed: () {
           _changePic();
         },
       ),

@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter_icons/flutter_icons.dart';
-//import 'package:video_player/video_player.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'services/database.dart';
 import 'models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_video_player/cached_video_player.dart';
+import 'shared/loading.dart';
+import 'global widgets/buttons.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -18,6 +19,7 @@ class UploadProofScreen extends StatefulWidget {
 }
 
 class _UploadProofState extends State<UploadProofScreen> {
+  bool _submitting = false;
   PickedFile _imageFile;
   dynamic _pickImageError;
   bool isVideo = false;
@@ -33,141 +35,118 @@ class _UploadProofState extends State<UploadProofScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("Create Fundder"),
-          actions: <Widget>[
-            new FlatButton(
-                child: Text('Submit',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                onPressed: () {
-                  print('Submit pressed');
-                  if (_imageFile != null) {
-                    print('not null');
-                    final String fileLocation = user.uid +
-                        "/" +
-                        DateTime.now().microsecondsSinceEpoch.toString();
-                    if (isVideo == true) {
-                      DatabaseService(uid: user.uid)
-                          .uploadVideo(File(_imageFile.path), fileLocation)
-                          .then((downloadUrl) => {
-                                print("Successful image upload"),
-                                print(downloadUrl),
-                                DatabaseService(uid: user.uid)
-                                    .updatePostStatusAndImage(
-                                        widget.postId, downloadUrl, 'done')
-                              });
-                    } else {
-                      DatabaseService(uid: user.uid)
-                          .uploadImage(File(_imageFile.path), fileLocation)
-                          .then((downloadUrl) => {
-                                print("Successful image upload"),
-                                print(downloadUrl),
-                                DatabaseService(uid: user.uid)
-                                    .updatePostStatusAndImage(
-                                        widget.postId, downloadUrl, 'done')
-                              });
-                    }
-                  }
-                })
-          ],
-          leading: new IconButton(
-            icon: new Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(null),
-          ),
-        ),
-        body: ListView(children: [
-          Container(
-            color: Colors.white,
-            margin: EdgeInsets.symmetric(vertical: 5),
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-            child: Text(
-              'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
-              style: TextStyle(
-                fontFamily: 'Quicksand',
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-          ),
-          Center(
-            child: !kIsWeb && Platform.isAndroid
-                ? FutureBuilder<void>(
-                    future: retrieveLostData(),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<void> snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                        case ConnectionState.waiting:
-                          return const Text(
-                            'You have not yet picked an image.',
-                            textAlign: TextAlign.center,
-                          );
-                        case ConnectionState.done:
-                          return isVideo ? _previewVideo() : _previewImage();
-                        default:
-                          if (snapshot.hasError) {
-                            return Text(
-                              'Pick image/video error: ${snapshot.error}}',
-                              textAlign: TextAlign.center,
-                            );
-                          } else {
-                            return const Text(
-                              'You have not yet picked an image.',
-                              textAlign: TextAlign.center,
-                            );
-                          }
+    return _submitting == true
+        ? Loading()
+        : Scaffold(
+            appBar: AppBar(
+              centerTitle: true,
+              title: Text("Create Fundder"),
+              actions: <Widget>[
+                new FlatButton(
+                    child: Text('Submit',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      setState(() {
+                        _submitting = true;
+                      });
+                      print('Submit pressed');
+                      if (_imageFile != null) {
+                        print('not null');
+                        final String fileLocation = user.uid +
+                            "/" +
+                            DateTime.now().microsecondsSinceEpoch.toString();
+                        if (isVideo == true) {
+                          DatabaseService(uid: user.uid)
+                              .uploadVideo(File(_imageFile.path), fileLocation)
+                              .then((downloadUrl) => {
+                                    print("Successful image upload"),
+                                    print(downloadUrl),
+                                    DatabaseService(uid: user.uid)
+                                        .updatePostStatusAndImage(
+                                            widget.postId, downloadUrl, 'done'),
+                                    Navigator.of(context).pop(null)
+                                  });
+                        } else {
+                          DatabaseService(uid: user.uid)
+                              .uploadImage(File(_imageFile.path), fileLocation)
+                              .then((downloadUrl) => {
+                                    print("Successful image upload"),
+                                    print(downloadUrl),
+                                    DatabaseService(uid: user.uid)
+                                        .updatePostStatusAndImage(
+                                            widget.postId, downloadUrl, 'done'),
+                                    Navigator.of(context).pop(null)
+                                  });
+                        }
                       }
-                    },
-                  )
-                : (isVideo ? _previewVideo() : _previewImage()),
-          ),
-          GestureDetector(
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-              margin: EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 1),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-              ),
-              child: Text(
-                "Select Video",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: Colors.black,
-                ),
+                    })
+              ],
+              leading: new IconButton(
+                icon: new Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(null),
               ),
             ),
-            onTap: () {
-              _changeVideo();
-            },
-          ),
-          GestureDetector(
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-              margin: EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 1),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-              ),
-              child: Text(
-                "Select Image",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: Colors.black,
+            body: ListView(children: [
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.symmetric(vertical: 5),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                child: Text(
+                  'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
+                  style: TextStyle(
+                    fontFamily: 'Quicksand',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
-            ),
-            onTap: () {
-              _changePic();
-            },
-          ),
-        ]));
+              Center(
+                child: !kIsWeb && Platform.isAndroid
+                    ? FutureBuilder<void>(
+                        future: retrieveLostData(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<void> snapshot) {
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                            case ConnectionState.waiting:
+                              return const Text(
+                                'You have not yet picked an image.',
+                                textAlign: TextAlign.center,
+                              );
+                            case ConnectionState.done:
+                              return isVideo
+                                  ? _previewVideo()
+                                  : _previewImage();
+                            default:
+                              if (snapshot.hasError) {
+                                return Text(
+                                  'Pick image/video error: ${snapshot.error}}',
+                                  textAlign: TextAlign.center,
+                                );
+                              } else {
+                                return const Text(
+                                  'You have not yet picked an image.',
+                                  textAlign: TextAlign.center,
+                                );
+                              }
+                          }
+                        },
+                      )
+                    : (isVideo ? _previewVideo() : _previewImage()),
+              ),
+              EditFundderButton(
+                text: "Select Video",
+                onPressed: () {
+                  _changeVideo();
+                },
+              ),
+              EditFundderButton(
+                text: "Select Image",
+                onPressed: () {
+                  _changePic();
+                },
+              ),
+            ]));
   }
 
   Future<void> _playVideo(PickedFile file) async {

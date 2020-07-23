@@ -75,6 +75,7 @@ class DatabaseService {
             : (doc["noLikes"]),
         peopleThatLikedThis: Set(),
         author: doc.data['author'],
+        authorUsername: doc.data['authorUsername'],
         title: doc.data['title'],
         charity: doc.data['charity'],
         amountRaised: doc.data['amountRaised'],
@@ -116,6 +117,31 @@ class DatabaseService {
         .map(_postsDataFromSnapshot);
   }
 
+  Future<List<Post>> refreshPosts(
+      String status, int limit, Timestamp startTimestamp) {
+    print('limit: ' + limit.toString());
+    return postsCollection
+        .orderBy("timestamp", descending: true)
+        .startAfter([startTimestamp])
+        .limit(limit)
+        .where('status', isEqualTo: status)
+        .getDocuments()
+        .then((snapshot) {
+          print(_postsDataFromSnapshot(snapshot));
+          return _postsDataFromSnapshot(snapshot);
+        });
+  }
+
+  Future<List<Post>> authorPosts(String id) {
+    return postsCollection
+        .where("author", isEqualTo: id)
+        .orderBy("timestamp", descending: true)
+        .getDocuments()
+        .then((snapshot) {
+      return _postsDataFromSnapshot(snapshot);
+    });
+  }
+
   // Get list of posts for given author
   Stream<List<Post>> postsByUser(id) {
     return postsCollection
@@ -142,6 +168,7 @@ class DatabaseService {
     return await postsCollection
         .add({
           "author": post.author,
+          "authorUsername": post.authorUsername,
           "title": post.title,
           "charity": post.charity,
           "amountRaised": post.amountRaised,
@@ -216,6 +243,7 @@ class DatabaseService {
     // create or update the document with this uid
     return await postsCollection.document(post.id).setData({
       "author": post.author,
+      "authorUsername": post.authorUsername,
       "title": post.title,
       "charity": post.charity,
       "amountRaised": post.amountRaised,
@@ -295,5 +323,33 @@ class DatabaseService {
       "text": doc.data["text"],
       "timestamp": doc.data["timestamp"]
     };
+  }
+
+  Future<List<DocumentSnapshot>> usersContainingString(String queryText) {
+    return userCollection
+        .orderBy('username', descending: false)
+        .startAt([queryText])
+        .endAt([queryText + '\uf8ff'])
+        .limit(20)
+        .getDocuments()
+        .then((snapshot) {
+          return snapshot.documents.map((DocumentSnapshot doc) {
+            return doc;
+          }).toList();
+        });
+  }
+
+  Future<List<DocumentSnapshot>> postsContainingString(String queryText) {
+    return postsCollection
+        .orderBy('subtitle', descending: false)
+        .startAt([queryText])
+        .endAt([queryText + '\uf8ff'])
+        .limit(20)
+        .getDocuments()
+        .then((snapshot) {
+          return snapshot.documents.map((DocumentSnapshot doc) {
+            return doc;
+          }).toList();
+        });
   }
 }
