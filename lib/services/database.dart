@@ -257,12 +257,11 @@ class DatabaseService {
     });
   }
 
-  Future updatePostStatusAndImage(
-      String postId, String downloadUrl, String status) async {
+  Future updatePostStatusImageTimestamp(String postId, String downloadUrl,
+      String status, Timestamp timestamp) async {
     // create or update the document with this uid
-    return await postsCollection
-        .document(postId)
-        .updateData({"imageUrl": downloadUrl, "status": status});
+    return await postsCollection.document(postId).updateData(
+        {"imageUrl": downloadUrl, "status": status, "timestamp": timestamp});
   }
 
 /*
