@@ -54,7 +54,7 @@ class _LikeBarState extends State<LikeBar> {
               if (snapshot.connectionState == ConnectionState.done) {
                 return Container(
                     margin: EdgeInsets.only(left: 10),
-                    child: Text(snapshot.toString()));
+                    child: Text(snapshot.data.toString()));
               } else {
                 return Container();
               }
