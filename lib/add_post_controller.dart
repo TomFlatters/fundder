@@ -13,7 +13,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'shared/loading.dart';
-import 'global widgets/buttons.dart';
+import 'global_widgets/buttons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AddPost extends StatefulWidget {

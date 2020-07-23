@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'services/database.dart';
 import 'shared/loading.dart';
-import 'global widgets/buttons.dart';
+import 'global_widgets/buttons.dart';
 
 class EditProfile extends StatefulWidget {
   @override

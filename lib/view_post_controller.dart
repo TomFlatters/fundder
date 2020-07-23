@@ -16,7 +16,7 @@ import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
 import 'video_item.dart';
-import 'global widgets/buttons.dart';
+import 'global_widgets/buttons.dart';
 
 class ViewPost extends StatefulWidget {
   final String postData;

@@ -5,7 +5,7 @@ import 'feed.dart';
 import 'models/user.dart';
 import 'helper_classes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'global widgets/buttons.dart';
+import 'global_widgets/buttons.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/post.dart';
 import 'package:flutter/cupertino.dart';
