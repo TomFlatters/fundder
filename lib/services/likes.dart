@@ -82,11 +82,17 @@ class LikesService {
     //   print("The user has not liked anything");
     //   return false;
     // }
-    bool likedPost;
-    await userCollection
-        .document(uid)
-        .get()
-        .then((doc) => likedPost = doc['likes'].contains(postId));
-    return likedPost;
+
+    DocumentSnapshot userprofile = await userCollection.document(uid).get();
+    if (userprofile.data == null) {
+      return false;
+    } else {
+      return userprofile.data['likes'].contains(postId);
+    }
+  }
+
+  Future<int> noOfLikes(String postId) async {
+    var postDoc = await postsCollection.document(postId).get();
+    return postDoc['noLikes'];
   }
 }
