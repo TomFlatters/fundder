@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'shared/loading.dart';
 import 'global_widgets/buttons.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -62,8 +63,11 @@ class _UploadProofState extends State<UploadProofScreen> {
                                     print("Successful image upload"),
                                     print(downloadUrl),
                                     DatabaseService(uid: user.uid)
-                                        .updatePostStatusAndImage(
-                                            widget.postId, downloadUrl, 'done'),
+                                        .updatePostStatusImageTimestamp(
+                                            widget.postId,
+                                            downloadUrl,
+                                            'done',
+                                            Timestamp.now()),
                                     Navigator.of(context).pop(null)
                                   });
                         } else {
@@ -73,8 +77,11 @@ class _UploadProofState extends State<UploadProofScreen> {
                                     print("Successful image upload"),
                                     print(downloadUrl),
                                     DatabaseService(uid: user.uid)
-                                        .updatePostStatusAndImage(
-                                            widget.postId, downloadUrl, 'done'),
+                                        .updatePostStatusImageTimestamp(
+                                            widget.postId,
+                                            downloadUrl,
+                                            'done',
+                                            Timestamp.now()),
                                     Navigator.of(context).pop(null)
                                   });
                         }
