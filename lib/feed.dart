@@ -17,6 +17,7 @@ import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'video_item.dart';
+import 'services/likes.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -77,6 +78,7 @@ class _FeedViewState extends State<FeedView> {
   Widget build(BuildContext context) {
     print("feed being built");
     final user = Provider.of<User>(context);
+    final LikesService likesService = LikesService(uid: user.uid);
     if (widget.postList == null) {
       return Text("No data...");
     } else {
@@ -90,228 +92,228 @@ class _FeedViewState extends State<FeedView> {
           // print(postData);
           return GestureDetector(
             child: Container(
-                color: Colors.white,
-                child: Container(
-                    margin: EdgeInsets.only(left: 0, right: 0, top: 0),
-                    child: Column(
+              color: Colors.white,
+              child: Container(
+                margin: EdgeInsets.only(left: 0, right: 0, top: 0),
+                child: Column(children: <Widget>[
+                  Container(
+                    height: 60,
+                    child: Row(
                       children: <Widget>[
-                        Container(
-                          height: 60,
-                          child: Row(
-                            children: <Widget>[
-                              Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: GestureDetector(
-                                    child: AspectRatio(
-                                        aspectRatio: 1 / 1,
-                                        child: Container(
-                                          child:
-                                              ProfilePic(postData.author, 40),
-                                          margin: EdgeInsets.all(10.0),
-                                        )),
-                                    onTap: () {
-                                      print('/user/' + postData.author);
-                                      Navigator.pushNamed(
-                                          context, '/user/' + postData.author);
-                                    },
-                                  )),
-                              Expanded(
-                                  child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(postData.authorUsername,
-                                          style: TextStyle(
-                                            fontFamily: 'Quicksand',
-                                            fontWeight: FontWeight.w600,
-                                          )))),
-                              Align(
-                                  alignment: Alignment.centerRight,
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: GestureDetector(
+                              child: AspectRatio(
+                                  aspectRatio: 1 / 1,
                                   child: Container(
-                                      margin: EdgeInsets.all(10.0),
-                                      child: Text(postData.charity))),
-                            ],
-                          ),
-                        ),
-                        Container(
-                            alignment: Alignment.centerLeft,
-                            margin: EdgeInsets.all(10),
-                            child: Text(postData.subtitle)),
-                        Container(
-                            alignment: Alignment.centerLeft,
-                            margin: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 10),
-                            child: Text(
-                              '£${postData.amountRaised} raised of £${postData.targetAmount} target',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                                    child: ProfilePic(postData.author, 40),
+                                    margin: EdgeInsets.all(10.0),
+                                  )),
+                              onTap: () {
+                                print('/user/' + postData.author);
+                                Navigator.pushNamed(
+                                    context, '/user/' + postData.author);
+                              },
                             )),
-                        Container(
-                          //alignment: Alignment.centerLeft,
-                          margin: EdgeInsets.only(
-                              top: 5, bottom: 15, left: 0, right: 0),
-                          child: LinearPercentIndicator(
-                            linearStrokeCap: LinearStrokeCap.butt,
-                            lineHeight: 3,
-                            percent: postData.percentRaised(),
-                            backgroundColor: HexColor('CCCCCC'),
-                            progressColor: HexColor('ff6b6c'),
-                          ),
-                        ),
-                        (postData.imageUrl == null)
-                            ? Container()
-                            : Container(
-                                /*constraints: BoxConstraints(
+                        Expanded(
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(postData.authorUsername,
+                                    style: TextStyle(
+                                      fontFamily: 'Quicksand',
+                                      fontWeight: FontWeight.w600,
+                                    )))),
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: Container(
+                                margin: EdgeInsets.all(10.0),
+                                child: Text(postData.charity))),
+                      ],
+                    ),
+                  ),
+                  Container(
+                      alignment: Alignment.centerLeft,
+                      margin: EdgeInsets.all(10),
+                      child: Text(postData.subtitle)),
+                  Container(
+                      alignment: Alignment.centerLeft,
+                      margin:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      child: Text(
+                        '£${postData.amountRaised} raised of £${postData.targetAmount} target',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                  Container(
+                    //alignment: Alignment.centerLeft,
+                    margin:
+                        EdgeInsets.only(top: 5, bottom: 15, left: 0, right: 0),
+                    child: LinearPercentIndicator(
+                      linearStrokeCap: LinearStrokeCap.butt,
+                      lineHeight: 3,
+                      percent: postData.percentRaised(),
+                      backgroundColor: HexColor('CCCCCC'),
+                      progressColor: HexColor('ff6b6c'),
+                    ),
+                  ),
+                  (postData.imageUrl == null)
+                      ? Container()
+                      : Container(
+                          /*constraints: BoxConstraints(
                                           maxHeight: MediaQuery.of(context)
                                               .size
                                               .width),*/
-                                child: SizedBox(
-                                    /*width:
+                          child: SizedBox(
+                              /*width:
                                             MediaQuery.of(context).size.width,
                                         height:
                                             MediaQuery.of(context).size.width *
                                                 1 /
                                                 1,*/
-                                    child: _previewImageVideo(postData)),
-                                margin: EdgeInsets.symmetric(vertical: 10.0),
-                              ),
-                        Container(
-                          height: 30,
-                          child: Row(children: <Widget>[
-                            Expanded(
-                              child: FlatButton(
-                                child: Row(children: [
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    padding: const EdgeInsets.all(0.0),
-                                    child: postData.likes.contains(user.uid)
-                                        ? Image.asset(
-                                            'assets/images/like_selected.png')
-                                        : Image.asset('assets/images/like.png'),
-                                  ),
-                                  Expanded(
-                                      //like bar
-                                      child: FutureBuilder(
-                                          future: likesService
-                                              .hasUserLikedPost(postData.id),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.done) {
-                                              return FlatButton(
-                                                child: Row(children: [
-                                                  Container(
-                                                      width: 20,
-                                                      height: 20,
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              0.0),
-                                                      child: (snapshot.data)
-                                                          ? Image.asset(
-                                                              'assets/images/like_selected.png')
-                                                          : Image.asset(
-                                                              'assets/images/like.png')),
-                                                  Expanded(
-                                                      child: Container(
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  left: 10),
-                                                          child: Text(postData
-                                                              .noLikes
-                                                              .toString())))
-                                                ]),
-                                                onPressed: () {
-                                                  print("Like pressed!!!!");
-                                                  if (!snapshot.data) {
-                                                    likesService
-                                                        .likePost(postData.id);
-                                                  } else {
-                                                    likesService.unlikePost(
-                                                        postData.id);
-                                                  }
-                                                },
-                                              );
-                                            } else {
-                                              return Container();
-                                            }
-                                          })),
-                            Expanded(
-                              child: FlatButton(
-                                child: Row(children: [
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    padding: const EdgeInsets.all(0.0),
-                                    child: Image.asset(
-                                        'assets/images/comment.png'),
-                                  ),
-                                  Expanded(
-                                      child: Container(
-                                          margin: EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            postData.comments.length.toString(),
-                                            textAlign: TextAlign.left,
-                                          )))
-                                ]),
-                                onPressed: () {
-                                  /*Navigator.of(context)
-                                            .push(_showComments());*/
-                                  Navigator.pushNamed(context,
-                                      '/post/' + postData.id + '/comments');
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: FlatButton(
-                                child: Row(children: [
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    padding: const EdgeInsets.all(0.0),
-                                    child:
-                                        Image.asset('assets/images/share.png'),
-                                  ),
-                                  Expanded(
-                                      child: Container(
-                                          margin: EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            'Share',
-                                            textAlign: TextAlign.left,
-                                          )))
-                                ]),
-                                onPressed: () {
-                                  _showShare();
-                                },
-                              ),
-                            )
-                          ]),
+                              child: _previewImageVideo(postData)),
+                          margin: EdgeInsets.symmetric(vertical: 10.0),
                         ),
-                        Row(children: [
+                  Container(
+                      height: 30,
+                      child: Row(
+                        children: <Widget>[
                           Expanded(
-                            child: Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.all(10),
-                              child: Text(howLongAgo(postData.timestamp),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  )),
-                            ),
-                          ),
-                          postData.author != user.uid
-                              ? Container()
-                              : FlatButton(
+                            child: Row(children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                padding: const EdgeInsets.all(0.0),
+                                child: postData.likes.contains(user.uid)
+                                    ? Image.asset(
+                                        'assets/images/like_selected.png')
+                                    : Image.asset('assets/images/like.png'),
+                              ),
+                              Expanded(
+                                  //like bar
+                                  child: FutureBuilder(
+                                      future: likesService
+                                          .hasUserLikedPost(postData.id),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.done) {
+                                          return FlatButton(
+                                            child: Row(children: [
+                                              Container(
+                                                  width: 20,
+                                                  height: 20,
+                                                  padding:
+                                                      const EdgeInsets.all(0.0),
+                                                  child: (snapshot.data)
+                                                      ? Image.asset(
+                                                          'assets/images/like_selected.png')
+                                                      : Image.asset(
+                                                          'assets/images/like.png')),
+                                              Expanded(
+                                                  child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 10),
+                                                      child: Text(postData
+                                                          .noLikes
+                                                          .toString())))
+                                            ]),
+                                            onPressed: () {
+                                              print("Like pressed!!!!");
+                                              if (!snapshot.data) {
+                                                likesService
+                                                    .likePost(postData.id);
+                                              } else {
+                                                likesService
+                                                    .unlikePost(postData.id);
+                                              }
+                                            },
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      })),
+                              Expanded(
+                                child: FlatButton(
+                                  child: Row(children: [
+                                    Container(
+                                      width: 20,
+                                      height: 20,
+                                      padding: const EdgeInsets.all(0.0),
+                                      child: Image.asset(
+                                          'assets/images/comment.png'),
+                                    ),
+                                    Expanded(
+                                        child: Container(
+                                            margin: EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              postData.comments.length
+                                                  .toString(),
+                                              textAlign: TextAlign.left,
+                                            )))
+                                  ]),
                                   onPressed: () {
-                                    print('button pressed');
-                                    _showDeleteDialog(postData);
+                                    /*Navigator.of(context)
+                                            .push(_showComments());*/
+                                    Navigator.pushNamed(context,
+                                        '/post/' + postData.id + '/comments');
                                   },
-                                  child: Text('Delete',
-                                      textAlign: TextAlign.right,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                      )),
                                 ),
-                        ])
-                      ],
-                    ))),
+                              ),
+                              Expanded(
+                                child: FlatButton(
+                                  child: Row(children: [
+                                    Container(
+                                      width: 20,
+                                      height: 20,
+                                      padding: const EdgeInsets.all(0.0),
+                                      child: Image.asset(
+                                          'assets/images/share.png'),
+                                    ),
+                                    Expanded(
+                                        child: Container(
+                                            margin: EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              'Share',
+                                              textAlign: TextAlign.left,
+                                            )))
+                                  ]),
+                                  onPressed: () {
+                                    _showShare();
+                                  },
+                                ),
+                              )
+                            ]),
+                          ),
+                          Row(children: [
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                margin: EdgeInsets.all(10),
+                                child: Text(howLongAgo(postData.timestamp),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    )),
+                              ),
+                            ),
+                            postData.author != user.uid
+                                ? Container()
+                                : FlatButton(
+                                    onPressed: () {
+                                      print('button pressed');
+                                      _showDeleteDialog(postData);
+                                    },
+                                    child: Text('Delete',
+                                        textAlign: TextAlign.right,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        )),
+                                  ),
+                          ])
+                        ],
+                      ))
+                ]),
+              ),
+            ),
             onTap: () {
               Navigator.pushNamed(context, '/post/' + postData.id);
             },
