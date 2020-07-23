@@ -84,7 +84,7 @@ class LikesService {
     // }
 
     DocumentSnapshot userprofile = await userCollection.document(uid).get();
-    if (userprofile.data == null) {
+    if (userprofile.data['likes'] == null) {
       return false;
     } else {
       return userprofile.data['likes'].contains(postId);
@@ -93,6 +93,6 @@ class LikesService {
 
   Future<int> noOfLikes(String postId) async {
     var postDoc = await postsCollection.document(postId).get();
-    return postDoc['noLikes'];
+    return postDoc.data['noLikes'];
   }
 }
