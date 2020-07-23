@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
 import 'helper_classes.dart';
-import 'other_user_profile.dart';
 import 'models/post.dart';
 import 'services/database.dart';
 import 'models/user.dart';

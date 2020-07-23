@@ -29,7 +29,13 @@ class _FeedWrapperState extends State<FeedWrapper> {
   Timestamp loadingTimestamp;
   List<List<Post>> postList;
   RefreshController _refreshController =
-      RefreshController(initialRefresh: true);
+      RefreshController(initialRefresh: false);
+
+  @override
+  void initState() {
+    super.initState();
+    _onRefresh();
+  }
 
   void _onRefresh() async {
     // monitor network fetch

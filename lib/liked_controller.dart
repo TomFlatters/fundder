@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'helper_classes.dart';
-import 'view_post_controller.dart';
-import 'other_user_profile.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';

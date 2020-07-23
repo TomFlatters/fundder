@@ -1,6 +1,5 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-import 'package:fundder/other_user_profile.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
 import 'package:fundder/donation/donate_page_controller.dart';
@@ -34,7 +33,7 @@ class FluroRouter {
           DonatePage(postData: params['id'][0]));
   static Handler _viewOtherProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ViewUser(
+          ProfileController(
             uid: params['id'][0],
           ));
   static Handler _followersHandler = Handler(
