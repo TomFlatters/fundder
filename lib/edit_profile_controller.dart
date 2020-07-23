@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'services/database.dart';
 import 'shared/loading.dart';
+import 'global widgets/buttons.dart';
 
 class EditProfile extends StatefulWidget {
   @override
@@ -50,7 +51,7 @@ class _EditProfileState extends State<EditProfile> {
         _uid = firebaseUser.uid;
         _name = value.data["name"];
         nameEntry.text = _name;
-        _username = firebaseUser.uid;
+        _username = value.data['username'];
         _email = firebaseUser.email;
         emailEntry.text = _email;
         _profilePic = value.data["profilePic"];
@@ -95,26 +96,9 @@ class _EditProfileState extends State<EditProfile> {
                   margin: EdgeInsets.all(10.0),
                 ),
               ),
-              GestureDetector(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                  margin:
-                      EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 1),
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  child: Text(
-                    "Change profile picture",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                onTap: () {
+              EditFundderButton(
+                text: "Change profile picture",
+                onPressed: () {
                   _changePic();
                 },
               ),
@@ -132,7 +116,7 @@ class _EditProfileState extends State<EditProfile> {
                           child: Text(entries[index])),
                       Expanded(
                         child: index == 1
-                            ? Text(_uid == null ? "username" : _uid)
+                            ? Text(_uid == null ? "username" : _username)
                             : TextField(
                                 controller: controllers[index],
                                 decoration: InputDecoration(
@@ -150,26 +134,9 @@ class _EditProfileState extends State<EditProfile> {
                   );
                 },
               ),
-              GestureDetector(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                  margin:
-                      EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-                  /*decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey, width: 1),
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),*/
-                  child: Text(
-                    "Save Changes",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                onTap: () {
+              SecondaryFundderButton(
+                text: 'Save Changes',
+                onPressed: () {
                   if (imageFile != null) {
                     final String fileLocation = _uid +
                         "/" +

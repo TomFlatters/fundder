@@ -5,6 +5,7 @@
 
 class Post {
   final String author;
+  final String authorUsername;
   final String title;
   final String charity;
   final String amountRaised;
@@ -22,6 +23,7 @@ class Post {
   Post({
     this.noLikes,
     this.author,
+    this.authorUsername,
     this.title,
     this.charity,
     this.amountRaised,
@@ -36,6 +38,7 @@ class Post {
     //why should one avoid initialisation to null
     this.peopleThatLikedThis,
   });
+
 
   double percentRaised() {
     //print("Amount raised1" + amountRaised);

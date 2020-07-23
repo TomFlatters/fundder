@@ -5,8 +5,7 @@ import 'package:fundder/services/auth.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:fundder/shared/constants.dart';
 import 'package:fundder/helper_classes.dart';
-//import 'package:fundder/auth_screens/register.dart';
-//import 'package:fundder/auth_screens/sign_in.dart';
+import 'package:fundder/global widgets/buttons.dart';
 
 class Authenticate extends StatefulWidget {
   @override
@@ -129,29 +128,9 @@ class _AuthenticateState extends State<Authenticate>
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 15),
                 ),
-                GestureDetector(
-                  child: Container(
-                    width: 250,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12, /*horizontal: 30*/
-                    ),
-                    margin: EdgeInsets.only(left: 50, right: 50, bottom: 10),
-                    decoration: BoxDecoration(
-                      color: HexColor('ff6b6c'),
-                      border: Border.all(color: HexColor('ff6b6c'), width: 1),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    child: Text(
-                      "Sign In",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  onTap: () async {
+                PrimaryFundderButton(
+                  text: 'Log In',
+                  onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       setState(() => loading = true);
                       dynamic result = await _auth.signInWithEmailAndPassword(
@@ -237,29 +216,9 @@ class _AuthenticateState extends State<Authenticate>
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 15),
                 ),
-                GestureDetector(
-                  child: Container(
-                    width: 250,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12, /*horizontal: 30*/
-                    ),
-                    margin: EdgeInsets.only(left: 50, right: 50, bottom: 10),
-                    decoration: BoxDecoration(
-                      color: HexColor('ff6b6c'),
-                      border: Border.all(color: HexColor('ff6b6c'), width: 1),
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    child: Text(
-                      "Register",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  onTap: () async {
+                PrimaryFundderButton(
+                  text: 'Register',
+                  onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       setState(() => loading = true);
                       dynamic result =

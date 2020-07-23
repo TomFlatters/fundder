@@ -15,6 +15,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
+import 'video_item.dart';
+import 'global widgets/buttons.dart';
 
 class ViewPost extends StatefulWidget {
   final String postData;
@@ -24,13 +26,18 @@ class ViewPost extends StatefulWidget {
   _ViewPostState createState() => _ViewPostState();
 }
 
-class _ViewPostState extends State<ViewPost> {
+class _ViewPostState extends State<ViewPost> with RouteAware {
+  RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
   Post postData;
 
   @override
   void initState() {
     //print(widget.postData);
-    //_getPost();
+    _getPost();
+    super.initState();
+  }
+
+  void _getPost() {
     DatabaseService(uid: widget.postData)
         .getPostById(widget.postData)
         .then((post) => {
@@ -40,7 +47,6 @@ class _ViewPostState extends State<ViewPost> {
                 postData = post;
               })
             });
-    super.initState();
   }
 
   @override
@@ -93,7 +99,7 @@ class _ViewPostState extends State<ViewPost> {
                                         child: Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              postData.author,
+                                              postData.authorUsername,
                                               style: TextStyle(
                                                 fontFamily: 'Quicksand',
                                                 fontWeight: FontWeight.w600,
@@ -112,28 +118,15 @@ class _ViewPostState extends State<ViewPost> {
                                     ? Container()
                                     : Container(
                                         child: SizedBox(
-                                          /*width:
+                                            /*width:
                                               MediaQuery.of(context).size.width,
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .width *
                                               9 /
                                               16,*/
-                                          child: kIsWeb == true
-                                              ? Image.network(postData.imageUrl)
-                                              : CachedNetworkImage(
-                                                  imageUrl: (postData
-                                                              .imageUrl !=
-                                                          null)
-                                                      ? postData.imageUrl
-                                                      : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-                                                  placeholder: (context, url) =>
-                                                      Loading(),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Icon(Icons.error),
-                                                ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
-                                        ),
+                                            child:
+                                                _previewImageVideo(postData)),
                                         margin: EdgeInsets.symmetric(
                                             vertical: 10.0),
                                       ),
@@ -297,33 +290,9 @@ class _ViewPostState extends State<ViewPost> {
                                               )),
                                         ),
                                 ]),
-                                GestureDetector(
-                                    child: Container(
-                                      width: 250,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 12, /*horizontal: 30*/
-                                      ),
-                                      margin: EdgeInsets.only(
-                                          left: 50, right: 50, bottom: 20),
-                                      decoration: BoxDecoration(
-                                        color: HexColor('ff6b6c'),
-                                        border: Border.all(
-                                            color: HexColor('ff6b6c'),
-                                            width: 1),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5)),
-                                      ),
-                                      child: Text(
-                                        "Donate",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    onTap: () {
+                                PrimaryFundderButton(
+                                    text: 'Donate',
+                                    onPressed: () {
                                       /*Navigator.of(context).push(_openDonate());*/
                                       Navigator.pushNamed(
                                           context,
@@ -331,40 +300,23 @@ class _ViewPostState extends State<ViewPost> {
                                               widget.postData +
                                               '/donate');
                                     }),
-                                user.uid != postData.author
+                                user.uid != postData.author ||
+                                        postData.status != 'fund'
                                     ? Container()
-                                    : GestureDetector(
-                                        child: Container(
-                                          width: 250,
-                                          padding: EdgeInsets.symmetric(
-                                            vertical: 12, /*horizontal: 30*/
-                                          ),
-                                          margin: EdgeInsets.only(
-                                              left: 50, right: 50, bottom: 20),
-                                          decoration: BoxDecoration(
-                                            color: HexColor('ff6b6c'),
-                                            border: Border.all(
-                                                color: HexColor('ff6b6c'),
-                                                width: 1),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(5)),
-                                          ),
-                                          child: Text(
-                                            "Complete Challenge",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                        onTap: () {
+                                    : PrimaryFundderButton(
+                                        text: 'Complete Challenge',
+                                        onPressed: () {
                                           Navigator.pushNamed(
-                                              context,
-                                              '/post/' +
-                                                  widget.postData +
-                                                  '/uploadProof');
+                                                  context,
+                                                  '/post/' +
+                                                      widget.postData +
+                                                      '/uploadProof')
+                                              .then((_) {
+                                            // you have come back to your Settings screen
+                                            setState(() {
+                                              _getPost();
+                                            });
+                                          });
                                         }),
                               ],
                             )))
@@ -415,11 +367,49 @@ class _ViewPostState extends State<ViewPost> {
     );
   }
 
+  Widget _previewImageVideo(Post postData) {
+    if (postData.imageUrl.contains('video')) {
+      print('initialising video');
+      return VideoItem(postData.imageUrl);
+    } else {
+      return kIsWeb == true
+          ? Image.network(postData.imageUrl)
+          : CachedNetworkImage(
+              imageUrl: (postData.imageUrl != null)
+                  ? postData.imageUrl
+                  : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
+              placeholder: (context, url) => Loading(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            );
+    }
+  }
+
   void _showShare() {
     showModalBottomSheet(
         context: context,
         builder: (context) {
           return SharePost();
         });
+  }
+
+  @override
+  void didChangeDependencies() {
+    routeObserver.subscribe(this, ModalRoute.of(context)); //Subscribe it here
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didPopNext() {
+    print("didPopNext");
+    setState(() {
+      print("Did pop controller above");
+    });
+    super.didPopNext();
+  }
+
+  @override
+  void didPush() {
+    print("didPush");
+    super.didPush();
   }
 }

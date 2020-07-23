@@ -9,6 +9,7 @@ import 'helper_classes.dart';
 import 'do_challenge.dart';
 import 'models/user.dart';
 import 'push_notifications.dart';
+import 'feed_wrapper.dart';
 
 class FeedController extends StatelessWidget {
   @override
@@ -33,10 +34,8 @@ class FeedController extends StatelessWidget {
         body: //FeedView('Do', HexColor('ff6b6c'))
             TabBarView(children: [
           DoChallenge(),
-          FeedView(UniqueKey(), "Fund", null, HexColor('ff6b6c'),
-              DatabaseService(uid: user.uid).fundPosts),
-          FeedView(UniqueKey(), "Done", null, HexColor('ff6b6c'),
-              DatabaseService(uid: user.uid).donePosts),
+          FeedWrapper("Fund", null, "fund"),
+          FeedWrapper("Done", null, "done"),
         ]),
       ),
     );
