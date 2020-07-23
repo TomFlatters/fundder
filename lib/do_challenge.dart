@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-import 'share_post_view.dart';
-import 'helper_classes.dart';
-import 'comment_view_controller.dart';
-import 'other_user_profile.dart';
-import 'package:grouped_list/grouped_list.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'do_challenge_detail.dart';
 import 'shared/loading.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'shared/loading.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class DoChallenge extends StatefulWidget {

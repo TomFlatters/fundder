@@ -21,7 +21,9 @@ import 'package:flutter/cupertino.dart';
 class ProfileController extends StatefulWidget {
   @override
   _ProfileState createState() => _ProfileState();
-  ProfileController();
+
+  final String uid;
+  ProfileController({this.uid});
 }
 
 class _ProfileState extends State<ProfileController>
@@ -56,17 +58,16 @@ class _ProfileState extends State<ProfileController>
   }
 
   void _retrieveUser() async {
-    var firebaseUser = await FirebaseAuth.instance.currentUser();
     Firestore.instance
         .collection("users")
-        .document(firebaseUser.uid)
+        .document(widget.uid)
         .get()
         .then((value) {
       setState(() {
-        _uid = firebaseUser.uid;
+        _uid = widget.uid;
         _name = value.data["name"];
         _username = value.data['username'];
-        _email = firebaseUser.email;
+        _email = value.data["email"];
         _profilePic = value.data["profilePic"];
         if (_profilePic == null) {
           _profilePic =
@@ -128,19 +129,20 @@ class _ProfileState extends State<ProfileController>
                   : AppBar(
                       centerTitle: true,
                       title: Text(_username),
-                      actions: <Widget>[
-                        FlatButton(
-                          onPressed:
-                              () /*async {
+                      actions: _uid == user.uid
+                          ? <Widget>[
+                              FlatButton(
+                                onPressed:
+                                    () /*async {
             await _auth.signOut();
           }*/
-                              {
-                            _showOptions();
-                          },
-                          child: Icon(AntDesign.ellipsis1),
-                        )
-                      ],
-                    ),
+                                    {
+                                  _showOptions();
+                                },
+                                child: Icon(AntDesign.ellipsis1),
+                              )
+                            ]
+                          : null),
               body: _uid == null
                   ? Loading()
                   : Column(children: [
@@ -258,11 +260,17 @@ class _ProfileState extends State<ProfileController>
                                     )),
                                   ],
                                 )),
-                            EditFundderButton(
-                                text: 'Edit Profile',
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/account/edit');
-                                }),
+                            _uid == user.uid
+                                ? EditFundderButton(
+                                    text: 'Edit Profile',
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, '/account/edit');
+                                    })
+                                : EditFundderButton(
+                                    text: "Follow",
+                                    onPressed: () {},
+                                  ),
                             DefaultTabController(
                               length: 2,
                               initialIndex: 0,
