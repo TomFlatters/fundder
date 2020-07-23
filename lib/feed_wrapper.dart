@@ -27,7 +27,7 @@ class FeedWrapper extends StatefulWidget {
 class _FeedWrapperState extends State<FeedWrapper> {
   int limit = 3;
   Timestamp loadingTimestamp;
-  List<List<Post>> postList;
+  List<FeedView> postList;
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
@@ -42,7 +42,10 @@ class _FeedWrapperState extends State<FeedWrapper> {
     loadingTimestamp = Timestamp.now();
     List<Post> futurePost = await DatabaseService()
         .refreshPosts(widget.status, limit, loadingTimestamp);
-    postList = [futurePost];
+    postList = [
+      FeedView(
+          widget.feedChoice, widget.identifier, HexColor('ff6b6c'), futurePost)
+    ];
     Post post = futurePost.last;
     print('postList' + postList.toString());
     loadingTimestamp = post.timestamp;
@@ -59,7 +62,8 @@ class _FeedWrapperState extends State<FeedWrapper> {
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
         print('futurePost' + futurePost.toString());
-        postList.add(futurePost);
+        postList.add(FeedView(widget.feedChoice, widget.identifier,
+            HexColor('ff6b6c'), futurePost));
         Post post = futurePost.last;
         loadingTimestamp = post.timestamp;
       }
@@ -101,8 +105,7 @@ class _FeedWrapperState extends State<FeedWrapper> {
         child: postList == null
             ? Container()
             : ListView.builder(
-                itemBuilder: (c, i) => FeedView(widget.feedChoice,
-                    widget.identifier, HexColor('ff6b6c'), postList[i]),
+                itemBuilder: (c, i) => postList[i],
                 itemCount: postList.length,
               ),
       ),
