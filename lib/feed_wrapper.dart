@@ -49,9 +49,13 @@ class _FeedWrapperState extends State<FeedWrapper> {
       FeedView(
           widget.feedChoice, widget.identifier, HexColor('ff6b6c'), futurePost)
     ];
-    Post post = futurePost.last;
-    print('postList' + postList.toString());
-    loadingTimestamp = post.timestamp;
+    if (futurePost != null) {
+      if (futurePost.isEmpty == false) {
+        Post post = futurePost.last;
+        print('postList' + postList.toString());
+        loadingTimestamp = post.timestamp;
+      }
+    }
     if (mounted) setState(() {});
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();

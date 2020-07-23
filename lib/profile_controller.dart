@@ -305,10 +305,14 @@ class _ProfileState extends State<ProfileController>
     // monitor network fetch
     loadingTimestamp = Timestamp.now();
     List<Post> futurePost = await DatabaseService().authorPosts(_uid);
-    postList = futurePost;
-    Post post = futurePost.last;
-    print('postList' + postList.toString());
-    loadingTimestamp = post.timestamp;
+    if (futurePost != null) {
+      if (futurePost.isEmpty == false) {
+        postList = futurePost;
+        Post post = futurePost.last;
+        print('postList' + postList.toString());
+        loadingTimestamp = post.timestamp;
+      }
+    }
     if (mounted) setState(() {});
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
