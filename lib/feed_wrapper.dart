@@ -10,6 +10,9 @@ import 'models/post.dart';
 
 // This class adds the refresh indicator to feeds not in the profile
 
+// The reason that every load creates a new feedview into a list is to make the
+// scrolling more seamless with no realoding of video controllers previously made
+
 class FeedWrapper extends StatefulWidget {
   @override
   _FeedWrapperState createState() => _FeedWrapperState();
