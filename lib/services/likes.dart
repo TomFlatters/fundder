@@ -84,7 +84,7 @@ class LikesService {
     // }
 
     DocumentSnapshot userprofile = await userCollection.document(uid).get();
-    if (userprofile.data == null) {
+    if (userprofile.data['likes'] == null) {
       return false;
     } else {
       return userprofile.data['likes'].contains(postId);

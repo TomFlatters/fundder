@@ -160,9 +160,12 @@ class _AddPostState extends State<AddPost> {
 
   void _pushPost(String downloadUrl, User user) {
     if (titleController.text == null ||
+        titleController.text == "" ||
         subtitleController.text == null ||
+        subtitleController.text == "" ||
         charity == -1 ||
-        moneyController.text == null) {
+        moneyController.text == null ||
+        moneyController.text == '0.00') {
       setState(() {
         _submitting = false;
       });
