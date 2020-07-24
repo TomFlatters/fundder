@@ -19,6 +19,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'video_item.dart';
 import 'services/likes.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -34,10 +35,14 @@ class FeedView extends StatefulWidget {
 
 class _FeedViewState extends State<FeedView> {
   ScrollPhysics physics;
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'addMessage',
+  );
 
   @override
   void initState() {
     super.initState();
+    //_tryMessage();
     if (widget.feedChoice == "user") {
       physics = NeverScrollableScrollPhysics();
     }
@@ -68,6 +73,27 @@ class _FeedViewState extends State<FeedView> {
       print(token); // Print the Token in Console
     });
   }
+
+  /*void _tryMessage() async {
+    try {
+      var callable = CloudFunctions.instance.getHttpsCallable(
+          functionName:
+              'addMessage'); // replace 'functionName' with the name of your function
+      dynamic response = callable
+          .call(<String, dynamic>{'text': 'message'}).catchError((onError) {
+        print(onError);
+      });
+      print(response);
+    } on CloudFunctionsException catch (e) {
+      print('caught firebase functions exception');
+      print(e.code);
+      print(e.message);
+      print(e.details);
+    } catch (e) {
+      print('caught generic exception');
+      print(e);
+    }
+  }*/
 
   @override
   void didUpdateWidget(FeedView oldWidget) {
