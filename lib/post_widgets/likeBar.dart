@@ -32,6 +32,7 @@ class LikesModel extends ChangeNotifier {
       _isLiked = false;
     } else {
       _likesService.likePost(postId);
+      _noLikes += 1;
       _isLiked = true;
     }
     notifyListeners();
