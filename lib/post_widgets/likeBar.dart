@@ -39,26 +39,25 @@ class LikesModel extends ChangeNotifier {
 }
 
 class LikeBar extends StatelessWidget {
-  //make this widget a child of a consumer. It should be rebuilt every time the state changes i.e a like is pressed
-  final bool isLiked;
-  final int noLikes;
-  final Function likePressed;
-  LikeBar({this.noLikes, this.isLiked, callBack}) : likePressed = callBack;
+  //the widget will listen use likesModel to interact with the state. It will be rebuilt everytime the state changes.
 
   @override
   Widget build(BuildContext context) {
+    var likesModel = Provider.of<LikesModel>(context);
     return Container(
         height: 30,
         child: Row(children: <Widget>[
           Expanded(
               child: FlatButton(
-                  onPressed: likePressed,
+                  onPressed: () {
+                    likesModel.likePressed();
+                  },
                   child: Row(children: [
                     Container(
                       width: 20,
                       height: 20,
                       padding: const EdgeInsets.all(0.0),
-                      child: (isLiked)
+                      child: (likesModel.isLiked)
                           ? Image.asset('assets/images/like_selected.png')
                           : Image.asset('assets/images/like.png'),
                     ),
@@ -66,22 +65,12 @@ class LikeBar extends StatelessWidget {
                         child: Container(
                             margin: EdgeInsets.only(left: 10),
                             child: Text(
-                              noLikes.toString(),
+                              likesModel.noLikes.toString(),
                               textAlign: TextAlign.left,
                             )))
                   ])))
         ]));
   }
-}
-
-Consumer<LikesModel> _createALikeBar() {
-  return Consumer<LikesModel>(builder: (context, likemodel, child) {
-    VoidCallback likePressed = () => likemodel.likePressed();
-    return LikeBar(
-        noLikes: likemodel.noLikes,
-        isLiked: likemodel.isLiked,
-        callBack: likePressed);
-  });
 }
 
 // class LikeBar extends StatefulWidget {
