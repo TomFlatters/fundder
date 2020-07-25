@@ -74,6 +74,16 @@ class LikeBar extends StatelessWidget {
   }
 }
 
+Consumer<LikesModel> _createALikeBar() {
+  return Consumer<LikesModel>(builder: (context, likemodel, child) {
+    VoidCallback likePressed = () => likemodel.likePressed();
+    return LikeBar(
+        noLikes: likemodel.noLikes,
+        isLiked: likemodel.isLiked,
+        callBack: likePressed);
+  });
+}
+
 // class LikeBar extends StatefulWidget {
 //   final String postId;
 //   LikeBar({
