@@ -91,170 +91,227 @@ class _FeedViewState extends State<FeedView> {
         itemCount: widget.postList.length,
         itemBuilder: (BuildContext context, int index) {
           Post postData = widget.postList[index];
-          // print(postData);
-          return GestureDetector(
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              color: Colors.white,
-              child: Container(
-                margin: EdgeInsets.only(left: 0, right: 0, top: 0),
-                child: Column(children: <Widget>[
-                  Container(
-                    height: 60,
-                    child: Row(
-                      children: <Widget>[
-                        Align(
-                            alignment: Alignment.centerLeft,
+          // print(postData)
+          bool initiallyHasLiked;
+          int initialLikesNo;
+          return FutureBuilder(
+              future: likesService.hasUserLikedPost(postData.id),
+              builder: (context, hasLiked) {
+                if (hasLiked.connectionState == ConnectionState.done) {
+                  initiallyHasLiked = hasLiked.data;
+                  return FutureBuilder(
+                    future: likesService.noOfLikes(postData.id),
+                    builder: (context, noLikes) {
+                      if (noLikes.connectionState == ConnectionState.done) {
+                        initialLikesNo = noLikes.data;
+                        var likesModel = LikesModel(
+                            initiallyHasLiked, initialLikesNo,
+                            uid: user.uid, postId: postData.id);
+                        return ChangeNotifierProvider(
+                            create: (context) => likesModel,
                             child: GestureDetector(
-                              child: AspectRatio(
-                                  aspectRatio: 1 / 1,
-                                  child: Container(
-                                    child: ProfilePic(postData.author, 40),
-                                    margin: EdgeInsets.all(10.0),
-                                  )),
-                              onTap: () {
-                                print('/user/' + postData.author);
-                                Navigator.pushNamed(
-                                    context, '/user/' + postData.author);
-                              },
-                            )),
-                        Expanded(
-                            child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(postData.authorUsername,
-                                    style: TextStyle(
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.w600,
-                                    )))),
-                        Align(
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                                margin: EdgeInsets.all(10.0),
-                                child: Text(postData.charity))),
-                      ],
-                    ),
-                  ),
-                  Container(
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.all(10),
-                      child: Text(postData.subtitle)),
-                  Container(
-                      alignment: Alignment.centerLeft,
-                      margin:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      child: Text(
-                        '£${postData.amountRaised} raised of £${postData.targetAmount} target',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      )),
-                  Container(
-                    //alignment: Alignment.centerLeft,
-                    margin:
-                        EdgeInsets.only(top: 5, bottom: 15, left: 0, right: 0),
-                    child: LinearPercentIndicator(
-                      linearStrokeCap: LinearStrokeCap.butt,
-                      lineHeight: 3,
-                      percent: postData.percentRaised(),
-                      backgroundColor: HexColor('CCCCCC'),
-                      progressColor: HexColor('ff6b6c'),
-                    ),
-                  ),
-                  (postData.imageUrl == null)
-                      ? Container()
-                      : Container(
-                          child: SizedBox(child: _previewImageVideo(postData)),
-                          margin: EdgeInsets.symmetric(vertical: 10.0),
-                        ),
-                  Container(
-                    //action bar
-                    key: GlobalKey(),
-                    height: 30,
-                    child: Row(children: <Widget>[
-                      Expanded(
-                          //like bar
-                          child: LikeBar(postId: postData.id)),
-                      Expanded(
-                        child: FlatButton(
-                          child: Row(children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              padding: const EdgeInsets.all(0.0),
-                              child: Image.asset('assets/images/comment.png'),
-                            ),
-                            Expanded(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.white,
                                 child: Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      postData.comments.length.toString(),
-                                      textAlign: TextAlign.left,
-                                    )))
-                          ]),
-                          onPressed: () {
-                            /*Navigator.of(context)
+                                  margin: EdgeInsets.only(
+                                      left: 0, right: 0, top: 0),
+                                  child: Column(children: <Widget>[
+                                    Container(
+                                      height: 60,
+                                      child: Row(
+                                        children: <Widget>[
+                                          Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: GestureDetector(
+                                                child: AspectRatio(
+                                                    aspectRatio: 1 / 1,
+                                                    child: Container(
+                                                      child: ProfilePic(
+                                                          postData.author, 40),
+                                                      margin:
+                                                          EdgeInsets.all(10.0),
+                                                    )),
+                                                onTap: () {
+                                                  print('/user/' +
+                                                      postData.author);
+                                                  Navigator.pushNamed(
+                                                      context,
+                                                      '/user/' +
+                                                          postData.author);
+                                                },
+                                              )),
+                                          Expanded(
+                                              child: Align(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                      postData.authorUsername,
+                                                      style: TextStyle(
+                                                        fontFamily: 'Quicksand',
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      )))),
+                                          Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Container(
+                                                  margin: EdgeInsets.all(10.0),
+                                                  child:
+                                                      Text(postData.charity))),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                        alignment: Alignment.centerLeft,
+                                        margin: EdgeInsets.all(10),
+                                        child: Text(postData.subtitle)),
+                                    Container(
+                                        alignment: Alignment.centerLeft,
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 10, horizontal: 10),
+                                        child: Text(
+                                          '£${postData.amountRaised} raised of £${postData.targetAmount} target',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        )),
+                                    Container(
+                                      //alignment: Alignment.centerLeft,
+                                      margin: EdgeInsets.only(
+                                          top: 5,
+                                          bottom: 15,
+                                          left: 0,
+                                          right: 0),
+                                      child: LinearPercentIndicator(
+                                        linearStrokeCap: LinearStrokeCap.butt,
+                                        lineHeight: 3,
+                                        percent: postData.percentRaised(),
+                                        backgroundColor: HexColor('CCCCCC'),
+                                        progressColor: HexColor('ff6b6c'),
+                                      ),
+                                    ),
+                                    (postData.imageUrl == null)
+                                        ? Container()
+                                        : Container(
+                                            child: SizedBox(
+                                                child: _previewImageVideo(
+                                                    postData)),
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 10.0),
+                                          ),
+                                    Container(
+                                      //action bar
+                                      key: GlobalKey(),
+                                      height: 30,
+                                      child: Row(children: <Widget>[
+                                        Expanded(
+                                            //like bar
+                                            child: LikeBar()),
+                                        Expanded(
+                                          child: FlatButton(
+                                            child: Row(children: [
+                                              Container(
+                                                width: 20,
+                                                height: 20,
+                                                padding:
+                                                    const EdgeInsets.all(0.0),
+                                                child: Image.asset(
+                                                    'assets/images/comment.png'),
+                                              ),
+                                              Expanded(
+                                                  child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 10),
+                                                      child: Text(
+                                                        postData.comments.length
+                                                            .toString(),
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                      )))
+                                            ]),
+                                            onPressed: () {
+                                              /*Navigator.of(context)
                                             .push(_showComments());*/
-                            Navigator.pushNamed(
-                                context, '/post/' + postData.id + '/comments');
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: FlatButton(
-                          child: Row(children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              padding: const EdgeInsets.all(0.0),
-                              child: Image.asset('assets/images/share.png'),
-                            ),
-                            Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      'Share',
-                                      textAlign: TextAlign.left,
-                                    )))
-                          ]),
-                          onPressed: () {
-                            _showShare();
-                          },
-                        ),
-                      ),
-                    ]),
-                  ),
-                  Row(children: [
-                    Expanded(
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.all(10),
-                        child: Text(howLongAgo(postData.timestamp),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            )),
-                      ),
-                    ),
-                    postData.author != user.uid
-                        ? Container()
-                        : FlatButton(
-                            onPressed: () {
-                              print('button pressed');
-                              _showDeleteDialog(postData);
-                            },
-                            child: Text('Delete',
-                                textAlign: TextAlign.right,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                )),
-                          ),
-                  ])
-                ]),
-              ),
-            ),
-            onTap: () {
-              Navigator.pushNamed(context, '/post/' + postData.id);
-            },
-          );
+                                              Navigator.pushNamed(
+                                                  context,
+                                                  '/post/' +
+                                                      postData.id +
+                                                      '/comments');
+                                            },
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: FlatButton(
+                                            child: Row(children: [
+                                              Container(
+                                                width: 20,
+                                                height: 20,
+                                                padding:
+                                                    const EdgeInsets.all(0.0),
+                                                child: Image.asset(
+                                                    'assets/images/share.png'),
+                                              ),
+                                              Expanded(
+                                                  child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 10),
+                                                      child: Text(
+                                                        'Share',
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                      )))
+                                            ]),
+                                            onPressed: () {
+                                              _showShare();
+                                            },
+                                          ),
+                                        ),
+                                      ]),
+                                    ),
+                                    Row(children: [
+                                      Expanded(
+                                        child: Container(
+                                          alignment: Alignment.centerLeft,
+                                          margin: EdgeInsets.all(10),
+                                          child: Text(
+                                              howLongAgo(postData.timestamp),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              )),
+                                        ),
+                                      ),
+                                      postData.author != user.uid
+                                          ? Container()
+                                          : FlatButton(
+                                              onPressed: () {
+                                                print('button pressed');
+                                                _showDeleteDialog(postData);
+                                              },
+                                              child: Text('Delete',
+                                                  textAlign: TextAlign.right,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.grey,
+                                                  )),
+                                            ),
+                                    ])
+                                  ]),
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, '/post/' + postData.id);
+                              },
+                            ));
+                      } else {
+                        return Container();
+                      }
+                    },
+                  );
+                } else {
+                  return Container();
+                }
+              });
         },
         separatorBuilder: (BuildContext context, int index) {
           return SizedBox(
