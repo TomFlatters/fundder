@@ -165,15 +165,13 @@ class _FeedViewState extends State<FeedView> {
                           margin: EdgeInsets.symmetric(vertical: 10.0),
                         ),
                   Container(
+                    //action bar
                     key: GlobalKey(),
                     height: 30,
                     child: Row(children: <Widget>[
                       Expanded(
                           //like bar
-                          child: LikeBar(
-                        postId: postData.id,
-                        key: GlobalKey(),
-                      )),
+                          child: LikeBar(postId: postData.id)),
                       Expanded(
                         child: FlatButton(
                           child: Row(children: [
