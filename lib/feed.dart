@@ -29,7 +29,8 @@ class FeedView extends StatefulWidget {
   final String identifier;
   //final Stream<List<Post>> postsStream;
   final List<Post> postList;
-  FeedView(this.feedChoice, this.identifier, this.colorChoice, this.postList);
+  FeedView(this.feedChoice, this.identifier, this.colorChoice, this.postList,
+      {Key key});
 }
 
 class _FeedViewState extends State<FeedView> {
@@ -164,11 +165,15 @@ class _FeedViewState extends State<FeedView> {
                           margin: EdgeInsets.symmetric(vertical: 10.0),
                         ),
                   Container(
+                    key: GlobalKey(),
                     height: 30,
                     child: Row(children: <Widget>[
                       Expanded(
                           //like bar
-                          child: LikeBar(postId: postData.id)),
+                          child: LikeBar(
+                        postId: postData.id,
+                        key: GlobalKey(),
+                      )),
                       Expanded(
                         child: FlatButton(
                           child: Row(children: [
