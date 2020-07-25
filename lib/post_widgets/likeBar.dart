@@ -7,9 +7,9 @@ import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../services/likes.dart';
 
-//the 'state' of the likes on a postId post on uid user's feed is housed here
-//the number of likes of this post
 class LikesModel extends ChangeNotifier {
+  //the 'state' of the likes on a 'postId' post in 'uid' user's feed is housed here
+//i.e the number of likes of this post as well as well as whether uid has liked postId
   bool _isLiked;
   int _noLikes;
   final String postId;
@@ -39,6 +39,7 @@ class LikesModel extends ChangeNotifier {
 }
 
 class LikeBar extends StatelessWidget {
+  //make this widget a child of a consumer. It should be rebuilt every time the state changes i.e a like is pressed
   final bool isLiked;
   final int noLikes;
   final Function likePressed;
