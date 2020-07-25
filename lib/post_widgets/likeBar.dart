@@ -7,7 +7,9 @@ import '../services/likes.dart';
 
 class LikeBar extends StatefulWidget {
   final String postId;
-  LikeBar({this.postId, Key key});
+  LikeBar({
+    this.postId,
+  });
   @override
   _LikeBarState createState() => _LikeBarState(postId: postId);
 }
