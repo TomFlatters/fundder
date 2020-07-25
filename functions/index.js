@@ -54,6 +54,18 @@ exports.onLike = functions.firestore
 
     console.log("owner " + postOwner.data());
 
+    const data = {
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        category: 'like',
+        docLiker: userId,
+        postId: postId
+    };
+      
+      // Add a new document in collection "cities" with ID 'LA'
+    const res = await admin.firestore().collection(`users/${author}/activity`).add(data);
+
+    console.log('Added document with ID: ', res.id);
+
     const tokens = [postOwner.data()['fcm']];
 
     if (tokens.length > 0) {
