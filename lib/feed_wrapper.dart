@@ -6,7 +6,6 @@ import 'feed.dart';
 import 'package:flutter/cupertino.dart';
 import 'helper_classes.dart';
 import 'services/database.dart';
-import 'models/post.dart';
 
 // This class adds the refresh indicator to feeds not in the profile
 

@@ -37,7 +37,7 @@ exports.onLike = functions.firestore
     {
         notification: { 
             title: 'Like',
-            body: `${docLiker.username} liked your post`, 
+            body: `${docLiker.data()['username']} liked your post`, 
         },
     };
 
@@ -58,6 +58,7 @@ exports.onLike = functions.firestore
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
         category: 'like',
         docLiker: userId,
+        docLikerUsername: docLiker.data()['username'],
         postId: postId
     };
       
