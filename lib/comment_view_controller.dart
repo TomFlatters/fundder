@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
+import 'package:fundder/services/comments_service.dart';
 import 'helper_classes.dart';
 import 'models/post.dart';
 import 'services/database.dart';
@@ -19,28 +20,6 @@ class CommentPage extends StatefulWidget {
 class _CommentPageState extends State<CommentPage> {
   final _textController = TextEditingController();
   Post postData;
-  List comments;
-
-  @override
-  void initState() {
-    //print(widget.postData);
-    //_getPost();
-    DatabaseService(uid: widget.postData)
-        .getPostById(widget.postData)
-        .then((post) => {
-              setState(() {
-                print("set state");
-                print(post);
-                postData = post;
-                if (postData.comments == {}) {
-                  comments = [];
-                } else {
-                  comments = postData.comments;
-                }
-              })
-            });
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -52,19 +31,17 @@ class _CommentPageState extends State<CommentPage> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
+    CommentsService commentsService =
+        CommentsService(uid: user.uid, postId: postData.id);
     return new StreamBuilder(
-        stream:
-            /*Firestore.instance
-            .collection('posts')
-            .document(widget.postData)
-            .snapshots(),*/
-
-            DatabaseService(uid: user.uid).commentsByDocId(widget.postData),
+        stream: commentsService.comments,
         builder: (context, snapshot) {
+          List<Map> comments;
           if (!snapshot.hasData) {
             comments = [];
           } else {
-            comments = snapshot.data["comments"];
+            comments = snapshot.data.map((s) => s.data);
+            ;
           }
           print('comments: ' + comments.toString());
           return Scaffold(
@@ -91,7 +68,7 @@ class _CommentPageState extends State<CommentPage> {
                       children: [
                         GestureDetector(
                           child: Text(
-                            comments[index]["author"],
+                            comments[index]["username"],
                             style: TextStyle(
                                 fontSize: 14.0,
                                 color: Colors.black,
@@ -165,7 +142,8 @@ class _CommentPageState extends State<CommentPage> {
                         ),
                         onTap: () {
                           Map comment = {
-                            "author": user.uid,
+                            "uid": user.uid,
+                            "username": '777TomKillsJerry777',
                             "text": _textController.text,
                             "timestamp": DateTime.now()
                           };
