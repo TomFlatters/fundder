@@ -27,7 +27,7 @@ class FluroRouter {
           ViewPost(postData: params['id'][0]));
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          CommentPage(postData: params['id'][0]));
+          CommentPage(pid: params['id'][0]));
   static Handler _donateHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           DonatePage(postData: params['id'][0]));
