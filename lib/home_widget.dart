@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fundder/feed_controller.dart';
+//import 'package:fundder/feed_controller.dart';
 import 'placeholder_widget.dart';
 import 'feed_controller.dart';
 import 'search_controller.dart';
@@ -9,6 +9,8 @@ import 'add_post_controller.dart';
 import 'helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:titled_navigation_bar/titled_navigation_bar.dart';
+import 'package:provider/provider.dart';
+import 'models/user.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -19,15 +21,18 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
-  final List<Widget> screens = [
-    FeedController(Colors.white),
-    SearchController(),
-    PlaceholderWidget(Colors.deepOrange),
-    LikedController(),
-    ProfileController()
-  ];
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+    final List<Widget> screens = [
+      FeedController(), //i.e. the one from home button
+      SearchController(),
+      PlaceholderWidget(Colors.white),
+      LikedController(),
+      ProfileController(
+        uid: user.uid,
+      )
+    ];
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
