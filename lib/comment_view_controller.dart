@@ -60,14 +60,10 @@ class _CommentPageState extends State<CommentPage> {
             .snapshots(),*/
 
             DatabaseService(uid: user.uid).commentsByDocId(widget.postData),
-        // widget.feedChoice == 'user'
-        //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
-        //   : Firestore.instance.collection("posts").snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             comments = [];
           } else {
-            //print("snapshot data" + snapshot.data);
             comments = snapshot.data["comments"];
           }
           print('comments: ' + comments.toString());
@@ -90,18 +86,6 @@ class _CommentPageState extends State<CommentPage> {
                 itemCount: comments.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
-                    /*leading: GestureDetector(
-                      child: AspectRatio(
-                          aspectRatio: 1 / 1,
-                          child: Container(
-                            child: ProfilePic(
-                                "https://i.imgur.com/BoN9kdC.png", 40),
-                            margin: EdgeInsets.all(10.0),
-                          )),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/username');
-                      },
-                    ),*/
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -130,35 +114,9 @@ class _CommentPageState extends State<CommentPage> {
                                       color: Colors.grey,
                                     )),
                           ),
-                          /*Container(
-                      alignment: Alignment.centerLeft,
-                      width: 150,
-                      margin: EdgeInsets.all(5),
-                      child: Text('3 likes',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          )),
-                    ),*/
                         ])
                       ],
                     ),
-                    /*trailing: GestureDetector(
-                child: Container(
-                  child: GestureDetector(
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      padding: const EdgeInsets.all(0.0),
-                      child: Image.asset('assets/images/like.png'),
-                    ),
-                    onTap: () {
-                      final snackBar = SnackBar(content: Text("Like passed"));
-                      Scaffold.of(context).showSnackBar(snackBar);
-                    },
-                  ),
-                ),
-              ),*/
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) {
