@@ -10,8 +10,9 @@ import 'shared/helper_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CommentPage extends StatefulWidget {
-  final String postData;
-  CommentPage({this.postData});
+  final String pid;
+
+  CommentPage({this.pid});
 
   @override
   _CommentPageState createState() => _CommentPageState();
@@ -32,16 +33,15 @@ class _CommentPageState extends State<CommentPage> {
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     CommentsService commentsService =
-        CommentsService(uid: user.uid, postId: postData.id);
+        CommentsService(uid: user.uid, postId: widget.pid);
     return new StreamBuilder(
-        stream: commentsService.comments,
+        stream: commentsService.comments(),
         builder: (context, snapshot) {
-          List<Map> comments;
+          List comments;
           if (!snapshot.hasData) {
             comments = [];
           } else {
-            comments = snapshot.data.map((s) => s.data);
-            ;
+            comments = snapshot.data.map((s) => s.data).toList();
           }
           print('comments: ' + comments.toString());
           return Scaffold(
@@ -147,8 +147,7 @@ class _CommentPageState extends State<CommentPage> {
                             "text": _textController.text,
                             "timestamp": DateTime.now()
                           };
-                          DatabaseService(uid: user.uid)
-                              .addCommentToPost(comment, postData.id);
+                          commentsService.addAcomment(comment);
                           _textController.text = '';
                         },
                       ),
