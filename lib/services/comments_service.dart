@@ -11,7 +11,7 @@ class CommentsService {
   final CollectionReference userCollection =
       Firestore.instance.collection('users');
 
-  Stream<List<DocumentSnapshot>> get comments {
+  Stream<List<DocumentSnapshot>> comments() {
     print('returning comments for  post: {$postId}');
     return postsCollection
         .document(postId)
