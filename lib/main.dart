@@ -7,11 +7,14 @@ import 'package:fundder/models/user.dart';
 import 'home_widget.dart';
 import 'helper_classes.dart';
 import 'routes/routes.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() {
   FluroRouter.setupRouter();
   runApp(MyApp());
 }
+
+RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 class MyApp extends StatelessWidget {
   @override
@@ -22,7 +25,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
           initialRoute: '/',
           onGenerateRoute: FluroRouter.router.generator,
-          title: 'My Flutter App',
+          title: 'Fundder',
+          navigatorObservers: [routeObserver],
           home: Wrapper(),
           theme: ThemeData(
               scaffoldBackgroundColor: Colors.white,

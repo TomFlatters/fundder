@@ -12,138 +12,260 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'shared/loading.dart';
+import 'global_widgets/buttons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class AddPost extends StatefulWidget {
   @override
   _AddPostState createState() => _AddPostState();
 }
 
 class _AddPostState extends State<AddPost> {
+  User user;
+  bool _submitting = false;
   int _current = 0;
   CarouselController _carouselController = CarouselController();
+
+  @override
+  void initState() {
+    _retrieveUser();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Create Fundder"),
-        actions: <Widget>[
-          new FlatButton(
-            child: _current == 4
-                ? Text('Submit', style: TextStyle(fontWeight: FontWeight.bold))
-                : Text('Next', style: TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: _current == 4
-                ? () {
-                    // add image to firebase storage
-                    final String fileLocation = user.uid +
-                        "/" +
-                        DateTime.now().microsecondsSinceEpoch.toString();
-                    DatabaseService(uid: user.uid)
-                        .uploadImage(imageFile, fileLocation)
-                        .then((downloadUrl) => {
-                              print("Successful image upload"),
-                              print(downloadUrl),
-
-                              // Check for the TYPE of the challenge (who they want to do it),
-                              // create a Template or Post accordingly
-                              if (whoDoes[selected] == "Myself")
-                                {
-                                  // Create a post from the state and image url, and add that post to firebase
-                                  DatabaseService(uid: user.uid)
-                                      .uploadPost(new Post(
-                                        title: titleController.text.toString(),
-                                        subtitle:
-                                            subtitleController.text.toString(),
-                                        author: user.uid,
-                                        charity: charities[charity],
-                                        likes: [],
-                                        comments: {},
-                                        timestamp: DateTime.now(),
-                                        amountRaised: "0",
-                                        targetAmount:
-                                            moneyController.text.toString(),
-                                        imageUrl: downloadUrl,
-                                      ))
-                                      .then((postId) => {
-                                            // if the post is successfully added, view the post
-                                            Navigator.pushReplacementNamed(
-                                                context,
-                                                '/post/' + postId.toString())
-                                          })
-                                }
-                              else
-                                {
-                                  // Create a template
-                                  print("Creating a template"),
-                                  DatabaseService(uid: user.uid)
-                                      .uploadTemplate(new Template(
-                                          title:
-                                              titleController.text.toString(),
-                                          subtitle: subtitleController.text
-                                              .toString(),
-                                          author: user.uid,
-                                          charity: charities[charity],
-                                          likes: [],
-                                          comments: {},
-                                          timestamp: DateTime.now(),
-                                          amountRaised: "0",
-                                          targetAmount:
-                                              moneyController.text.toString(),
-                                          imageUrl: downloadUrl,
-                                          whoDoes: whoDoes[selected].toString(),
-                                          acceptedBy: [],
-                                          completedBy: [],
-                                          active: true))
-                                      .then((templateId) => {
-                                            // if the post is successfully added, view the post
-                                            Navigator.pushReplacementNamed(
-                                                context,
-                                                '/template/' +
-                                                    templateId.toString())
-                                          })
-                                }
-                            });
-                  }
-                : () {
-                    /*Navigator.of(context).pushReplacement(_viewPost());*/
-                    _carouselController.nextPage(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.linear);
-                  },
-          )
-        ],
-        leading: new IconButton(
-          icon: new Icon(Icons.close),
-          onPressed: () => Navigator.of(context).pop(null),
+    //final user = Provider.of<User>(context);
+    if (user == null && kIsWeb == true) {
+      Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
+      return Scaffold(
+        body: Text(
+          "Redirecting",
+          style: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 20,
+              color: Colors.black,
+              decoration: null),
         ),
-      ),
-      body: Builder(
-        builder: (context) {
-          final double height = MediaQuery.of(context).size.height;
-          return CarouselSlider(
-            carouselController: _carouselController,
-            options: CarouselOptions(
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
+      );
+    } else
+    // This size provide us total height and width  of our screen
+    {
+      return _submitting == true
+          ? Loading()
+          : Scaffold(
+              appBar: AppBar(
+                centerTitle: true,
+                title: Text("Create Fundder"),
+                actions: <Widget>[
+                  new FlatButton(
+                    child: _current == 4
+                        ? Text('Submit',
+                            style: TextStyle(fontWeight: FontWeight.bold))
+                        : Text('Next',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: _current == 4
+                        ? () {
+                            try {
+                              setState(() {
+                                _submitting = true;
+                              });
+
+                              // add image to firebase storage
+                              if (imageFile != null) {
+                                final String fileLocation = user.uid +
+                                    "/" +
+                                    DateTime.now()
+                                        .microsecondsSinceEpoch
+                                        .toString();
+                                DatabaseService(uid: user.uid)
+                                    .uploadImage(
+                                        File(imageFile.path), fileLocation)
+                                    .then((downloadUrl) => {
+                                          print("Successful image upload"),
+                                          print(downloadUrl),
+                                          _pushItem(downloadUrl, user)
+                                        });
+                              } else {
+                                _pushItem(null, user);
+                              }
+                            } catch (e) {
+                              setState(() {
+                                _submitting = false;
+                              });
+                              _showErrorDialog(e.toString());
+                            }
+                          }
+                        : () {
+                            /*Navigator.of(context).pushReplacement(_viewPost());*/
+                            _carouselController.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.linear);
+                          },
+                  )
+                ],
+                leading: new IconButton(
+                  icon: new Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(null),
+                ),
+              ),
+              body: Builder(
+                builder: (context) {
+                  final double height = MediaQuery.of(context).size.height;
+                  return CarouselSlider(
+                    carouselController: _carouselController,
+                    options: CarouselOptions(
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _current = index;
+                        });
+                      },
+                      enableInfiniteScroll: false,
+                      height: height,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      // autoPlay: false,
+                    ),
+                    items: [
+                      _defineDescription(),
+                      _choosePerson(),
+                      _setMoney(),
+                      _chooseCharity(),
+                      _imageUpload()
+                    ],
+                  );
+                },
+              ),
+            );
+    }
+  }
+
+  void _retrieveUser() async {
+    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(firebaseUser.uid)
+        .get()
+        .then((value) {
+      setState(() {
+        user = User(
+            uid: firebaseUser.uid,
+            name: value.data["name"],
+            username: value.data['username'],
+            email: firebaseUser.email,
+            profilePic: value.data["profilePic"]);
+      });
+    });
+  }
+
+  void _pushItem(String downloadUrl, User user) {
+    // Validate form
+    if (titleController.text == null ||
+        subtitleController.text == null ||
+        charity == -1 ||
+        moneyController.text == null) {
+      setState(() {
+        _submitting = false;
+      });
+      _showErrorDialog('You have not filled all the required fields');
+    } else {
+      // Depending on the form selection, upload a post or a template
+      if (whoDoes[selected] == "Myself") {
+        // Upload a post
+        DatabaseService(uid: user.uid)
+            .uploadPost(new Post(
+                title: titleController.text.toString(),
+                subtitle: subtitleController.text.toString(),
+                author: user.uid,
+                authorUsername: user.username,
+                charity: charities[charity],
+                noLikes: 0,
+                comments: [],
+                timestamp: DateTime.now(),
+                amountRaised: "0",
+                targetAmount: moneyController.text.toString(),
+                imageUrl: downloadUrl,
+                status: 'fund'))
+            .then((postId) => {
+                  if (postId == null)
+                    {
+                      setState(() {
+                        _submitting = false;
+                      })
+                    }
+                  else
+                    {
+                      print("The doc id is " +
+                          postId
+                              .toString()
+                              .substring(1, postId.toString().length - 1)),
+
+                      // if the post is successfully added, view the post
+                      /*DatabaseService(uid: user.uid).getPostById(postId.toString())
+                    .then((post) => {
+                      Navigator.of(context)
+                        .pushReplacement(_viewPost(post))
+                    })*/
+                      Navigator.pushReplacementNamed(
+                          context,
+                          '/post/' +
+                              postId
+                                  .toString()
+                                  .substring(1, postId.toString().length - 1))
+                    } //the substring is very important as postId.toString() is in brackets
                 });
-              },
-              enableInfiniteScroll: false,
-              height: height,
-              viewportFraction: 1.0,
-              enlargeCenterPage: false,
-              // autoPlay: false,
+      } else {
+        // Create a template
+        DatabaseService(uid: user.uid)
+            .uploadTemplate(new Template(
+                title: titleController.text.toString(),
+                subtitle: subtitleController.text.toString(),
+                author: user.uid,
+                charity: charities[charity],
+                likes: [],
+                comments: {},
+                timestamp: DateTime.now(),
+                amountRaised: "0",
+                targetAmount: moneyController.text.toString(),
+                imageUrl: downloadUrl,
+                whoDoes: whoDoes[selected].toString(),
+                acceptedBy: [],
+                completedBy: [],
+                active: true))
+            .then((templateId) => {
+                  // if the post is successfully added, view the post
+                  Navigator.pushReplacementNamed(
+                      context, '/template/' + templateId.toString())
+                });
+      }
+    }
+  }
+
+  Future<void> _showErrorDialog(String string) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error Creating Challenge'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(string),
+              ],
             ),
-            items: [
-              _defineDescription(),
-              _choosePerson(),
-              _setMoney(),
-              _chooseCharity(),
-              _imageUpload()
-            ],
-          );
-        },
-      ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
   // Define widgets for each of the form stages:
@@ -191,8 +313,7 @@ class _AddPostState extends State<AddPost> {
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: InputDecoration(
-                        hintText:
-                            'This will appear under the title in the feed')),
+                        hintText: 'This will appear under the title')),
               ]))
     ]);
   }
@@ -376,25 +497,9 @@ class _AddPostState extends State<AddPost> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width * 9 / 16,
       ),
-      GestureDetector(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          margin: EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 1),
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-          ),
-          child: Text(
-            "Select Image",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        onTap: () {
+      EditFundderButton(
+        text: "Change profile picture",
+        onPressed: () {
           _changePic();
         },
       ),

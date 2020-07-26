@@ -3,7 +3,6 @@ import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
 
 class AuthService {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create user obj based on (a subset of) FirebaseUser
@@ -15,8 +14,7 @@ class AuthService {
 
   // auth change user stream (returns Users)
   Stream<User> get user {
-    return _auth.onAuthStateChanged
-      .map(_userFromFirebaseUser);
+    return _auth.onAuthStateChanged.map(_userFromFirebaseUser);
   }
 
   // sign in anon
@@ -25,7 +23,7 @@ class AuthService {
       AuthResult result = await _auth.signInAnonymously();
       FirebaseUser user = result.user;
       return _userFromFirebaseUser(user);
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
       return null;
     }
@@ -34,25 +32,31 @@ class AuthService {
   // sign in w/ email & password
   Future signInWithEmailAndPassword(String email, String password) async {
     try {
-      AuthResult result = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      AuthResult result = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
       FirebaseUser user = result.user;
       return _userFromFirebaseUser(user);
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
       return null;
     }
   }
 
   // register w/ email & password
-  Future registerWithEmailAndPassword(String email, String password) async {
+  Future registerWithEmailPasswordUsername(
+      String email, String password, String username) async {
     try {
-      AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      AuthResult result = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
       FirebaseUser user = result.user;
+      String defaultPic =
+          'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
       // create a new (firestore) document for the user with corresponding uid
-      await DatabaseService(uid: user.uid).updateUserData(email, null, null);
+      await DatabaseService(uid: user.uid)
+          .updateUserData(email, username, null, defaultPic);
       // ADD: user sets username
       return _userFromFirebaseUser(user);
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
       return null;
     }
@@ -64,11 +68,9 @@ class AuthService {
   Future signOut() async {
     try {
       return await _auth.signOut();
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
       return null;
     }
   }
-
-
 }

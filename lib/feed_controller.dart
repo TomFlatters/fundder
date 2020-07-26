@@ -8,78 +8,36 @@ import 'feed.dart';
 import 'helper_classes.dart';
 import 'do_challenge.dart';
 import 'models/user.dart';
+import 'push_notifications.dart';
+import 'feed_wrapper.dart';
 
-class FeedController extends StatefulWidget {
-  @override
-  _FeedState createState() => _FeedState();
-  final Color color;
-  FeedController(this.color);
-}
-
-class _FeedState extends State<FeedController>
-    with SingleTickerProviderStateMixin {
-  final List<String> entries = <String>['A', 'B', 'C'];
-  final List<String> colors = <String>['ff6b6c', 'E63946', 'ff6b6c'];
-  int index = 0;
-  //bool colorChanged = true;
-
-  TabController _tabController;
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(_handleTabSelection);
-    super.initState();
-  }
-
-  _handleTabSelection() {
-    if (_tabController.indexIsChanging) {
-      //index = _tabController.index;
-      //colorChanged = false;
-      setState(() {});
-    }
-    print(_tabController.animation.value);
-  }
-
-  /*_changeTicker() {
-    if (_tabController.animation.value%1>0.7 && colorChanged == false){
-      setState(() {});
-      colorChanged = true;
-    }
-    print(_tabController.animation.value);
-  }*/
-
+class FeedController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print('feed controller instantiated');
     final user = Provider.of<User>(context);
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Feed'),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: HexColor(colors[_tabController.index]),
-          tabs: [
-            Tab(text: 'Do'),
-            Tab(text: 'Fund'),
-            Tab(text: 'Done'),
-          ],
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text('Feed'),
+          bottom: TabBar(
+            //indicatorColor: HexColor(colors[_tabController.index]),
+            tabs: [
+              Tab(text: 'Do'),
+              Tab(text: 'Fund'),
+              Tab(text: 'Done'),
+            ],
+          ),
         ),
+        body: //FeedView('Do', HexColor('ff6b6c'))
+            TabBarView(children: [
+          DoChallenge(),
+          FeedWrapper("Fund", null, "fund"),
+          FeedWrapper("Done", null, "done"),
+        ]),
       ),
-      body: //FeedView('Do', HexColor('ff6b6c'))
-          TabBarView(controller: _tabController, children: [
-        DoChallenge(),
-        FeedView("Fund", null, HexColor(colors[1]),
-            DatabaseService(uid: user.uid).posts),
-        FeedView("Done", null, HexColor(colors[2]),
-            DatabaseService(uid: user.uid).posts),
-      ]),
     );
   }
 }

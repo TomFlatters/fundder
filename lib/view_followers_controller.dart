@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
 import 'helper_classes.dart';
-import 'other_user_profile.dart';
 
 class ViewFollowers extends StatefulWidget {
   @override
   _ViewFollowersState createState() => _ViewFollowersState();
+
+  final String uid;
+  ViewFollowers({this.uid});
 }
 
 class _ViewFollowersState extends State<ViewFollowers>
@@ -86,13 +88,15 @@ class _ViewFollowersState extends State<ViewFollowers>
                                           aspectRatio: 1 / 1,
                                           child: Container(
                                             child: ProfilePic(
-                                                "https://i.imgur.com/BoN9kdC.png",
+                                                "hkKCaiUeWUYhKwRLA0zDOoEuKxW2",
                                                 40),
                                             margin: EdgeInsets.all(10.0),
                                           )),
                                       onTap: () {
                                         Navigator.pushNamed(
-                                            context, '/username');
+                                            context,
+                                            '/user/' +
+                                                'hkKCaiUeWUYhKwRLA0zDOoEuKxW2');
                                       },
                                     )),
                                 Expanded(
