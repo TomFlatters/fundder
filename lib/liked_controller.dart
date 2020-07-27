@@ -96,7 +96,9 @@ class _ActivityState extends State<LikedController> {
                             return Container(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 0.0),
-                                color: Colors.white,
+                                color: likedItem['seen'] == false
+                                    ? Colors.grey[100]
+                                    : Colors.white,
                                 child: Container(
                                     margin:
                                         EdgeInsets.symmetric(horizontal: 10),
@@ -180,6 +182,20 @@ class _ActivityState extends State<LikedController> {
                                                       ),
                                                     ),
                                                     onTap: () {
+                                                      Firestore.instance
+                                                          .collection('users')
+                                                          .document(uid)
+                                                          .collection(
+                                                              'activity')
+                                                          .where('postId',
+                                                              isEqualTo:
+                                                                  likedItem[
+                                                                      'postId'])
+                                                          .getDocuments()
+                                                          .then((response) => {
+                                                                _batchUpdate(
+                                                                    response)
+                                                              });
                                                       Navigator.pushNamed(
                                                           context,
                                                           '/post/' +
@@ -194,6 +210,12 @@ class _ActivityState extends State<LikedController> {
                 }
               }));
     }
+  }
+
+  _batchUpdate(QuerySnapshot response) {
+    response.documents.forEach((msgDoc) {
+      msgDoc.reference.updateData({'seen': true});
+    });
   }
 
   Stream<List<DocumentSnapshot>> get activityItems {

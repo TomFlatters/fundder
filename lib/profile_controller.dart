@@ -51,6 +51,7 @@ class _ProfileState extends State<ProfileController>
 
   @override
   void initState() {
+    print("uid: " + widget.uid);
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
     _retrieveUser();
@@ -123,29 +124,29 @@ class _ProfileState extends State<ProfileController>
               print("has data");
             }
 
-            return Scaffold(
-              appBar: kIsWeb == true
-                  ? null
-                  : AppBar(
-                      centerTitle: true,
-                      title: Text(_username),
-                      actions: _uid == user.uid
-                          ? <Widget>[
-                              FlatButton(
-                                onPressed:
-                                    () /*async {
+            return _username == null
+                ? Loading()
+                : Scaffold(
+                    appBar: kIsWeb == true
+                        ? null
+                        : AppBar(
+                            centerTitle: true,
+                            title: Text(_username),
+                            actions: _uid == user.uid
+                                ? <Widget>[
+                                    FlatButton(
+                                      onPressed:
+                                          () /*async {
             await _auth.signOut();
           }*/
-                                    {
-                                  _showOptions();
-                                },
-                                child: Icon(AntDesign.ellipsis1),
-                              )
-                            ]
-                          : null),
-              body: _uid == null
-                  ? Loading()
-                  : Column(children: [
+                                          {
+                                        _showOptions();
+                                      },
+                                      child: Icon(AntDesign.ellipsis1),
+                                    )
+                                  ]
+                                : null),
+                    body: Column(children: [
                       kIsWeb == true ? WebMenu(5) : Container(),
                       Expanded(
                         child: SmartRefresher(
@@ -296,7 +297,7 @@ class _ProfileState extends State<ProfileController>
                         ),
                       ),
                     ]),
-            );
+                  );
           });
     }
   }
@@ -304,7 +305,7 @@ class _ProfileState extends State<ProfileController>
   void _onRefresh() async {
     // monitor network fetch
     loadingTimestamp = Timestamp.now();
-    List<Post> futurePost = await DatabaseService().authorPosts(_uid);
+    List<Post> futurePost = await DatabaseService().authorPosts(widget.uid);
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
         postList = futurePost;

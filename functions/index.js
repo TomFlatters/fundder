@@ -59,7 +59,8 @@ exports.onLike = functions.firestore
         category: 'like',
         docLiker: userId,
         docLikerUsername: docLiker.data()['username'],
-        postId: postId
+        postId: postId,
+        seen: false
     };
       
       // Add a new document in collection "cities" with ID 'LA'
@@ -67,7 +68,7 @@ exports.onLike = functions.firestore
 
     console.log('Added document with ID: ', res.id);
 
-    const tokens = [postOwner.data()['fcm']];
+    const tokens = postOwner.data()['fcm'];
 
     if (tokens.length > 0) {
     // Send notifications to all tokens.
