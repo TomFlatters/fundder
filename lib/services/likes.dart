@@ -64,25 +64,6 @@ class LikesService {
 
   //checks whether current user has liked a given post
   Future<bool> hasUserLikedPost(String postId) async {
-    // CollectionReference myLikes =
-    //     userCollection.document(uid).collection('I_Liked');
-    // if (myLikes != null) {
-    //   var result = await myLikes.where(postId, isEqualTo: true).getDocuments();
-    //   print("documents retrieved from subcollection myLikes...");
-    //   if (result.documents.length == 0) {
-    //     print("no query found!!!!");
-    //     return false;
-    //   } else {
-    //     result.documents.forEach((res) {
-    //       print(res.data);
-    //     });
-    //   }
-    //   return true;
-    // } else {
-    //   print("The user has not liked anything");
-    //   return false;
-    // }
-
     DocumentSnapshot userprofile = await userCollection.document(uid).get();
     if (userprofile.data['likes'] == null) {
       return false;
