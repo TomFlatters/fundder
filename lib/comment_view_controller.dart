@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
+import 'package:fundder/services/comments_service.dart';
 import 'helper_classes.dart';
 import 'models/post.dart';
 import 'services/database.dart';
@@ -9,8 +10,9 @@ import 'shared/helper_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CommentPage extends StatefulWidget {
-  final String postData;
-  CommentPage({this.postData});
+  final String pid;
+
+  CommentPage({this.pid});
 
   @override
   _CommentPageState createState() => _CommentPageState();
@@ -19,28 +21,6 @@ class CommentPage extends StatefulWidget {
 class _CommentPageState extends State<CommentPage> {
   final _textController = TextEditingController();
   Post postData;
-  List comments;
-
-  @override
-  void initState() {
-    //print(widget.postData);
-    //_getPost();
-    DatabaseService(uid: widget.postData)
-        .getPostById(widget.postData)
-        .then((post) => {
-              setState(() {
-                print("set state");
-                print(post);
-                postData = post;
-                if (postData.comments == {}) {
-                  comments = [];
-                } else {
-                  comments = postData.comments;
-                }
-              })
-            });
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -52,23 +32,16 @@ class _CommentPageState extends State<CommentPage> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    return new StreamBuilder(
-        stream:
-            /*Firestore.instance
-            .collection('posts')
-            .document(widget.postData)
-            .snapshots(),*/
-
-            DatabaseService(uid: user.uid).commentsByDocId(widget.postData),
-        // widget.feedChoice == 'user'
-        //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
-        //   : Firestore.instance.collection("posts").snapshots(),
+    CommentsService commentsService =
+        CommentsService(uid: user.uid, postId: widget.pid);
+    return StreamBuilder(
+        stream: commentsService.comments(),
         builder: (context, snapshot) {
+          List comments;
           if (!snapshot.hasData) {
             comments = [];
           } else {
-            //print("snapshot data" + snapshot.data);
-            comments = snapshot.data["comments"];
+            comments = snapshot.data.map((s) => s.data).toList();
           }
           print('comments: ' + comments.toString());
           return Scaffold(
@@ -90,24 +63,12 @@ class _CommentPageState extends State<CommentPage> {
                 itemCount: comments.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
-                    /*leading: GestureDetector(
-                      child: AspectRatio(
-                          aspectRatio: 1 / 1,
-                          child: Container(
-                            child: ProfilePic(
-                                "https://i.imgur.com/BoN9kdC.png", 40),
-                            margin: EdgeInsets.all(10.0),
-                          )),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/username');
-                      },
-                    ),*/
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         GestureDetector(
                           child: Text(
-                            comments[index]["author"],
+                            comments[index]["username"],
                             style: TextStyle(
                                 fontSize: 14.0,
                                 color: Colors.black,
@@ -130,35 +91,9 @@ class _CommentPageState extends State<CommentPage> {
                                       color: Colors.grey,
                                     )),
                           ),
-                          /*Container(
-                      alignment: Alignment.centerLeft,
-                      width: 150,
-                      margin: EdgeInsets.all(5),
-                      child: Text('3 likes',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          )),
-                    ),*/
                         ])
                       ],
                     ),
-                    /*trailing: GestureDetector(
-                child: Container(
-                  child: GestureDetector(
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      padding: const EdgeInsets.all(0.0),
-                      child: Image.asset('assets/images/like.png'),
-                    ),
-                    onTap: () {
-                      final snackBar = SnackBar(content: Text("Like passed"));
-                      Scaffold.of(context).showSnackBar(snackBar);
-                    },
-                  ),
-                ),
-              ),*/
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) {
@@ -168,6 +103,7 @@ class _CommentPageState extends State<CommentPage> {
                 },
               )),
               Row(children: [
+                //bottom comment input bar
                 Container(
                   height: 80,
                   child: AspectRatio(
@@ -196,27 +132,37 @@ class _CommentPageState extends State<CommentPage> {
                                 contentPadding:
                                     EdgeInsets.only(bottom: 20, left: 10)),
                           ))),
-                  GestureDetector(
-                    child: Container(
-                      child: GestureDetector(
-                        child: Container(
-                          width: 80,
-                          height: 40,
-                          padding: const EdgeInsets.all(0.0),
-                          child: Text('Send'),
-                        ),
-                        onTap: () {
-                          Map comment = {
-                            "author": user.uid,
-                            "text": _textController.text,
-                            "timestamp": DateTime.now()
-                          };
-                          DatabaseService(uid: user.uid)
-                              .addCommentToPost(comment, postData.id);
-                          _textController.text = '';
-                        },
-                      ),
-                    ),
+                  FutureBuilder(
+                    future: DatabaseService(uid: user.uid).readUserData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        String username = snapshot.data.username;
+                        return GestureDetector(
+                          child: Container(
+                            child: GestureDetector(
+                              child: Container(
+                                width: 80,
+                                height: 40,
+                                padding: const EdgeInsets.all(0.0),
+                                child: Text('Send'),
+                              ),
+                              onTap: () {
+                                Map comment = {
+                                  "uid": user.uid,
+                                  "username": username,
+                                  "text": _textController.text,
+                                  "timestamp": DateTime.now()
+                                };
+                                commentsService.addAcomment(comment);
+                                _textController.text = '';
+                              },
+                            ),
+                          ),
+                        );
+                      } else {
+                        return GestureDetector();
+                      }
+                    },
                   ),
                 ])),
               ])
