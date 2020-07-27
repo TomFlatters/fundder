@@ -46,32 +46,6 @@ class _FeedViewState extends State<FeedView> {
     if (widget.feedChoice == "user") {
       physics = NeverScrollableScrollPhysics();
     }
-    // print fcm token
-    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    _firebaseMessaging.configure(
-      onLaunch: (Map<String, dynamic> message) {
-        print('onLaunch called');
-      },
-      onResume: (Map<String, dynamic> message) {
-        print('onResume called');
-      },
-      onMessage: (Map<String, dynamic> message) {
-        print('onMessage called');
-      },
-    );
-    _firebaseMessaging.subscribeToTopic('all');
-    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
-      sound: true,
-      badge: true,
-      alert: true,
-    ));
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings settings) {
-      print('Hello');
-    });
-    _firebaseMessaging.getToken().then((token) {
-      print(token); // Print the Token in Console
-    });
   }
 
   /*void _tryMessage() async {
@@ -208,7 +182,8 @@ class _FeedViewState extends State<FeedView> {
                                 child: Container(
                                     margin: EdgeInsets.only(left: 10),
                                     child: Text(
-                                      postData.comments.length.toString(),
+                                      '0',
+                                      //postData.comments.length.toString(),
                                       textAlign: TextAlign.left,
                                     )))
                           ]),
