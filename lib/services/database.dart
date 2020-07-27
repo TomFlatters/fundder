@@ -99,7 +99,7 @@ class DatabaseService {
         amountRaised: doc.data['amountRaised'],
         targetAmount: doc.data['targetAmount'],
         likes: doc.data['likes'],
-        comments: doc.data['comments'],
+        noComments: doc.data['noComments'],
         subtitle: doc.data['subtitle'],
         timestamp: doc.data['timestamp'],
         imageUrl: doc.data['imageUrl'],
@@ -193,7 +193,7 @@ class DatabaseService {
           "amountRaised": post.amountRaised,
           "targetAmount": post.targetAmount,
           "noLikes": post.noLikes,
-          "comments": post.comments,
+          "noComments": post.noComments,
           "subtitle": post.subtitle,
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
@@ -261,6 +261,7 @@ class DatabaseService {
   Future updatePostData(Post post) async {
     // create or update the document with this uid
     return await postsCollection.document(post.id).setData({
+      "noLikes": post.noLikes,
       "author": post.author,
       "authorUsername": post.authorUsername,
       "title": post.title,
@@ -268,7 +269,7 @@ class DatabaseService {
       "amountRaised": post.amountRaised,
       "targetAmount": post.targetAmount,
       "likes": post.likes,
-      "comments": post.comments,
+      "noComments": post.noComments,
       "subtitle": post.subtitle,
       "timestamp": post.timestamp,
       "imageUrl": post.imageUrl,
@@ -281,66 +282,6 @@ class DatabaseService {
     // create or update the document with this uid
     return await postsCollection.document(postId).updateData(
         {"imageUrl": downloadUrl, "status": status, "timestamp": timestamp});
-  }
-
-/*
-  Future addLiketoPost(Post post) async {
-    postsCollection.document(post.id).updateData({
-      "likes": FieldValue.arrayUnion([uid])
-    });
-  }
-*/
-
-  /*
-  Future removeLikefromPost(Post post) async {
-    postsCollection.document(post.id).updateData({
-      "likes": FieldValue.arrayRemove([uid])
-    });
-  }
-  */
-
-  Future addCommentToPost(Map comment, String postId) async {
-    /*return await postsCollection.document(postId).collection("comments").add({
-      "author": comment["author"],
-      "text": comment["text"],
-      "timestamp": comment["timestamp"]
-    });*/
-    postsCollection.document(postId).updateData({
-      "comments": FieldValue.arrayUnion([
-        {
-          "author": comment["author"],
-          "text": comment["text"],
-          "timestamp": comment["timestamp"]
-        }
-      ])
-    });
-  }
-
-  Stream<DocumentSnapshot> commentsByDocId(postId) {
-    return postsCollection.document(postId).snapshots();
-    //.map(_commentsDataFromSnapshot);
-  }
-
-  /*// Get comments list Stream
-  List<Map> _commentsDataFromSnapshot(DocumentSnapshot doc) {
-    print('doc snapshot' + doc.data["comments"].toString());
-    return doc.data["comments"];
-  }*/
-
-  /*Map _makeComment(DocumentSnapshot doc) {
-    return {
-      "author": doc.data["author"],
-      "text": doc.data["text"],
-      "timestamp": doc.data["timestamp"]
-    };
-  }*/
-
-  Map _makeComment(DocumentSnapshot doc) {
-    return {
-      "author": doc.data["author"],
-      "text": doc.data["text"],
-      "timestamp": doc.data["timestamp"]
-    };
   }
 
   Future<List<DocumentSnapshot>> usersContainingString(String queryText) {

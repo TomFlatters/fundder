@@ -3,6 +3,9 @@
 //Remember, queries are shallow, meaning if we retrieve the documents inside
 //the user collection, then the documents inside the sub-collection won't be retrieved.
 
+//WARNING: THIS IS A DEPRECATED MODEL OF POST, WITHOUT MANY OF ITS FEATURES AND SOME STALE FEATURES.
+//NEEDS REFACTORING
+
 class Post {
   final String author;
   final String authorUsername;
@@ -11,8 +14,9 @@ class Post {
   final String amountRaised;
   final String targetAmount;
   final List likes;
-  int noLikes;
-  final comments;
+  final int noLikes;
+  final int noComments;
+
   final String subtitle;
   final timestamp;
   String imageUrl;
@@ -21,6 +25,7 @@ class Post {
   final Set<String> peopleThatLikedThis;
 
   Post({
+    this.noComments,
     this.noLikes,
     this.author,
     this.authorUsername,
@@ -30,15 +35,12 @@ class Post {
     this.targetAmount,
     this.subtitle,
     this.likes,
-    this.comments,
     this.timestamp,
     this.imageUrl,
     this.id,
     this.status,
-    //why should one avoid initialisation to null
     this.peopleThatLikedThis,
   });
-
 
   double percentRaised() {
     //print("Amount raised1" + amountRaised);
