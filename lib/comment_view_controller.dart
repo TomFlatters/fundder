@@ -34,7 +34,7 @@ class _CommentPageState extends State<CommentPage> {
     final user = Provider.of<User>(context);
     CommentsService commentsService =
         CommentsService(uid: user.uid, postId: widget.pid);
-    return new StreamBuilder(
+    return StreamBuilder(
         stream: commentsService.comments(),
         builder: (context, snapshot) {
           List comments;
@@ -103,6 +103,7 @@ class _CommentPageState extends State<CommentPage> {
                 },
               )),
               Row(children: [
+                //bottom comment input bar
                 Container(
                   height: 80,
                   child: AspectRatio(
@@ -131,27 +132,37 @@ class _CommentPageState extends State<CommentPage> {
                                 contentPadding:
                                     EdgeInsets.only(bottom: 20, left: 10)),
                           ))),
-                  GestureDetector(
-                    child: Container(
-                      child: GestureDetector(
-                        child: Container(
-                          width: 80,
-                          height: 40,
-                          padding: const EdgeInsets.all(0.0),
-                          child: Text('Send'),
-                        ),
-                        onTap: () {
-                          Map comment = {
-                            "uid": user.uid,
-                            "username": '777TomKillsJerry777',
-                            "text": _textController.text,
-                            "timestamp": DateTime.now()
-                          };
-                          commentsService.addAcomment(comment);
-                          _textController.text = '';
-                        },
-                      ),
-                    ),
+                  FutureBuilder(
+                    future: DatabaseService(uid: user.uid).readUserData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        String username = snapshot.data.username;
+                        return GestureDetector(
+                          child: Container(
+                            child: GestureDetector(
+                              child: Container(
+                                width: 80,
+                                height: 40,
+                                padding: const EdgeInsets.all(0.0),
+                                child: Text('Send'),
+                              ),
+                              onTap: () {
+                                Map comment = {
+                                  "uid": user.uid,
+                                  "username": username,
+                                  "text": _textController.text,
+                                  "timestamp": DateTime.now()
+                                };
+                                commentsService.addAcomment(comment);
+                                _textController.text = '';
+                              },
+                            ),
+                          ),
+                        );
+                      } else {
+                        return GestureDetector();
+                      }
+                    },
                   ),
                 ])),
               ])
