@@ -25,6 +25,7 @@ class _EditProfileState extends State<EditProfile> {
   String _email = "Email";
   String _profilePic;
   PickedFile imageFile;
+  List fcmToken;
   final picker = ImagePicker();
 
   @override
