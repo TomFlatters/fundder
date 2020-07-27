@@ -242,6 +242,7 @@ class DatabaseService {
   Future updatePostData(Post post) async {
     // create or update the document with this uid
     return await postsCollection.document(post.id).setData({
+      "noLikes": post.noLikes,
       "author": post.author,
       "authorUsername": post.authorUsername,
       "title": post.title,
