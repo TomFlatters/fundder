@@ -19,6 +19,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'video_item.dart';
 import 'services/likes.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -35,40 +36,39 @@ class FeedView extends StatefulWidget {
 
 class _FeedViewState extends State<FeedView> {
   ScrollPhysics physics;
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'addMessage',
+  );
 
   @override
   void initState() {
     super.initState();
+    //_tryMessage();
     if (widget.feedChoice == "user") {
       physics = NeverScrollableScrollPhysics();
     }
-    // print fcm token
-    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    _firebaseMessaging.configure(
-      onLaunch: (Map<String, dynamic> message) {
-        print('onLaunch called');
-      },
-      onResume: (Map<String, dynamic> message) {
-        print('onResume called');
-      },
-      onMessage: (Map<String, dynamic> message) {
-        print('onMessage called');
-      },
-    );
-    _firebaseMessaging.subscribeToTopic('all');
-    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
-      sound: true,
-      badge: true,
-      alert: true,
-    ));
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings settings) {
-      print('Hello');
-    });
-    _firebaseMessaging.getToken().then((token) {
-      print(token); // Print the Token in Console
-    });
   }
+
+  /*void _tryMessage() async {
+    try {
+      var callable = CloudFunctions.instance.getHttpsCallable(
+          functionName:
+              'addMessage'); // replace 'functionName' with the name of your function
+      dynamic response = callable
+          .call(<String, dynamic>{'text': 'message'}).catchError((onError) {
+        print(onError);
+      });
+      print(response);
+    } on CloudFunctionsException catch (e) {
+      print('caught firebase functions exception');
+      print(e.code);
+      print(e.message);
+      print(e.details);
+    } catch (e) {
+      print('caught generic exception');
+      print(e);
+    }
+  }*/
 
   @override
   void didUpdateWidget(FeedView oldWidget) {
