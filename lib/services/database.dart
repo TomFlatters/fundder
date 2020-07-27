@@ -37,12 +37,30 @@ class DatabaseService {
   Future updateUserData(
       String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
-    return await userCollection.document(uid).setData({
+    return await userCollection.document(uid).updateData({
       'email': email,
       'username': username,
       'name': name,
-      'profilePic': profilePic
+      'profilePic': profilePic,
     });
+  }
+
+  Future addFCMToken(String token) async {
+    // create or update the document with this uid
+    return await userCollection.document(uid).updateData({
+      "fcm": FieldValue.arrayUnion([token])
+    });
+  }
+
+  Future removeFCMToken(String token) async {
+    if (token != null) {
+      // create or update the document with this uid
+      return await userCollection.document(uid).updateData({
+        "fcm": FieldValue.arrayRemove([token])
+      });
+    } else {
+      return null;
+    }
   }
 
   // Get users stream
@@ -133,6 +151,7 @@ class DatabaseService {
   }
 
   Future<List<Post>> authorPosts(String id) {
+    print('gettig posts by author: ' + id);
     return postsCollection
         .where("author", isEqualTo: id)
         .orderBy("timestamp", descending: true)

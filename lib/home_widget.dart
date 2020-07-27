@@ -11,6 +11,9 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:titled_navigation_bar/titled_navigation_bar.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -21,6 +24,53 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  bool unreadNotifs = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkNotifs();
+    _firebaseMessaging.configure(
+      onLaunch: (Map<String, dynamic> message) {
+        print('onLaunch called');
+      },
+      onResume: (Map<String, dynamic> message) {
+        print('onResume called');
+      },
+      onMessage: (Map<String, dynamic> message) {
+        print('onMessage called');
+        setState(() {
+          unreadNotifs = true;
+        });
+      },
+    );
+  }
+
+  void _checkNotifs() async {
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(user.uid)
+        .get()
+        .then((value) {
+      Firestore.instance
+          .collection('posts')
+          .where("seen", isEqualTo: false)
+          .limit(1)
+          .getDocuments()
+          .then((snapshot) {
+        if (snapshot != null) {
+          if (snapshot.documents.isEmpty == false) {
+            setState(() {
+              unreadNotifs = true;
+            });
+          }
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
@@ -67,7 +117,8 @@ class _HomeState extends State<Home> {
           ),
           new BottomNavigationBarItem(
             icon: Icon(
-              AntDesign.hearto,
+              unreadNotifs == false ? AntDesign.hearto : AntDesign.heart,
+              color: unreadNotifs == false ? null : HexColor('ff6b6c'),
             ),
             title: showIndicator(_currentIndex == 3),
           ),
@@ -95,6 +146,9 @@ class _HomeState extends State<Home> {
     if (index != 2) {
       setState(() {
         _currentIndex = index;
+        if (index == 3) {
+          unreadNotifs = false;
+        }
       });
     } else {
       Navigator.pushNamed(context, '/addpost');

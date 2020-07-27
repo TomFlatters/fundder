@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class AuthService {
+  String fcmToken;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create user obj based on (a subset of) FirebaseUser
@@ -35,6 +37,7 @@ class AuthService {
       AuthResult result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       FirebaseUser user = result.user;
+      _getFCMToken(user.uid);
       return _userFromFirebaseUser(user);
     } catch (e) {
       print(e.toString());
@@ -54,6 +57,7 @@ class AuthService {
       // create a new (firestore) document for the user with corresponding uid
       await DatabaseService(uid: user.uid)
           .updateUserData(email, username, null, defaultPic);
+      _getFCMToken(user.uid);
       // ADD: user sets username
       return _userFromFirebaseUser(user);
     } catch (e) {
@@ -62,11 +66,56 @@ class AuthService {
     }
   }
 
+  void _getFCMToken(String uid) {
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    _firebaseMessaging.configure(
+      onLaunch: (Map<String, dynamic> message) {
+        print('onLaunch called');
+      },
+      onResume: (Map<String, dynamic> message) {
+        print('onResume called');
+      },
+      onMessage: (Map<String, dynamic> message) {
+        print('onMessage called');
+      },
+    );
+    _firebaseMessaging.subscribeToTopic('all');
+    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
+      sound: true,
+      badge: true,
+      alert: true,
+    ));
+    _firebaseMessaging.onIosSettingsRegistered
+        .listen((IosNotificationSettings settings) {
+      print('Hello');
+    });
+    _firebaseMessaging.getToken().then((token) {
+      print(token);
+      fcmToken = token;
+      DatabaseService(uid: uid)
+          .addFCMToken(fcmToken); // Print the Token in Console
+    });
+  }
+
+  void _removeFCMToken() async {
+    final FirebaseUser user = await _auth.currentUser();
+    final uid = user.uid;
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    _firebaseMessaging.getToken().then((token) {
+      _firebaseMessaging.deleteInstanceID();
+      print(token);
+      fcmToken = token;
+      DatabaseService(uid: uid)
+          .removeFCMToken(fcmToken); // Print the Token in Console
+    });
+  }
+
   // ... add more for Google and Facebook
 
   // sign out
   Future signOut() async {
     try {
+      _removeFCMToken();
       return await _auth.signOut();
     } catch (e) {
       print(e.toString());
