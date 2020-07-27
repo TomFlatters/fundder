@@ -222,7 +222,8 @@ class _FeedViewState extends State<FeedView> {
                                                       margin: EdgeInsets.only(
                                                           left: 10),
                                                       child: Text(
-                                                        "777",
+                                                        postData.noComments
+                                                            .toString(),
                                                         textAlign:
                                                             TextAlign.left,
                                                       )))
