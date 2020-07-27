@@ -14,7 +14,8 @@ class Post {
   final String amountRaised;
   final String targetAmount;
   final List likes;
-  int noLikes;
+  final int noLikes;
+  final int noComments;
 
   final String subtitle;
   final timestamp;
@@ -24,6 +25,7 @@ class Post {
   final Set<String> peopleThatLikedThis;
 
   Post({
+    this.noComments,
     this.noLikes,
     this.author,
     this.authorUsername,

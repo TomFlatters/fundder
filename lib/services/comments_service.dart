@@ -29,5 +29,8 @@ class CommentsService {
       'timestamp': comment['timestamp'],
       'text': comment['text']
     });
+    postsCollection
+        .document(postId)
+        .updateData({'noComments': FieldValue.increment(1)});
   }
 }
