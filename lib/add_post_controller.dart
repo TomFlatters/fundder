@@ -176,7 +176,6 @@ class _AddPostState extends State<AddPost> {
               authorUsername: user.username,
               charity: charities[charity],
               noLikes: 0,
-              comments: [],
               timestamp: DateTime.now(),
               amountRaised: "0",
               targetAmount: moneyController.text.toString(),
