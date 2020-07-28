@@ -21,7 +21,8 @@ import 'global_widgets/buttons.dart';
 
 class ViewPost extends StatefulWidget {
   final String postData;
-  ViewPost({this.postData});
+  final LikesModel likesModel;
+  ViewPost({this.postData, this.likesModel});
 
   @override
   _ViewPostState createState() => _ViewPostState();
@@ -170,7 +171,10 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                       //     child: LikeBar(
                                       //   postId: postData.id,
                                       // )
-                                      child: LikeBar(),
+                                      child: ChangeNotifierProvider(
+                                          create: (context) =>
+                                              widget.likesModel,
+                                          child: LikeBar()),
                                     ),
                                     Expanded(
                                       child: FlatButton(
