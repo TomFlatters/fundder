@@ -37,6 +37,12 @@ class LikesModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void manuallySetState({int noLikes, bool isLiked}) {
+    _noLikes = noLikes;
+    _isLiked = isLiked;
+    notifyListeners();
+  }
 }
 
 class LikeBar extends StatelessWidget {
