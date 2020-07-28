@@ -20,7 +20,10 @@ class SearchDescriptor extends StatelessWidget {
               child: Text(
                 'Search for users by username or for posts by keyword',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 15),
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                    fontFamily: 'Roboto Mono'),
               )),
         ]),
       )),

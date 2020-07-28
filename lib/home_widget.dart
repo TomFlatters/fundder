@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:fundder/feed_controller.dart';
 import 'placeholder_widget.dart';
 import 'feed_controller.dart';
-import 'search_controller.dart';
+import 'search/search_controller.dart';
 import 'liked_controller.dart';
 import 'profile_controller.dart';
 import 'add_post_controller.dart';

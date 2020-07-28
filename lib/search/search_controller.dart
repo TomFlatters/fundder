@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_pages/web_menu.dart';
+import '../web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
-import 'models/user.dart';
-import 'services/database.dart';
-import 'helper_classes.dart';
-import 'search_descriptor.dart';
+import '../models/user.dart';
+import '../services/database.dart';
+import '../helper_classes.dart';
+import '../search/search_descriptor.dart';
 
 class SearchController extends StatefulWidget {
   @override

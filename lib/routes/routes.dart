@@ -14,7 +14,7 @@ import 'package:fundder/web_pages/feed_web.dart';
 import 'package:fundder/web_pages/about_page.dart';
 import 'package:fundder/web_pages/login_web.dart';
 import 'package:fundder/web_pages/logging_out.dart';
-import 'package:fundder/search_controller.dart';
+import 'package:fundder/search/search_controller.dart';
 import 'package:fundder/liked_controller.dart';
 import 'package:fundder/profile_controller.dart';
 import 'package:fundder/web_pages/temparary_upload_page.dart';
