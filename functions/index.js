@@ -12,20 +12,6 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-// Take the text parameter passed to this HTTP endpoint and insert it into 
-// Cloud Firestore under the path /messages/:documentId/original
-exports.addMessage = functions.https.onRequest(async (req, res) => {
-    functions.logger.log("req:", req);
-    functions.logger.log("req body:", req['body']);
-    functions.logger.log("req.query.text:", req.query.text);
-    // Grab the text parameter.
-    const original = req['body']['data']['text'];
-    // Push the new message into Cloud Firestore using the Firebase Admin SDK.
-    const writeResult = await admin.firestore().collection('messages').add({original: original});
-    // Send back a message that we've succesfully written the message
-    res.json({result: `Message with ID: ${writeResult.id} added.`});
-  });
-
 exports.onLike = functions.firestore
     .document('/posts/{postId}/whoLiked/{userId}')
     .onCreate(async (snapshot, context) =>
@@ -59,6 +45,60 @@ exports.onLike = functions.firestore
         category: 'like',
         docLiker: userId,
         docLikerUsername: docLiker.data()['username'],
+        postId: postId,
+        seen: false
+    };
+      
+      // Add a new document in collection "cities" with ID 'LA'
+    const res = await admin.firestore().collection(`users/${author}/activity`).add(data);
+
+    console.log('Added document with ID: ', res.id);
+
+    const tokens = postOwner.data()['fcm'];
+
+    if (tokens.length > 0) {
+    // Send notifications to all tokens.
+    const response = await admin.messaging().sendToDevice(tokens, payload);
+    await cleanupTokens(response, tokens);
+    console.log('Notifications have been sent and tokens cleaned up.');
+    }
+});
+
+exports.onComment = functions.firestore
+    .document('/posts/{postId}/comments/{docId}')
+    .onCreate(async (snapshot, context) =>
+    {
+    console.log('snapshot author uid: ' + snapshot.data()['uid']);
+
+    const userId = snapshot.data()['uid'];
+    const userRef = admin.firestore().doc(`users/${userId}`);
+    const payload =
+    {
+        notification: { 
+            title: 'Comment',
+            body: `${snapshot.data()['username']} commented on your post - ${snapshot.data()['text']}`, 
+        },
+    };
+
+    const postId = context.params.postId;
+    const doc = await admin.firestore().doc(`posts/${postId}`).get();
+
+    console.log("doc " + doc.data());
+
+    const author = doc.data()['author'];
+
+    console.log("author " + author);
+
+    const postOwner = await admin.firestore().doc(`users/${author}`).get();
+
+    console.log("owner " + postOwner.data());
+
+    const data = {
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        category: 'comment',
+        text: snapshot.data()['text'],
+        docLiker: userId,
+        docLikerUsername: snapshot.data()['username'],
         postId: postId,
         seen: false
     };
