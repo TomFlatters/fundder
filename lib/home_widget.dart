@@ -14,6 +14,7 @@ import 'models/user.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'services/database.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -45,6 +46,11 @@ class _HomeState extends State<Home> {
         });
       },
     );
+    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
+    fcmTokenStream.listen((token) async {
+      final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+      DatabaseService(uid: user.uid).addFCMToken(token);
+    });
   }
 
   void _checkNotifs() async {
