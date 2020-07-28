@@ -299,8 +299,12 @@ class _FeedViewState extends State<FeedView> {
                                 ),
                               ),
                               onTap: () {
-                                Navigator.pushNamed(
-                                    context, '/post/' + postData.id);
+                                var pid = postData.id;
+                                var noLikes = likesModel.noLikes;
+                                var isLiked = likesModel.isLiked;
+                                var uid = user.uid;
+                                Navigator.pushNamed(context,
+                                    '/post/$pid/$noLikes/$isLiked/$uid');
                               },
                             ));
                       } else {

@@ -1,5 +1,6 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
 import 'package:fundder/donation/donate_page_controller.dart';
@@ -20,11 +21,26 @@ import 'package:fundder/profile_controller.dart';
 import 'package:fundder/web_pages/temparary_upload_page.dart';
 import 'package:fundder/upload_proof_controller.dart';
 
+void phandler(Map<String, dynamic> params) {}
+
 class FluroRouter {
   static Router router = Router();
-  static Handler _postHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ViewPost(postData: params['id'][0]));
+  static Handler _postHandler =
+      Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
+    String pid = params['id'][0];
+    String noLikes = params['noLikes'][0];
+    String isLiked = params['isLiked'][0];
+    String uid = params['uid'][0];
+    print('/post/{$pid}/{$noLikes}/{$isLiked}/{$uid}' + "LOLLLLL");
+    LikesModel likesModel = LikesModel(
+        (isLiked == 'true') ? true : false, int.parse(noLikes),
+        uid: uid, postId: pid);
+
+    return ViewPost(
+      postData: params['id'][0],
+      likesModel: likesModel,
+    );
+  });
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(pid: params['id'][0]));
@@ -86,7 +102,7 @@ class FluroRouter {
 
   static void setupRouter() {
     router.define(
-      '/post/:id',
+      '/post/:id/:noLikes/:isLiked/:uid',
       handler: _postHandler,
       transitionType: TransitionType.fadeIn,
     );
