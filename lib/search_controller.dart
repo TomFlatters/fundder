@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'models/user.dart';
 import 'services/database.dart';
 import 'helper_classes.dart';
+import 'search_descriptor.dart';
 
 class SearchController extends StatefulWidget {
   @override
@@ -93,6 +94,7 @@ class _SearchState extends State<SearchController>
                 ),
                 hintText: 'search accounts',
                 onSearch: search,
+                emptyWidget: SearchDescriptor(),
                 minimumChars: 0,
                 onItemFound: (DocumentSnapshot doc, int index) {
                   // if they are searching for users
