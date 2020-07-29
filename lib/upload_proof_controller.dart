@@ -27,6 +27,7 @@ class _UploadProofState extends State<UploadProofScreen> {
   CachedVideoPlayerController _controller;
   CachedVideoPlayerController _toBeDisposed;
   String _retrieveDataError;
+  double aspectRatio;
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController maxWidthController = TextEditingController();
@@ -63,11 +64,12 @@ class _UploadProofState extends State<UploadProofScreen> {
                                     print("Successful image upload"),
                                     print(downloadUrl),
                                     DatabaseService(uid: user.uid)
-                                        .updatePostStatusImageTimestamp(
+                                        .updatePostStatusImageTimestampRatio(
                                             widget.postId,
                                             downloadUrl,
                                             'done',
-                                            Timestamp.now()),
+                                            Timestamp.now(),
+                                            aspectRatio),
                                     Navigator.of(context).pop(null)
                                   });
                         } else {
@@ -77,11 +79,12 @@ class _UploadProofState extends State<UploadProofScreen> {
                                     print("Successful image upload"),
                                     print(downloadUrl),
                                     DatabaseService(uid: user.uid)
-                                        .updatePostStatusImageTimestamp(
+                                        .updatePostStatusImageTimestampRatio(
                                             widget.postId,
                                             downloadUrl,
                                             'done',
-                                            Timestamp.now()),
+                                            Timestamp.now(),
+                                            aspectRatio),
                                     Navigator.of(context).pop(null)
                                   });
                         }
@@ -243,6 +246,9 @@ class _UploadProofState extends State<UploadProofScreen> {
         'You have not yet picked a video',
         textAlign: TextAlign.center,
       );
+    } else {
+      aspectRatio = _controller.value.aspectRatio;
+      print(aspectRatio);
     }
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -261,7 +267,9 @@ class _UploadProofState extends State<UploadProofScreen> {
         // See https://pub.dev/packages/image_picker#getting-ready-for-the-web-platform
         return Image.network(_imageFile.path);
       } else {
-        return Image.file(File(_imageFile.path));
+        File image = File(_imageFile.path);
+        _findAspectRatio(image);
+        return Image.file(image);
       }
     } else if (_pickImageError != null) {
       return Text(
@@ -274,6 +282,13 @@ class _UploadProofState extends State<UploadProofScreen> {
         textAlign: TextAlign.center,
       );
     }
+  }
+
+  void _findAspectRatio(File image) async {
+    var decodedImage = await decodeImageFromList(image.readAsBytesSync());
+    print(decodedImage.width);
+    print(decodedImage.height);
+    aspectRatio = decodedImage.width / decodedImage.height;
   }
 
   Future<void> retrieveLostData() async {

@@ -26,6 +26,7 @@ class _AddPostState extends State<AddPost> {
   bool _submitting = false;
   int _current = 0;
   CarouselController _carouselController = CarouselController();
+  double aspectRatio;
 
   @override
   void initState() {
@@ -181,7 +182,8 @@ class _AddPostState extends State<AddPost> {
               amountRaised: "0",
               targetAmount: moneyController.text.toString(),
               imageUrl: downloadUrl,
-              status: 'fund'))
+              status: 'fund',
+              aspectRatio: aspectRatio))
           .then((postId) => {
                 if (postId == null)
                   {
@@ -470,7 +472,7 @@ class _AddPostState extends State<AddPost> {
         height: MediaQuery.of(context).size.width * 9 / 16,
       ),
       EditFundderButton(
-        text: "Change profile picture",
+        text: "Select an image",
         onPressed: () {
           _changePic();
         },
@@ -519,8 +521,18 @@ class _AddPostState extends State<AddPost> {
     if (imageFile == null) {
       return Center(child: Text('No image selected'));
     } else {
-      return Image.file(File(imageFile.path));
+      File image =
+          new File(imageFile.path); // Or any other way to get a File instance.
+      _findAspectRatio(image);
+      return Image.file(image);
     }
+  }
+
+  void _findAspectRatio(File image) async {
+    var decodedImage = await decodeImageFromList(image.readAsBytesSync());
+    print(decodedImage.width);
+    print(decodedImage.height);
+    aspectRatio = decodedImage.width / decodedImage.height;
   }
 
   ListView _buildBottomNavigationMenu(context) {
