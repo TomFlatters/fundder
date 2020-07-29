@@ -71,7 +71,7 @@ class _LoadingState extends State<Loading> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.dispose();
+    //_controller.dispose();
     super.dispose();
   }
 }

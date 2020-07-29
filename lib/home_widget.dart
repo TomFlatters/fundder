@@ -31,7 +31,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    _checkIfIntroed();
     _checkNotifs();
+    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
+    fcmTokenStream.listen((token) async {
+      final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+      DatabaseService(uid: user.uid).addFCMToken(token);
+    });
     _firebaseMessaging.configure(
       onLaunch: (Map<String, dynamic> message) {
         print('onLaunch called');
@@ -46,34 +52,48 @@ class _HomeState extends State<Home> {
         });
       },
     );
-    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
-    fcmTokenStream.listen((token) async {
-      final FirebaseUser user = await FirebaseAuth.instance.currentUser();
-      DatabaseService(uid: user.uid).addFCMToken(token);
-    });
   }
 
+  // checks if user has any notifications and if they have set their profile pic yet
   void _checkNotifs() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     Firestore.instance
         .collection("users")
         .document(user.uid)
-        .get()
-        .then((value) {
-      Firestore.instance
-          .collection('posts')
-          .where("seen", isEqualTo: false)
-          .limit(1)
-          .getDocuments()
-          .then((snapshot) {
-        if (snapshot != null) {
-          if (snapshot.documents.isEmpty == false) {
-            setState(() {
-              unreadNotifs = true;
-            });
-          }
+        .collection("activity")
+        .where("seen", isEqualTo: false)
+        .limit(1)
+        .getDocuments()
+        .then((snapshot) {
+      if (snapshot != null) {
+        if (snapshot.documents.isEmpty == false) {
+          setState(() {
+            unreadNotifs = true;
+          });
         }
-      });
+      }
+    });
+  }
+
+  void _checkIfIntroed() async {
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(user.uid)
+        .get()
+        .then((snapshot) {
+      if (snapshot != null) {
+        if (snapshot['dpSetterPrompted'] != null) {
+          if (snapshot['dpSetterPrompted'] != true) {
+            Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
+          }
+        } else {
+          Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
+        }
+        if (snapshot['seenTutorial'] != null) {
+          if (snapshot['seenTutorial'] != true) {}
+        }
+      }
     });
   }
 
