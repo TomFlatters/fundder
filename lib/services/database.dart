@@ -104,7 +104,8 @@ class DatabaseService {
         timestamp: doc.data['timestamp'],
         imageUrl: doc.data['imageUrl'],
         id: doc.documentID,
-        status: doc.data['status']);
+        status: doc.data['status'],
+        aspectRatio: doc.data['aspectRatio']);
   }
 
   // Get posts list stream is mapped to the Post object
@@ -197,7 +198,8 @@ class DatabaseService {
           "subtitle": post.subtitle,
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
-          'status': post.status
+          'status': post.status,
+          'aspectRatio': post.aspectRatio
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
@@ -273,15 +275,20 @@ class DatabaseService {
       "subtitle": post.subtitle,
       "timestamp": post.timestamp,
       "imageUrl": post.imageUrl,
-      "status": post.status
+      "status": post.status,
+      'aspecRatio': post.aspectRatio
     });
   }
 
-  Future updatePostStatusImageTimestamp(String postId, String downloadUrl,
-      String status, Timestamp timestamp) async {
+  Future updatePostStatusImageTimestampRatio(String postId, String downloadUrl,
+      String status, Timestamp timestamp, double aspectRatio) async {
     // create or update the document with this uid
-    return await postsCollection.document(postId).updateData(
-        {"imageUrl": downloadUrl, "status": status, "timestamp": timestamp});
+    return await postsCollection.document(postId).updateData({
+      "imageUrl": downloadUrl,
+      "status": status,
+      "timestamp": timestamp,
+      "aspectRatio": aspectRatio
+    });
   }
 
   Future<List<DocumentSnapshot>> usersContainingString(String queryText) {
