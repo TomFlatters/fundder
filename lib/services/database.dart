@@ -45,6 +45,20 @@ class DatabaseService {
     });
   }
 
+  // only call this on registration, since it sets profile pic and tutorials viewed as false
+  Future registerUserData(
+      String email, String username, String name, String profilePic) async {
+    // create or update the document with this uid
+    return await userCollection.document(uid).updateData({
+      'email': email,
+      'username': username,
+      'name': name,
+      'profilePic': profilePic,
+      'seenTutorial': false,
+      'dpSetterPrompted': false,
+    });
+  }
+
   Future addFCMToken(String token) async {
     // create or update the document with this uid
     return await userCollection.document(uid).updateData({

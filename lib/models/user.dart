@@ -9,6 +9,8 @@ class User {
   final String gender;
   final String name;
   final String profilePic;
+  final bool seenTutorial;
+  final bool dpSetterPrompted;
 
   // construct them into the object here
   User(
@@ -20,5 +22,7 @@ class User {
       this.following,
       this.gender,
       this.name,
-      this.profilePic});
+      this.profilePic,
+      this.seenTutorial,
+      this.dpSetterPrompted});
 }

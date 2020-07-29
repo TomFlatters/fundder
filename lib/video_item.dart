@@ -101,7 +101,9 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   void dispose() {
     //routeObserver.unsubscribe(this);
     super.dispose();
-    _controller.dispose();
+    if (mounted) {
+      _controller.dispose();
+    }
   }
 
   _playPause() {
