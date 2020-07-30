@@ -14,7 +14,7 @@ class CommentButton extends StatelessWidget {
         child: Image.asset('assets/images/comment.png'),
       ),
       onPressed: () {
-        Navigator.pushNamed(context, '/post/' + widget.postData + '/comments');
+        Navigator.pushNamed(context, '/post/' + pid + '/comments');
       },
     );
   }
