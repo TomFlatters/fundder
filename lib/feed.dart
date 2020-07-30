@@ -92,92 +92,93 @@ class _FeedViewState extends State<FeedView> {
                             initiallyHasLiked, initialLikesNo,
                             uid: user.uid, postId: postData.id);
 
-                        return ChangeNotifierProvider(
-                            create: (context) => likesModel,
-                            child: GestureDetector(
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                color: Colors.white,
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      left: 0, right: 0, top: 0),
-                                  child: Column(children: <Widget>[
-                                    PostHeader(
-                                      postAuthorId: postData.author,
-                                      postAuthorUserName:
-                                          postData.authorUsername,
-                                      targetCharity: postData.charity,
+                        return GestureDetector(
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            color: Colors.white,
+                            child: Container(
+                              margin:
+                                  EdgeInsets.only(left: 0, right: 0, top: 0),
+                              child: Column(children: <Widget>[
+                                PostHeader(
+                                  postAuthorId: postData.author,
+                                  postAuthorUserName: postData.authorUsername,
+                                  targetCharity: postData.charity,
+                                ),
+                                PostBody(postData: postData),
+                                Container(
+                                  //action bar
+                                  key: GlobalKey(),
+                                  height: 30,
+                                  child: Row(children: <Widget>[
+                                    Expanded(
+                                      //like bar
+                                      child: ChangeNotifierProvider(
+                                          create: (context) => likesModel,
+                                          child: LikeBar()),
                                     ),
-                                    PostBody(postData: postData),
-                                    Container(
-                                      //action bar
-                                      key: GlobalKey(),
-                                      height: 30,
-                                      child: Row(children: <Widget>[
-                                        Expanded(
-                                            //like bar
-                                            child: LikeBar()),
-                                        Expanded(
-                                          child: CommentButton(
-                                            pid: postData.id,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: ShareBar(),
-                                        ),
-                                      ]),
+                                    Expanded(
+                                        child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: CommentButton(
+                                        pid: postData.id,
+                                      ),
+                                    )),
+                                    Expanded(
+                                      child: ShareBar(),
                                     ),
-                                    Row(children: [
-                                      Expanded(
-                                        child: Container(
-                                          alignment: Alignment.centerLeft,
-                                          margin: EdgeInsets.all(10),
-                                          child: Text(
-                                              howLongAgo(postData.timestamp),
+                                  ]),
+                                ),
+                                Row(children: [
+                                  Expanded(
+                                    child: Container(
+                                      alignment: Alignment.centerLeft,
+                                      margin: EdgeInsets.all(10),
+                                      child:
+                                          Text(howLongAgo(postData.timestamp),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              )),
+                                    ),
+                                  ),
+                                  postData.author != user.uid
+                                      ? Container()
+                                      : FlatButton(
+                                          onPressed: () {
+                                            print('button pressed');
+                                            _showDeleteDialog(postData);
+                                          },
+                                          child: Text('Delete',
+                                              textAlign: TextAlign.right,
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.grey,
                                               )),
                                         ),
-                                      ),
-                                      postData.author != user.uid
-                                          ? Container()
-                                          : FlatButton(
-                                              onPressed: () {
-                                                print('button pressed');
-                                                _showDeleteDialog(postData);
-                                              },
-                                              child: Text('Delete',
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.grey,
-                                                  )),
-                                            ),
-                                    ])
-                                  ]),
-                                ),
-                              ),
-                              onTap: () async {
-                                var pid = postData.id;
-                                var noLikes = likesModel.noLikes;
-                                var isLiked = likesModel.isLiked;
-                                var uid = user.uid;
-                                //passing state into ViewPost screen
-                                LikesModel likeState = LikesModel(
-                                    isLiked, noLikes,
-                                    uid: uid, postId: pid);
+                                ])
+                              ]),
+                            ),
+                          ),
+                          onTap: () async {
+                            var pid = postData.id;
+                            var noLikes = likesModel.noLikes;
+                            var isLiked = likesModel.isLiked;
+                            var uid = user.uid;
+                            //passing state into ViewPost screen
+                            LikesModel likeState = LikesModel(isLiked, noLikes,
+                                uid: uid, postId: pid);
 
-                                var newState = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ViewPost(
-                                            postData: postData.id,
-                                            likesModel: likeState)));
-                                likesModel.manuallySetState(
-                                    newState['noLikes'], newState['isLiked']);
-                              },
-                            ));
+                            var newState = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ViewPost(
+                                        postData: postData.id,
+                                        likesModel: likeState)));
+                            likesModel.manuallySetState(
+                                newState['noLikes'], newState['isLiked']);
+                          },
+                        );
                       } else {
                         return Container();
                       }
