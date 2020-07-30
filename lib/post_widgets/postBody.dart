@@ -8,6 +8,7 @@ import 'package:fundder/models/post.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:fundder/video_item.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class PostBody extends StatelessWidget {
   Post postData;
@@ -58,7 +59,15 @@ class PostBody extends StatelessWidget {
       print('initialising video');
       return VideoItem(key: UniqueKey(), url: postData.imageUrl);
     } else {
-      return Image.network(postData.imageUrl);
+      return kIsWeb == true
+          ? Image.network(postData.imageUrl)
+          : CachedNetworkImage(
+              imageUrl: (postData.imageUrl != null)
+                  ? postData.imageUrl
+                  : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
+              placeholder: (context, url) => Loading(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            );
     }
   }
 }
