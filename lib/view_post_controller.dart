@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fundder/post_widgets/commentBar.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/post_widgets/shareBar.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'helper_classes.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -66,9 +68,15 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                     title: Text(postData.title),
                     actions: <Widget>[
                       new IconButton(
-                        icon: new Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(null),
-                      )
+                          icon: new Icon(Icons.close),
+                          onPressed: () {
+                            Map newState = {
+                              'noLikes': widget.likesModel.noLikes,
+                              'isLiked': widget.likesModel.isLiked
+                            };
+
+                            Navigator.of(context).pop(newState);
+                          })
                     ],
                     leading: new Container(),
                   ),
@@ -177,58 +185,11 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                           child: LikeBar()),
                                     ),
                                     Expanded(
-                                      child: FlatButton(
-                                        child: Row(children: [
-                                          Container(
-                                            width: 20,
-                                            height: 20,
-                                            padding: const EdgeInsets.all(0.0),
-                                            child: Image.asset(
-                                                'assets/images/comment.png'),
-                                          ),
-                                          Expanded(
-                                              child: Container(
-                                                  margin:
-                                                      EdgeInsets.only(left: 10),
-                                                  child: Text(
-                                                    '777',
-                                                    textAlign: TextAlign.left,
-                                                  )))
-                                        ]),
-                                        onPressed: () {
-                                          /*Navigator.of(context)
-                                          .push(_showComments());*/
-                                          Navigator.pushNamed(
-                                              context,
-                                              '/post/' +
-                                                  widget.postData +
-                                                  '/comments');
-                                        },
-                                      ),
-                                    ),
+                                        child: CommentButton(
+                                      pid: postData.id,
+                                    )),
                                     Expanded(
-                                      child: FlatButton(
-                                        child: Row(children: [
-                                          Container(
-                                            width: 20,
-                                            height: 20,
-                                            padding: const EdgeInsets.all(0.0),
-                                            child: Image.asset(
-                                                'assets/images/share.png'),
-                                          ),
-                                          Expanded(
-                                              child: Container(
-                                                  margin:
-                                                      EdgeInsets.only(left: 10),
-                                                  child: Text(
-                                                    'Share',
-                                                    textAlign: TextAlign.left,
-                                                  )))
-                                        ]),
-                                        onPressed: () {
-                                          _showShare();
-                                        },
-                                      ),
+                                      child: ShareBar(),
                                     )
                                   ]),
                                 ),
@@ -356,14 +317,6 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
               errorWidget: (context, url, error) => Icon(Icons.error),
             );
     }
-  }
-
-  void _showShare() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SharePost();
-        });
   }
 
   @override
