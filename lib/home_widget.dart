@@ -48,7 +48,9 @@ class _HomeState extends State<Home> {
       onMessage: (Map<String, dynamic> message) {
         print('onMessage called');
         setState(() {
-          unreadNotifs = true;
+          if (_currentIndex != 3) {
+            unreadNotifs = true;
+          }
         });
       },
     );
