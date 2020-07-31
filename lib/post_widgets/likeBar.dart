@@ -46,8 +46,8 @@ class LikesModel extends ChangeNotifier {
 }
 
 class LikeBar extends StatelessWidget {
-  //the widget will listen use likesModel to interact with the state. It will be rebuilt everytime the state changes.
-  //must be placed in below a LikesModel
+  //the widget will listen to a likesModel to interact with the state. It will be rebuilt everytime the state changes in LikesModel.
+  //must be placed in below a LikesModel in widget tree
   @override
   Widget build(BuildContext context) {
     var likesModel = Provider.of<LikesModel>(context);
