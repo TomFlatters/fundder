@@ -176,9 +176,6 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                   height: 30,
                                   child: Row(children: <Widget>[
                                     Expanded(
-                                      //     child: LikeBar(
-                                      //   postId: postData.id,
-                                      // )
                                       child: ChangeNotifierProvider(
                                           create: (context) =>
                                               widget.likesModel,
