@@ -3,30 +3,26 @@ import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/donation/money_input_text_widget.dart';
 import 'package:fundder/donation/payment_methods.dart';
 import 'package:fundder/main.dart';
+import 'package:fundder/models/user.dart';
 import 'package:fundder/services/payment_service.dart';
+import 'package:provider/provider.dart';
 import '../helper_classes.dart';
 
 class DonatePage extends StatefulWidget {
   @override
-  final String postData;
-  DonatePage({this.postData});
+  final String postId;
+  DonatePage({this.postId});
 
   _DonatePageState createState() => _DonatePageState();
 }
 
 class _DonatePageState extends State<DonatePage> {
+  final moneyController =
+      MoneyMaskedTextController(decimalSeparator: '.', thousandSeparator: ',');
   @override
   void initState() {
     super.initState();
     StripeService.init();
-  }
-
-  payViaNewCard() async {
-    var response =
-        await StripeService.payWithNewCard(amount: '777', currency: 'gbp');
-    response.success == true
-        ? print('twas a success')
-        : print('twas not a success');
   }
 
   Widget moneyInput = moneyInputWidget(
@@ -35,8 +31,8 @@ class _DonatePageState extends State<DonatePage> {
   @override
   Widget build(BuildContext context) {
     print('building donate widget');
-    final moneyController = MoneyMaskedTextController(
-        decimalSeparator: '.', thousandSeparator: ',');
+    final user = Provider.of<User>(context);
+
     ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
@@ -72,8 +68,21 @@ class _DonatePageState extends State<DonatePage> {
           ListTile(
               leading: Icon(Icons.add_circle, color: Colors.black),
               title: Text("Pay via new card"),
-              onTap: () {
-                payViaNewCard();
+              onTap: () async {
+                print(moneyController.text);
+                double amount = double.parse(moneyController.text);
+                PaymentBookKeepingSevice paymentBookKeeping =
+                    PaymentBookKeepingSevice();
+
+                var response = await StripeService.payWithNewCard(
+                    amount: '777', currency: 'gbp');
+                if (response.success == true) {
+                  print("twas a success");
+                  paymentBookKeeping.userDonatedToPost(
+                      user.uid, widget.postId, amount);
+                } else {
+                  print("twas not a success");
+                }
               }),
           ListTile(
             leading: Icon(Icons.credit_card, color: Colors.black),
