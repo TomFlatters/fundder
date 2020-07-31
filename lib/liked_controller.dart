@@ -147,7 +147,10 @@ class _ActivityState extends State<LikedController> {
                                                                         'category'] ==
                                                                     'like'
                                                                 ? ' liked your post'
-                                                                : ' commented on your post'),
+                                                                : likedItem['category'] ==
+                                                                        'comment'
+                                                                    ? ' commented on your post'
+                                                                    : ' has completed a challenge that you liked'),
                                                       ])))),
                                           Container(
                                               width: 110,
