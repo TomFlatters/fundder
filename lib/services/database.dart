@@ -285,6 +285,21 @@ class DatabaseService {
         .catchError((error) => {print(error)});
   }
 
+  // Get templates list is mapped to the Template object
+  List<Template> _templatesDataFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((DocumentSnapshot doc) {
+      return _makeTemplate(doc);
+    }).toList();
+  }
+
+  Future<List<Template>> getTemplates() {
+    return templatesCollection
+        .limit(10)
+        .orderBy("timestamp", descending: true)
+        .getDocuments()
+        .then((snapshot) => _templatesDataFromSnapshot(snapshot));
+  }
+
   // -----------------------------------
   // 4. Firebase Storage (image upload):
   // -----------------------------------

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'shared/loading.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+
+import 'package:fundder/services/database.dart';
+import 'models/template.dart';
+import 'shared/loading.dart';
 
 class DoChallenge extends StatefulWidget {
   @override
@@ -9,6 +12,11 @@ class DoChallenge extends StatefulWidget {
 }
 
 class _DoChallengeState extends State<DoChallenge> {
+  Future<List<Template>> _getTemplates() async {
+    List<Template> templateList = await DatabaseService().getTemplates();
+    return templateList;
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<String> entries = <String>['Active', 'Past'];
@@ -36,35 +44,32 @@ class _DoChallengeState extends State<DoChallenge> {
     final List<List> entries3 = <List>[activeDescription, pastDescriptions];
     final List<List> entries4 = <List>[activePics, pastPics];
 
-    return ListView.separated(
-      physics: AlwaysScrollableScrollPhysics(),
-      shrinkWrap: true,
-      padding: const EdgeInsets.only(top: 10.0),
-      itemCount: entries.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Column(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.all(10),
-              child: Text(
-                entries[index],
-                textAlign: TextAlign.left,
-              ),
-            ),
-            _sectionComponents(
-                entries2[index], entries3[index], entries4[index])
-          ],
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return SizedBox(
-          height: 10,
-        );
-      },
-    );
+    return FutureBuilder<List<Template>>(
+        future: _getTemplates(),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<Template>> snapshot) {
+          if (snapshot.hasData) {
+            return ListView.separated(
+              physics: AlwaysScrollableScrollPhysics(),
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(top: 10.0),
+              itemCount: snapshot.data.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _templateListView(snapshot.data[index]);
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return SizedBox(
+                  height: 10,
+                );
+              },
+            );
+          } else {
+            return Center(child: Container(child: Text('Loading...')));
+          }
+        });
   }
 
-  Widget _sectionComponents(List array, List array2, List array3) {
+  Widget _templateListView(Template template) {
     return ListView.separated(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
