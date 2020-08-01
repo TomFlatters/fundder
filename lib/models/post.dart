@@ -37,20 +37,13 @@ class Post {
       this.imageUrl,
       this.id,
       this.status,
-      //why should one avoid initialisation to null
       this.peopleThatLikedThis,
       // Add an optional parameter for posts to have a template tag
       this.templateTag = 'None'});
 
   double percentRaised() {
-    //print("Amount raised1" + amountRaised);
-    //print("Amount target1" + targetAmount);
     double processAmount(String s) =>
         double.parse(s.contains(",") ? s.replaceAll(",", "") : s);
-    //print("percent Raised" +
-    //(processAmount(amountRaised) / processAmount(targetAmount)).toString());
-    //print("Amount raised" + processAmount(amountRaised).toString());
-    //print("Amount target" + processAmount(targetAmount).toString());
     return processAmount(amountRaised) / processAmount(targetAmount);
   }
 }
