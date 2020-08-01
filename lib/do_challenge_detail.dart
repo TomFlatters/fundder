@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+import 'models/template.dart';
 import 'package:fundder/services/database.dart';
 import 'helper_classes.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'models/template.dart';
-import 'shared/loading.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_pages/web_menu.dart';
 import 'global_widgets/buttons.dart';
+import 'web_pages/web_menu.dart';
+import 'shared/loading.dart';
 
 class ChallengeDetail extends StatefulWidget {
   @override
@@ -17,9 +18,10 @@ class ChallengeDetail extends StatefulWidget {
 }
 
 class _ChallengeDetailState extends State<ChallengeDetail> {
-
   Future<Template> _getTemplate() async {
-    Template template = await DatabaseService.g
+    Template template =
+        await DatabaseService().getTemplateById(widget.challengeId);
+    return template;
   }
 
   @override
