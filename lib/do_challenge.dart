@@ -19,31 +19,6 @@ class _DoChallengeState extends State<DoChallenge> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> entries = <String>['Active', 'Past'];
-    final List<String> active = ['Sleep 2 nights in the garden'];
-    final List<String> activeDescription = [
-      'Sleep 2 nights in the garden to raise money for Help Refugees'
-    ];
-    final List<String> activePics = [
-      'https://i.pinimg.com/originals/99/d9/fa/99d9fa7c22ca5ca5856cf4dd30db692e.jpg'
-    ];
-
-    final List<String> past = [
-      'Run 5, Donate £5, Nominate 5',
-      'ALS Ice Bucket'
-    ];
-    final List<String> pastDescriptions = [
-      'Run 5k, donate £5 to Run for Heroes and nominate 5 people to do the same',
-      'Throw ice on yourself to raise money for ALS'
-    ];
-    final List<String> pastPics = [
-      'https://blog.theclymb.com/wp-content/uploads/2014/03/pinterest-quotes-for-running-featured.jpg',
-      'https://api.time.com/wp-content/uploads/2014/08/ice-bucket-challenge2.jpg'
-    ];
-    final List<List> entries2 = <List>[active, past];
-    final List<List> entries3 = <List>[activeDescription, pastDescriptions];
-    final List<List> entries4 = <List>[activePics, pastPics];
-
     return FutureBuilder<List<Template>>(
         future: _getTemplates(),
         builder:
