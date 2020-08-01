@@ -70,103 +70,86 @@ class _DoChallengeState extends State<DoChallenge> {
   }
 
   Widget _templateListView(Template template) {
-    return ListView.separated(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      padding: const EdgeInsets.only(top: 10.0),
-      itemCount: array.length,
-      itemBuilder: (BuildContext context, int index) {
-        return GestureDetector(
+    return GestureDetector(
+      child: Container(
+          color: Colors.white,
           child: Container(
-              color: Colors.white,
-              child: Container(
-                  margin: EdgeInsets.only(left: 0, right: 0, top: 0),
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        height: 80,
-                        margin: EdgeInsets.only(left: 0, right: 0, top: 0),
-                        child: Row(
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                  margin: EdgeInsets.only(
-                                      left: 20, right: 20, top: 0),
-                                  child: AspectRatio(
-                                    aspectRatio: 1 / 1,
-                                    child: Container(
-                                      child: kIsWeb == true
-                                          ? Image.network(array3[index])
-                                          : CachedNetworkImage(
-                                              imageUrl: '${array3[index]}',
-                                              placeholder: (context, url) =>
-                                                  Loading(),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Icon(Icons.error),
-                                            ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
-                                    ),
-                                  )),
-                            ),
-                            Expanded(
-                              child: Column(children: [
-                                Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      '${array[index]}',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontFamily: 'Roboto Mono',
-                                        fontSize: 16,
-                                        //fontWeight: FontWeight.bold,
-                                      ),
-                                    )),
-                                Padding(padding: EdgeInsets.all(2)),
-                                Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      '${array2[index]}',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey,
-                                        //fontWeight: FontWeight.bold,
-                                      ),
-                                    )),
-                                Expanded(
-                                    child: Align(
-                                        alignment: Alignment.bottomLeft,
-                                        child: Row(
-                                          children: <Widget>[
-                                            Align(
-                                              alignment: Alignment.bottomLeft,
-                                              child: Text(
-                                                '${index * 4000 - 345 + 87 * 98} people, 16 days left',
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: Colors.grey,
-                                                  //fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        )))
-                              ]),
-                            ),
-                          ],
+              margin: EdgeInsets.only(left: 0, right: 0, top: 0),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    height: 80,
+                    margin: EdgeInsets.only(left: 0, right: 0, top: 0),
+                    child: Row(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                              margin:
+                                  EdgeInsets.only(left: 20, right: 20, top: 0),
+                              child: AspectRatio(
+                                aspectRatio: 1 / 1,
+                                child: Container(
+                                  child: kIsWeb == true
+                                      ? Image.network(template.imageUrl)
+                                      : CachedNetworkImage(
+                                          imageUrl: '${template.imageUrl}',
+                                          placeholder: (context, url) =>
+                                              Loading(),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
+                                        ),
+                                ),
+                              )),
                         ),
-                      ),
-                    ],
-                  ))),
-          onTap: () {
-            Navigator.pushNamed(context, '/challenge/' + '123');
-          },
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return SizedBox(
-          height: 20,
-        );
+                        Expanded(
+                          child: Column(children: [
+                            Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  '${template.title}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto Mono',
+                                    fontSize: 16,
+                                  ),
+                                )),
+                            Padding(padding: EdgeInsets.all(2)),
+                            Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  '${template.subtitle}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey,
+                                  ),
+                                )),
+                            Expanded(
+                                child: Align(
+                                    alignment: Alignment.bottomLeft,
+                                    child: Row(
+                                      children: <Widget>[
+                                        Align(
+                                          alignment: Alignment.bottomLeft,
+                                          child: Text(
+                                            '${template.acceptedBy.length} people, 16 days left',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )))
+                          ]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ))),
+      onTap: () {
+        Navigator.pushNamed(context, '/challenge/' + template.id);
       },
     );
   }
