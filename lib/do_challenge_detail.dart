@@ -116,7 +116,6 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                         style: TextStyle(
                                           fontFamily: 'Roboto Mono',
                                           fontSize: 16,
-                                          //fontWeight: FontWeight.bold,
                                         ),
                                       )),
                                   Container(
@@ -124,6 +123,12 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                       margin: EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       child: Text(snapshot.data.subtitle)),
+                                  Container(
+                                      alignment: Alignment.centerLeft,
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      child: Text(
+                                          'A challenge by ${snapshot.data.charity}')),
                                   Padding(
                                     padding: EdgeInsets.all(20),
                                   ),
