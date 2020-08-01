@@ -20,25 +20,27 @@ class Post {
   String status;
   final Set<String> peopleThatLikedThis;
 
-  Post({
-    this.noLikes,
-    this.author,
-    this.authorUsername,
-    this.title,
-    this.charity,
-    this.amountRaised,
-    this.targetAmount,
-    this.subtitle,
-    this.likes,
-    this.comments,
-    this.timestamp,
-    this.imageUrl,
-    this.id,
-    this.status,
-    //why should one avoid initialisation to null
-    this.peopleThatLikedThis,
-  });
+  final String templateTag;
 
+  Post(
+      {this.noLikes,
+      this.author,
+      this.authorUsername,
+      this.title,
+      this.charity,
+      this.amountRaised,
+      this.targetAmount,
+      this.subtitle,
+      this.likes,
+      this.comments,
+      this.timestamp,
+      this.imageUrl,
+      this.id,
+      this.status,
+      //why should one avoid initialisation to null
+      this.peopleThatLikedThis,
+      // Add an optional parameter for posts to have a template tag
+      this.templateTag = 'None'});
 
   double percentRaised() {
     //print("Amount raised1" + amountRaised);
