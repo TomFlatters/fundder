@@ -108,7 +108,7 @@ class _ProfileState extends State<ProfileController>
       return new StreamBuilder(
           stream: Firestore.instance
               .collection('users')
-              .document(user.uid)
+              .document(widget.uid)
               .snapshots(),
           // widget.feedChoice == 'user'
           //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
@@ -213,8 +213,11 @@ class _ProfileState extends State<ProfileController>
                                         ],
                                       ),
                                       onTap: () {
-                                        Navigator.pushNamed(context,
-                                            '/user/' + user.uid + '/followers');
+                                        Navigator.pushNamed(
+                                            context,
+                                            '/user/' +
+                                                widget.uid +
+                                                '/followers');
                                       },
                                     )),
                                     Expanded(
@@ -237,8 +240,11 @@ class _ProfileState extends State<ProfileController>
                                         ],
                                       ),
                                       onTap: () {
-                                        Navigator.pushNamed(context,
-                                            '/user/' + user.uid + '/followers');
+                                        Navigator.pushNamed(
+                                            context,
+                                            '/user/' +
+                                                widget.uid +
+                                                '/followers');
                                       },
                                     )),
                                     Expanded(
@@ -285,10 +291,8 @@ class _ProfileState extends State<ProfileController>
                                     controller: _tabController,
                                   ),
                                   [
-                                    FeedView('feedChoice', 'identifier',
-                                        HexColor('ff6b6c'), postList),
-                                    FeedView('user', _username, Colors.blue,
-                                        postList),
+                                    _profileView(),
+                                    _profileView()
                                   ][_tabController.index]
                                 ],
                               ),
@@ -300,6 +304,24 @@ class _ProfileState extends State<ProfileController>
                   );
           });
     }
+  }
+
+  Widget _profileView() {
+    return ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: postList != null ? postList.length : 0,
+        itemBuilder: (BuildContext context, int index) {
+          Post post = postList[index];
+          return ListTile(
+            leading: ProfilePic(post.author, 40),
+            title: Text(post.title),
+            subtitle: Text(post.subtitle),
+            onTap: () {
+              Navigator.pushNamed(context, '/post/' + post.id);
+            },
+          );
+        });
   }
 
   void _onRefresh() async {
