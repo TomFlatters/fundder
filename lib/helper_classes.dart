@@ -57,11 +57,13 @@ class _ProfilePicState extends State<ProfilePic> {
         .document(widget.uid)
         .get()
         .then((value) {
-      setState(() {
-        if (value.data != null) {
-          url = value.data["profilePic"];
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (value.data != null) {
+            url = value.data["profilePic"];
+          }
+        });
+      }
     });
   }
 

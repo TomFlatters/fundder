@@ -19,6 +19,7 @@ import 'package:fundder/liked_controller.dart';
 import 'package:fundder/profile_controller.dart';
 import 'package:fundder/web_pages/temparary_upload_page.dart';
 import 'package:fundder/upload_proof_controller.dart';
+import 'package:fundder/welcome_pages/profilepic_setter.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -56,6 +57,9 @@ class FluroRouter {
   static Handler _uploadProofHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           UploadProofScreen(postId: params['id'][0]));
+  static Handler _profilePicHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ProfilePicSetter(uid: params['id'][0]));
 
   // Web handlers
 
@@ -133,6 +137,12 @@ class FluroRouter {
     router.define(
       '/post/:id/uploadProof',
       handler: _uploadProofHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+
+    router.define(
+      '/:id/addProfilePic',
+      handler: _profilePicHandler,
       transitionType: TransitionType.fadeIn,
     );
 

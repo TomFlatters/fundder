@@ -16,6 +16,7 @@ class Post {
   final List likes;
   final int noLikes;
   final int noComments;
+  final double aspectRatio;
 
   final String subtitle;
   final timestamp;
@@ -24,23 +25,23 @@ class Post {
   String status;
   final Set<String> peopleThatLikedThis;
 
-  Post({
-    this.noComments,
-    this.noLikes,
-    this.author,
-    this.authorUsername,
-    this.title,
-    this.charity,
-    this.amountRaised,
-    this.targetAmount,
-    this.subtitle,
-    this.likes,
-    this.timestamp,
-    this.imageUrl,
-    this.id,
-    this.status,
-    this.peopleThatLikedThis,
-  });
+  Post(
+      {this.noComments,
+      this.noLikes,
+      this.author,
+      this.authorUsername,
+      this.title,
+      this.charity,
+      this.amountRaised,
+      this.targetAmount,
+      this.subtitle,
+      this.likes,
+      this.timestamp,
+      this.imageUrl,
+      this.id,
+      this.status,
+      this.peopleThatLikedThis,
+      this.aspectRatio});
 
   double percentRaised() {
     //print("Amount raised1" + amountRaised);

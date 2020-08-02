@@ -118,6 +118,78 @@ exports.onComment = functions.firestore
     }
 });
 
+exports.postDone = functions.firestore
+    .document('/posts/{postId}')
+    .onUpdate(async (change, context) => {
+      // Get an object representing the document
+      // e.g. {'name': 'Marie', 'age': 66}
+      const newValue = change.after.data();
+
+      // ...or the previous value before this update
+      const previousValue = change.before.data();
+      console.log('new value: ' + newValue);
+      const postId = context.params.postId;
+
+      // access a particular field as you would any JS property
+      if(newValue["status"] === 'done' && previousValue["status"] === 'fund')
+      {
+        
+        const whoLikedSnapshot = await admin.firestore().collection(`posts/${postId}/whoLiked`).get();
+        const whoLikedDoc = whoLikedSnapshot.docs.map(doc => doc);
+
+        console.log(whoLikedDoc);
+
+        var tokens = [];
+
+        const postOwner = await admin.firestore().doc(`users/${newValue['author']}`).get();
+
+        
+        /* eslint-disable no-await-in-loop */
+        for(var i=0; i<whoLikedDoc.length; i++){
+            console.log(whoLikedDoc[i]);
+            const doc = whoLikedDoc[i];
+            console.log(doc.id);
+
+            if(doc.data()[doc.id] === true){
+              const data = {
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                category: 'post completed',
+                docLiker: newValue['author'],
+                docLikerUsername: postOwner.data()['username'],
+                postId: postId,
+                seen: false
+            };
+
+            const res = await admin.firestore().collection(`users/${doc.id}/activity`).add(data);
+            console.log('Added document with ID: ', res.id);
+              if (postOwner.data()['fcm'] !== null) {
+                tokens = tokens.concat(postOwner.data()['fcm']);
+              }
+            }
+        }
+
+        console.log(tokens);
+
+        const payload =
+          {
+              notification: { 
+                  title: 'Post completed',
+                  body: `${newValue['author']} completed a post that you like`, 
+              },
+          };
+
+        if (tokens.length > 0) {
+            // Send notifications to all tokens.
+            const response = await admin.messaging().sendToDevice(tokens, payload);
+            await cleanupTokens(response, tokens);
+            console.log('Notifications have been sent and tokens cleaned up.');
+            }
+        
+      }
+
+      // perform desired operations ...
+    });
+
 // Cleans up the tokens that are no longer valid.
 function cleanupTokens(response, tokens) {
     // For each notification we check if there was an error.
