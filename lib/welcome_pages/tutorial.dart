@@ -77,7 +77,7 @@ class _TutorialState extends State<Tutorial> {
                 slideNumber: 3),
             _buildDescription(
                 title: 'Done',
-                subtitle: 'View completed challenges inn the "Done" feed',
+                subtitle: 'View completed challenges in the "Done" feed',
                 slideNumber: 4),
           ],
         ));
