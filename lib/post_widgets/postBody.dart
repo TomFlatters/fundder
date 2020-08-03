@@ -47,7 +47,13 @@ class PostBody extends StatelessWidget {
         (postData.imageUrl == null)
             ? Container()
             : Container(
-                child: SizedBox(child: _previewImageVideo(postData)),
+                child: postData.aspectRatio == null
+                    ? SizedBox(child: _previewImageVideo(postData))
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.width /
+                            postData.aspectRatio,
+                        child: _previewImageVideo(postData)),
                 margin: EdgeInsets.symmetric(vertical: 10.0),
               ),
       ],
