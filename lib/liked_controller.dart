@@ -143,8 +143,14 @@ class _ActivityState extends State<LikedController> {
                                                                     FontWeight
                                                                         .bold)),
                                                         TextSpan(
-                                                            text:
-                                                                ' liked your post'),
+                                                            text: likedItem[
+                                                                        'category'] ==
+                                                                    'like'
+                                                                ? ' liked your post'
+                                                                : likedItem['category'] ==
+                                                                        'comment'
+                                                                    ? ' commented on your post'
+                                                                    : ' has completed a challenge that you liked'),
                                                       ])))),
                                           Container(
                                               width: 110,
@@ -191,10 +197,18 @@ class _ActivityState extends State<LikedController> {
                                                               isEqualTo:
                                                                   likedItem[
                                                                       'postId'])
+                                                          .where('category',
+                                                              isEqualTo:
+                                                                  likedItem[
+                                                                      'category'])
                                                           .getDocuments()
                                                           .then((response) => {
-                                                                _batchUpdate(
-                                                                    response)
+                                                                if (response !=
+                                                                    null)
+                                                                  {
+                                                                    _batchUpdate(
+                                                                        response)
+                                                                  }
                                                               });
                                                       Navigator.pushNamed(
                                                           context,

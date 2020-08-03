@@ -127,6 +127,7 @@ class _FeedViewState extends State<FeedView> {
                                     Expanded(
                                       child: ShareBar(),
                                     ),
+
                                   ]),
                                 ),
                                 Row(children: [
@@ -140,6 +141,7 @@ class _FeedViewState extends State<FeedView> {
                                                 fontSize: 14,
                                                 color: Colors.grey,
                                               )),
+r
                                     ),
                                   ),
                                   postData.author != user.uid

@@ -27,6 +27,7 @@ class _EditProfileState extends State<EditProfile> {
   PickedFile imageFile;
   List fcmToken;
   final picker = ImagePicker();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -73,13 +74,39 @@ class _EditProfileState extends State<EditProfile> {
         title: Text('Edit Profile'),
         actions: <Widget>[
           new IconButton(
-            icon: new Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(setState(() {})),
+            icon: Text('Save'),
+            onPressed: () {
+              setState(() {
+                isLoading = true;
+              });
+              if (imageFile != null) {
+                final String fileLocation = _uid +
+                    "/" +
+                    DateTime.now().microsecondsSinceEpoch.toString();
+                DatabaseService(uid: _uid)
+                    .uploadImage(File(imageFile.path), fileLocation)
+                    .then((downloadUrl) => {
+                          print("Successful image upload"),
+                          print(downloadUrl),
+
+                          // create post from the state and image url, and add that post to firebase
+                          DatabaseService(uid: _uid).updateUserData(
+                              emailEntry.text,
+                              _username,
+                              nameEntry.text,
+                              downloadUrl)
+                        });
+              } else {
+                DatabaseService(uid: _uid).updateUserData(
+                    emailEntry.text, _username, nameEntry.text, _profilePic);
+              }
+              Navigator.of(context).pop(setState(() {}));
+            },
           )
         ],
         leading: new Container(),
       ),
-      body: _uid == null
+      body: _uid == null || isLoading == true
           ? Loading()
           : ListView(shrinkWrap: true, children: <Widget>[
               Container(
@@ -135,32 +162,10 @@ class _EditProfileState extends State<EditProfile> {
                   );
                 },
               ),
-              SecondaryFundderButton(
+              /*SecondaryFundderButton(
                 text: 'Save Changes',
-                onPressed: () {
-                  if (imageFile != null) {
-                    final String fileLocation = _uid +
-                        "/" +
-                        DateTime.now().microsecondsSinceEpoch.toString();
-                    DatabaseService(uid: _uid)
-                        .uploadImage(File(imageFile.path), fileLocation)
-                        .then((downloadUrl) => {
-                              print("Successful image upload"),
-                              print(downloadUrl),
-
-                              // create post from the state and image url, and add that post to firebase
-                              DatabaseService(uid: _uid).updateUserData(
-                                  emailEntry.text,
-                                  _username,
-                                  nameEntry.text,
-                                  downloadUrl)
-                            });
-                  } else {
-                    DatabaseService(uid: _uid).updateUserData(emailEntry.text,
-                        _username, nameEntry.text, _profilePic);
-                  }
-                },
-              ),
+                onPressed: () {},
+              ),*/
             ]),
     );
   }
