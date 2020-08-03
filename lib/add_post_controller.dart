@@ -186,6 +186,7 @@ class _AddPostState extends State<AddPost> {
                 amountRaised: "0",
                 targetAmount: moneyController.text.toString(),
                 imageUrl: downloadUrl,
+                templateTag: '',
                 status: 'fund'))
             .then((postId) => {
                   if (postId == null)

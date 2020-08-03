@@ -185,7 +185,8 @@ class DatabaseService {
           "subtitle": post.subtitle,
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
-          'status': post.status
+          'status': post.status,
+          'templateTag': post.templateTag
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
