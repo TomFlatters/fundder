@@ -127,7 +127,6 @@ class _FeedViewState extends State<FeedView> {
                                     Expanded(
                                       child: ShareBar(),
                                     ),
-
                                   ]),
                                 ),
                                 Row(children: [
@@ -135,13 +134,13 @@ class _FeedViewState extends State<FeedView> {
                                     child: Container(
                                       alignment: Alignment.centerLeft,
                                       margin: EdgeInsets.all(10),
-                                      child:
-                                          Text(howLongAgo(postData.timestamp),
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              )),
-r
+                                      child: Text(
+                                        howLongAgo(postData.timestamp),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   postData.author != user.uid
