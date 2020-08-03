@@ -138,7 +138,10 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             context,
                                             '/challenge/' +
                                                 widget.challengeId +
-                                                '/steps');
+                                                '/steps',
+                                            arguments: {
+                                              'template': snapshot.data
+                                            });
                                       }),
                                   SecondaryFundderButton(
                                       text: 'View Completed',
