@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/services/auth.dart';
+import 'package:fundder/view_post_controller.dart';
 import 'feed.dart';
 import 'profile_actions_view.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -291,8 +292,8 @@ class _ProfileState extends State<ProfileController>
                                     controller: _tabController,
                                   ),
                                   [
-                                    _profileView(),
-                                    _profileView()
+                                    _profileView(user.uid),
+                                    _profileView(user.uid)
                                   ][_tabController.index]
                                 ],
                               ),
@@ -306,7 +307,7 @@ class _ProfileState extends State<ProfileController>
     }
   }
 
-  Widget _profileView() {
+  Widget _profileView(String uid) {
     return ListView.builder(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
@@ -318,7 +319,11 @@ class _ProfileState extends State<ProfileController>
             title: Text(post.title),
             subtitle: Text(post.subtitle),
             onTap: () {
-              Navigator.pushNamed(context, '/post/' + post.id);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ViewPost(postData: post.id, likesModel: null)));
             },
           );
         });
