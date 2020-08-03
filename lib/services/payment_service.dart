@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:stripe_payment/stripe_payment.dart';
@@ -82,5 +83,31 @@ class StripeService {
       print('err charging user: ${err.toString()}');
     }
     return null;
+  }
+}
+
+class PaymentBookKeepingSevice {
+  final CollectionReference postsCollection =
+      Firestore.instance.collection('posts');
+  final CollectionReference userCollection =
+      Firestore.instance.collection('users');
+
+  void userDonatedToPost(String uid, String postId, double amount) {
+    postsCollection
+        .document(postId)
+        .collection('whoDonated')
+        .document(uid)
+        .setData({uid: true});
+    postsCollection
+        .document(postId)
+        .updateData({'moneyRaised': FieldValue.increment(amount)});
+    userCollection
+        .document(uid)
+        .updateData({'amountDonated': FieldValue.increment(amount)});
+    userCollection
+        .document(uid)
+        .collection('myDonations')
+        .document(postId)
+        .setData({postId: true});
   }
 }

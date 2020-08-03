@@ -4,10 +4,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/post_widgets/commentBar.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/post_widgets/postBody.dart';
+import 'package:fundder/post_widgets/postHeader.dart';
+import 'package:fundder/post_widgets/shareBar.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
+import 'package:fundder/view_post_controller.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'models/post.dart';
@@ -28,7 +33,6 @@ class FeedView extends StatefulWidget {
   final Color colorChoice;
   final String feedChoice;
   final String identifier;
-  //final Stream<List<Post>> postsStream;
   final List<Post> postList;
   FeedView(this.feedChoice, this.identifier, this.colorChoice, this.postList,
       {Key key});
@@ -48,27 +52,6 @@ class _FeedViewState extends State<FeedView> {
       physics = NeverScrollableScrollPhysics();
     }
   }
-
-  /*void _tryMessage() async {
-    try {
-      var callable = CloudFunctions.instance.getHttpsCallable(
-          functionName:
-              'addMessage'); // replace 'functionName' with the name of your function
-      dynamic response = callable
-          .call(<String, dynamic>{'text': 'message'}).catchError((onError) {
-        print(onError);
-      });
-      print(response);
-    } on CloudFunctionsException catch (e) {
-      print('caught firebase functions exception');
-      print(e.code);
-      print(e.message);
-      print(e.details);
-    } catch (e) {
-      print('caught generic exception');
-      print(e);
-    }
-  }*/
 
   @override
   void didUpdateWidget(FeedView oldWidget) {
@@ -90,6 +73,7 @@ class _FeedViewState extends State<FeedView> {
         padding: const EdgeInsets.only(top: 10.0),
         itemCount: widget.postList.length,
         itemBuilder: (BuildContext context, int index) {
+          //building an individual post
           Post postData = widget.postList[index];
           // print(postData)
           bool initiallyHasLiked;
@@ -107,216 +91,96 @@ class _FeedViewState extends State<FeedView> {
                         var likesModel = LikesModel(
                             initiallyHasLiked, initialLikesNo,
                             uid: user.uid, postId: postData.id);
-                        return ChangeNotifierProvider(
-                            create: (context) => likesModel,
-                            child: GestureDetector(
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                color: Colors.white,
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      left: 0, right: 0, top: 0),
-                                  child: Column(children: <Widget>[
-                                    Container(
-                                      height: 60,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: GestureDetector(
-                                                child: AspectRatio(
-                                                    aspectRatio: 1 / 1,
-                                                    child: Container(
-                                                      child: ProfilePic(
-                                                          postData.author, 40),
-                                                      margin:
-                                                          EdgeInsets.all(10.0),
-                                                    )),
-                                                onTap: () {
-                                                  print('/user/' +
-                                                      postData.author);
-                                                  Navigator.pushNamed(
-                                                      context,
-                                                      '/user/' +
-                                                          postData.author);
-                                                },
+
+                        return GestureDetector(
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            color: Colors.white,
+                            child: Container(
+                              margin:
+                                  EdgeInsets.only(left: 0, right: 0, top: 0),
+                              child: Column(children: <Widget>[
+                                PostHeader(
+                                  postAuthorId: postData.author,
+                                  postAuthorUserName: postData.authorUsername,
+                                  targetCharity: postData.charity,
+                                ),
+                                PostBody(postData: postData),
+                                Container(
+                                  //action bar
+                                  key: GlobalKey(),
+                                  height: 30,
+                                  child: Row(children: <Widget>[
+                                    Expanded(
+                                      //like bar
+                                      child: ChangeNotifierProvider(
+                                          create: (context) => likesModel,
+                                          child: LikeBar()),
+                                    ),
+                                    Expanded(
+                                        child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: CommentButton(
+                                        pid: postData.id,
+                                      ),
+                                    )),
+                                    Expanded(
+                                      child: ShareBar(),
+                                    ),
+
+                                  ]),
+                                ),
+                                Row(children: [
+                                  Expanded(
+                                    child: Container(
+                                      alignment: Alignment.centerLeft,
+                                      margin: EdgeInsets.all(10),
+                                      child:
+                                          Text(howLongAgo(postData.timestamp),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
                                               )),
-                                          Expanded(
-                                              child: Align(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                      postData.authorUsername,
-                                                      style: TextStyle(
-                                                        fontFamily: 'Quicksand',
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      )))),
-                                          Align(
-                                              alignment: Alignment.centerRight,
-                                              child: Container(
-                                                  margin: EdgeInsets.all(10.0),
-                                                  child:
-                                                      Text(postData.charity))),
-                                        ],
-                                      ),
+r
                                     ),
-                                    Container(
-                                        alignment: Alignment.centerLeft,
-                                        margin: EdgeInsets.all(10),
-                                        child: Text(postData.subtitle)),
-                                    Container(
-                                        alignment: Alignment.centerLeft,
-                                        margin: EdgeInsets.symmetric(
-                                            vertical: 10, horizontal: 10),
-                                        child: Text(
-                                          '£${postData.amountRaised} raised of £${postData.targetAmount} target',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        )),
-                                    Container(
-                                      //alignment: Alignment.centerLeft,
-                                      margin: EdgeInsets.only(
-                                          top: 5,
-                                          bottom: 15,
-                                          left: 0,
-                                          right: 0),
-                                      child: LinearPercentIndicator(
-                                        linearStrokeCap: LinearStrokeCap.butt,
-                                        lineHeight: 3,
-                                        percent: postData.percentRaised(),
-                                        backgroundColor: HexColor('CCCCCC'),
-                                        progressColor: HexColor('ff6b6c'),
-                                      ),
-                                    ),
-                                    (postData.imageUrl == null)
-                                        ? Container()
-                                        : Container(
-                                            child: postData.aspectRatio == null
-                                                ? SizedBox(
-                                                    child: _previewImageVideo(
-                                                        postData))
-                                                : SizedBox(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                            .size
-                                                            .width,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width /
-                                                            postData
-                                                                .aspectRatio,
-                                                    child: _previewImageVideo(
-                                                        postData)),
-                                            margin: EdgeInsets.symmetric(
-                                                vertical: 10.0),
-                                          ),
-                                    Container(
-                                      //action bar
-                                      key: GlobalKey(),
-                                      height: 30,
-                                      child: Row(children: <Widget>[
-                                        Expanded(
-                                            //like bar
-                                            child: LikeBar()),
-                                        Expanded(
-                                          child: FlatButton(
-                                            child: Row(children: [
-                                              Container(
-                                                width: 20,
-                                                height: 20,
-                                                padding:
-                                                    const EdgeInsets.all(0.0),
-                                                child: Image.asset(
-                                                    'assets/images/comment.png'),
-                                              ),
-                                              Expanded(
-                                                  child: Container(
-                                                      margin: EdgeInsets.only(
-                                                          left: 10),
-                                                      child: Text(
-                                                        postData.noComments
-                                                            .toString(),
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                      )))
-                                            ]),
-                                            onPressed: () {
-                                              /*Navigator.of(context)
-                                            .push(_showComments());*/
-                                              Navigator.pushNamed(
-                                                  context,
-                                                  '/post/' +
-                                                      postData.id +
-                                                      '/comments');
-                                            },
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: FlatButton(
-                                            child: Row(children: [
-                                              Container(
-                                                width: 20,
-                                                height: 20,
-                                                padding:
-                                                    const EdgeInsets.all(0.0),
-                                                child: Image.asset(
-                                                    'assets/images/share.png'),
-                                              ),
-                                              Expanded(
-                                                  child: Container(
-                                                      margin: EdgeInsets.only(
-                                                          left: 10),
-                                                      child: Text(
-                                                        'Share',
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                      )))
-                                            ]),
-                                            onPressed: () {
-                                              _showShare();
-                                            },
-                                          ),
-                                        ),
-                                      ]),
-                                    ),
-                                    Row(children: [
-                                      Expanded(
-                                        child: Container(
-                                          alignment: Alignment.centerLeft,
-                                          margin: EdgeInsets.all(10),
-                                          child: Text(
-                                              howLongAgo(postData.timestamp),
+                                  ),
+                                  postData.author != user.uid
+                                      ? Container()
+                                      : FlatButton(
+                                          onPressed: () {
+                                            print('button pressed');
+                                            _showDeleteDialog(postData);
+                                          },
+                                          child: Text('Delete',
+                                              textAlign: TextAlign.right,
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.grey,
                                               )),
                                         ),
-                                      ),
-                                      postData.author != user.uid
-                                          ? Container()
-                                          : FlatButton(
-                                              onPressed: () {
-                                                print('button pressed');
-                                                _showDeleteDialog(postData);
-                                              },
-                                              child: Text('Delete',
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.grey,
-                                                  )),
-                                            ),
-                                    ])
-                                  ]),
-                                ),
-                              ),
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, '/post/' + postData.id);
-                              },
-                            ));
+                                ])
+                              ]),
+                            ),
+                          ),
+                          onTap: () async {
+                            var pid = postData.id;
+                            var noLikes = likesModel.noLikes;
+                            var isLiked = likesModel.isLiked;
+                            var uid = user.uid;
+                            //passing state into ViewPost screen
+                            LikesModel likeState = LikesModel(isLiked, noLikes,
+                                uid: uid, postId: pid);
+
+                            var newState = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ViewPost(
+                                        postData: postData.id,
+                                        likesModel: likeState)));
+                            likesModel.manuallySetState(
+                                newState['noLikes'], newState['isLiked']);
+                          },
+                        );
                       } else {
                         return Container();
                       }
@@ -333,23 +197,6 @@ class _FeedViewState extends State<FeedView> {
           );
         },
       );
-    }
-  }
-
-  Widget _previewImageVideo(Post postData) {
-    if (postData.imageUrl.contains('video')) {
-      print('initialising video');
-      return VideoItem(key: UniqueKey(), url: postData.imageUrl);
-    } else {
-      return kIsWeb == true
-          ? Image.network(postData.imageUrl)
-          : CachedNetworkImage(
-              imageUrl: (postData.imageUrl != null)
-                  ? postData.imageUrl
-                  : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-              placeholder: (context, url) => Loading(),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            );
     }
   }
 
@@ -391,13 +238,5 @@ class _FeedViewState extends State<FeedView> {
         );
       },
     );
-  }
-
-  void _showShare() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SharePost();
-        });
   }
 }
