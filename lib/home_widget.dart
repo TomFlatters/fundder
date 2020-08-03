@@ -93,7 +93,11 @@ class _HomeState extends State<Home> {
           Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
         }
         if (snapshot['seenTutorial'] != null) {
-          if (snapshot['seenTutorial'] != true) {}
+          if (snapshot['seenTutorial'] != true) {
+            Navigator.pushNamed(context, '/' + user.uid + '/tutorial');
+          }
+        } else {
+          Navigator.pushNamed(context, '/' + user.uid + '/tutorial');
         }
       }
     });

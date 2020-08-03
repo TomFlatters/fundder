@@ -83,7 +83,6 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
                       .collection('users')
                       .document(_uid)
                       .updateData({
-                    'seenTutorial': false,
                     'dpSetterPrompted': true,
                   });
                 }
