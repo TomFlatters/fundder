@@ -1,5 +1,6 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
 import 'package:fundder/donation/donate_page_controller.dart';
@@ -23,15 +24,30 @@ import 'package:fundder/welcome_pages/profilepic_setter.dart';
 
 class FluroRouter {
   static Router router = Router();
-  static Handler _postHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ViewPost(postData: params['id'][0]));
+
+  // static Handler _postHandler =
+  //     Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
+  //   String pid = params['id'][0];
+  //   String noLikes = params['noLikes'][0];
+  //   String isLiked = params['isLiked'][0];
+  //   String uid = params['uid'][0];
+  //   print('/post/{$pid}/{$noLikes}/{$isLiked}/{$uid}' + "LOLLLLL");
+  //   LikesModel likesModel = LikesModel(
+  //       (isLiked == 'true') ? true : false, int.parse(noLikes),
+  //       uid: uid, postId: pid);
+
+  //   return ViewPost(
+  //     postData: params['id'][0],
+  //     likesModel: likesModel,
+  //   );
+  // });
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(pid: params['id'][0]));
+
   static Handler _donateHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          DonatePage(postData: params['id'][0]));
+          DonatePage(postId: params['id'][0]));
   static Handler _viewOtherProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ProfileController(
@@ -89,11 +105,11 @@ class FluroRouter {
           TemporaryUpload());
 
   static void setupRouter() {
-    router.define(
-      '/post/:id',
-      handler: _postHandler,
-      transitionType: TransitionType.fadeIn,
-    );
+    // router.define(
+    //   '/post/:id/:noLikes/:isLiked/:uid',
+    //   handler: _postHandler,
+    //   transitionType: TransitionType.fadeIn,
+    // );
     router.define(
       '/post/:id/comments',
       handler: _commentHandler,
