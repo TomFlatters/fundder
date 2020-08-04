@@ -49,7 +49,7 @@ class DatabaseService {
   Future registerUserData(
       String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
-    return await userCollection.document(uid).updateData({
+    return await userCollection.document(uid).setData({
       'email': email,
       'username': username,
       'name': name,

@@ -22,6 +22,7 @@ import 'package:fundder/web_pages/temparary_upload_page.dart';
 import 'package:fundder/upload_proof_controller.dart';
 import 'package:fundder/welcome_pages/profilepic_setter.dart';
 import 'package:fundder/welcome_pages/tutorial.dart';
+import 'package:fundder/auth_screens/check_verified.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -107,6 +108,9 @@ class FluroRouter {
   static Handler _tempAddPostHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           TemporaryUpload());
+  static Handler _checkVerifiedHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          CheckVerified());
 
   static void setupRouter() {
     // router.define(
@@ -169,6 +173,12 @@ class FluroRouter {
     router.define(
       '/:id/tutorial',
       handler: _tutorialHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+
+    router.define(
+      '/:id/verification',
+      handler: _checkVerifiedHandler,
       transitionType: TransitionType.fadeIn,
     );
 
