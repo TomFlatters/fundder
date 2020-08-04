@@ -71,7 +71,7 @@ class _AuthenticateState extends State<Authenticate>
                   child: Container(
                     width: 150,
                     height: 150,
-                    child: Image.asset('assets/images/fundder_loading.png'),
+                    child: Image.asset('assets/images/pink_bear.png'),
                   ),
                 ),
               ),
@@ -144,6 +144,20 @@ class _AuthenticateState extends State<Authenticate>
                     }
                   },
                 ),
+                //SizedBox(height: 6.0),
+                EditFundderButton(
+                    text: 'Forgot Password',
+                    onPressed: () async {
+                      if (email != '') {
+                        error = await _auth.forgotPassword(email);
+                        setState(() {});
+                      } else {
+                        setState(() {
+                          error =
+                              'Please enter your email for us to send a reset link';
+                        });
+                      }
+                    }),
                 SizedBox(height: 12.0),
                 Text(
                   error,

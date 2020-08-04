@@ -36,7 +36,10 @@ class _HomeState extends State<Home> {
     var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
     fcmTokenStream.listen((token) async {
       final FirebaseUser user = await FirebaseAuth.instance.currentUser();
-      DatabaseService(uid: user.uid).addFCMToken(token);
+      // this will get called on logging out otherwise and throw errors
+      if (user != null) {
+        DatabaseService(uid: user.uid).addFCMToken(token);
+      }
     });
     _firebaseMessaging.configure(
       onLaunch: (Map<String, dynamic> message) {
@@ -79,6 +82,7 @@ class _HomeState extends State<Home> {
 
   void _checkIfIntroed() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    await user.reload();
     Firestore.instance
         .collection("users")
         .document(user.uid)
@@ -99,6 +103,9 @@ class _HomeState extends State<Home> {
         } else {
           Navigator.pushNamed(context, '/' + user.uid + '/tutorial');
         }
+      }
+      if (user.isEmailVerified == false) {
+        Navigator.pushNamed(context, '/' + user.uid + '/verification');
       }
     });
   }
