@@ -341,9 +341,7 @@ class _ProfileState extends State<ProfileController>
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ViewPost(
-                                        postData: post.id,
-                                        likesModel: likesModel)));
+                                    builder: (context) => ViewPost(post)));
                           },
                         );
                       } else {
