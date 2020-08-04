@@ -317,46 +317,22 @@ class _ProfileState extends State<ProfileController>
         shrinkWrap: true,
         itemCount: postList != null ? postList.length : 0,
         itemBuilder: (BuildContext context, int index) {
-          bool initiallyHasLiked;
-          int initialLikesNo;
           Post post = postList[index];
-          return FutureBuilder(
-              future: likesService.hasUserLikedPost(post.id),
-              builder: (context, hasLiked) {
-                if (hasLiked.connectionState == ConnectionState.done) {
-                  initiallyHasLiked = hasLiked.data;
-                  return FutureBuilder(
-                    future: likesService.noOfLikes(post.id),
-                    builder: (context, noLikes) {
-                      if (noLikes.connectionState == ConnectionState.done) {
-                        initialLikesNo = noLikes.data;
-                        var likesModel = LikesModel(
-                            initiallyHasLiked, initialLikesNo,
-                            uid: uid, postId: post.id);
-                        return ListTile(
-                          leading: ProfilePic(post.author, 40),
-                          title: Text(post.title),
-                          subtitle: Text(post.subtitle),
-                          trailing: post.status == 'done'
-                              ? Icon(
-                                  Ionicons.ios_checkmark_circle,
-                                  color: HexColor('ff6b6c'),
-                                )
-                              : Container(width: 0),
-                          onTap: () {
-                            print("Going onto view post from activity yayy");
-                            Navigator.pushNamed(context, '/post/${post.id}');
-                          },
-                        );
-                      } else {
-                        return ListTile();
-                      }
-                    },
-                  );
-                } else {
-                  return ListTile();
-                }
-              });
+          return ListTile(
+            leading: ProfilePic(post.author, 40),
+            title: Text(post.title),
+            subtitle: Text(post.subtitle),
+            trailing: post.status == 'done'
+                ? Icon(
+                    Ionicons.ios_checkmark_circle,
+                    color: HexColor('ff6b6c'),
+                  )
+                : Container(width: 0),
+            onTap: () {
+              print("Going onto view post from activity yayy");
+              Navigator.pushNamed(context, '/post/${post.id}');
+            },
+          );
         });
   }
 
