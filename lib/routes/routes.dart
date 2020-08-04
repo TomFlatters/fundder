@@ -1,6 +1,8 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/models/user.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/services/database.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
 import 'package:fundder/donation/donate_page_controller.dart';
@@ -22,26 +24,41 @@ import 'package:fundder/web_pages/temparary_upload_page.dart';
 import 'package:fundder/upload_proof_controller.dart';
 import 'package:fundder/welcome_pages/profilepic_setter.dart';
 import 'package:fundder/welcome_pages/tutorial.dart';
+import 'package:provider/provider.dart';
 
 class FluroRouter {
   static Router router = Router();
 
-  // static Handler _postHandler =
-  //     Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
-  //   String pid = params['id'][0];
-  //   String noLikes = params['noLikes'][0];
-  //   String isLiked = params['isLiked'][0];
-  //   String uid = params['uid'][0];
-  //   print('/post/{$pid}/{$noLikes}/{$isLiked}/{$uid}' + "LOLLLLL");
-  //   LikesModel likesModel = LikesModel(
-  //       (isLiked == 'true') ? true : false, int.parse(noLikes),
-  //       uid: uid, postId: pid);
-
-  //   return ViewPost(
-  //     postData: params['id'][0],
-  //     likesModel: likesModel,
-  //   );
-  // });
+  static Handler _postHandler =
+      Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
+    String pid = params['id'][0];
+    print(pid);
+    //   String noLikes = params['noLikes'][0];
+    //   String isLiked = params['isLiked'][0];
+    //   String uid = params['uid'][0];
+    //   print('/post/{$pid}/{$noLikes}/{$isLiked}/{$uid}' + "LOLLLLL");
+    //   LikesModel likesModel = LikesModel(
+    //       (isLiked == 'true') ? true : false, int.parse(noLikes),
+    //       uid: uid, postId: pid);
+    var user = Provider.of<User>(context);
+    var databaseServices = DatabaseService(uid: user.uid);
+    return FutureBuilder(
+      future: databaseServices.getPostById(pid),
+      builder: (context, post) {
+        if (post.connectionState == ConnectionState.done) {
+          var postData = post.data;
+          if (postData == null) {
+            return Container(
+                child: Text("Null post attained from Database services"));
+          } else {
+            return ViewPost(postData);
+          }
+        } else {
+          return Container();
+        }
+      },
+    );
+  });
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(pid: params['id'][0]));
@@ -109,11 +126,11 @@ class FluroRouter {
           TemporaryUpload());
 
   static void setupRouter() {
-    // router.define(
-    //   '/post/:id/:noLikes/:isLiked/:uid',
-    //   handler: _postHandler,
-    //   transitionType: TransitionType.fadeIn,
-    // );
+    router.define(
+      '/post/:id', // /:noLikes/:isLiked/:uid',
+      handler: _postHandler,
+      transitionType: TransitionType.fadeIn,
+    );
     router.define(
       '/post/:id/comments',
       handler: _commentHandler,
