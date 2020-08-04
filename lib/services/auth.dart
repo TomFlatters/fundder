@@ -52,11 +52,12 @@ class AuthService {
       AuthResult result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       FirebaseUser user = result.user;
+      user.sendEmailVerification();
       String defaultPic =
           'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
       // create a new (firestore) document for the user with corresponding uid
       await DatabaseService(uid: user.uid)
-          .updateUserData(email, username, null, defaultPic);
+          .registerUserData(email, username, null, defaultPic);
       _getFCMToken(user.uid);
       // ADD: user sets username
       return _userFromFirebaseUser(user);
@@ -97,7 +98,7 @@ class AuthService {
     });
   }
 
-  void _removeFCMToken() async {
+  Future _removeFCMToken() async {
     final FirebaseUser user = await _auth.currentUser();
     final uid = user.uid;
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -110,12 +111,22 @@ class AuthService {
     });
   }
 
+  Future forgotPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return 'Password reset email sent';
+    } catch (e) {
+      print(e.toString());
+      return e.toString();
+    }
+  }
+
   // ... add more for Google and Facebook
 
   // sign out
   Future signOut() async {
     try {
-      _removeFCMToken();
+      await _removeFCMToken();
       return await _auth.signOut();
     } catch (e) {
       print(e.toString());
