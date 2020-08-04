@@ -97,7 +97,8 @@ class PaymentBookKeepingSevice {
         .document(postId)
         .collection('whoDonated')
         .document(uid)
-        .setData({uid: true});
+        .setData({uid: true, 'amountDonated': FieldValue.increment(amount)},
+            merge: true);
     postsCollection
         .document(postId)
         .updateData({'moneyRaised': FieldValue.increment(amount)});
@@ -108,6 +109,7 @@ class PaymentBookKeepingSevice {
         .document(uid)
         .collection('myDonations')
         .document(postId)
-        .setData({postId: true});
+        .setData({postId: true, 'amountDonated': FieldValue.increment(amount)},
+            merge: true);
   }
 }
