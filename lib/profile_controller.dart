@@ -338,11 +338,11 @@ class _ProfileState extends State<ProfileController>
                           title: Text(post.title),
                           subtitle: Text(post.subtitle),
                           trailing: post.status == 'done'
-                            ? Icon(
-                                Ionicons.ios_checkmark_circle,
-                                color: HexColor('ff6b6c'),
-                              )
-                            : Container(width: 0),
+                              ? Icon(
+                                  Ionicons.ios_checkmark_circle,
+                                  color: HexColor('ff6b6c'),
+                                )
+                              : Container(width: 0),
                           onTap: () {
                             Navigator.push(
                                 context,

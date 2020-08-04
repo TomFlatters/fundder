@@ -110,6 +110,16 @@ class AuthService {
     });
   }
 
+  Future forgotPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return 'Password reset email sent';
+    } catch (e) {
+      print(e.toString());
+      return e.toString();
+    }
+  }
+
   // ... add more for Google and Facebook
 
   // sign out
