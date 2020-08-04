@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/services/auth.dart';
+import 'package:fundder/services/likes.dart';
+import 'package:fundder/view_post_controller.dart';
 import 'feed.dart';
 import 'profile_actions_view.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -291,8 +294,8 @@ class _ProfileState extends State<ProfileController>
                                     controller: _tabController,
                                   ),
                                   [
-                                    _profileView(),
-                                    _profileView()
+                                    _profileView(user.uid),
+                                    _profileView(user.uid)
                                   ][_tabController.index]
                                 ],
                               ),
@@ -306,27 +309,58 @@ class _ProfileState extends State<ProfileController>
     }
   }
 
-  Widget _profileView() {
+  Widget _profileView(String uid) {
+    LikesService likesService = LikesService(uid: uid);
+
     return ListView.builder(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: postList != null ? postList.length : 0,
         itemBuilder: (BuildContext context, int index) {
+          bool initiallyHasLiked;
+          int initialLikesNo;
           Post post = postList[index];
-          return ListTile(
-            leading: ProfilePic(post.author, 40),
-            title: Text(post.title),
-            subtitle: Text(post.subtitle),
-            trailing: post.status == 'done'
-                ? Icon(
-                    Ionicons.ios_checkmark_circle,
-                    color: HexColor('ff6b6c'),
-                  )
-                : Container(width: 0),
-            onTap: () {
-              Navigator.pushNamed(context, '/post/' + post.id);
-            },
-          );
+          return FutureBuilder(
+              future: likesService.hasUserLikedPost(post.id),
+              builder: (context, hasLiked) {
+                if (hasLiked.connectionState == ConnectionState.done) {
+                  initiallyHasLiked = hasLiked.data;
+                  return FutureBuilder(
+                    future: likesService.noOfLikes(post.id),
+                    builder: (context, noLikes) {
+                      if (noLikes.connectionState == ConnectionState.done) {
+                        initialLikesNo = noLikes.data;
+                        var likesModel = LikesModel(
+                            initiallyHasLiked, initialLikesNo,
+                            uid: uid, postId: post.id);
+                        return ListTile(
+                          leading: ProfilePic(post.author, 40),
+                          title: Text(post.title),
+                          subtitle: Text(post.subtitle),
+                          trailing: post.status == 'done'
+                            ? Icon(
+                                Ionicons.ios_checkmark_circle,
+                                color: HexColor('ff6b6c'),
+                              )
+                            : Container(width: 0),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ViewPost(
+                                        postData: post.id,
+                                        likesModel: likesModel)));
+                          },
+                        );
+                      } else {
+                        return ListTile();
+                      }
+                    },
+                  );
+                } else {
+                  return ListTile();
+                }
+              });
         });
   }
 
