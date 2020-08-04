@@ -4,6 +4,7 @@ import 'package:fundder/post_widgets/commentBar.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/post_widgets/shareBar.dart';
 import 'package:fundder/shared/helper_functions.dart';
+import 'post_widgets/postHeader.dart';
 import 'helper_classes.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'models/post.dart';
@@ -92,9 +93,16 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                             child: Column(
                               children: <Widget>[
                                 Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 10),
-                                  height: 60,
-                                  child: Row(
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    height: 60,
+                                    child: PostHeader(
+                                      postAuthorId: postData.author,
+                                      postAuthorUserName:
+                                          postData.authorUsername,
+                                      targetCharity: postData.charity,
+                                      postStatus: postData.status,
+                                    ) /*Row(
                                     children: <Widget>[
                                       Align(
                                           alignment: Alignment.centerLeft,
@@ -122,21 +130,25 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                               margin: EdgeInsets.all(10.0),
                                               child: Text(postData.charity))),
                                     ],
-                                  ),
-                                ),
+                                  ),*/
+                                    ),
                                 (postData.imageUrl == null)
                                     ? Container()
                                     : Container(
-                                        child: SizedBox(
-                                            /*width:
-                                              MediaQuery.of(context).size.width,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              9 /
-                                              16,*/
-                                            child:
-                                                _previewImageVideo(postData)),
+                                        child: postData.aspectRatio == null
+                                            ? SizedBox(
+                                                child: _previewImageVideo(
+                                                    postData))
+                                            : SizedBox(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    postData.aspectRatio,
+                                                child: _previewImageVideo(
+                                                    postData)),
                                         margin: EdgeInsets.symmetric(
                                             vertical: 10.0),
                                       ),
