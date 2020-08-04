@@ -101,10 +101,10 @@ class _FeedViewState extends State<FeedView> {
                                   EdgeInsets.only(left: 0, right: 0, top: 0),
                               child: Column(children: <Widget>[
                                 PostHeader(
-                                  postAuthorId: postData.author,
-                                  postAuthorUserName: postData.authorUsername,
-                                  targetCharity: postData.charity,
-                                ),
+                                    postAuthorId: postData.author,
+                                    postAuthorUserName: postData.authorUsername,
+                                    targetCharity: postData.charity,
+                                    postStatus: postData.status),
                                 PostBody(postData: postData),
                                 Container(
                                   //action bar
