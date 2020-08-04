@@ -338,10 +338,8 @@ class _ProfileState extends State<ProfileController>
                           title: Text(post.title),
                           subtitle: Text(post.subtitle),
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ViewPost(post)));
+                            print("Going onto view post from activity yayy");
+                            Navigator.pushNamed(context, '/post/${post.id}');
                           },
                         );
                       } else {
