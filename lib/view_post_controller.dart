@@ -110,7 +110,7 @@ class ViewPost extends StatelessWidget with RouteAware {
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     LikesService likesService = LikesService(uid: user.uid);
-    LikesModel likesModel;
+
     bool initiallyHasLiked;
     int initialLikesNo;
 
@@ -125,8 +125,12 @@ class ViewPost extends StatelessWidget with RouteAware {
                 future: likesService.noOfLikes(postData.id),
                 builder: (context, noLikes) {
                   if (noLikes.connectionState == ConnectionState.done) {
-                    likesModel = LikesModel(initiallyHasLiked, initialLikesNo,
+                    initialLikesNo = noLikes.data;
+                    var likesModel = LikesModel(
+                        initiallyHasLiked, initialLikesNo,
                         uid: user.uid, postId: postData.id);
+                    print(
+                        'In viewpost, just made a likesModel and the values are ${likesModel.noLikes} and ${likesModel.isLiked}');
                     return Scaffold(
                       appBar: kIsWeb == true
                           ? null
