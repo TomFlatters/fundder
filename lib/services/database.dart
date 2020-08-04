@@ -220,7 +220,7 @@ class DatabaseService {
   }
 
   // Get a post from Firestore given a known id
-  Future getPostById(String documentId) async {
+  Future<Post> getPostById(String documentId) async {
     String formattedId = documentId.substring(0,
         documentId.length); // I think this needs to be changed for older posts
     DocumentReference docRef = postsCollection.document(formattedId);
