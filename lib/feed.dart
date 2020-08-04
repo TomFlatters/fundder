@@ -162,20 +162,18 @@ class _FeedViewState extends State<FeedView> {
                             ),
                           ),
                           onTap: () async {
-                            var pid = postData.id;
-                            var noLikes = likesModel.noLikes;
-                            var isLiked = likesModel.isLiked;
-                            var uid = user.uid;
-                            //passing state into ViewPost screen
-                            LikesModel likeState = LikesModel(isLiked, noLikes,
-                                uid: uid, postId: pid);
+                            // var pid = postData.id;
+                            // var noLikes = likesModel.noLikes;
+                            // var isLiked = likesModel.isLiked;
+                            // var uid = user.uid;
+                            // //passing state into ViewPost screen
+                            // LikesModel likeState = LikesModel(isLiked, noLikes,
+                            //     uid: uid, postId: pid);
 
                             var newState = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ViewPost(
-                                        postData: postData.id,
-                                        likesModel: likeState)));
+                                    builder: (context) => ViewPost(postData)));
                             likesModel.manuallySetState(
                                 newState['noLikes'], newState['isLiked']);
                           },
