@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/helper_classes.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fundder/helper_classes.dart';
 
 //NB* A widget that aligns its child within itself and optionally sizes itself based on the child's size.
 
@@ -8,7 +10,12 @@ class PostHeader extends StatelessWidget {
   final String postAuthorUserName;
 
   final String targetCharity;
-  PostHeader({this.postAuthorId, this.postAuthorUserName, this.targetCharity});
+  final String postStatus;
+  PostHeader(
+      {this.postAuthorId,
+      this.postAuthorUserName,
+      this.targetCharity,
+      this.postStatus});
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +49,17 @@ class PostHeader extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: Container(
                   margin: EdgeInsets.all(10.0), child: Text(targetCharity))),
+          this.postStatus == 'done'
+              ? Row(children: [
+                  Icon(
+                    Ionicons.ios_checkmark_circle,
+                    color: HexColor('ff6b6c'),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  )
+                ])
+              : Container(),
         ],
       ),
     );
