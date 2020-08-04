@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/post_widgets/commentBar.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/post_widgets/postBody.dart';
+import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/post_widgets/shareBar.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'helper_classes.dart';
@@ -21,51 +23,98 @@ import 'models/user.dart';
 import 'video_item.dart';
 import 'global_widgets/buttons.dart';
 
-class ViewPost extends StatefulWidget {
-  final String postData;
-  final LikesModel likesModel;
-  ViewPost({this.postData, this.likesModel});
-
-  @override
-  _ViewPostState createState() => _ViewPostState();
-}
-
-class _ViewPostState extends State<ViewPost> with RouteAware {
+class ViewPost extends StatelessWidget with RouteAware {
   RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
-  Post postData;
 
-  @override
-  void initState() {
-    //print(widget.postData);
-    _getPost();
-    super.initState();
-  }
+  final Post postData;
+  int noLikes;
+  bool hasLiked;
 
-  void _getPost() {
-    DatabaseService(uid: widget.postData)
-        .getPostById(widget.postData)
-        .then((post) => {
-              setState(() {
-                print("set state");
-                print(post);
-                postData = post;
-              })
-            });
+  ViewPost(this.postData, {this.noLikes, this.hasLiked});
+
+  Container createPostUI(
+      Post postData, LikesModel likesModel, String uid, context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      color: Colors.white,
+      child: Container(
+        margin: EdgeInsets.only(left: 0, right: 0, top: 0),
+        child: Column(children: <Widget>[
+          PostHeader(
+            postAuthorId: postData.author,
+            postAuthorUserName: postData.authorUsername,
+            targetCharity: postData.charity,
+          ),
+          PostBody(postData: postData),
+          Container(
+            //action bar
+            key: GlobalKey(),
+            height: 30,
+            child: Row(children: <Widget>[
+              Expanded(
+                //like bar
+                child: ChangeNotifierProvider(
+                    create: (context) => likesModel, child: LikeBar()),
+              ),
+              Expanded(
+                  child: Align(
+                alignment: Alignment.centerLeft,
+                child: CommentButton(
+                  pid: postData.id,
+                ),
+              )),
+              Expanded(
+                child: ShareBar(),
+              ),
+            ]),
+          ),
+          Row(children: [
+            Expanded(
+              child: Container(
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.all(10),
+                child: Text(
+                  howLongAgo(postData.timestamp),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+            postData.author != uid
+                ? Container()
+                : FlatButton(
+                    onPressed: () {
+                      print('button pressed');
+                      _showDeleteDialog(postData);
+                    },
+                    child: Text('Delete',
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        )),
+                  ),
+          ])
+        ]),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     print("View post controller");
-    //print(howLongAgo(postData.timestamp));
-    return (postData == null)
+    //print(howLongAgo(postId.timestamp));
+    return (postId == null)
         ? Loading()
         : Scaffold(
             appBar: kIsWeb == true
                 ? null
                 : AppBar(
                     centerTitle: true,
-                    title: Text(postData.title),
+                    title: Text(postId.title),
                     actions: <Widget>[
                       new IconButton(
                           icon: new Icon(Icons.close),
@@ -102,14 +151,14 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                               aspectRatio: 1 / 1,
                                               child: Container(
                                                 child: ProfilePic(
-                                                    postData.author, 40),
+                                                    postId.author, 40),
                                                 margin: EdgeInsets.all(10.0),
                                               ))),
                                       Expanded(
                                         child: Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              postData.authorUsername,
+                                              postId.authorUsername,
                                               style: TextStyle(
                                                 fontFamily: 'Quicksand',
                                                 fontWeight: FontWeight.w600,
@@ -120,11 +169,11 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                           alignment: Alignment.centerRight,
                                           child: Container(
                                               margin: EdgeInsets.all(10.0),
-                                              child: Text(postData.charity))),
+                                              child: Text(postId.charity))),
                                     ],
                                   ),
                                 ),
-                                (postData.imageUrl == null)
+                                (postId.imageUrl == null)
                                     ? Container()
                                     : Container(
                                         child: SizedBox(
@@ -135,8 +184,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                                   .width *
                                               9 /
                                               16,*/
-                                            child:
-                                                _previewImageVideo(postData)),
+                                            child: _previewImageVideo(postId)),
                                         margin: EdgeInsets.symmetric(
                                             vertical: 10.0),
                                       ),
@@ -145,7 +193,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                     margin: EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     child: Text(
-                                      '£${postData.amountRaised} raised of £${postData.targetAmount} target',
+                                      '£${postId.amountRaised} raised of £${postId.targetAmount} target',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     )),
@@ -156,7 +204,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                   child: LinearPercentIndicator(
                                     linearStrokeCap: LinearStrokeCap.butt,
                                     lineHeight: 3,
-                                    percent: postData.percentRaised(),
+                                    percent: postId.percentRaised(),
                                     backgroundColor: HexColor('CCCCCC'),
                                     progressColor: HexColor('ff6b6c'),
                                   ),
@@ -165,7 +213,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                     alignment: Alignment.centerLeft,
                                     margin: EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
-                                    child: Text(postData.subtitle)),
+                                    child: Text(postId.subtitle)),
                                 Padding(
                                   padding: EdgeInsets.only(
                                       left: 20, right: 20, bottom: 20),
@@ -183,7 +231,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                     ),
                                     Expanded(
                                         child: CommentButton(
-                                      pid: postData.id,
+                                      pid: postId.id,
                                     )),
                                     Expanded(
                                       child: ShareBar(),
@@ -196,20 +244,19 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                       alignment: Alignment.centerLeft,
                                       margin: EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
-                                      child:
-                                          Text(howLongAgo(postData.timestamp),
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              )),
+                                      child: Text(howLongAgo(postId.timestamp),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          )),
                                     ),
                                   ),
-                                  postData.author != user.uid
+                                  postId.author != user.uid
                                       ? Container()
                                       : FlatButton(
                                           onPressed: () {
                                             print('button pressed');
-                                            _showDeleteDialog(postData);
+                                            _showDeleteDialog(postId);
                                           },
                                           child: Text('Delete',
                                               textAlign: TextAlign.right,
@@ -223,14 +270,11 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                     text: 'Donate',
                                     onPressed: () {
                                       /*Navigator.of(context).push(_openDonate());*/
-                                      Navigator.pushNamed(
-                                          context,
-                                          '/post/' +
-                                              widget.postData +
-                                              '/donate');
+                                      Navigator.pushNamed(context,
+                                          '/post/' + widget.postId + '/donate');
                                     }),
-                                user.uid != postData.author ||
-                                        postData.status != 'fund'
+                                user.uid != postId.author ||
+                                        postId.status != 'fund'
                                     ? Container()
                                     : PrimaryFundderButton(
                                         text: 'Complete Challenge',
@@ -238,7 +282,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                           Navigator.pushNamed(
                                                   context,
                                                   '/post/' +
-                                                      widget.postData +
+                                                      widget.postId +
                                                       '/uploadProof')
                                               .then((_) {
                                             // you have come back to your Settings screen
@@ -296,19 +340,19 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
     );
   }
 
-  Widget _previewImageVideo(Post postData) {
-    if (postData.imageUrl.contains('video')) {
+  Widget _previewImageVideo(Post postId) {
+    if (postId.imageUrl.contains('video')) {
       print('initialising video');
       return VideoItem(
         key: UniqueKey(),
-        url: postData.imageUrl,
+        url: postId.imageUrl,
       );
     } else {
       return kIsWeb == true
-          ? Image.network(postData.imageUrl)
+          ? Image.network(postId.imageUrl)
           : CachedNetworkImage(
-              imageUrl: (postData.imageUrl != null)
-                  ? postData.imageUrl
+              imageUrl: (postId.imageUrl != null)
+                  ? postId.imageUrl
                   : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
               placeholder: (context, url) => Loading(),
               errorWidget: (context, url, error) => Icon(Icons.error),
