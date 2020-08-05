@@ -92,6 +92,9 @@ class _SearchState extends State<SearchController>
                     controller: _tabController,
                   ),
                 ),
+                onCancelled: () {
+                  FocusScope.of(context).unfocus();
+                },
                 hintText: 'search accounts',
                 onSearch: search,
                 emptyWidget: SearchDescriptor(),
