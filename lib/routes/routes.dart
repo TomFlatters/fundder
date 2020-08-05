@@ -48,12 +48,13 @@ class FluroRouter {
       builder: (context, post) {
         if (post.connectionState == ConnectionState.done) {
           var postData = post.data;
-          if (postData == null) {
+          /*if (postData == null) {
             return Container(
-                child: Text("Null post attained from Database services"));
-          } else {
-            return ViewPost(postData);
-          }
+                child: Text(
+                    "Error retrieving post: either the post does not exist, or your internet is not connected"));
+          } else {*/
+          return ViewPost(postData);
+          //}
         } else {
           return Container();
         }
