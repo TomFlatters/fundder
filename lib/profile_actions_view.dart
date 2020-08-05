@@ -36,7 +36,7 @@ class ProfileActions extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        ListTile(
+        /*ListTile(
           leading: Icon(FontAwesome.money),
           title: Text('Payments'),
           onTap: () {},
@@ -50,7 +50,7 @@ class ProfileActions extends StatelessWidget {
           leading: Icon(MaterialCommunityIcons.account_badge_outline),
           title: Text('Account'),
           onTap: () {},
-        ),
+        ),*/
       ],
     );
   }
