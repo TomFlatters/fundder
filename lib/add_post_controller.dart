@@ -180,6 +180,7 @@ class _AddPostState extends State<AddPost> {
               noComments: 0,
               timestamp: DateTime.now(),
               amountRaised: "0",
+              moneyRaised: 0,
               targetAmount: moneyController.text.toString(),
               imageUrl: downloadUrl,
               status: 'fund',
