@@ -120,7 +120,10 @@ class _ActivityState extends State<LikedController> {
                                                     )),
                                                 onTap: () {
                                                   Navigator.pushNamed(
-                                                      context, '/username');
+                                                      context,
+                                                      '/user/' +
+                                                          likedItem[
+                                                              'docLiker']);
                                                 },
                                               )),
                                           Expanded(
