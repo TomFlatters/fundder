@@ -117,6 +117,7 @@ class _AddPostState extends State<AddPost> {
                     carouselController: _carouselController,
                     options: CarouselOptions(
                       onPageChanged: (index, reason) {
+                        _changePage();
                         setState(() {
                           _current = index;
                         });
@@ -139,6 +140,10 @@ class _AddPostState extends State<AddPost> {
               ),
             );
     }
+  }
+
+  void _changePage() {
+    FocusScope.of(context).unfocus();
   }
 
   void _retrieveUser() async {
