@@ -30,11 +30,13 @@ class FeedView extends StatefulWidget {
   @override
   _FeedViewState createState() => _FeedViewState();
 
+  final VoidCallback onDeletePressed;
   final Color colorChoice;
   final String feedChoice;
   final String identifier;
   final List<Post> postList;
   FeedView(this.feedChoice, this.identifier, this.colorChoice, this.postList,
+      this.onDeletePressed,
       {Key key});
 }
 
@@ -222,6 +224,7 @@ class _FeedViewState extends State<FeedView> {
                     .delete()
                     .then((value) {
                   Navigator.of(context).pop();
+                  widget.onDeletePressed();
                 });
               },
             ),
