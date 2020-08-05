@@ -46,7 +46,10 @@ class _FeedWrapperState extends State<FeedWrapper> {
         .refreshPosts(widget.status, limit, loadingTimestamp);
     postList = [
       FeedView(
-          widget.feedChoice, widget.identifier, HexColor('ff6b6c'), futurePost)
+          widget.feedChoice, widget.identifier, HexColor('ff6b6c'), futurePost,
+          () {
+        _onRefresh();
+      })
     ];
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
@@ -69,7 +72,9 @@ class _FeedWrapperState extends State<FeedWrapper> {
       if (futurePost.isEmpty == false) {
         print('futurePost' + futurePost.toString());
         postList.add(FeedView(widget.feedChoice, widget.identifier,
-            HexColor('ff6b6c'), futurePost));
+            HexColor('ff6b6c'), futurePost, () {
+          _onRefresh();
+        }));
         Post post = futurePost.last;
         loadingTimestamp = post.timestamp;
       }

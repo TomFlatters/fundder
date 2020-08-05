@@ -89,7 +89,8 @@ class ViewPost extends StatelessWidget with RouteAware {
             ),
             postData.author != uid
                 ? Container()
-                : FlatButton(
+                : Container() // Decided against allowing deletion on view post controller for now as passing the reloading to feed is difficult
+            /*FlatButton(
                     onPressed: () {
                       print('button pressed');
                       _showDeleteDialog(postData, context);
@@ -100,7 +101,7 @@ class ViewPost extends StatelessWidget with RouteAware {
                           fontSize: 14,
                           color: Colors.grey,
                         )),
-                  ),
+                  ),*/
           ])
         ]),
       ),
