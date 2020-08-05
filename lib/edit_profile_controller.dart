@@ -73,8 +73,8 @@ class _EditProfileState extends State<EditProfile> {
         centerTitle: true,
         title: Text('Edit Profile'),
         actions: <Widget>[
-          new IconButton(
-            icon: Text('Save'),
+          new FlatButton(
+            child: Text('Save'),
             onPressed: () {
               setState(() {
                 isLoading = true;
