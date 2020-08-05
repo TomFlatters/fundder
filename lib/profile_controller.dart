@@ -322,18 +322,75 @@ class _ProfileState extends State<ProfileController>
             leading: ProfilePic(post.author, 40),
             title: Text(post.title),
             subtitle: Text(post.subtitle),
-            trailing: post.status == 'done'
-                ? Icon(
-                    Ionicons.ios_checkmark_circle,
-                    color: HexColor('ff6b6c'),
-                  )
-                : Container(width: 0),
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              post.status == 'done'
+                  ? Icon(
+                      Ionicons.ios_checkmark_circle,
+                      color: HexColor('ff6b6c'),
+                    )
+                  : Container(width: 0),
+              post.author != uid
+                  ? Container(width: 0)
+                  : FlatButton(
+                      onPressed: () {
+                        print('button pressed');
+                        _showDeleteDialog(post);
+                      },
+                      child: Text('Delete',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          )),
+                    ),
+            ]),
             onTap: () {
               print("Going onto view post from activity yayy");
               Navigator.pushNamed(context, '/post/${post.id}');
             },
           );
         });
+  }
+
+  Future<void> _showDeleteDialog(Post post) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Post?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Once you delete this post, all the money donated will be refunded unless you have uploaded proof of challenge completion. This cannot be undone.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Firestore.instance
+                    .collection('posts')
+                    .document(post.id)
+                    .delete()
+                    .then((value) {
+                  Navigator.of(context).pop();
+                  _onRefresh();
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _onRefresh() async {
