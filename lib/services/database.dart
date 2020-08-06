@@ -323,17 +323,32 @@ class DatabaseService {
         });
   }
 
-  Future<List<DocumentSnapshot>> postsContainingString(String queryText) {
-    return postsCollection
-        .orderBy('subtitle', descending: false)
-        .startAt([queryText])
-        .endAt([queryText + '\uf8ff'])
-        .limit(20)
-        .getDocuments()
-        .then((snapshot) {
-          return snapshot.documents.map((DocumentSnapshot doc) {
-            return doc;
-          }).toList();
-        });
+  Future<List<DocumentSnapshot>> hashtagsContainingString(String queryText) {
+    if (queryText != "") {
+      return Firestore.instance
+          .collection('hashtags')
+          .orderBy(FieldPath.documentId, descending: false)
+          .startAt([queryText])
+          .endAt([queryText + '\uf8ff'])
+          //.where(FieldPath.documentId, isGreaterThanOrEqualTo: queryText)
+          .limit(20)
+          .getDocuments()
+          .then((snapshot) {
+            return snapshot.documents.map((DocumentSnapshot doc) {
+              return doc;
+            }).toList();
+          });
+    } else {
+      return Firestore.instance
+          .collection('hashtags')
+          //.where(FieldPath.documentId, isGreaterThanOrEqualTo: queryText)
+          .limit(20)
+          .getDocuments()
+          .then((snapshot) {
+        return snapshot.documents.map((DocumentSnapshot doc) {
+          return doc;
+        }).toList();
+      });
+    }
   }
 }
