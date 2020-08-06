@@ -77,7 +77,7 @@ class LikeBar extends StatelessWidget {
                         child: Text(
                           likesModel.noLikes.toString(),
                           style:
-                              TextStyle(fontSize: 17, color: Colors.grey[850]),
+                              TextStyle(fontSize: 15, color: Colors.grey[850]),
                           textAlign: TextAlign.left,
                         )))
               ]))
