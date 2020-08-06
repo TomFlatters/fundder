@@ -67,9 +67,16 @@ class _VerificationState extends State<CheckVerified> {
                     verificationText = 'Verification email sent';
                   });
                 }),
+            SecondaryFundderButton(
+              text: 'Sign out',
+              onPressed: () async {
+                await _auth.signOut();
+                Navigator.pop(context);
+              },
+            ),
             SizedBox(
               height: 30,
-            )
+            ),
           ],
         ));
   }

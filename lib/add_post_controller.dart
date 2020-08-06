@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'shared/loading.dart';
 import 'global_widgets/buttons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'services/hashtags.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -168,7 +170,8 @@ class _AddPostState extends State<AddPost> {
     if (titleController.text == "" ||
         subtitleController.text == "" ||
         charity == -1 ||
-        moneyController.text == "0.00") {
+        moneyController.text == "0.00" ||
+        hashtags.length < 2) {
       setState(() {
         _submitting = false;
       });
@@ -189,7 +192,8 @@ class _AddPostState extends State<AddPost> {
               targetAmount: moneyController.text.toString(),
               imageUrl: downloadUrl,
               status: 'fund',
-              aspectRatio: aspectRatio))
+              aspectRatio: aspectRatio,
+              hashtags: hashtags))
           .then((postId) => {
                 if (postId == null)
                   {
@@ -203,6 +207,8 @@ class _AddPostState extends State<AddPost> {
                         postId
                             .toString()
                             .substring(1, postId.toString().length - 1)),
+                    HashtagsService(uid: user.uid)
+                        .addHashtag(postId.toString(), hashtags),
 
                     // if the post is successfully added, view the post
                     /*DatabaseService(uid: user.uid).getPostById(postId.toString())
@@ -252,10 +258,12 @@ class _AddPostState extends State<AddPost> {
   // _defineDescription state:
   final titleController = TextEditingController();
   final subtitleController = TextEditingController();
+  final hashtagController = TextEditingController();
   final descriptionController = TextEditingController();
+  List<String> hashtags = [];
 
   Widget _defineDescription() {
-    return ListView(children: <Widget>[
+    return ListView(shrinkWrap: true, children: <Widget>[
       Container(
           color: Colors.white,
           margin: EdgeInsets.symmetric(vertical: 5),
@@ -294,7 +302,81 @@ class _AddPostState extends State<AddPost> {
                     maxLines: null,
                     decoration: InputDecoration(
                         hintText: 'This will appear under the title')),
-              ]))
+                Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: RichText(
+                        text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.black,
+                              fontFamily: 'Muli',
+                            ),
+                            children: [
+                          TextSpan(
+                              text: 'Hashtags ',
+                              style: TextStyle(
+                                fontFamily: 'Quicksand',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              )),
+                          TextSpan(
+                              text: 'minimum 2, maximum 5',
+                              style: TextStyle(
+                                fontFamily: 'Quicksand',
+                                fontSize: 12,
+                              )),
+                        ]))),
+                Row(children: [
+                  Expanded(
+                      child: TextField(
+                          inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]"))
+                      ],
+                          controller: hashtagController,
+                          keyboardType: TextInputType.text,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                              hintText:
+                                  'Only text allowed, press add for each hashtag'))),
+                  hashtags.length < 5
+                      ? FlatButton(
+                          onPressed: () {
+                            if (hashtags.contains(hashtagController.text) ==
+                                false) {
+                              setState(() {
+                                hashtags
+                                    .add(hashtagController.text.toLowerCase());
+                                hashtagController.text = "";
+                              });
+                            }
+                          },
+                          child: Text('Add'))
+                      : Container()
+                ]),
+                ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: hashtags.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        dense: true,
+                        title: Text("#" + hashtags[index]),
+                        trailing: FlatButton(
+                          child: Text('Delete',
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              )),
+                          onPressed: () {
+                            setState(() {
+                              hashtags.removeAt(index);
+                            });
+                          },
+                        ),
+                      );
+                    })
+              ])),
     ]);
   }
 
@@ -460,18 +542,31 @@ class _AddPostState extends State<AddPost> {
   Widget _imageUpload() {
     return ListView(children: <Widget>[
       Container(
-        color: Colors.white,
-        margin: EdgeInsets.symmetric(vertical: 5),
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-        child: Text(
-          'Add a photo to make your Fundder more recognisable',
-          style: TextStyle(
-            fontFamily: 'Quicksand',
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-      ),
+          color: Colors.white,
+          margin: EdgeInsets.symmetric(vertical: 5),
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          child: RichText(
+              text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.black,
+                    fontFamily: 'Muli',
+                  ),
+                  children: [
+                TextSpan(
+                    text: 'Add a photo to make your Fundder more recognisable ',
+                    style: TextStyle(
+                      fontFamily: 'Quicksand',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    )),
+                TextSpan(
+                    text: 'optional',
+                    style: TextStyle(
+                      fontFamily: 'Quicksand',
+                      fontSize: 12,
+                    )),
+              ]))),
       Container(
         child: _decideImageView(),
         width: MediaQuery.of(context).size.width,

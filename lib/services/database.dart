@@ -215,7 +215,8 @@ class DatabaseService {
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
           'status': post.status,
-          'aspectRatio': post.aspectRatio
+          'aspectRatio': post.aspectRatio,
+          "hashtags": post.hashtags
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
