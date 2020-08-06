@@ -16,8 +16,8 @@ class ShareBar extends StatelessWidget {
     return FlatButton(
       child: Row(children: [
         Container(
-          width: 20,
-          height: 20,
+          width: 25,
+          height: 25,
           padding: const EdgeInsets.all(0.0),
           child: Image.asset('assets/images/share.png'),
         ),
@@ -27,6 +27,7 @@ class ShareBar extends StatelessWidget {
                 child: Text(
                   'Share',
                   textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 17, color: Colors.grey[850]),
                 )))
       ]),
       onPressed: () {

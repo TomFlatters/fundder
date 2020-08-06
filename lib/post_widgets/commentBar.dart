@@ -8,10 +8,13 @@ class CommentButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlatButton(
       child: Container(
-        width: 20,
-        height: 20,
+        width: 23,
+        height: 23,
         padding: const EdgeInsets.all(0.0),
-        child: Image.asset('assets/images/comment.png'),
+        child: Image.asset(
+          'assets/images/comment.png',
+          color: Colors.grey[850],
+        ),
       ),
       onPressed: () {
         Navigator.pushNamed(context, '/post/' + pid + '/comments');
