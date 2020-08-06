@@ -15,7 +15,7 @@ class SearchDescriptor extends StatelessWidget {
             Container(
                 margin: EdgeInsets.only(top: 30, left: 40, right: 40),
                 child: Text(
-                  'Search for users by username or for posts by keyword',
+                  'Search for posts by hashtag or for users by username',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.grey,
