@@ -18,6 +18,7 @@ class Post {
   final int noLikes;
   final int noComments;
   final double aspectRatio;
+  final List<String> hashtags;
 
   final String subtitle;
   final timestamp;
@@ -43,7 +44,8 @@ class Post {
       this.status,
       this.peopleThatLikedThis,
       this.aspectRatio,
-      this.moneyRaised});
+      this.moneyRaised,
+      this.hashtags});
 
   double percentRaised() {
     //print("Amount raised1" + amountRaised);
