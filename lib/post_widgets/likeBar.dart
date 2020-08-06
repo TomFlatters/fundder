@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../models/user.dart';
 import '../services/likes.dart';
+import 'package:fundder/helper_classes.dart';
 
 class LikesModel extends ChangeNotifier {
   //the 'state' of the likes on a 'postId' post in 'uid' user's feed is housed here
@@ -51,31 +52,35 @@ class LikeBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var likesModel = Provider.of<LikesModel>(context);
-    return Container(
-        height: 30,
-        child: Row(children: <Widget>[
-          Expanded(
-              child: FlatButton(
-                  onPressed: () {
-                    likesModel.likePressed();
-                  },
+    return FlatButton(
+        onPressed: () {
+          likesModel.likePressed();
+        },
+        child: Container(
+            height: 40,
+            child: Row(children: <Widget>[
+              Expanded(
                   child: Row(children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      padding: const EdgeInsets.all(0.0),
-                      child: (likesModel.isLiked)
-                          ? Image.asset('assets/images/like_selected.png')
-                          : Image.asset('assets/images/like.png'),
-                    ),
-                    Expanded(
-                        child: Container(
-                            margin: EdgeInsets.only(left: 10),
-                            child: Text(
-                              likesModel.noLikes.toString(),
-                              textAlign: TextAlign.left,
-                            )))
-                  ])))
-        ]));
+                Container(
+                  width: 25,
+                  height: 25,
+                  padding: const EdgeInsets.all(0.0),
+                  child: (likesModel.isLiked)
+                      ? Image.asset('assets/images/like_selected.png',
+                          color: HexColor('ff6b6c'))
+                      : Image.asset('assets/images/like.png',
+                          color: Colors.grey[850]),
+                ),
+                Expanded(
+                    child: Container(
+                        margin: EdgeInsets.only(left: 10),
+                        child: Text(
+                          likesModel.noLikes.toString(),
+                          style:
+                              TextStyle(fontSize: 17, color: Colors.grey[850]),
+                          textAlign: TextAlign.left,
+                        )))
+              ]))
+            ])));
   }
 }
