@@ -54,7 +54,7 @@ class _SearchState extends State<SearchController>
     if (_tabController.index == 0) {
       return DatabaseService(uid: uid).usersContainingString(search);
     } else {
-      return DatabaseService(uid: uid).postsContainingString(search);
+      return DatabaseService(uid: uid).hashtagsContainingString(search);
     }
   }
 
@@ -88,10 +88,13 @@ class _SearchState extends State<SearchController>
                   length: 2,
                   initialIndex: 0,
                   child: TabBar(
-                    tabs: [Tab(text: 'Users'), Tab(text: 'Posts')],
+                    tabs: [Tab(text: 'Users'), Tab(text: 'Hashtags')],
                     controller: _tabController,
                   ),
                 ),
+                onCancelled: () {
+                  FocusScope.of(context).unfocus();
+                },
                 hintText: 'search accounts',
                 onSearch: search,
                 emptyWidget: SearchDescriptor(),
@@ -109,11 +112,17 @@ class _SearchState extends State<SearchController>
                     // if they are searching for posts
                   } else {
                     return ListTile(
-                      leading: ProfilePic(doc.data['author'], 40),
-                      title: Text(doc.data['subtitle']),
-                      subtitle: Text(doc.data['authorUsername']),
+                      //leading: ProfilePic(doc.data['author'], 40),
+                      title: Text("#" + doc.documentID.toString()),
+                      subtitle:
+                          Text(doc.data['count'].toString() + " challenges"),
                       onTap: () {
-                        Navigator.pushNamed(context, '/post/' + doc.documentID);
+                        Navigator.pushNamed(
+                            context,
+                            '/hashtag/' +
+                                doc.documentID.toString() +
+                                '/' +
+                                doc.data['count'].toString());
                       },
                     );
                   }
