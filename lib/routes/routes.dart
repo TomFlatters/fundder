@@ -26,6 +26,7 @@ import 'package:fundder/welcome_pages/profilepic_setter.dart';
 import 'package:fundder/welcome_pages/tutorial.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/auth_screens/check_verified.dart';
+import 'package:fundder/search/hashtag_feed.dart';
 
 class FluroRouter {
   static Router router = Router();
@@ -99,6 +100,9 @@ class FluroRouter {
   static Handler _tutorialHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           Tutorial(uid: params['id'][0]));
+  static Handler _hashtagHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          HashtagFeed(params['id'][0], params['id2'][0]));
 
   // Web handlers
 
@@ -197,6 +201,12 @@ class FluroRouter {
     router.define(
       '/:id/verification',
       handler: _checkVerifiedHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+
+    router.define(
+      'hashtag/:id/:id2',
+      handler: _hashtagHandler,
       transitionType: TransitionType.fadeIn,
     );
 

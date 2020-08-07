@@ -166,6 +166,21 @@ class DatabaseService {
         });
   }
 
+  Future<List<Post>> refreshHashtag(
+      String hashtag, int limit, Timestamp startTimestamp) {
+    print('limit: ' + limit.toString());
+    return postsCollection
+        .orderBy("timestamp", descending: true)
+        .startAfter([startTimestamp])
+        .limit(limit)
+        .where('hashtags', arrayContains: hashtag)
+        .getDocuments()
+        .then((snapshot) {
+          print(_postsDataFromSnapshot(snapshot));
+          return _postsDataFromSnapshot(snapshot);
+        });
+  }
+
   Future<List<Post>> authorPosts(String id) {
     print('gettig posts by author: ' + id);
     return postsCollection

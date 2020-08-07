@@ -117,7 +117,12 @@ class _SearchState extends State<SearchController>
                       subtitle:
                           Text(doc.data['count'].toString() + " challenges"),
                       onTap: () {
-                        //Navigator.pushNamed(context, '/post/' + doc.documentID);
+                        Navigator.pushNamed(
+                            context,
+                            '/hashtag/' +
+                                doc.documentID.toString() +
+                                '/' +
+                                doc.data['count'].toString());
                       },
                     );
                   }

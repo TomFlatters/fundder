@@ -42,8 +42,14 @@ class _FeedWrapperState extends State<FeedWrapper> {
   void _onRefresh() async {
     // monitor network fetch
     loadingTimestamp = Timestamp.now();
-    List<Post> futurePost = await DatabaseService()
-        .refreshPosts(widget.status, limit, loadingTimestamp);
+    List<Post> futurePost;
+    if (widget.status == 'hashtag') {
+      futurePost = await DatabaseService()
+          .refreshHashtag(widget.identifier, limit, loadingTimestamp);
+    } else {
+      futurePost = await DatabaseService()
+          .refreshPosts(widget.status, limit, loadingTimestamp);
+    }
     postList = [
       FeedView(
           widget.feedChoice, widget.identifier, HexColor('ff6b6c'), futurePost,
@@ -66,8 +72,14 @@ class _FeedWrapperState extends State<FeedWrapper> {
   void _onLoading() async {
     // monitor network fetch
 
-    List<Post> futurePost = await DatabaseService()
-        .refreshPosts(widget.status, limit, loadingTimestamp);
+    List<Post> futurePost;
+    if (widget.status == 'hashtag') {
+      futurePost = await DatabaseService()
+          .refreshHashtag(widget.identifier, limit, loadingTimestamp);
+    } else {
+      futurePost = await DatabaseService()
+          .refreshPosts(widget.status, limit, loadingTimestamp);
+    }
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
         print('futurePost' + futurePost.toString());
