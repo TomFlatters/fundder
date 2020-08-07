@@ -141,11 +141,12 @@ class _CommentPageState extends State<CommentPage> {
                           child: Container(
                             child: GestureDetector(
                               child: Container(
-                                width: 80,
-                                height: 40,
-                                padding: const EdgeInsets.all(0.0),
-                                child: Text('Send'),
-                              ),
+                                  width: 70,
+                                  height: 80,
+                                  padding: const EdgeInsets.only(right: 25.0),
+                                  child: Center(
+                                    child: Text('Send'),
+                                  )),
                               onTap: () {
                                 Map comment = {
                                   "uid": user.uid,
@@ -160,7 +161,7 @@ class _CommentPageState extends State<CommentPage> {
                           ),
                         );
                       } else {
-                        return GestureDetector();
+                        return Container(width: 0, height: 0);
                       }
                     },
                   ),
