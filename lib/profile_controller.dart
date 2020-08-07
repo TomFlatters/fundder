@@ -259,24 +259,28 @@ class _ProfileState extends State<ProfileController>
                                                 '/followers');
                                       },
                                     )),
-                                    Expanded(
-                                        child: Column(
-                                      children: <Widget>[
-                                        Container(
-                                          alignment: Alignment.topCenter,
-                                          child: Text("£54",
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
+                                    _uid == user.uid
+                                        ? Expanded(
+                                            child: Column(
+                                            children: <Widget>[
+                                              Container(
+                                                alignment: Alignment.topCenter,
+                                                child: Text("£54",
+                                                    style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    )),
+                                              ),
+                                              Expanded(
+                                                  child: Container(
+                                                alignment:
+                                                    Alignment.bottomCenter,
+                                                child: Text("Raised"),
                                               )),
-                                        ),
-                                        Expanded(
-                                            child: Container(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Text("Raised"),
-                                        )),
-                                      ],
-                                    )),
+                                            ],
+                                          ))
+                                        : Container()
                                   ],
                                 )),
                             _uid == user.uid
