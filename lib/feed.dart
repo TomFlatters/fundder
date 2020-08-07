@@ -121,12 +121,16 @@ class _FeedViewState extends State<FeedView> {
                                           child: LikeBar()),
                                     );
                                   } else {
-                                    return Container();
+                                    return Expanded(
+                                      child: Container(),
+                                    );
                                   }
                                 },
                               );
                             } else {
-                              return Container();
+                              return Expanded(
+                                child: Container(),
+                              );
                             }
                           }),
                       Expanded(
