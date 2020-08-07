@@ -192,6 +192,16 @@ class DatabaseService {
     });
   }
 
+  Future<List<Post>> likedPosts(String id, List likesList) {
+    print('gettig liked posts by author: ' + id);
+    return postsCollection
+        .where(FieldPath.documentId, whereIn: likesList)
+        .getDocuments()
+        .then((snapshot) {
+      return _postsDataFromSnapshot(snapshot);
+    });
+  }
+
   // Get list of posts for given author
   Stream<List<Post>> postsByUser(id) {
     return postsCollection

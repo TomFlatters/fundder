@@ -33,7 +33,8 @@ class _ProfileState extends State<ProfileController>
     with SingleTickerProviderStateMixin {
   int limit = 3;
   Timestamp loadingTimestamp;
-  List<Post> postList;
+  List<Post> authorPostList;
+  List<Post> likedPostList;
   RefreshController _refreshController =
       RefreshController(initialRefresh: true);
 
@@ -45,6 +46,10 @@ class _ProfileState extends State<ProfileController>
   String _uid;
   String _email = "Email";
   String _profilePic;
+  List<dynamic> _likesList;
+  int _startIndex;
+  int _lastIndex;
+  bool initial = true;
 
   @override
   void dispose() {
@@ -122,6 +127,9 @@ class _ProfileState extends State<ProfileController>
               if (snapshot.data['name'] != null) {
                 _name = snapshot.data["name"];
               }
+              if (snapshot.data['likes'] != null) {
+                _likesList = snapshot.data["likes"];
+              }
               _email = snapshot.data["email"];
               _profilePic = snapshot.data["profilePic"];
               print("has data");
@@ -154,7 +162,7 @@ class _ProfileState extends State<ProfileController>
                       Expanded(
                         child: SmartRefresher(
                           enablePullDown: true,
-                          enablePullUp: false,
+                          enablePullUp: true,
                           header: WaterDropHeader(),
                           footer: CustomFooter(
                             builder: (BuildContext context, LoadStatus mode) {
@@ -178,6 +186,7 @@ class _ProfileState extends State<ProfileController>
                           ),
                           controller: _refreshController,
                           onRefresh: _onRefresh,
+                          onLoading: _onLoading,
                           child: ListView(shrinkWrap: true, children: <Widget>[
                             Container(
                               margin: EdgeInsets.only(top: 20, bottom: 10),
@@ -287,15 +296,26 @@ class _ProfileState extends State<ProfileController>
                               child: Column(
                                 children: [
                                   TabBar(
+                                    onTap: (index) {
+                                      if (user.uid != widget.uid) {
+                                        setState(() {
+                                          _tabController.index = 0;
+                                        });
+                                      }
+                                    },
                                     tabs: [
                                       Tab(text: 'Posts'),
-                                      Tab(text: 'Liked')
+                                      Tab(
+                                          child: Text('Liked',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              )))
                                     ],
                                     controller: _tabController,
                                   ),
                                   [
-                                    _profileView(user.uid),
-                                    _profileView(user.uid)
+                                    _profileView(user.uid, 0),
+                                    _profileView(user.uid, 1)
                                   ][_tabController.index]
                                 ],
                               ),
@@ -309,8 +329,14 @@ class _ProfileState extends State<ProfileController>
     }
   }
 
-  Widget _profileView(String uid) {
-    LikesService likesService = LikesService(uid: uid);
+  Widget _profileView(String uid, int index) {
+    //LikesService likesService = LikesService(uid: uid);
+    List<Post> postList;
+    if (index == 0 && authorPostList != null) {
+      postList = authorPostList;
+    } else if (index == 1 && likedPostList != null) {
+      postList = likedPostList;
+    }
 
     return ListView.builder(
         physics: NeverScrollableScrollPhysics(),
@@ -377,6 +403,7 @@ class _ProfileState extends State<ProfileController>
                     .delete()
                     .then((value) {
                   Navigator.of(context).pop();
+                  initial = true;
                   _onRefresh();
                 });
               },
@@ -396,18 +423,84 @@ class _ProfileState extends State<ProfileController>
   void _onRefresh() async {
     // monitor network fetch
     loadingTimestamp = Timestamp.now();
-    List<Post> futurePost = await DatabaseService().authorPosts(widget.uid);
-    if (futurePost != null) {
-      if (futurePost.isEmpty == false) {
-        postList = futurePost;
-        Post post = futurePost.last;
-        print('postList' + postList.toString());
-        loadingTimestamp = post.timestamp;
+    List<Post> futurePost;
+    if (_tabController.index == 0 || initial == true) {
+      futurePost = await DatabaseService().authorPosts(widget.uid);
+      if (futurePost != null) {
+        if (futurePost.isEmpty == false) {
+          authorPostList = futurePost;
+          Post post = futurePost.last;
+          print('postList' + authorPostList.toString());
+          loadingTimestamp = post.timestamp;
+        }
+      }
+    }
+    if ((_tabController.index == 1 || initial == true) && _likesList != null) {
+      if (_likesList.length > 10) {
+        _startIndex = _likesList.length - 10;
+        _lastIndex = _likesList.length;
+      } else {
+        _startIndex = 0;
+        _lastIndex = _likesList.length;
+      }
+      print("startIndex1:" + _startIndex.toString());
+      print("lastIndex1:" + _lastIndex.toString());
+      futurePost = await DatabaseService().likedPosts(widget.uid,
+          _likesList.sublist(_startIndex, _lastIndex).reversed.toList());
+      futurePost = futurePost.reversed.toList();
+      _lastIndex = _startIndex;
+      if (_startIndex > 10) {
+        _startIndex = _startIndex - 10;
+      } else {
+        _startIndex = 0;
+      }
+      print("startIndex2:" + _startIndex.toString());
+      print("lastIndex2:" + _lastIndex.toString());
+      if (futurePost != null) {
+        if (futurePost.isEmpty == false) {
+          likedPostList = futurePost;
+          Post post = futurePost.last;
+          print('postList' + likedPostList.toString());
+          loadingTimestamp = post.timestamp;
+        }
       }
     }
     if (mounted) setState(() {});
     // if failed,use refreshFailed()
+    initial = false;
     _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    // monitor network fetch
+    if (_tabController.index == 1 &&
+        _startIndex != _lastIndex &&
+        _likesList != null) {
+      List<Post> futurePost;
+      futurePost = await DatabaseService().likedPosts(widget.uid,
+          _likesList.sublist(_startIndex, _lastIndex).reversed.toList());
+      futurePost = futurePost.reversed.toList();
+      _lastIndex = _startIndex;
+      if (_startIndex > 10) {
+        _startIndex = _startIndex - 10;
+      } else {
+        _startIndex = 0;
+      }
+      if (futurePost != null) {
+        if (futurePost.isEmpty == false) {
+          likedPostList.addAll(futurePost);
+          Post post = futurePost.last;
+          print('postList' + likedPostList.toString());
+          loadingTimestamp = post.timestamp;
+        }
+      }
+      if (mounted) setState(() {});
+      // if failed,use refreshFailed()
+      _refreshController.loadComplete();
+    } else {
+      _refreshController.loadNoData();
+      _refreshController.loadComplete();
+    }
   }
 
   void _showOptions() {
