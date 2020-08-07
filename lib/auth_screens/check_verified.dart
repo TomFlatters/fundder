@@ -54,7 +54,7 @@ class _VerificationState extends State<CheckVerified> {
                     SizedBox(
                       height: 5,
                     ),
-                    Text(user.email,
+                    Text(user != null ? user.email : "user email",
                         style:
                             TextStyle(fontFamily: "Roboto Mono", fontSize: 17)),
                     Expanded(
