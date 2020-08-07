@@ -208,3 +208,102 @@ function cleanupTokens(response, tokens) {
     });
     return Promise.all(tokensDelete);
    }
+
+
+
+   ////////////////////////////////////////////STRIPE PAYMENT CLOUD FUNCTIONS TODO: FIND OUT HOW TO SEPERATE THE FILES FOR THE CLOUD FUNCTIONS /////////////////////////////
+
+   const firestore = admin.firestore();
+   const settings = {timestampInSnapshots: true};
+   firestore.settings(settings);
+
+   //initialise with secret key server side
+   const stripe = require('stripe')('sk_test_51H1vCtEefLDIzK0NarA3HlvO3vtYAOYNDNjtB6JuULS5woYBlzeG9fGsmdyQoXtby0yd0b68dwC0PDfvXlQkw7NU00TIOFSvSQ');
+
+
+//Create Payment
+exports.createPayment = functions.region('europe-west3').https.onCall(async (data, context) => {
+  try {
+
+    // If You Want to Implement Combine Process Of CreatePayment and ConfirmPayment
+    //then Please Uncomment this below two lines then return status and Do not Call Below ConfirmPayment
+    //method From FrontEnd Side
+
+    //Create PaymentIntent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 999,
+      currency: 'gbp',
+      // payment_method: connectedAccountPaymentMethod.id,
+      // confirm: true,
+      description: data.postId,
+
+    })
+    const clientSecret = paymentIntent.client_secret
+    return {
+      paymentIntentId: paymentIntent.id,
+      clientSecret: clientSecret
+    }
+  } catch (e) {
+    console.log(e);
+    return {
+      error : e,
+      paymentIntentId: "",
+      
+    }
+  }
+});
+
+//For Confirmming Payment
+exports.confirmPayment = functions.region('europe-west3').https.onCall(async (data, context) => {
+  try {
+    const finalPayment = await stripe.paymentIntents.confirm(
+      data.paymentIntentId,
+      { payment_method: data.paymentMethodId });
+    return {
+      paymentStatus: finalPayment.status,
+    }
+  } catch (e) {
+    console.log(e);
+    return {
+      error : e,
+      paymentStatus : ""
+    }
+  }
+});
+
+//For Canceling Payment
+exports.cancelPayment = functions.region('europe-west3').https.onCall(async (data, context) => {
+  try{
+  const cancel = await stripe.paymentIntents.cancel(
+    data.paymentIntentId,
+  );
+  return {
+    cancelStatus: cancel.status,
+  }
+  }catch(e){
+    console.log(e);
+    return {
+      error : e,
+      cancelStatus : ""
+    }
+  }
+});
+
+
+/**
+ * When a user is created, create a Stripe customer object for them.
+ *
+ * @see https://stripe.com/docs/payments/save-and-reuse#web-create-customer
+ */
+exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
+  const customer = await stripe.customers.create({ email: user.email });
+  const intent = await stripe.setupIntents.create({
+    customer: customer.id,
+  });
+  await admin.firestore().collection('stripe_customers').doc(user.uid).set({
+    customer_id: customer.id,
+    setup_secret: intent.client_secret,
+  });
+  return;
+});
+
