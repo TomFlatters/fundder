@@ -12,11 +12,13 @@ class Post {
   final String title;
   final String charity;
   final String amountRaised;
+  final double moneyRaised;
   final String targetAmount;
   final List likes;
   final int noLikes;
   final int noComments;
   final double aspectRatio;
+  final List<String> hashtags;
 
   final String subtitle;
   final timestamp;
@@ -41,7 +43,9 @@ class Post {
       this.id,
       this.status,
       this.peopleThatLikedThis,
-      this.aspectRatio});
+      this.aspectRatio,
+      this.moneyRaised,
+      this.hashtags});
 
   double percentRaised() {
     //print("Amount raised1" + amountRaised);
@@ -52,6 +56,13 @@ class Post {
     //(processAmount(amountRaised) / processAmount(targetAmount)).toString());
     //print("Amount raised" + processAmount(amountRaised).toString());
     //print("Amount target" + processAmount(targetAmount).toString());
-    return processAmount(amountRaised) / processAmount(targetAmount);
+    if (moneyRaised != null && moneyRaised / processAmount(targetAmount) <= 1) {
+      return moneyRaised / processAmount(targetAmount);
+    } else if (moneyRaised != null &&
+        moneyRaised / processAmount(targetAmount) > 1) {
+      return 1;
+    } else {
+      return 0;
+    }
   }
 }

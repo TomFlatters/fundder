@@ -120,7 +120,10 @@ class _ActivityState extends State<LikedController> {
                                                     )),
                                                 onTap: () {
                                                   Navigator.pushNamed(
-                                                      context, '/username');
+                                                      context,
+                                                      '/user/' +
+                                                          likedItem[
+                                                              'docLiker']);
                                                 },
                                               )),
                                           Expanded(
@@ -137,20 +140,13 @@ class _ActivityState extends State<LikedController> {
                                                           children: [
                                                         TextSpan(
                                                             text: likedItem[
-                                                                'docLikerUsername'],
+                                                                    'docLikerUsername'] +
+                                                                " ",
                                                             style: TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold)),
-                                                        TextSpan(
-                                                            text: likedItem[
-                                                                        'category'] ==
-                                                                    'like'
-                                                                ? ' liked your post'
-                                                                : likedItem['category'] ==
-                                                                        'comment'
-                                                                    ? ' commented on your post'
-                                                                    : ' has completed a challenge that you liked'),
+                                                        _itemText(likedItem),
                                                       ])))),
                                           Container(
                                               width: 110,
@@ -223,6 +219,28 @@ class _ActivityState extends State<LikedController> {
                           }));
                 }
               }));
+    }
+  }
+
+  TextSpan _itemText(DocumentSnapshot likedItem) {
+    switch (likedItem['category']) {
+      case 'like':
+        return TextSpan(text: 'liked your post');
+
+      case 'comment':
+        return TextSpan(text: 'commented on your post');
+
+      case 'donate':
+        return TextSpan(text: 'donated to your challenge');
+
+      case 'post completed':
+        return TextSpan(text: 'completed a challenge that you like');
+
+      case 'post donated to completed':
+        return TextSpan(text: 'completed a challenge that you donated to');
+
+      default:
+        return TextSpan(text: 'has done an action on a post');
     }
   }
 

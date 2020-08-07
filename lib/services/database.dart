@@ -111,6 +111,7 @@ class DatabaseService {
         title: doc.data['title'],
         charity: doc.data['charity'],
         amountRaised: doc.data['amountRaised'],
+        moneyRaised: doc.data['moneyRaised'],
         targetAmount: doc.data['targetAmount'],
         likes: doc.data['likes'],
         noComments: doc.data['noComments'],
@@ -165,11 +166,36 @@ class DatabaseService {
         });
   }
 
+  Future<List<Post>> refreshHashtag(
+      String hashtag, int limit, Timestamp startTimestamp) {
+    print('limit: ' + limit.toString());
+    return postsCollection
+        .orderBy("timestamp", descending: true)
+        .startAfter([startTimestamp])
+        .limit(limit)
+        .where('hashtags', arrayContains: hashtag)
+        .getDocuments()
+        .then((snapshot) {
+          print(_postsDataFromSnapshot(snapshot));
+          return _postsDataFromSnapshot(snapshot);
+        });
+  }
+
   Future<List<Post>> authorPosts(String id) {
     print('gettig posts by author: ' + id);
     return postsCollection
         .where("author", isEqualTo: id)
         .orderBy("timestamp", descending: true)
+        .getDocuments()
+        .then((snapshot) {
+      return _postsDataFromSnapshot(snapshot);
+    });
+  }
+
+  Future<List<Post>> likedPosts(String id, List likesList) {
+    print('gettig liked posts by author: ' + id);
+    return postsCollection
+        .where(FieldPath.documentId, whereIn: likesList)
         .getDocuments()
         .then((snapshot) {
       return _postsDataFromSnapshot(snapshot);
@@ -206,6 +232,7 @@ class DatabaseService {
           "title": post.title,
           "charity": post.charity,
           "amountRaised": post.amountRaised,
+          "moneyRaised": post.moneyRaised,
           "targetAmount": post.targetAmount,
           "noLikes": post.noLikes,
           "noComments": post.noComments,
@@ -213,7 +240,8 @@ class DatabaseService {
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
           'status': post.status,
-          'aspectRatio': post.aspectRatio
+          'aspectRatio': post.aspectRatio,
+          "hashtags": post.hashtags
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
@@ -283,6 +311,7 @@ class DatabaseService {
       "title": post.title,
       "charity": post.charity,
       "amountRaised": post.amountRaised,
+      "moneyRaised": post.moneyRaised,
       "targetAmount": post.targetAmount,
       "likes": post.likes,
       "noComments": post.noComments,
@@ -319,17 +348,32 @@ class DatabaseService {
         });
   }
 
-  Future<List<DocumentSnapshot>> postsContainingString(String queryText) {
-    return postsCollection
-        .orderBy('subtitle', descending: false)
-        .startAt([queryText])
-        .endAt([queryText + '\uf8ff'])
-        .limit(20)
-        .getDocuments()
-        .then((snapshot) {
-          return snapshot.documents.map((DocumentSnapshot doc) {
-            return doc;
-          }).toList();
-        });
+  Future<List<DocumentSnapshot>> hashtagsContainingString(String queryText) {
+    if (queryText != "") {
+      return Firestore.instance
+          .collection('hashtags')
+          .orderBy(FieldPath.documentId, descending: false)
+          .startAt([queryText])
+          .endAt([queryText + '\uf8ff'])
+          //.where(FieldPath.documentId, isGreaterThanOrEqualTo: queryText)
+          .limit(20)
+          .getDocuments()
+          .then((snapshot) {
+            return snapshot.documents.map((DocumentSnapshot doc) {
+              return doc;
+            }).toList();
+          });
+    } else {
+      return Firestore.instance
+          .collection('hashtags')
+          //.where(FieldPath.documentId, isGreaterThanOrEqualTo: queryText)
+          .limit(20)
+          .getDocuments()
+          .then((snapshot) {
+        return snapshot.documents.map((DocumentSnapshot doc) {
+          return doc;
+        }).toList();
+      });
+    }
   }
 }

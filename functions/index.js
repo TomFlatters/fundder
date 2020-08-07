@@ -118,6 +118,58 @@ exports.onComment = functions.firestore
     }
 });
 
+exports.onDonate = functions.firestore
+    .document('/posts/{postId}/whoDonated/{userId}')
+    .onCreate(async (snapshot, context) =>
+    {
+    const userId = context.params.userId;
+    const userRef = admin.firestore().doc(`users/${userId}`);
+    const docDonor = await userRef.get();
+    const payload =
+    {
+        notification: { 
+            title: 'Donation',
+            body: `${docDonor.data()['username']} donated to your challenge`, 
+        },
+    };
+
+    const postId = context.params.postId;
+    const doc = await admin.firestore().doc(`posts/${postId}`).get();
+
+    console.log("doc " + doc.data());
+
+    const author = doc.data()['author'];
+
+    console.log("author " + author);
+
+    const postOwner = await admin.firestore().doc(`users/${author}`).get();
+
+    console.log("owner " + postOwner.data());
+
+    const data = {
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        category: 'donate',
+        docLiker: userId,
+        docLikerUsername: docDonor.data()['username'],
+        postId: postId,
+        seen: false
+    };
+      
+      // Add a new document in collection "cities" with ID 'LA'
+    const res = await admin.firestore().collection(`users/${author}/activity`).add(data);
+
+    console.log('Added document with ID: ', res.id);
+
+    const tokens = postOwner.data()['fcm'];
+
+    if (tokens.length > 0) {
+    // Send notifications to all tokens.
+    const response = await admin.messaging().sendToDevice(tokens, payload);
+    await cleanupTokens(response, tokens);
+    console.log('Notifications have been sent and tokens cleaned up.');
+    }
+});
+
 exports.postDone = functions.firestore
     .document('/posts/{postId}')
     .onUpdate(async (change, context) => {
@@ -134,6 +186,7 @@ exports.postDone = functions.firestore
       if(newValue["status"] === 'done' && previousValue["status"] === 'fund')
       {
         
+        // first send a notification to all those that liked a post
         const whoLikedSnapshot = await admin.firestore().collection(`posts/${postId}/whoLiked`).get();
         const whoLikedDoc = whoLikedSnapshot.docs.map(doc => doc);
 
@@ -181,6 +234,55 @@ exports.postDone = functions.firestore
         if (tokens.length > 0) {
             // Send notifications to all tokens.
             const response = await admin.messaging().sendToDevice(tokens, payload);
+            await cleanupTokens(response, tokens);
+            console.log('Notifications have been sent and tokens cleaned up.');
+            }
+
+        // then send a notification to all those that donated to a post
+        const whoDonatedSnapshot = await admin.firestore().collection(`posts/${postId}/whoDonated`).get();
+        const whoDonatedDoc = whoDonatedSnapshot.docs.map(doc => doc);
+
+        console.log(whoDonatedDoc);
+
+        tokens = [];
+
+        /* eslint-disable no-await-in-loop */
+        for(var a=0; a<whoDonatedDoc.length; a++){
+            console.log(whoDonatedDoc[a]);
+            const doc = whoDonatedDoc[a];
+            console.log(doc.id);
+
+            if(doc.data()[doc.id] === true){
+              const data = {
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                category: 'post donated to completed',
+                docLiker: newValue['author'],
+                docLikerUsername: postOwner.data()['username'],
+                postId: postId,
+                seen: false
+            };
+
+            const res = await admin.firestore().collection(`users/${doc.id}/activity`).add(data);
+            console.log('Added document with ID: ', res.id);
+              if (postOwner.data()['fcm'] !== null) {
+                tokens = tokens.concat(postOwner.data()['fcm']);
+              }
+            }
+        }
+
+        console.log(tokens);
+
+        const donationPayload =
+          {
+              notification: { 
+                  title: 'Post completed',
+                  body: `${newValue['author']} completed a post that you have donated to`, 
+              },
+          };
+
+        if (tokens.length > 0) {
+            // Send notifications to all tokens.
+            const response = await admin.messaging().sendToDevice(tokens, donationPayload);
             await cleanupTokens(response, tokens);
             console.log('Notifications have been sent and tokens cleaned up.');
             }

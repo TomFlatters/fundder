@@ -30,7 +30,7 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
-              '£${postData.amountRaised} raised of £${postData.targetAmount} target',
+              '£${postData.moneyRaised} raised of £${postData.targetAmount} target',
               style: TextStyle(fontWeight: FontWeight.bold),
             )),
         Container(
