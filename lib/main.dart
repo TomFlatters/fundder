@@ -9,6 +9,8 @@ import 'home_widget.dart';
 import 'helper_classes.dart';
 import 'routes/routes.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 void main() {
   FluroRouter.setupRouter();
@@ -16,6 +18,9 @@ void main() {
 }
 
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+FirebaseAnalytics analytics = FirebaseAnalytics();
+FirebaseAnalyticsObserver observer =
+    FirebaseAnalyticsObserver(analytics: analytics);
 
 class MyApp extends StatelessWidget {
   @override
@@ -30,7 +35,10 @@ class MyApp extends StatelessWidget {
                   initialRoute: '/',
                   onGenerateRoute: FluroRouter.router.generator,
                   title: 'Fundder',
-                  navigatorObservers: [routeObserver],
+                  navigatorObservers: [
+                    routeObserver,
+                    observer,
+                  ],
                   home: snapshot.connectionState != ConnectionState.waiting
                       ? Wrapper()
                       : Loading(),
