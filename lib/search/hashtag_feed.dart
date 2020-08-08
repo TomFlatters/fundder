@@ -30,7 +30,7 @@ class HashtagFeed extends StatelessWidget {
         leading: new Container(),
       ),
       body: Column(children: [
-        Text(count + ' posts'),
+        count != null ? Text(count + ' posts') : Container(),
         SizedBox(
           height: 5,
         ),

@@ -120,7 +120,8 @@ class DatabaseService {
         imageUrl: doc.data['imageUrl'],
         id: doc.documentID,
         status: doc.data['status'],
-        aspectRatio: doc.data['aspectRatio']);
+        aspectRatio: doc.data['aspectRatio'],
+        hashtags: doc.data['hashtags']);
   }
 
   // Get posts list stream is mapped to the Post object
@@ -319,7 +320,8 @@ class DatabaseService {
       "timestamp": post.timestamp,
       "imageUrl": post.imageUrl,
       "status": post.status,
-      'aspecRatio': post.aspectRatio
+      'aspectRatio': post.aspectRatio,
+      'hashtags': post.hashtags
     });
   }
 

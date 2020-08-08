@@ -18,7 +18,7 @@ class Post {
   final int noLikes;
   final int noComments;
   final double aspectRatio;
-  final List<String> hashtags;
+  final List<dynamic> hashtags;
 
   final String subtitle;
   final timestamp;
