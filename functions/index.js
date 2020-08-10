@@ -315,35 +315,33 @@ function cleanupTokens(response, tokens) {
 
    ////////////////////////////////////////////STRIPE PAYMENT CLOUD FUNCTIONS TODO: FIND OUT HOW TO SEPERATE THE FILES FOR THE CLOUD FUNCTIONS /////////////////////////////
 
+  //https://firebase.google.com/docs/functions/http-events
+   //need to have a look at the implementation of the cloud function plugin on github to understand what exactly is the nature of 
+   //the request the HttpsCallable calls.
    const firestore = admin.firestore();
    const settings = {timestampInSnapshots: true};
    firestore.settings(settings);
 
-   //initialise with secret key server side
+   //initialise Stripe with secret key server side (Step 1)
    const stripe = require('stripe')('sk_test_51H1vCtEefLDIzK0NarA3HlvO3vtYAOYNDNjtB6JuULS5woYBlzeG9fGsmdyQoXtby0yd0b68dwC0PDfvXlQkw7NU00TIOFSvSQ');
 
 
 //Create Payment
-exports.createPayment = functions.region('europe-west3').https.onCall(async (data, context) => {
+//this is the process requiring the secret key, so it's being done server side ;)
+exports.createPaymentIntent = functions.region('europe-west3').https.onCall(async (data, context) => {
   try {
-
-    // If You Want to Implement Combine Process Of CreatePayment and ConfirmPayment
-    //then Please Uncomment this below two lines then return status and Do not Call Below ConfirmPayment
-    //method From FrontEnd Side
-
-    //Create PaymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 999,
+      amount: data.amount,
       currency: 'gbp',
       // payment_method: connectedAccountPaymentMethod.id,
       // confirm: true,
-      description: data.postId,
+     // description: data.postTitle,
 
     })
-    const clientSecret = paymentIntent.client_secret
+
     return {
       paymentIntentId: paymentIntent.id,
-      clientSecret: clientSecret
+      clientSecret: paymentIntent.client_secret
     }
   } catch (e) {
     console.log(e);
@@ -355,41 +353,6 @@ exports.createPayment = functions.region('europe-west3').https.onCall(async (dat
   }
 });
 
-//For Confirmming Payment
-exports.confirmPayment = functions.region('europe-west3').https.onCall(async (data, context) => {
-  try {
-    const finalPayment = await stripe.paymentIntents.confirm(
-      data.paymentIntentId,
-      { payment_method: data.paymentMethodId });
-    return {
-      paymentStatus: finalPayment.status,
-    }
-  } catch (e) {
-    console.log(e);
-    return {
-      error : e,
-      paymentStatus : ""
-    }
-  }
-});
-
-//For Canceling Payment
-exports.cancelPayment = functions.region('europe-west3').https.onCall(async (data, context) => {
-  try{
-  const cancel = await stripe.paymentIntents.cancel(
-    data.paymentIntentId,
-  );
-  return {
-    cancelStatus: cancel.status,
-  }
-  }catch(e){
-    console.log(e);
-    return {
-      error : e,
-      cancelStatus : ""
-    }
-  }
-});
 
 
 /**
