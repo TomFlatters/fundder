@@ -4,32 +4,34 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:stripe_payment/stripe_payment.dart';
+
+//NOTE: MUST HAVE TLS ENABBLED ON ANY PAGE THAT HANDLES PAYMENT
 //dcoumentation for stripe api....flutter stripe plugin is adapted from the one
 //of react native. Same documentation applies.
 // https://tipsi.github.io/tipsi-stripe/docs/index.html
 
-/**Steps involved in a Stripe card payment: 
- * 
- * 1. (Server Side)Initialise Stripe with secret key in cloud functions.
- * 
- * 2. (Server Side) Create a function that is capable of creating a PaymentIntent.
- *    Doing this server side removes the need to store the secret key client 
- *    side.
- * 
- * 3 .(Client Side) Add an instance of Stripe’s CardInputWidget to 
- *    your checkout form. This is used to collect card details and ensures that the
- *    sensitive details never touch your server. You can extract a token from 
- *    this which will serve as the payment method, instead of storing the card
- *    details in your own servers. 
- * 
- *  4. (Client Side) Make a request to your server for a PaymentIntent as soon as the view
- *    loads. Store a reference to the client secret, instead of the server 
- *    passing back the entire. 
- *  
- * 5. (Client Side) Confirm payment using the PaymentIntent client secret you 
- *    collected from your server as well as the token for the payment method.
- * 
- * */
+/// Steps involved in a Stripe card payment:
+///
+/// 1. (Server Side)Initialise Stripe with secret key in cloud functions.
+///
+/// 2. (Server Side) Create a function that is capable of creating a PaymentIntent.
+///    Doing this server side removes the need to store the secret key client
+///    side.
+///
+/// 3 .(Client Side) Add an instance of Stripe’s CardInputWidget to
+///    your checkout form. This is used to collect card details and ensures that the
+///    sensitive details never touch your server. You can extract a token from
+///    this which will serve as the payment method, instead of storing the card
+///    details in your own servers.
+///
+///  4. (Client Side) Make a request to your server for a PaymentIntent as soon as the view
+///    loads. Store a reference to the client secret, instead of the server
+///    passing back the entire.
+///
+/// 5. (Client Side) Confirm payment using the PaymentIntent client secret you
+///    collected from your server as well as the token for the payment method.
+///
+/// */
 
 class StripeTransactionResponse {
   String message;
@@ -38,15 +40,6 @@ class StripeTransactionResponse {
 }
 
 class StripeService {
-  // static String apiBase = 'https://api.stripe.com/v1';
-  // static String paymentApiUrl = '${StripeService.apiBase}/payment_intents';
-  // static String secret =
-  //     'sk_test_51H1vCtEefLDIzK0NarA3HlvO3vtYAOYNDNjtB6JuULS5woYBlzeG9fGsmdyQoXtby0yd0b68dwC0PDfvXlQkw7NU00TIOFSvSQ';
-  // static Map<String, String> headers = {
-  //   'Authorization': 'Bearer ${StripeService.secret}',
-  //   'Content-Type': 'application/x-www-form-urlencoded'
-  // };
-
   static init() {
     StripePayment.setOptions(StripeOptions(
         publishableKey:
@@ -65,8 +58,6 @@ class StripeService {
           CardFormPaymentRequest());
       print('payment intent being created in backend...');
 
-      //var https callable function to start the payment...taking in the
-      //token for the payment method and the amount to be paid
       //currency will be gbp for now
 
       HttpsCallable createPaymentIntent = CloudFunctions.instance
@@ -76,8 +67,6 @@ class StripeService {
 
       HttpsCallableResult paymentIntent =
           await createPaymentIntent.call(<String, dynamic>{'amount': 888});
-      //var paymentIntent =
-      //    await StripeService.createPaymentIntent(amount, currency);
 
       //get client secret from paymentIntent object created server side
 
@@ -112,25 +101,6 @@ class StripeService {
 
     return new StripeTransactionResponse(message: message, success: false);
   }
-
-  // static Future<Map<String, dynamic>> createPaymentIntent(
-  //     String amount, String currency) async {
-  //   try {
-  //     Map<String, dynamic> body = {
-  //       'amount': amount,
-  //       'currency': currency,
-  //       'payment_method_types[]': 'card'
-  //     };
-  //     var response = await http.post(StripeService.paymentApiUrl,
-  //         body: body, headers: StripeService.headers);
-  //     print(response.body);
-  //     return jsonDecode(response.body);
-  //   } catch (err) {
-  //     print('err charging user: ${err.toString()}');
-  //   }
-  //   return null;
-  // }
-
 }
 
 class PaymentBookKeepingSevice {
