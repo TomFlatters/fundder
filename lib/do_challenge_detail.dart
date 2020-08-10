@@ -62,7 +62,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                           placeholder: (context, url) => Loading(),
                           errorWidget: (context, url, error) =>
                               Icon(Icons.error),
-                        ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                        ),
                 ),
                 margin: EdgeInsets.symmetric(vertical: 10.0),
               ),

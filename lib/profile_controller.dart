@@ -50,6 +50,7 @@ class _ProfileState extends State<ProfileController>
   int _startIndex;
   int _lastIndex;
   bool initial = true;
+  double _amountDonated = 0.00;
 
   @override
   void dispose() {
@@ -83,6 +84,9 @@ class _ProfileState extends State<ProfileController>
               'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
           DatabaseService(uid: _uid)
               .updateUserData(_email, _username, _name, _profilePic);
+        }
+        if (value.data['amountDonated'] != null) {
+          _amountDonated = value.data['amountDonated'];
         }
       });
     });
@@ -131,7 +135,12 @@ class _ProfileState extends State<ProfileController>
                 _likesList = snapshot.data["likes"];
               }
               _email = snapshot.data["email"];
-              _profilePic = snapshot.data["profilePic"];
+              if (_profilePic != null) {
+                _profilePic = snapshot.data["profilePic"];
+              }
+              if (snapshot.data['amountDonated'] != null) {
+                _amountDonated = snapshot.data['amountDonated'];
+              }
               print("has data");
             }
 
@@ -265,7 +274,10 @@ class _ProfileState extends State<ProfileController>
                                             children: <Widget>[
                                               Container(
                                                 alignment: Alignment.topCenter,
-                                                child: Text("£54",
+                                                child: Text(
+                                                    "£" +
+                                                        _amountDonated
+                                                            .toStringAsFixed(2),
                                                     style: TextStyle(
                                                       fontSize: 20,
                                                       fontWeight:

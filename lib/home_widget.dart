@@ -88,7 +88,7 @@ class _HomeState extends State<Home> {
         .document(user.uid)
         .get()
         .then((snapshot) {
-      if (snapshot != null) {
+      if (snapshot != null && user.isEmailVerified == true) {
         if (snapshot['dpSetterPrompted'] != null) {
           if (snapshot['dpSetterPrompted'] != true) {
             Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
