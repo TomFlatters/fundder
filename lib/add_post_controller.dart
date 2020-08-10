@@ -179,8 +179,8 @@ class _AddPostState extends State<AddPost> {
     } else {
       DatabaseService(uid: user.uid)
           .uploadPost(new Post(
-              title: titleController.text.toString(),
-              subtitle: subtitleController.text.toString(),
+              title: titleController.text.toString().trimRight(),
+              subtitle: subtitleController.text.toString().trimRight(),
               author: user.uid,
               authorUsername: user.username,
               charity: charities[charity],

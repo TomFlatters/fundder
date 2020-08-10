@@ -2,6 +2,7 @@
 // with how much money has been raised so far
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/post.dart';
@@ -11,8 +12,9 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class PostBody extends StatelessWidget {
-  Post postData;
-  PostBody({this.postData});
+  final Post postData;
+  final String hashtag;
+  PostBody({this.postData, this.hashtag});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -24,13 +26,15 @@ class PostBody extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold))),
         Container(
             alignment: Alignment.centerLeft,
-            margin: EdgeInsets.all(10),
-            child: Text(postData.subtitle)),
+            margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
+            child: RichText(
+                text: TextSpan(
+                    children: _returnHashtags(postData.hashtags, context)))),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
-              '£${postData.moneyRaised} raised of £${postData.targetAmount} target',
+              '£${postData.moneyRaised == null ? 0.00.toStringAsFixed(2) : postData.moneyRaised.toStringAsFixed(2)} raised of £${postData.targetAmount} target',
               style: TextStyle(fontWeight: FontWeight.bold),
             )),
         Container(
@@ -58,6 +62,29 @@ class PostBody extends StatelessWidget {
               ),
       ],
     );
+  }
+
+  List<TextSpan> _returnHashtags(List hashtags, BuildContext context) {
+    List<TextSpan> hashtagText = [
+      TextSpan(
+          text: postData.subtitle + " ", style: TextStyle(color: Colors.black))
+    ];
+    if (hashtags != null) {
+      for (var i = 0; i < hashtags.length; i++) {
+        hashtagText.add(TextSpan(
+            text: "#" + hashtags[i].toString() + " ",
+            style:
+                TextStyle(color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                if (hashtags[i].toString() != hashtag) {
+                  Navigator.pushNamed(
+                      context, '/hashtag/' + hashtags[i].toString() + '/');
+                }
+              }));
+      }
+    }
+    return hashtagText;
   }
 
   Widget _previewImageVideo(Post postData) {

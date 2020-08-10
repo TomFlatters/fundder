@@ -154,14 +154,22 @@ class _CommentPageState extends State<CommentPage> {
                                   "text": _textController.text,
                                   "timestamp": DateTime.now()
                                 };
-                                commentsService.addAcomment(comment);
-                                _textController.text = '';
+                                if (_textController.text != "") {
+                                  commentsService.addAcomment(comment);
+                                  _textController.text = '';
+                                }
                               },
                             ),
                           ),
                         );
                       } else {
-                        return Container(width: 0, height: 0);
+                        return Container(
+                            width: 70,
+                            height: 80,
+                            padding: const EdgeInsets.only(right: 25.0),
+                            child: Center(
+                              child: Text('Send'),
+                            ));
                       }
                     },
                   ),
