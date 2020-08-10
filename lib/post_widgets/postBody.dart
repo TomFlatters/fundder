@@ -73,8 +73,8 @@ class PostBody extends StatelessWidget {
       for (var i = 0; i < hashtags.length; i++) {
         hashtagText.add(TextSpan(
             text: "#" + hashtags[i].toString() + " ",
-            style: TextStyle(
-                fontWeight: FontWeight.bold, color: HexColor('ff6b6c')),
+            style:
+                TextStyle(color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Navigator.pushNamed(
