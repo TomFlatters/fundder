@@ -11,6 +11,7 @@ class User {
   final String profilePic;
   final bool seenTutorial;
   final bool dpSetterPrompted;
+  final bool verified;
 
   // construct them into the object here
   User(
@@ -24,5 +25,6 @@ class User {
       this.name,
       this.profilePic,
       this.seenTutorial,
-      this.dpSetterPrompted});
+      this.dpSetterPrompted,
+      this.verified});
 }
