@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
   String fcmToken;
@@ -38,32 +39,56 @@ class AuthService {
           email: email, password: password);
       FirebaseUser user = result.user;
       _getFCMToken(user.uid);
-      return _userFromFirebaseUser(user);
+      return 'Success';
     } catch (e) {
       print(e.toString());
-      return null;
+      if (e.message != null) {
+        return e.message;
+      } else {
+        return e.toString();
+      }
     }
   }
 
   // register w/ email & password
   Future registerWithEmailPasswordUsername(
       String email, String password, String username) async {
-    try {
-      AuthResult result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      FirebaseUser user = result.user;
-      user.sendEmailVerification();
-      String defaultPic =
-          'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-      // create a new (firestore) document for the user with corresponding uid
-      await DatabaseService(uid: user.uid)
-          .registerUserData(email, username, null, defaultPic);
-      _getFCMToken(user.uid);
-      // ADD: user sets username
-      return _userFromFirebaseUser(user);
-    } catch (e) {
-      print(e.toString());
-      return null;
+    if (await usernameUnique(username) == true) {
+      try {
+        AuthResult result = await _auth.createUserWithEmailAndPassword(
+            email: email, password: password);
+        FirebaseUser user = result.user;
+        user.sendEmailVerification();
+        String defaultPic =
+            'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+        // create a new (firestore) document for the user with corresponding uid
+        await DatabaseService(uid: user.uid)
+            .registerUserData(email, username, null, defaultPic);
+        _getFCMToken(user.uid);
+        // ADD: user sets username
+        return 'Success';
+      } catch (e) {
+        print(e.toString());
+        if (e.message != null) {
+          return e.message;
+        } else {
+          return e.toString();
+        }
+      }
+    } else {
+      return 'Username is taken';
+    }
+  }
+
+  Future<bool> usernameUnique(String username) async {
+    final snapshot = await Firestore.instance
+        .collection('users')
+        .where("username", isEqualTo: username)
+        .getDocuments();
+    if (snapshot == null || snapshot.documents.isEmpty) {
+      return true; //username is unique.
+    } else {
+      return false; //username exists.
     }
   }
 
@@ -116,8 +141,11 @@ class AuthService {
       await _auth.sendPasswordResetEmail(email: email);
       return 'Password reset email sent';
     } catch (e) {
-      print(e.toString());
-      return e.toString();
+      if (e.message != null) {
+        return e.message;
+      } else {
+        return e.toString();
+      }
     }
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fundder/auth_screens/register.dart';
 import 'package:fundder/helper_classes.dart';
 
 class DefaultButton extends StatelessWidget {
