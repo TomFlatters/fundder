@@ -51,11 +51,9 @@ class _FeedWrapperState extends State<FeedWrapper> {
           .refreshPosts(widget.status, limit, loadingTimestamp);
     }
     postList = [
-      FeedView(
-          widget.feedChoice, widget.identifier, HexColor('ff6b6c'), futurePost,
-          () {
+      FeedView(futurePost, () {
         _onRefresh();
-      })
+      }, widget.status == 'hashtag' ? widget.identifier : null)
     ];
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
@@ -83,10 +81,9 @@ class _FeedWrapperState extends State<FeedWrapper> {
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
         print('futurePost' + futurePost.toString());
-        postList.add(FeedView(widget.feedChoice, widget.identifier,
-            HexColor('ff6b6c'), futurePost, () {
+        postList.add(FeedView(futurePost, () {
           _onRefresh();
-        }));
+        }, widget.status == 'hashtag' ? widget.identifier : null));
         Post post = futurePost.last;
         loadingTimestamp = post.timestamp;
       }
