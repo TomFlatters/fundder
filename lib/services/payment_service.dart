@@ -72,6 +72,8 @@ class StripeService {
       HttpsCallable createPaymentIntent = CloudFunctions.instance
           .getHttpsCallable(functionName: 'createPaymentIntent');
 
+      print('cloud function instantiated client side...');
+
       HttpsCallableResult paymentIntent =
           await createPaymentIntent.call(<String, dynamic>{'amount': 888});
       //var paymentIntent =
@@ -80,6 +82,7 @@ class StripeService {
       //get client secret from paymentIntent object created server side
 
       //confirmation of payment will be done client side
+      print('cloud function called');
       var response = await StripePayment.confirmPaymentIntent(PaymentIntent(
           clientSecret: paymentIntent.data['clientSecret'],
           paymentMethodId: paymentMethod.id));
