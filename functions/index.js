@@ -318,6 +318,7 @@ function cleanupTokens(response, tokens) {
   //https://firebase.google.com/docs/functions/http-events
    //need to have a look at the implementation of the cloud function plugin on github to understand what exactly is the nature of 
    //the request the HttpsCallable calls.
+   // https://firebase.google.com/docs/functions/callable
    const firestore = admin.firestore();
    const settings = {timestampInSnapshots: true};
    firestore.settings(settings);
@@ -326,10 +327,13 @@ function cleanupTokens(response, tokens) {
    const stripe = require('stripe')('sk_test_51H1vCtEefLDIzK0NarA3HlvO3vtYAOYNDNjtB6JuULS5woYBlzeG9fGsmdyQoXtby0yd0b68dwC0PDfvXlQkw7NU00TIOFSvSQ');
 
 
-//Create Payment
+//Create Payment:
 //this is the process requiring the secret key, so it's being done server side ;)
-exports.createPaymentIntent = functions.region('europe-west3').https.onCall(async (data, context) => {
+//note that this is a CALLABLE function
+//there do exist 'function.https.onRequest'
+exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
   try {
+    console.log('creatING a payment intent through stripe backend')
     const paymentIntent = await stripe.paymentIntents.create({
       amount: data.amount,
       currency: 'gbp',
@@ -339,17 +343,20 @@ exports.createPaymentIntent = functions.region('europe-west3').https.onCall(asyn
 
     })
 
+    console.log('payment intent creatED via stripe in backend')
+    const paymentid = paymentIntent.id;
+    const clientSecret = paymentIntent.client_secret;
     return {
-      paymentIntentId: paymentIntent.id,
-      clientSecret: paymentIntent.client_secret
-    }
+      paymentIntentId: paymentid,
+      clientSecret: clientSecret,
+    };
   } catch (e) {
     console.log(e);
     return {
       error : e,
       paymentIntentId: "",
       
-    }
+    };
   }
 });
 
