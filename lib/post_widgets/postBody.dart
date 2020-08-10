@@ -10,11 +10,10 @@ import 'package:fundder/shared/loading.dart';
 import 'package:fundder/video_item.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:fundder/search/hashtag_feed.dart';
 
 class PostBody extends StatelessWidget {
-  Post postData;
-  String hashtag;
+  final Post postData;
+  final String hashtag;
   PostBody({this.postData, this.hashtag});
   @override
   Widget build(BuildContext context) {
@@ -35,7 +34,7 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Text(
-              '£${postData.moneyRaised} raised of £${postData.targetAmount} target',
+              '£${postData.moneyRaised == null ? 0.00.toStringAsFixed(2) : postData.moneyRaised.toStringAsFixed(2)} raised of £${postData.targetAmount} target',
               style: TextStyle(fontWeight: FontWeight.bold),
             )),
         Container(
