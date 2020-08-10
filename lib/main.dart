@@ -11,8 +11,13 @@ import 'routes/routes.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 void main() {
+  Crashlytics.instance.enableInDevMode = true;
+
+  // Pass all uncaught errors from the framework to Crashlytics.
+  FlutterError.onError = Crashlytics.instance.recordFlutterError;
   FluroRouter.setupRouter();
   runApp(MyApp());
 }
