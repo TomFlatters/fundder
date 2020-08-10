@@ -67,6 +67,7 @@ class _VerificationState extends State<CheckVerified> {
                         FirebaseUser user =
                             await FirebaseAuth.instance.currentUser();
                         await user.reload();
+                        user = await FirebaseAuth.instance.currentUser();
                         if (user.isEmailVerified == true) {
                           Navigator.pop(context);
                         } else {
