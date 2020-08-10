@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:stripe_payment/stripe_payment.dart';
@@ -37,14 +38,14 @@ class StripeTransactionResponse {
 }
 
 class StripeService {
-  static String apiBase = 'https://api.stripe.com/v1';
-  static String paymentApiUrl = '${StripeService.apiBase}/payment_intents';
-  static String secret =
-      'sk_test_51H1vCtEefLDIzK0NarA3HlvO3vtYAOYNDNjtB6JuULS5woYBlzeG9fGsmdyQoXtby0yd0b68dwC0PDfvXlQkw7NU00TIOFSvSQ';
-  static Map<String, String> headers = {
-    'Authorization': 'Bearer ${StripeService.secret}',
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
+  // static String apiBase = 'https://api.stripe.com/v1';
+  // static String paymentApiUrl = '${StripeService.apiBase}/payment_intents';
+  // static String secret =
+  //     'sk_test_51H1vCtEefLDIzK0NarA3HlvO3vtYAOYNDNjtB6JuULS5woYBlzeG9fGsmdyQoXtby0yd0b68dwC0PDfvXlQkw7NU00TIOFSvSQ';
+  // static Map<String, String> headers = {
+  //   'Authorization': 'Bearer ${StripeService.secret}',
+  //   'Content-Type': 'application/x-www-form-urlencoded'
+  // };
 
   static init() {
     StripePayment.setOptions(StripeOptions(
@@ -67,14 +68,20 @@ class StripeService {
       //var https callable function to start the payment...taking in the
       //token for the payment method and the amount to be paid
       //currency will be gbp for now
-      var paymentIntent =
-          await StripeService.createPaymentIntent(amount, currency);
+
+      HttpsCallable createPaymentIntent = CloudFunctions.instance
+          .getHttpsCallable(functionName: 'createPaymentIntent');
+
+      HttpsCallableResult paymentIntent =
+          await createPaymentIntent.call(<String, dynamic>{'amount': 888});
+      //var paymentIntent =
+      //    await StripeService.createPaymentIntent(amount, currency);
 
       //get client secret from paymentIntent object created server side
 
       //confirmation of payment will be done client side
       var response = await StripePayment.confirmPaymentIntent(PaymentIntent(
-          clientSecret: paymentIntent['client_secret'],
+          clientSecret: paymentIntent.data['clientSecret'],
           paymentMethodId: paymentMethod.id));
       print('about to determine response...');
       if (response.status == 'succeeded') {
@@ -103,23 +110,24 @@ class StripeService {
     return new StripeTransactionResponse(message: message, success: false);
   }
 
-  static Future<Map<String, dynamic>> createPaymentIntent(
-      String amount, String currency) async {
-    try {
-      Map<String, dynamic> body = {
-        'amount': amount,
-        'currency': currency,
-        'payment_method_types[]': 'card'
-      };
-      var response = await http.post(StripeService.paymentApiUrl,
-          body: body, headers: StripeService.headers);
-      print(response.body);
-      return jsonDecode(response.body);
-    } catch (err) {
-      print('err charging user: ${err.toString()}');
-    }
-    return null;
-  }
+  // static Future<Map<String, dynamic>> createPaymentIntent(
+  //     String amount, String currency) async {
+  //   try {
+  //     Map<String, dynamic> body = {
+  //       'amount': amount,
+  //       'currency': currency,
+  //       'payment_method_types[]': 'card'
+  //     };
+  //     var response = await http.post(StripeService.paymentApiUrl,
+  //         body: body, headers: StripeService.headers);
+  //     print(response.body);
+  //     return jsonDecode(response.body);
+  //   } catch (err) {
+  //     print('err charging user: ${err.toString()}');
+  //   }
+  //   return null;
+  // }
+
 }
 
 class PaymentBookKeepingSevice {
