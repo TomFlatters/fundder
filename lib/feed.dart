@@ -31,13 +31,9 @@ class FeedView extends StatefulWidget {
   _FeedViewState createState() => _FeedViewState();
 
   final VoidCallback onDeletePressed;
-  final Color colorChoice;
-  final String feedChoice;
-  final String identifier;
   final List<Post> postList;
-  FeedView(this.feedChoice, this.identifier, this.colorChoice, this.postList,
-      this.onDeletePressed,
-      {Key key});
+  final String hashtag;
+  FeedView(this.postList, this.onDeletePressed, this.hashtag, {Key key});
 }
 
 class _FeedViewState extends State<FeedView> {
@@ -49,10 +45,6 @@ class _FeedViewState extends State<FeedView> {
   @override
   void initState() {
     super.initState();
-    //_tryMessage();
-    if (widget.feedChoice == "user") {
-      physics = NeverScrollableScrollPhysics();
-    }
   }
 
   @override
@@ -93,7 +85,10 @@ class _FeedViewState extends State<FeedView> {
                       postAuthorUserName: postData.authorUsername,
                       targetCharity: postData.charity,
                       postStatus: postData.status),
-                  PostBody(postData: postData),
+                  PostBody(
+                    postData: postData,
+                    hashtag: widget.hashtag,
+                  ),
                   Container(
                     //action bar
                     key: GlobalKey(),

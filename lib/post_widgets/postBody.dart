@@ -14,7 +14,8 @@ import 'package:fundder/search/hashtag_feed.dart';
 
 class PostBody extends StatelessWidget {
   Post postData;
-  PostBody({this.postData});
+  String hashtag;
+  PostBody({this.postData, this.hashtag});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -77,8 +78,10 @@ class PostBody extends StatelessWidget {
                 TextStyle(color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pushNamed(
-                    context, '/hashtag/' + hashtags[i].toString() + '/');
+                if (hashtags[i].toString() != hashtag) {
+                  Navigator.pushNamed(
+                      context, '/hashtag/' + hashtags[i].toString() + '/');
+                }
               }));
       }
     }
