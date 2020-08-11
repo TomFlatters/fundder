@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/profileWidgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/view_post_controller.dart';
@@ -302,10 +303,8 @@ class _ProfileState extends State<ProfileController>
                                       Navigator.pushNamed(
                                           context, '/account/edit');
                                     })
-                                : EditFundderButton(
-                                    text: "Follow",
-                                    onPressed: () {},
-                                  ),
+                                : FollowButton(
+                                    profileOwnerId: _uid, myId: user.uid),
                             DefaultTabController(
                               length: 2,
                               initialIndex: 0,
