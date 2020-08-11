@@ -20,6 +20,13 @@ class FollowersService {
         .collection('following')
         .document(newlyFollowedId)
         .setData({'following': true, 'uid': newlyFollowedId}, merge: true);
+    //do the bookkeeping in the noFollowers and noFollowing fields
+    userCollection
+        .document(uid)
+        .updateData({'noFollowing': FieldValue.increment(1)});
+    userCollection
+        .document(newlyFollowedId)
+        .updateData({'noFollowers': FieldValue.increment(1)});
   }
 
   void userUNfollowedSomeone(String recentlyUnfollowedId) {
@@ -38,6 +45,13 @@ class FollowersService {
         .delete();
     //.setData({'following': false, 'uid': recentlyUnfollowedId},
     //   merge: true);
+    //do the bookkeeping in the noFollowers and noFollowing fields
+    userCollection
+        .document(uid)
+        .updateData({'noFollowing': FieldValue.increment(-1)});
+    userCollection
+        .document(recentlyUnfollowedId)
+        .updateData({'noFollowers': FieldValue.increment(-1)});
   }
 
   Future<bool> doesXfollowY({@required String x, @required String y}) async {
@@ -47,5 +61,23 @@ class FollowersService {
         .document(y)
         .get();
     return (docSnap.exists);
+  }
+}
+
+class GeneralFollowerServices {
+  static Future<int> howManyFollowers(String uid) async {
+    CollectionReference userCollection = Firestore.instance.collection('users');
+    Map<String, dynamic> doc;
+    await userCollection.document(uid).get().then((value) => doc = value.data);
+
+    return (doc.containsKey('noFollowers') ? doc['noFollowers'] : 0);
+  }
+
+  static Future<int> howManyFollowing(String uid) async {
+    CollectionReference userCollection = Firestore.instance.collection('users');
+    Map<String, dynamic> doc;
+    await userCollection.document(uid).get().then((value) => doc = value.data);
+
+    return (doc.containsKey('noFollowing') ? doc['noFollowing'] : 0);
   }
 }
