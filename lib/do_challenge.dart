@@ -10,6 +10,11 @@ class DoChallenge extends StatefulWidget {
 
 class _DoChallengeState extends State<DoChallenge> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final List<String> entries = <String>['Active', 'Past'];
     final List<String> active = ['Sleep 2 nights in the garden'];
@@ -100,7 +105,7 @@ class _DoChallengeState extends State<DoChallenge> {
                                               errorWidget:
                                                   (context, url, error) =>
                                                       Icon(Icons.error),
-                                            ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
+                                            ),
                                     ),
                                   )),
                             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/feed_wrapper.dart';
+import 'package:fundder/connection_listener.dart';
 
 class HashtagFeed extends StatelessWidget {
   final String hashtag;
@@ -34,6 +35,7 @@ class HashtagFeed extends StatelessWidget {
         SizedBox(
           height: 5,
         ),
+        ConnectionListener(),
         Expanded(child: FeedWrapper('hashtag', hashtag, 'hashtag')),
       ]),
     );

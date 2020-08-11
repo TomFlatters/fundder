@@ -17,7 +17,9 @@ class CommentButton extends StatelessWidget {
         ),
       ),
       onPressed: () {
-        Navigator.pushNamed(context, '/post/' + pid + '/comments');
+        if (pid != null) {
+          Navigator.pushNamed(context, '/post/' + pid + '/comments');
+        }
       },
     );
   }
