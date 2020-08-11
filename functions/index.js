@@ -362,20 +362,20 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
 
 
 
-/**
- * When a user is created, create a Stripe customer object for them.
- *
- * @see https://stripe.com/docs/payments/save-and-reuse#web-create-customer
- */
-exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
-  const customer = await stripe.customers.create({ email: user.email });
-  const intent = await stripe.setupIntents.create({
-    customer: customer.id,
-  });
-  await admin.firestore().collection('stripe_customers').doc(user.uid).set({
-    customer_id: customer.id,
-    setup_secret: intent.client_secret,
-  });
-  return;
-});
+// /**
+//  * When a user is created, create a Stripe customer object for them.
+//  *
+//  * @see https://stripe.com/docs/payments/save-and-reuse#web-create-customer
+//  */
+// exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
+//   const customer = await stripe.customers.create({ email: user.email });
+//   const intent = await stripe.setupIntents.create({
+//     customer: customer.id,
+//   });
+//   await admin.firestore().collection('stripe_customers').doc(user.uid).set({
+//     customer_id: customer.id,
+//     setup_secret: intent.client_secret,
+//   });
+//   return;
+// });
 
