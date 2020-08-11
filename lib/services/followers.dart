@@ -28,13 +28,24 @@ class FollowersService {
         .document(recentlyUnfollowedId)
         .collection('myFollowers')
         .document(uid)
-        .setData({'following': false, 'uid': uid}, merge: true);
+        .delete();
+    //.setData({'following': false, 'uid': uid}, merge: true);
     //remove this receently unfollowed scumbag from our followers list
     userCollection
         .document(uid)
         .collection('following')
         .document(recentlyUnfollowedId)
-        .setData({'following': false, 'uid': recentlyUnfollowedId},
-            merge: true);
+        .delete();
+    //.setData({'following': false, 'uid': recentlyUnfollowedId},
+    //   merge: true);
+  }
+
+  Future<bool> doesXfollowY({@required String x, @required String y}) async {
+    DocumentSnapshot doc_snap = await userCollection
+        .document(x)
+        .collection('following')
+        .document(y)
+        .get();
+    return (doc_snap.exists);
   }
 }
