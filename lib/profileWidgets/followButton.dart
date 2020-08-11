@@ -5,17 +5,22 @@ import 'package:fundder/global_widgets/buttons.dart';
 import 'package:fundder/services/followers.dart';
 
 class FollowButton extends StatefulWidget {
+  final bool initialState;
   final String profileOwnerId;
   final String myId;
   final FollowersService followersService;
-  FollowButton({@required this.profileOwnerId, @required this.myId})
-      : followersService = FollowersService(uid: myId);
+  FollowButton(
+    this.initialState, {
+    @required this.profileOwnerId,
+    @required this.myId,
+  }) : followersService = FollowersService(uid: myId);
   @override
-  _FollowButtonState createState() => _FollowButtonState();
+  _FollowButtonState createState() => _FollowButtonState(initialState);
 }
 
 class _FollowButtonState extends State<FollowButton> {
   bool isFollowed;
+  _FollowButtonState(this.isFollowed);
   void followPressed() {
     if (isFollowed) {
       //already followed, so intention is to unfollow.
