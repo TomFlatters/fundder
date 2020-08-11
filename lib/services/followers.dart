@@ -41,11 +41,11 @@ class FollowersService {
   }
 
   Future<bool> doesXfollowY({@required String x, @required String y}) async {
-    DocumentSnapshot doc_snap = await userCollection
+    DocumentSnapshot docSnap = await userCollection
         .document(x)
         .collection('following')
         .document(y)
         .get();
-    return (doc_snap.exists);
+    return (docSnap.exists);
   }
 }
