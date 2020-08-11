@@ -79,7 +79,7 @@ class PostBody extends StatelessWidget {
               ..onTap = () {
                 if (hashtags[i].toString() != hashtag) {
                   Navigator.pushNamed(
-                      context, '/hashtag/' + hashtags[i].toString() + '/');
+                      context, '/hashtag/' + hashtags[i].toString());
                 }
               }));
       }
