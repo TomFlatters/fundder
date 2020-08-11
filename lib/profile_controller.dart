@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/profileWidgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
+import 'package:fundder/services/followers.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'feed.dart';
@@ -303,8 +304,21 @@ class _ProfileState extends State<ProfileController>
                                       Navigator.pushNamed(
                                           context, '/account/edit');
                                     })
-                                : FollowButton(
-                                    profileOwnerId: _uid, myId: user.uid),
+                                : FutureBuilder(
+                                    future: FollowersService(uid: user.uid)
+                                        .doesXfollowY(x: user.uid, y: _uid),
+                                    builder: (context, initialState) {
+                                      if (initialState.connectionState ==
+                                          ConnectionState.done) {
+                                        return FollowButton(initialState.data,
+                                            profileOwnerId: _uid,
+                                            myId: user.uid);
+                                      } else {
+                                        return Container(
+                                            width: 0.0, height: 0.0);
+                                      }
+                                    },
+                                  ),
                             DefaultTabController(
                               length: 2,
                               initialIndex: 0,
