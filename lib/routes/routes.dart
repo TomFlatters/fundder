@@ -102,7 +102,7 @@ class FluroRouter {
           Tutorial(uid: params['id'][0]));
   static Handler _hashtagHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          HashtagFeed(params['id'][0], params['id2'][0]));
+          HashtagFeed(params['id'][0], null));
 
   // Web handlers
 
@@ -205,7 +205,7 @@ class FluroRouter {
     );
 
     router.define(
-      'hashtag/:id/:id2',
+      'hashtag/:id',
       handler: _hashtagHandler,
       transitionType: TransitionType.fadeIn,
     );
