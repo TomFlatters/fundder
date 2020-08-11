@@ -15,6 +15,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/database.dart';
+import 'connection_listener.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -120,13 +121,17 @@ class _HomeState extends State<Home> {
       LikedController(),
       ProfileController(
         uid: user.uid,
-      )
+      ),
     ];
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
-      ), // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
+      body: Column(children: [
+        Expanded(
+            child: IndexedStack(
+          index: _currentIndex,
+          children: screens,
+        )),
+        ConnectionListener()
+      ]), // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.black,
