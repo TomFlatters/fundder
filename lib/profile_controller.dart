@@ -53,6 +53,8 @@ class _ProfileState extends State<ProfileController>
   int _lastIndex;
   bool initial = true;
   double _amountDonated = 0.00;
+  int _noFollowers;
+  int _noFollowing;
 
   @override
   void dispose() {
@@ -81,6 +83,14 @@ class _ProfileState extends State<ProfileController>
         _username = value.data['username'];
         _email = value.data["email"];
         _profilePic = value.data["profilePic"];
+        //followers bookkeeping
+        _noFollowing = (value.data.containsKey('noFollowing')
+            ? value.data['noFollowing']
+            : 0);
+        _noFollowers = (value.data.containsKey('noFollowers')
+            ? value.data['noFollowers']
+            : 0);
+
         if (_profilePic == null) {
           _profilePic =
               'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
@@ -222,7 +232,7 @@ class _ProfileState extends State<ProfileController>
                                         children: <Widget>[
                                           Container(
                                             alignment: Alignment.topCenter,
-                                            child: Text("54",
+                                            child: Text(_noFollowing.toString(),
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold,
@@ -249,7 +259,7 @@ class _ProfileState extends State<ProfileController>
                                         children: <Widget>[
                                           Container(
                                             alignment: Alignment.topCenter,
-                                            child: Text("106",
+                                            child: Text(_noFollowers.toString(),
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold,
