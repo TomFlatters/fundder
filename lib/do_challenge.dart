@@ -10,6 +10,11 @@ class DoChallenge extends StatefulWidget {
 
 class _DoChallengeState extends State<DoChallenge> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final List<String> entries = <String>['Active', 'Past'];
     final List<String> active = ['Sleep 2 nights in the garden'];
