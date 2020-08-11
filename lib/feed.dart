@@ -25,6 +25,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'video_item.dart';
 import 'services/likes.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -173,6 +174,8 @@ class _FeedViewState extends State<FeedView> {
               ),
             ),
             onTap: () async {
+              //
+              //throw StateError('Uncaught error thrown by app.');
               // var pid = postData.id;
               // var noLikes = likesModel.noLikes;
               // var isLiked = likesModel.isLiked;
