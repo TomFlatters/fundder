@@ -65,8 +65,9 @@ class FollowersService {
 }
 
 class GeneralFollowerServices {
+  static CollectionReference userCollection =
+      Firestore.instance.collection('users');
   static Future<int> howManyFollowers(String uid) async {
-    CollectionReference userCollection = Firestore.instance.collection('users');
     Map<String, dynamic> doc;
     await userCollection.document(uid).get().then((value) => doc = value.data);
 
@@ -74,10 +75,19 @@ class GeneralFollowerServices {
   }
 
   static Future<int> howManyFollowing(String uid) async {
-    CollectionReference userCollection = Firestore.instance.collection('users');
     Map<String, dynamic> doc;
     await userCollection.document(uid).get().then((value) => doc = value.data);
 
     return (doc.containsKey('noFollowing') ? doc['noFollowing'] : 0);
+  }
+
+  static Future<List<String>> whoFollowsUser(String uid) async {
+    //returns the user id of all users following user 'uid'
+    QuerySnapshot q = await userCollection
+        .document(uid)
+        .collection('myFollowers')
+        .getDocuments();
+    //remember that the doc ids are the user ids of the followers]
+    return (q.documents.map((e) => e.documentID).toList());
   }
 }
