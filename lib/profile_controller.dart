@@ -149,7 +149,7 @@ class _ProfileState extends State<ProfileController>
               }
               _username = snapshot.data['username'];
               _email = snapshot.data["email"];
-              if (_profilePic != null) {
+              if (snapshot.data["profilePic"] != null) {
                 _profilePic = snapshot.data["profilePic"];
               } else {
                 _profilePic =
