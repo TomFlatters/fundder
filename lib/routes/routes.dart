@@ -100,7 +100,10 @@ class FluroRouter {
   static Handler _tutorialHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           Tutorial(uid: params['id'][0]));
-  static Handler _hashtagHandler = Handler(
+  static Handler _hashtagHandler1 = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          HashtagFeed(params['id'][0], params['id2'][0]));
+  static Handler _hashtagHandler2 = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           HashtagFeed(params['id'][0], null));
 
@@ -205,8 +208,14 @@ class FluroRouter {
     );
 
     router.define(
+      'hashtag/:id/:id2',
+      handler: _hashtagHandler1,
+      transitionType: TransitionType.fadeIn,
+    );
+
+    router.define(
       'hashtag/:id',
-      handler: _hashtagHandler,
+      handler: _hashtagHandler2,
       transitionType: TransitionType.fadeIn,
     );
 
