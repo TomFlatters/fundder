@@ -67,11 +67,11 @@ class _ProfileState extends State<ProfileController>
     print("uid: " + widget.uid);
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
-    _retrieveUser();
+    //_retrieveUser();
     super.initState();
   }
 
-  void _retrieveUser() async {
+  /*void _retrieveUser() async {
     Firestore.instance
         .collection("users")
         .document(widget.uid)
@@ -102,7 +102,7 @@ class _ProfileState extends State<ProfileController>
         }
       });
     });
-  }
+  }*/
 
   _handleTabSelection() {
     if (_tabController.indexIsChanging) {
@@ -140,20 +140,31 @@ class _ProfileState extends State<ProfileController>
           builder: (context, snapshot) {
             // print(snapshot.data);
             if (snapshot.hasData) {
+              _uid = widget.uid;
               if (snapshot.data['name'] != null) {
                 _name = snapshot.data["name"];
               }
               if (snapshot.data['likes'] != null) {
                 _likesList = snapshot.data["likes"];
               }
+              _username = snapshot.data['username'];
               _email = snapshot.data["email"];
               if (_profilePic != null) {
                 _profilePic = snapshot.data["profilePic"];
+              } else {
+                _profilePic =
+                    'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
               }
               if (snapshot.data['amountDonated'] != null) {
                 _amountDonated = snapshot.data['amountDonated'];
               }
               print("has data");
+              _noFollowing = snapshot.data['noFollowing'] != null
+                  ? snapshot.data['noFollowing']
+                  : 0;
+              _noFollowers = snapshot.data['noFollowers'] != null
+                  ? snapshot.data['noFollowers']
+                  : 0;
             }
 
             return _username == null
@@ -307,7 +318,7 @@ class _ProfileState extends State<ProfileController>
                                         : Container()
                                   ],
                                 )),
-                            _uid == user.uid
+                            widget.uid == user.uid
                                 ? EditFundderButton(
                                     text: 'Edit Profile',
                                     onPressed: () {
@@ -324,8 +335,8 @@ class _ProfileState extends State<ProfileController>
                                             profileOwnerId: _uid,
                                             myId: user.uid);
                                       } else {
-                                        return Container(
-                                            width: 0.0, height: 0.0);
+                                        return EditFundderButton(
+                                            text: "Follow", onPressed: () {});
                                       }
                                     },
                                   ),
