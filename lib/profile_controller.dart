@@ -158,13 +158,15 @@ class _ProfileState extends State<ProfileController>
               if (snapshot.data['amountDonated'] != null) {
                 _amountDonated = snapshot.data['amountDonated'];
               }
-              print("has data");
+              print("profile controller has data");
               _noFollowing = snapshot.data['noFollowing'] != null
                   ? snapshot.data['noFollowing']
                   : 0;
               _noFollowers = snapshot.data['noFollowers'] != null
                   ? snapshot.data['noFollowers']
                   : 0;
+            } else {
+              print("profile controller does not have data");
             }
 
             return _username == null
