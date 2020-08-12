@@ -81,7 +81,7 @@ class GeneralFollowerServices {
     return (doc.containsKey('noFollowing') ? doc['noFollowing'] : 0);
   }
 
-  static Future<List<String>> whoFollowsUser(String uid) async {
+  static Future<List<String>> idsFollowingUser(String uid) async {
     //returns the user id of all users following user 'uid'
     QuerySnapshot q = await userCollection
         .document(uid)
@@ -89,5 +89,10 @@ class GeneralFollowerServices {
         .getDocuments();
     //remember that the doc ids are the user ids of the followers]
     return (q.documents.map((e) => e.documentID).toList());
+  }
+
+  static Future<String> mapIDtoName(String uid) async {
+    var doc = await userCollection.document(uid).get();
+    return doc.data['username'];
   }
 }
