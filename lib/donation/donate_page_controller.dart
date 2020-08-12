@@ -4,6 +4,7 @@ import 'package:fundder/donation/money_input_text_widget.dart';
 import 'package:fundder/donation/payment_methods.dart';
 import 'package:fundder/main.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/payment_controllers/existingCards.dart';
 import 'package:fundder/services/payment_service.dart';
 import 'package:provider/provider.dart';
 import '../helper_classes.dart';
@@ -71,12 +72,13 @@ class _DonatePageState extends State<DonatePage> {
               onTap: () async {
                 print(moneyController.text);
                 double amount = double.parse(moneyController.text);
+                int amountInPence = (amount * 100).toInt();
                 PaymentBookKeepingSevice paymentBookKeeping =
                     PaymentBookKeepingSevice();
 
                 var response = await StripeService.payWithNewCard(
-                    amount: '777', currency: 'gbp');
-                if (response.success == true) {
+                    amount: amountInPence, currency: 'gbp');
+                if (response.success) {
                   print("twas a success");
                   paymentBookKeeping.userDonatedToPost(
                       user.uid, widget.postId, amount);
@@ -87,6 +89,10 @@ class _DonatePageState extends State<DonatePage> {
           ListTile(
             leading: Icon(Icons.credit_card, color: Colors.black),
             title: Text("Pay via existing cards"),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ExistingCards()));
+            },
           )
         ],
       ),
