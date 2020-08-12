@@ -110,13 +110,13 @@ class StripeService {
   }
 }
 
-class PaymentBookKeepingSevice {
-  final CollectionReference postsCollection =
+class PaymentBookKeepingService {
+  static CollectionReference postsCollection =
       Firestore.instance.collection('posts');
-  final CollectionReference userCollection =
+  static CollectionReference userCollection =
       Firestore.instance.collection('users');
 
-  void userDonatedToPost(String uid, String postId, double amount) {
+  static void userDonatedToPost(String uid, String postId, double amount) {
     postsCollection
         .document(postId)
         .collection('whoDonated')
