@@ -276,10 +276,12 @@ class _AuthenticateState extends State<Authenticate>
                           loading = false;
                         });
                       } else {
-                        setState(() {
-                          registrationerror = result;
-                          loading = false;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            registrationerror = result;
+                            loading = false;
+                          });
+                        }
                       }
                     }
                   },

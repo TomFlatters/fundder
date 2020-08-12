@@ -57,6 +57,9 @@ class AuthService {
       try {
         AuthResult result = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
+        Firestore.instance.collection('usernames').document(username).setData({
+          username: true,
+        });
         FirebaseUser user = result.user;
         user.sendEmailVerification();
         String defaultPic =
@@ -82,8 +85,8 @@ class AuthService {
 
   Future<bool> usernameUnique(String username) async {
     final snapshot = await Firestore.instance
-        .collection('users')
-        .where("username", isEqualTo: username)
+        .collection('usernames')
+        .where(username, isEqualTo: true)
         .getDocuments();
     if (snapshot == null || snapshot.documents.isEmpty) {
       return true; //username is unique.
@@ -127,11 +130,11 @@ class AuthService {
     final FirebaseUser user = await _auth.currentUser();
     final uid = user.uid;
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    _firebaseMessaging.getToken().then((token) {
+    await _firebaseMessaging.getToken().then((token) async {
       _firebaseMessaging.deleteInstanceID();
       print(token);
       fcmToken = token;
-      DatabaseService(uid: uid)
+      await DatabaseService(uid: uid)
           .removeFCMToken(fcmToken); // Print the Token in Console
     });
   }
