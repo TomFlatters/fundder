@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:stripe_payment/stripe_payment.dart';
 
@@ -48,33 +49,39 @@ class StripeService {
         androidPayMode: 'test'));
   }
 
-  static Future<StripeTransactionResponse> payWithNewCard(
-      {String amount, String currency}) async {
+  static Future<PaymentIntent> initialisePaymentWithNewCard(
+      //creates a PaymentIntent using api secret key client side, giving it a
+      //payment method as well i.e. the card
+      {@required int amount,
+      String currency}) async {
+    print('card form created and details about to be entered...');
+    //token from this payment method to be passed server side
+
+    var paymentMethod = await StripePayment.paymentRequestWithCardForm(
+        CardFormPaymentRequest());
+    print('payment intent being created in backend...');
+
+    //currency will be gbp for now, preset server side
+
+    HttpsCallable createPaymentIntent = CloudFunctions.instance
+        .getHttpsCallable(functionName: 'createPaymentIntent');
+
+    print('cloud function instantiated client side...');
+//get client secret from paymentIntent object created server side
+    HttpsCallableResult paymentIntent =
+        await createPaymentIntent.call(<String, dynamic>{'amount': amount});
+    print('cloud function called');
+
+    return PaymentIntent(
+        clientSecret: paymentIntent.data['clientSecret'],
+        paymentMethodId: paymentMethod.id);
+  }
+
+  static Future<StripeTransactionResponse> confirmPayment(
+      PaymentIntent paymentIntent) async {
     try {
-      print('card form created and details about to be entered...');
-      //token from this payment method to be passed server side
+      var response = await StripePayment.confirmPaymentIntent(paymentIntent);
 
-      var paymentMethod = await StripePayment.paymentRequestWithCardForm(
-          CardFormPaymentRequest());
-      print('payment intent being created in backend...');
-
-      //currency will be gbp for now
-
-      HttpsCallable createPaymentIntent = CloudFunctions.instance
-          .getHttpsCallable(functionName: 'createPaymentIntent');
-
-      print('cloud function instantiated client side...');
-
-      HttpsCallableResult paymentIntent =
-          await createPaymentIntent.call(<String, dynamic>{'amount': 888});
-
-      //get client secret from paymentIntent object created server side
-
-      //confirmation of payment will be done client side
-      print('cloud function called');
-      var response = await StripePayment.confirmPaymentIntent(PaymentIntent(
-          clientSecret: paymentIntent.data['clientSecret'],
-          paymentMethodId: paymentMethod.id));
       print('about to determine response...');
       if (response.status == 'succeeded') {
         return new StripeTransactionResponse(
