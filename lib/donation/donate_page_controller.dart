@@ -76,8 +76,13 @@ class _DonatePageState extends State<DonatePage> {
                 PaymentBookKeepingSevice paymentBookKeeping =
                     PaymentBookKeepingSevice();
 
-                var response = await StripeService.payWithNewCard(
-                    amount: amountInPence, currency: 'gbp');
+                var paymentIntent =
+                    await StripeService.initialisePaymentWithNewCard(
+                        amount: amountInPence);
+                //create a screen to ask user to confirm once again they wish to proceed
+                print("User has confirmed they wish to proceed");
+                var response =
+                    await StripeService.confirmPayment(paymentIntent);
                 if (response.success) {
                   print("twas a success");
                   paymentBookKeeping.userDonatedToPost(
