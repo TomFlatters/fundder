@@ -81,6 +81,13 @@ class GeneralFollowerServices {
     return (doc.containsKey('noFollowing') ? doc['noFollowing'] : 0);
   }
 
+  static Future<String> mapIDtoName(String uid) async {
+    //returns corresponding username to uid
+    var doc = await userCollection.document(uid).get();
+    return doc.data['username'];
+  }
+
+///////////////////////////// change after launch to give ten at time kind of thing////////
   static Future<List<String>> idsFollowingUser(String uid) async {
     //returns the user id of all users following user 'uid'
     QuerySnapshot q = await userCollection
@@ -91,8 +98,14 @@ class GeneralFollowerServices {
     return (q.documents.map((e) => e.documentID).toList());
   }
 
-  static Future<String> mapIDtoName(String uid) async {
-    var doc = await userCollection.document(uid).get();
-    return doc.data['username'];
+  static Future<List<String>> unamesFollowingUser(String uid) async {
+    //return the usernames of all users following the user
+    var uids = await GeneralFollowerServices.idsFollowingUser(uid);
+    List<String> res = [];
+    for (var i; i < uids.length; i++) {
+      var uname = await mapIDtoName(uids[i]);
+      res.add(uname);
+    }
+    return res;
   }
 }
