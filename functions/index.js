@@ -113,7 +113,7 @@ exports.onComment = functions.firestore
     if (tokens.length > 0) {
     // Send notifications to all tokens.
     const response = await admin.messaging().sendToDevice(tokens, payload);
-    await cleanupTokens(response, tokens);
+    //await cleanupTokens(response, tokens);
     console.log('Notifications have been sent and tokens cleaned up.');
     }
 });
@@ -165,7 +165,7 @@ exports.onDonate = functions.firestore
     if (tokens.length > 0) {
     // Send notifications to all tokens.
     const response = await admin.messaging().sendToDevice(tokens, payload);
-    await cleanupTokens(response, tokens);
+    //await cleanupTokens(response, tokens);
     console.log('Notifications have been sent and tokens cleaned up.');
     }
 });
@@ -194,7 +194,7 @@ exports.postDone = functions.firestore
 
         var tokens = [];
 
-        const postOwner = await admin.firestore().doc(`users/${newValue['author']}`).get();
+        
 
         
         /* eslint-disable no-await-in-loop */
@@ -208,11 +208,11 @@ exports.postDone = functions.firestore
                 timestamp: admin.firestore.FieldValue.serverTimestamp(),
                 category: 'post completed',
                 docLiker: newValue['author'],
-                docLikerUsername: postOwner.data()['username'],
+                docLikerUsername: newValue['authorUsername'],
                 postId: postId,
                 seen: false
             };
-
+            const postOwner = await admin.firestore().doc(`users/${doc.id}`).get();
             const res = await admin.firestore().collection(`users/${doc.id}/activity`).add(data);
             console.log('Added document with ID: ', res.id);
               if (postOwner.data()['fcm'] !== null) {
@@ -227,14 +227,14 @@ exports.postDone = functions.firestore
           {
               notification: { 
                   title: 'Post completed',
-                  body: `${newValue['author']} completed a post that you like`, 
+                  body: `${newValue['authorUsername']} completed a post that you like`, 
               },
           };
 
         if (tokens.length > 0) {
             // Send notifications to all tokens.
             const response = await admin.messaging().sendToDevice(tokens, payload);
-            await cleanupTokens(response, tokens);
+            //await cleanupTokens(response, tokens);
             console.log('Notifications have been sent and tokens cleaned up.');
             }
 
@@ -257,11 +257,11 @@ exports.postDone = functions.firestore
                 timestamp: admin.firestore.FieldValue.serverTimestamp(),
                 category: 'post donated to completed',
                 docLiker: newValue['author'],
-                docLikerUsername: postOwner.data()['username'],
+                docLikerUsername: newValue['authorUsername'],
                 postId: postId,
                 seen: false
             };
-
+            const postOwner = await admin.firestore().doc(`users/${doc.id}`).get();
             const res = await admin.firestore().collection(`users/${doc.id}/activity`).add(data);
             console.log('Added document with ID: ', res.id);
               if (postOwner.data()['fcm'] !== null) {
@@ -276,14 +276,14 @@ exports.postDone = functions.firestore
           {
               notification: { 
                   title: 'Post completed',
-                  body: `${newValue['author']} completed a post that you have donated to`, 
+                  body: `${newValue['authorUsername']} completed a post that you have donated to`, 
               },
           };
 
         if (tokens.length > 0) {
             // Send notifications to all tokens.
             const response = await admin.messaging().sendToDevice(tokens, donationPayload);
-            await cleanupTokens(response, tokens);
+            //await cleanupTokens(response, tokens);
             console.log('Notifications have been sent and tokens cleaned up.');
             }
         
@@ -292,8 +292,114 @@ exports.postDone = functions.firestore
       // perform desired operations ...
     });
 
+    exports.postCreated = functions.firestore
+    .document('/posts/{postId}')
+    .onCreate(async (snapshot, context) => {
+
+      const postId = context.params.postId;
+        
+
+        var tokens = [];
+        // first find the post owner followers
+        const postOwnerFollowers = await admin.firestore().collection(`users/${snapshot.data()['author']}/myFollowers`).get();
+        const postOwnerFollowersDoc = postOwnerFollowers.docs.map(doc => doc);
+
+        
+        /* eslint-disable no-await-in-loop */
+        for(var i=0; i<postOwnerFollowersDoc.length; i++){
+            console.log(postOwnerFollowersDoc[i]);
+            const doc = postOwnerFollowersDoc[i];
+            console.log(doc.id);
+
+            if(doc.data()['following'] === true){
+              const data = {
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                category: 'new post from following',
+                docLiker: snapshot.data()['author'],
+                docLikerUsername: snapshot.data()['authorUsername'],
+                postId: postId,
+                seen: false
+            };
+
+            const postOwner = await admin.firestore().doc(`users/${doc.id}`).get();
+            const res = await admin.firestore().collection(`users/${doc.id}/activity`).add(data);
+            console.log('Added document with ID: ', res.id);
+              if (postOwner.data()['fcm'] !== null) {
+                tokens = tokens.concat(postOwner.data()['fcm']);
+              }
+            }
+        }
+
+        console.log(tokens);
+
+        const payload =
+          {
+              notification: { 
+                  title: 'Post added',
+                  body: `${snapshot.data()['authorUsername']}, who you follow, has added a new post`, 
+              },
+          };
+
+        if (tokens.length > 0) {
+            // Send notifications to all tokens.
+            const response = await admin.messaging().sendToDevice(tokens, payload);
+            //await cleanupTokens(response, tokens);
+            console.log('Notifications have been sent and tokens cleaned up.');
+            }
+      // perform desired operations ...
+    });
+
+    exports.followerGained = functions.firestore
+    .document('/users/{userId}/myFollowers/{followerId}')
+    .onCreate(async (snapshot, context) => {
+
+      const userId = context.params.userId;
+      const user = await admin.firestore().doc(`users/${userId}`).get();
+        
+      const followerId = context.params.followerId;
+      const follower = await admin.firestore().doc(`users/${followerId}`).get();
+
+      var tokens = [];
+      const data = {
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          category: 'new follower',
+          docLiker: followerId,
+          docLikerUsername: follower.data()['username'],
+          postId: followerId,
+          seen: false
+      };
+
+      const res = await admin.firestore().collection(`users/${userId}/activity`).add(data);
+      console.log('Added document with ID: ', res.id);
+      if (user.data()['fcm'] !== null) {
+        tokens = tokens.concat(user.data()['fcm']);
+      }
+
+
+      console.log(tokens);
+
+      const payload =
+        {
+            notification: { 
+                title: 'New follower',
+                body: `${follower.data()['username']} has started following you`, 
+            },
+        };
+
+        console.log(`${follower.data()['username']} has started following you`);
+        console.log(payload);
+
+        if (tokens.length > 0) {
+            // Send notifications to all tokens.
+            const response = await admin.messaging().sendToDevice(tokens, payload);
+            //await cleanupTokens(response, tokens);
+            console.log('Notifications have been sent and tokens cleaned up.');
+            }
+      // perform desired operations ...
+    });
+
 // Cleans up the tokens that are no longer valid.
-function cleanupTokens(response, tokens) {
+/*function cleanupTokens(response, tokens) {
     // For each notification we check if there was an error.
     const tokensDelete = [];
     response.results.forEach((result, index) => {
@@ -309,7 +415,7 @@ function cleanupTokens(response, tokens) {
       }
     });
     return Promise.all(tokensDelete);
-   }
+   }*/
 
 
 
