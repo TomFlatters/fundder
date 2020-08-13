@@ -139,32 +139,35 @@ class _ProfileState extends State<ProfileController>
           //   : Firestore.instance.collection("posts").snapshots(),
           builder: (context, snapshot) {
             // print(snapshot.data);
-            if (snapshot.hasData) {
-              _uid = widget.uid;
-              if (snapshot.data['name'] != null) {
-                _name = snapshot.data["name"];
+            if (snapshot != null) {
+              if (snapshot.hasData && snapshot.data != []) {
+                print(snapshot.data);
+                _uid = widget.uid;
+                if (snapshot.data['name'] != null) {
+                  _name = snapshot.data["name"];
+                }
+                if (snapshot.data['likes'] != null) {
+                  _likesList = snapshot.data["likes"];
+                }
+                _username = snapshot.data['username'];
+                _email = snapshot.data["email"];
+                if (snapshot.data["profilePic"] != null) {
+                  _profilePic = snapshot.data["profilePic"];
+                } else {
+                  _profilePic =
+                      'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+                }
+                if (snapshot.data['amountDonated'] != null) {
+                  _amountDonated = snapshot.data['amountDonated'];
+                }
+                print("profile controller has data");
+                _noFollowing = snapshot.data['noFollowing'] != null
+                    ? snapshot.data['noFollowing']
+                    : 0;
+                _noFollowers = snapshot.data['noFollowers'] != null
+                    ? snapshot.data['noFollowers']
+                    : 0;
               }
-              if (snapshot.data['likes'] != null) {
-                _likesList = snapshot.data["likes"];
-              }
-              _username = snapshot.data['username'];
-              _email = snapshot.data["email"];
-              if (snapshot.data["profilePic"] != null) {
-                _profilePic = snapshot.data["profilePic"];
-              } else {
-                _profilePic =
-                    'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-              }
-              if (snapshot.data['amountDonated'] != null) {
-                _amountDonated = snapshot.data['amountDonated'];
-              }
-              print("profile controller has data");
-              _noFollowing = snapshot.data['noFollowing'] != null
-                  ? snapshot.data['noFollowing']
-                  : 0;
-              _noFollowers = snapshot.data['noFollowers'] != null
-                  ? snapshot.data['noFollowers']
-                  : 0;
             } else {
               print("profile controller does not have data");
             }
