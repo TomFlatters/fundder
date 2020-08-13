@@ -360,22 +360,37 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
   }
 });
 
+//create Stripe customers, enabling us to safely save card details and charge them later
 
 
-// /**
-//  * When a user is created, create a Stripe customer object for them.
-//  *
-//  * @see https://stripe.com/docs/payments/save-and-reuse#web-create-customer
-//  */
-// exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
-//   const customer = await stripe.customers.create({ email: user.email });
-//   const intent = await stripe.setupIntents.create({
-//     customer: customer.id,
-//   });
-//   await admin.firestore().collection('stripe_customers').doc(user.uid).set({
-//     customer_id: customer.id,
-//     setup_secret: intent.client_secret,
-//   });
-//   return;
-// });
+
+
+
+/**
+ * When a user is created, create a Stripe customer object for them.
+ *
+ * @see https://stripe.com/docs/payments/save-and-reuse#web-create-customer
+ * Firebase accounts will trigger user creation events for Cloud Functions when:
+
+    A user creates an email account and password.
+    A user signs in for the first time using a federated identity provider.
+    The developer creates an account using the Firebase Admin SDK.
+    A user signs in to a new anonymous auth session for the first time.
+
+A Cloud Functions event is not triggered when a user signs in for the first time using a custom token.
+ */
+exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
+  //We also associate the ID of the Customer object with our own internal representation of 
+  //a customer
+  const customer = await stripe.customers.create({ email: user.email });
+  const intent = await stripe.setupIntents.create({
+    customer: customer.id,
+  });
+  await admin.firestore().collection('stripe_customers').doc(user.uid).set({
+    customer_id: customer.id,
+    setup_secret: intent.client_secret,
+    fundder_id: user.uid,
+  });
+  return;
+});
 
