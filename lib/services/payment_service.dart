@@ -34,11 +34,19 @@ import 'package:stripe_payment/stripe_payment.dart';
 ///
 /// */
 
+///////////////////// LIGHTWEIGHT SUCCESS/FAILURE FLAGS ////////////////////////
 class StripeTransactionResponse {
   String message;
   bool success;
   StripeTransactionResponse({this.message, this.success});
 }
+
+class StripeSetupResponse {
+  String message;
+  bool success;
+  StripeSetupResponse({this.message, this.success});
+}
+////////////////////////////////////////////////////////////////////////////////
 
 class StripeService {
   static init() {
@@ -68,9 +76,10 @@ class StripeService {
 
     print('cloud function instantiated client side...');
 //get client secret from paymentIntent object created server side
+
     HttpsCallableResult paymentIntent =
         await createPaymentIntent.call(<String, dynamic>{'amount': amount});
-    print('cloud function called');
+    print('cloud function called to get payment intent');
 
     return PaymentIntent(
         clientSecret: paymentIntent.data['clientSecret'],
@@ -108,6 +117,8 @@ class StripeService {
 
     return new StripeTransactionResponse(message: message, success: false);
   }
+
+  static Future<StripeSetupResponse> addNewCard(String uid) {}
 }
 
 class PaymentBookKeepingService {
