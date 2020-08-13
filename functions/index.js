@@ -394,3 +394,13 @@ exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
   return;
 });
 
+//Code to create a setupIntent:
+//A SetupIntent is an object that represents your intent to set up a payment method for future payments.
+
+exports.createSetupIntent = functions.https.onCall(async (data, context)=>{
+  //create a setup intent for a customer and pass the client secret client side 
+  const setupIntent = await stripe.setupIntents.create({
+    customer: data.customerId,
+  });
+  return setupIntent.client_secret;
+});
