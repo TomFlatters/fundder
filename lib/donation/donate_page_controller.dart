@@ -4,7 +4,7 @@ import 'package:fundder/donation/money_input_text_widget.dart';
 import 'package:fundder/donation/payment_methods.dart';
 import 'package:fundder/main.dart';
 import 'package:fundder/models/user.dart';
-import 'package:fundder/payment_controllers/existingCards.dart';
+// import 'package:fundder/payment_controllers/existingCards.dart';
 import 'package:fundder/services/payment_service.dart';
 import 'package:provider/provider.dart';
 import 'package:stripe_payment/stripe_payment.dart';
@@ -86,8 +86,8 @@ class _DonatePageState extends State<DonatePage> {
             leading: Icon(Icons.credit_card, color: Colors.black),
             title: Text("Pay via existing cards"),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ExistingCards()));
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => ExistingCards()));
             },
           )
         ],

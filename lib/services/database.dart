@@ -263,7 +263,6 @@ class DatabaseService {
   //       ? documentId.substring(1, documentId.length - 1)
   //       : documentId;
   //   print('Formatted data: ' + formattedId);
-
   // Get a post from Firestore given a known id
   Future<Post> getPostById(String documentId) async {
     String formattedId = documentId.substring(0,
