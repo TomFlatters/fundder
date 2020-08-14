@@ -52,7 +52,6 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
               Container(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.width * 9 / 16,
                   child: kIsWeb == true
                       ? Image.network(
                           'https://i.pinimg.com/originals/99/d9/fa/99d9fa7c22ca5ca5856cf4dd30db692e.jpg')
@@ -126,7 +125,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                               margin: EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 20),
                               child: Text(
-                                  'Sleep 2 nights in the garden to raise money for Help Refugees')),
+                                  'Sleep 4 nights in the garden to raise money for Help Refugees')),
                           Padding(
                             padding: EdgeInsets.all(20),
                           ),

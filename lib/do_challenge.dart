@@ -19,7 +19,7 @@ class _DoChallengeState extends State<DoChallenge> {
     final List<String> entries = <String>['Active', 'Past'];
     final List<String> active = ['Sleep 2 nights in the garden'];
     final List<String> activeDescription = [
-      'Sleep 2 nights in the garden to raise money for Help Refugees'
+      'Sleep 4 nights in the garden to raise money for Help Refugees'
     ];
     final List<String> activePics = [
       'https://i.pinimg.com/originals/99/d9/fa/99d9fa7c22ca5ca5856cf4dd30db692e.jpg'
@@ -99,6 +99,7 @@ class _DoChallengeState extends State<DoChallenge> {
                                       child: kIsWeb == true
                                           ? Image.network(array3[index])
                                           : CachedNetworkImage(
+                                              fit: BoxFit.cover,
                                               imageUrl: '${array3[index]}',
                                               placeholder: (context, url) =>
                                                   Loading(),
