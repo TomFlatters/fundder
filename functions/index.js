@@ -394,13 +394,25 @@ exports.createStripeCustomer = functions.auth.user().onCreate(async (user) => {
   return;
 });
 
+const db = admin.firestore();
+
+async function mapUIDtoStripeCustomer(uid)  {
+  const doc = await db.collection('stripe_customers').doc(uid).get()
+  if (doc.exists){
+    return doc.data().customer_id
+  }
+  else return null
+}
+
 //Code to create a setupIntent:
 //A SetupIntent is an object that represents your intent to set up a payment method for future payments.
 
 exports.createSetupIntent = functions.https.onCall(async (data, context)=>{
+  //get Stripe customer id from the user id
+  const customerId = await mapUIDtoStripeCustomer(data.uid)
   //create a setup intent for a customer and pass the client secret client side 
   const setupIntent = await stripe.setupIntents.create({
-    customer: data.customerId,
+    customer: customerId,
   });
   return setupIntent.client_secret;
 });
