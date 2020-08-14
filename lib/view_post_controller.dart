@@ -7,6 +7,7 @@ import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/post_widgets/shareBar.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'post_widgets/postHeader.dart';
 import 'helper_classes.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -194,11 +195,25 @@ class ViewPost extends StatelessWidget with RouteAware {
                                                     text: 'Donate',
                                                     onPressed: () {
                                                       /*Navigator.of(context).push(_openDonate());*/
-                                                      Navigator.pushNamed(
-                                                          context,
-                                                          '/post/' +
-                                                              postData.id +
-                                                              '/donate');
+                                                      // Navigator.pushNamed(
+                                                      //     context,
+                                                      //     '/post/' +
+                                                      //         postData.id +
+                                                      //         '/donate');
+
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    WebView(
+                                                                      initialUrl:
+                                                                          'https://fundder.co/',
+                                                                      javascriptMode:
+                                                                          JavascriptMode
+                                                                              .unrestricted,
+                                                                    )),
+                                                      );
                                                     }),
                                                 user.uid != postData.author ||
                                                         postData.status !=
