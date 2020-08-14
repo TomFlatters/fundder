@@ -18,6 +18,11 @@ class _DoChallengeState extends State<DoChallenge> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Template>>(
         future: _getTemplates(),

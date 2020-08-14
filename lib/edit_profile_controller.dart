@@ -25,7 +25,9 @@ class _EditProfileState extends State<EditProfile> {
   String _email = "Email";
   String _profilePic;
   PickedFile imageFile;
+  List fcmToken;
   final picker = ImagePicker();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -71,14 +73,40 @@ class _EditProfileState extends State<EditProfile> {
         centerTitle: true,
         title: Text('Edit Profile'),
         actions: <Widget>[
-          new IconButton(
-            icon: new Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(setState(() {})),
+          new FlatButton(
+            child: Text('Save'),
+            onPressed: () {
+              setState(() {
+                isLoading = true;
+              });
+              if (imageFile != null) {
+                final String fileLocation = _uid +
+                    "/" +
+                    DateTime.now().microsecondsSinceEpoch.toString();
+                DatabaseService(uid: _uid)
+                    .uploadImage(File(imageFile.path), fileLocation)
+                    .then((downloadUrl) => {
+                          print("Successful image upload"),
+                          print(downloadUrl),
+
+                          // create post from the state and image url, and add that post to firebase
+                          DatabaseService(uid: _uid).updateUserData(
+                              _email, //emailEntry.text,
+                              _username,
+                              nameEntry.text,
+                              downloadUrl)
+                        });
+              } else {
+                DatabaseService(uid: _uid).updateUserData(
+                    emailEntry.text, _username, nameEntry.text, _profilePic);
+              }
+              Navigator.of(context).pop(setState(() {}));
+            },
           )
         ],
         leading: new Container(),
       ),
-      body: _uid == null
+      body: _uid == null || isLoading == true
           ? Loading()
           : ListView(shrinkWrap: true, children: <Widget>[
               Container(
@@ -108,22 +136,39 @@ class _EditProfileState extends State<EditProfile> {
                 padding: const EdgeInsets.only(top: 10.0),
                 itemCount: entries.length,
                 itemBuilder: (BuildContext context, int index) {
+                  // Edge insets on certain indices to make size of texts match the textfield size
                   return Row(
                     children: <Widget>[
                       Container(
-                          margin: EdgeInsets.symmetric(horizontal: 20),
-                          width: 80,
-                          child: Text(entries[index])),
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        width: 80,
+                        child: Container(
+                            child: Text(entries[index]),
+                            margin:
+                                EdgeInsets.only(bottom: index == 1 ? 15 : 0)),
+                      ),
                       Expanded(
                         child: index == 1
-                            ? Text(_uid == null ? "username" : _username)
-                            : TextField(
-                                controller: controllers[index],
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: hints[index],
-                                ),
-                              ),
+                            ? Container(
+                                child: Text(
+                                    _uid == null ? "username" : _username,
+                                    style: TextStyle(
+                                        fontSize: 17, color: Colors.grey)),
+                                margin: EdgeInsets.only(bottom: 15),
+                              )
+                            : index == 2
+                                ? Text(
+                                    _uid == null ? "email" : _email,
+                                    style: TextStyle(
+                                        fontSize: 17, color: Colors.grey),
+                                  )
+                                : TextField(
+                                    controller: controllers[index],
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: hints[index],
+                                    ),
+                                  ),
                       )
                     ],
                   );
@@ -134,32 +179,10 @@ class _EditProfileState extends State<EditProfile> {
                   );
                 },
               ),
-              SecondaryFundderButton(
+              /*SecondaryFundderButton(
                 text: 'Save Changes',
-                onPressed: () {
-                  if (imageFile != null) {
-                    final String fileLocation = _uid +
-                        "/" +
-                        DateTime.now().microsecondsSinceEpoch.toString();
-                    DatabaseService(uid: _uid)
-                        .uploadImage(File(imageFile.path), fileLocation)
-                        .then((downloadUrl) => {
-                              print("Successful image upload"),
-                              print(downloadUrl),
-
-                              // create post from the state and image url, and add that post to firebase
-                              DatabaseService(uid: _uid).updateUserData(
-                                  emailEntry.text,
-                                  _username,
-                                  nameEntry.text,
-                                  downloadUrl)
-                            });
-                  } else {
-                    DatabaseService(uid: _uid).updateUserData(emailEntry.text,
-                        _username, nameEntry.text, _profilePic);
-                  }
-                },
-              ),
+                onPressed: () {},
+              ),*/
             ]),
     );
   }

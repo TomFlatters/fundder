@@ -4,10 +4,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/post_widgets/commentBar.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/post_widgets/postBody.dart';
+import 'package:fundder/post_widgets/postHeader.dart';
+import 'package:fundder/post_widgets/shareBar.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
+import 'package:fundder/view_post_controller.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'models/post.dart';
@@ -19,55 +24,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'video_item.dart';
 import 'services/likes.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class FeedView extends StatefulWidget {
   @override
   _FeedViewState createState() => _FeedViewState();
 
-  final Color colorChoice;
-  final String feedChoice;
-  final String identifier;
-  //final Stream<List<Post>> postsStream;
+  final VoidCallback onDeletePressed;
   final List<Post> postList;
-  FeedView(this.feedChoice, this.identifier, this.colorChoice, this.postList,
-      {Key key});
+  final String hashtag;
+  FeedView(this.postList, this.onDeletePressed, this.hashtag, {Key key});
 }
 
 class _FeedViewState extends State<FeedView> {
   ScrollPhysics physics;
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'addMessage',
+  );
 
   @override
   void initState() {
     super.initState();
-    if (widget.feedChoice == "user") {
-      physics = NeverScrollableScrollPhysics();
-    }
-    // print fcm token
-    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    _firebaseMessaging.configure(
-      onLaunch: (Map<String, dynamic> message) {
-        print('onLaunch called');
-      },
-      onResume: (Map<String, dynamic> message) {
-        print('onResume called');
-      },
-      onMessage: (Map<String, dynamic> message) {
-        print('onMessage called');
-      },
-    );
-    _firebaseMessaging.subscribeToTopic('all');
-    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
-      sound: true,
-      badge: true,
-      alert: true,
-    ));
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings settings) {
-      print('Hello');
-    });
-    _firebaseMessaging.getToken().then((token) {
-      print(token); // Print the Token in Console
-    });
   }
 
   @override
@@ -78,6 +56,7 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
+    LikesModel likesModel;
     print("feed being built");
     final user = Provider.of<User>(context);
     final LikesService likesService = LikesService(uid: user.uid);
@@ -90,8 +69,11 @@ class _FeedViewState extends State<FeedView> {
         padding: const EdgeInsets.only(top: 10.0),
         itemCount: widget.postList.length,
         itemBuilder: (BuildContext context, int index) {
+          //building an individual post
           Post postData = widget.postList[index];
-          // print(postData);
+          // print(postData)
+          bool initiallyHasLiked;
+          int initialLikesNo;
           return GestureDetector(
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -99,127 +81,63 @@ class _FeedViewState extends State<FeedView> {
               child: Container(
                 margin: EdgeInsets.only(left: 0, right: 0, top: 0),
                 child: Column(children: <Widget>[
-                  Container(
-                    height: 60,
-                    child: Row(
-                      children: <Widget>[
-                        Align(
-                            alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              child: AspectRatio(
-                                  aspectRatio: 1 / 1,
-                                  child: Container(
-                                    child: ProfilePic(postData.author, 40),
-                                    margin: EdgeInsets.all(10.0),
-                                  )),
-                              onTap: () {
-                                print('/user/' + postData.author);
-                                Navigator.pushNamed(
-                                    context, '/user/' + postData.author);
-                              },
-                            )),
-                        Expanded(
-                            child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(postData.authorUsername,
-                                    style: TextStyle(
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.w600,
-                                    )))),
-                        Align(
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                                margin: EdgeInsets.all(10.0),
-                                child: Text(postData.charity))),
-                      ],
-                    ),
+                  PostHeader(
+                      postAuthorId: postData.author,
+                      postAuthorUserName: postData.authorUsername,
+                      targetCharity: postData.charity,
+                      postStatus: postData.status),
+                  PostBody(
+                    postData: postData,
+                    hashtag: widget.hashtag,
                   ),
                   Container(
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.all(10),
-                      child: Text(postData.subtitle)),
-                  Container(
-                      alignment: Alignment.centerLeft,
-                      margin:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      child: Text(
-                        '£${postData.amountRaised} raised of £${postData.targetAmount} target',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      )),
-                  Container(
-                    //alignment: Alignment.centerLeft,
-                    margin:
-                        EdgeInsets.only(top: 5, bottom: 15, left: 0, right: 0),
-                    child: LinearPercentIndicator(
-                      linearStrokeCap: LinearStrokeCap.butt,
-                      lineHeight: 3,
-                      percent: postData.percentRaised(),
-                      backgroundColor: HexColor('CCCCCC'),
-                      progressColor: HexColor('ff6b6c'),
-                    ),
-                  ),
-                  (postData.imageUrl == null)
-                      ? Container()
-                      : Container(
-                          child: SizedBox(child: _previewImageVideo(postData)),
-                          margin: EdgeInsets.symmetric(vertical: 10.0),
-                        ),
-                  Container(
+                    //action bar
                     key: GlobalKey(),
                     height: 30,
                     child: Row(children: <Widget>[
+                      FutureBuilder(
+                          future: likesService.hasUserLikedPost(postData.id),
+                          builder: (context, hasLiked) {
+                            if (hasLiked.connectionState ==
+                                ConnectionState.done) {
+                              initiallyHasLiked = hasLiked.data;
+                              return FutureBuilder(
+                                future: likesService.noOfLikes(postData.id),
+                                builder: (context, noLikes) {
+                                  if (noLikes.connectionState ==
+                                      ConnectionState.done) {
+                                    initialLikesNo = noLikes.data;
+                                    likesModel = LikesModel(
+                                        initiallyHasLiked, initialLikesNo,
+                                        uid: user.uid, postId: postData.id);
+                                    return Expanded(
+                                      //like bar
+                                      child: ChangeNotifierProvider(
+                                          create: (context) => likesModel,
+                                          child: LikeBar()),
+                                    );
+                                  } else {
+                                    return Expanded(
+                                      child: Container(),
+                                    );
+                                  }
+                                },
+                              );
+                            } else {
+                              return Expanded(
+                                child: Container(),
+                              );
+                            }
+                          }),
                       Expanded(
-                          //like bar
-                          child: LikeBar(
-                        postId: postData.id,
-                        key: GlobalKey(),
+                          child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: CommentButton(
+                          pid: postData.id,
+                        ),
                       )),
                       Expanded(
-                        child: FlatButton(
-                          child: Row(children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              padding: const EdgeInsets.all(0.0),
-                              child: Image.asset('assets/images/comment.png'),
-                            ),
-                            Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      postData.comments.length.toString(),
-                                      textAlign: TextAlign.left,
-                                    )))
-                          ]),
-                          onPressed: () {
-                            /*Navigator.of(context)
-                                            .push(_showComments());*/
-                            Navigator.pushNamed(
-                                context, '/post/' + postData.id + '/comments');
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: FlatButton(
-                          child: Row(children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              padding: const EdgeInsets.all(0.0),
-                              child: Image.asset('assets/images/share.png'),
-                            ),
-                            Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      'Share',
-                                      textAlign: TextAlign.left,
-                                    )))
-                          ]),
-                          onPressed: () {
-                            _showShare();
-                          },
-                        ),
+                        child: ShareBar(),
                       ),
                     ]),
                   ),
@@ -228,11 +146,13 @@ class _FeedViewState extends State<FeedView> {
                       child: Container(
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.all(10),
-                        child: Text(howLongAgo(postData.timestamp),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            )),
+                        child: Text(
+                          howLongAgo(postData.timestamp),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
                       ),
                     ),
                     postData.author != user.uid
@@ -253,8 +173,24 @@ class _FeedViewState extends State<FeedView> {
                 ]),
               ),
             ),
-            onTap: () {
-              Navigator.pushNamed(context, '/post/' + postData.id);
+            onTap: () async {
+              //
+              //throw StateError('Uncaught error thrown by app.');
+              // var pid = postData.id;
+              // var noLikes = likesModel.noLikes;
+              // var isLiked = likesModel.isLiked;
+              // var uid = user.uid;
+              // //passing state into ViewPost screen
+              // LikesModel likeState = LikesModel(isLiked, noLikes,
+              //     uid: uid, postId: pid);
+              if (likesModel != null) {
+                var newState = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ViewPost(postData)));
+                likesModel.manuallySetState(
+                    newState['noLikes'], newState['isLiked']);
+              }
             },
           );
         },
@@ -264,23 +200,6 @@ class _FeedViewState extends State<FeedView> {
           );
         },
       );
-    }
-  }
-
-  Widget _previewImageVideo(Post postData) {
-    if (postData.imageUrl.contains('video')) {
-      print('initialising video');
-      return VideoItem(key: UniqueKey(), url: postData.imageUrl);
-    } else {
-      return kIsWeb == true
-          ? Image.network(postData.imageUrl)
-          : CachedNetworkImage(
-              imageUrl: (postData.imageUrl != null)
-                  ? postData.imageUrl
-                  : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-              placeholder: (context, url) => Loading(),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            );
     }
   }
 
@@ -309,6 +228,7 @@ class _FeedViewState extends State<FeedView> {
                     .delete()
                     .then((value) {
                   Navigator.of(context).pop();
+                  widget.onDeletePressed();
                 });
               },
             ),
@@ -322,13 +242,5 @@ class _FeedViewState extends State<FeedView> {
         );
       },
     );
-  }
-
-  void _showShare() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SharePost();
-        });
   }
 }

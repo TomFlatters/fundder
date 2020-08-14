@@ -40,12 +40,44 @@ class DatabaseService {
   Future updateUserData(
       String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
+    return await userCollection.document(uid).updateData({
+      'email': email,
+      'username': username,
+      'name': name,
+      'profilePic': profilePic,
+    });
+  }
+
+  // only call this on registration, since it sets profile pic and tutorials viewed as false
+  Future registerUserData(
+      String email, String username, String name, String profilePic) async {
+    // create or update the document with this uid
     return await userCollection.document(uid).setData({
       'email': email,
       'username': username,
       'name': name,
-      'profilePic': profilePic
+      'profilePic': profilePic,
+      'seenTutorial': false,
+      'dpSetterPrompted': false,
     });
+  }
+
+  Future addFCMToken(String token) async {
+    // create or update the document with this uid
+    return await userCollection.document(uid).updateData({
+      "fcm": FieldValue.arrayUnion([token])
+    });
+  }
+
+  Future removeFCMToken(String token) async {
+    if (token != null) {
+      // create or update the document with this uid
+      return await userCollection.document(uid).updateData({
+        "fcm": FieldValue.arrayRemove([token])
+      });
+    } else {
+      return null;
+    }
   }
 
   // Get users stream
@@ -86,14 +118,17 @@ class DatabaseService {
         title: doc.data['title'],
         charity: doc.data['charity'],
         amountRaised: doc.data['amountRaised'],
+        moneyRaised: doc.data['moneyRaised'],
         targetAmount: doc.data['targetAmount'],
         likes: doc.data['likes'],
-        comments: doc.data['comments'],
+        noComments: doc.data['noComments'],
         subtitle: doc.data['subtitle'],
         timestamp: doc.data['timestamp'],
         imageUrl: doc.data['imageUrl'],
         id: doc.documentID,
-        status: doc.data['status']);
+        status: doc.data['status'],
+        aspectRatio: doc.data['aspectRatio'],
+        hashtags: doc.data['hashtags']);
   }
 
   // Get posts list stream is mapped to the Post object
@@ -139,10 +174,36 @@ class DatabaseService {
         });
   }
 
+  Future<List<Post>> refreshHashtag(
+      String hashtag, int limit, Timestamp startTimestamp) {
+    print('limit: ' + limit.toString());
+    return postsCollection
+        .orderBy("timestamp", descending: true)
+        .startAfter([startTimestamp])
+        .limit(limit)
+        .where('hashtags', arrayContains: hashtag)
+        .getDocuments()
+        .then((snapshot) {
+          print(_postsDataFromSnapshot(snapshot));
+          return _postsDataFromSnapshot(snapshot);
+        });
+  }
+
   Future<List<Post>> authorPosts(String id) {
+    print('gettig posts by author: ' + id);
     return postsCollection
         .where("author", isEqualTo: id)
         .orderBy("timestamp", descending: true)
+        .getDocuments()
+        .then((snapshot) {
+      return _postsDataFromSnapshot(snapshot);
+    });
+  }
+
+  Future<List<Post>> likedPosts(String id, List likesList) {
+    print('gettig liked posts by author: ' + id);
+    return postsCollection
+        .where(FieldPath.documentId, whereIn: likesList)
         .getDocuments()
         .then((snapshot) {
       return _postsDataFromSnapshot(snapshot);
@@ -179,26 +240,34 @@ class DatabaseService {
           "title": post.title,
           "charity": post.charity,
           "amountRaised": post.amountRaised,
+          "moneyRaised": post.moneyRaised,
           "targetAmount": post.targetAmount,
           "noLikes": post.noLikes,
-          "comments": post.comments,
+          "noComments": post.noComments,
           "subtitle": post.subtitle,
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
           'status': post.status,
-          'templateTag': post.templateTag
+          'templateTag': post.templateTag,
+          'aspectRatio': post.aspectRatio,
+          "hashtags": post.hashtags
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
   }
 
-  // Get a post from Firestore given a known id: if the post id is bracketted these are automatically removed
-  Future getPostById(String documentId) async {
-    String formattedId = (documentId.substring(0, 1) == "{" &&
-            documentId.substring(documentId.length - 1) == "}")
-        ? documentId.substring(1, documentId.length - 1)
-        : documentId;
-    print('Formatted data: ' + formattedId);
+  // // Get a post from Firestore given a known id: if the post id is bracketted these are automatically removed
+  // Future getPostById(String documentId) async {
+  //   String formattedId = (documentId.substring(0, 1) == "{" &&
+  //           documentId.substring(documentId.length - 1) == "}")
+  //       ? documentId.substring(1, documentId.length - 1)
+  //       : documentId;
+  //   print('Formatted data: ' + formattedId);
+
+  // Get a post from Firestore given a known id
+  Future<Post> getPostById(String documentId) async {
+    String formattedId = documentId.substring(0,
+        documentId.length); // I think this needs to be changed for older posts
     DocumentReference docRef = postsCollection.document(formattedId);
     return await docRef.get().then((DocumentSnapshot doc) {
       print(doc);
@@ -342,86 +411,34 @@ class DatabaseService {
   Future updatePostData(Post post) async {
     // create or update the document with this uid
     return await postsCollection.document(post.id).setData({
+      "noLikes": post.noLikes,
       "author": post.author,
       "authorUsername": post.authorUsername,
       "title": post.title,
       "charity": post.charity,
       "amountRaised": post.amountRaised,
+      "moneyRaised": post.moneyRaised,
       "targetAmount": post.targetAmount,
       "likes": post.likes,
-      "comments": post.comments,
+      "noComments": post.noComments,
       "subtitle": post.subtitle,
       "timestamp": post.timestamp,
       "imageUrl": post.imageUrl,
-      "status": post.status
+      "status": post.status,
+      'aspectRatio': post.aspectRatio,
+      'hashtags': post.hashtags
     });
   }
 
-  Future updatePostStatusImageTimestamp(String postId, String downloadUrl,
-      String status, Timestamp timestamp) async {
+  Future updatePostStatusImageTimestampRatio(String postId, String downloadUrl,
+      String status, Timestamp timestamp, double aspectRatio) async {
     // create or update the document with this uid
-    return await postsCollection.document(postId).updateData(
-        {"imageUrl": downloadUrl, "status": status, "timestamp": timestamp});
-  }
-
-/*
-  Future addLiketoPost(Post post) async {
-    postsCollection.document(post.id).updateData({
-      "likes": FieldValue.arrayUnion([uid])
+    return await postsCollection.document(postId).updateData({
+      "imageUrl": downloadUrl,
+      "status": status,
+      "timestamp": timestamp,
+      "aspectRatio": aspectRatio
     });
-  }
-*/
-
-  /*
-  Future removeLikefromPost(Post post) async {
-    postsCollection.document(post.id).updateData({
-      "likes": FieldValue.arrayRemove([uid])
-    });
-  }
-  */
-
-  Future addCommentToPost(Map comment, String postId) async {
-    /*return await postsCollection.document(postId).collection("comments").add({
-      "author": comment["author"],
-      "text": comment["text"],
-      "timestamp": comment["timestamp"]
-    });*/
-    postsCollection.document(postId).updateData({
-      "comments": FieldValue.arrayUnion([
-        {
-          "author": comment["author"],
-          "text": comment["text"],
-          "timestamp": comment["timestamp"]
-        }
-      ])
-    });
-  }
-
-  Stream<DocumentSnapshot> commentsByDocId(postId) {
-    return postsCollection.document(postId).snapshots();
-    //.map(_commentsDataFromSnapshot);
-  }
-
-  /*// Get comments list Stream
-  List<Map> _commentsDataFromSnapshot(DocumentSnapshot doc) {
-    print('doc snapshot' + doc.data["comments"].toString());
-    return doc.data["comments"];
-  }*/
-
-  /*Map _makeComment(DocumentSnapshot doc) {
-    return {
-      "author": doc.data["author"],
-      "text": doc.data["text"],
-      "timestamp": doc.data["timestamp"]
-    };
-  }*/
-
-  Map _makeComment(DocumentSnapshot doc) {
-    return {
-      "author": doc.data["author"],
-      "text": doc.data["text"],
-      "timestamp": doc.data["timestamp"]
-    };
   }
 
   Future<List<DocumentSnapshot>> usersContainingString(String queryText) {
@@ -438,17 +455,32 @@ class DatabaseService {
         });
   }
 
-  Future<List<DocumentSnapshot>> postsContainingString(String queryText) {
-    return postsCollection
-        .orderBy('subtitle', descending: false)
-        .startAt([queryText])
-        .endAt([queryText + '\uf8ff'])
-        .limit(20)
-        .getDocuments()
-        .then((snapshot) {
-          return snapshot.documents.map((DocumentSnapshot doc) {
-            return doc;
-          }).toList();
-        });
+  Future<List<DocumentSnapshot>> hashtagsContainingString(String queryText) {
+    if (queryText != "") {
+      return Firestore.instance
+          .collection('hashtags')
+          .orderBy(FieldPath.documentId, descending: false)
+          .startAt([queryText])
+          .endAt([queryText + '\uf8ff'])
+          //.where(FieldPath.documentId, isGreaterThanOrEqualTo: queryText)
+          .limit(20)
+          .getDocuments()
+          .then((snapshot) {
+            return snapshot.documents.map((DocumentSnapshot doc) {
+              return doc;
+            }).toList();
+          });
+    } else {
+      return Firestore.instance
+          .collection('hashtags')
+          //.where(FieldPath.documentId, isGreaterThanOrEqualTo: queryText)
+          .limit(20)
+          .getDocuments()
+          .then((snapshot) {
+        return snapshot.documents.map((DocumentSnapshot doc) {
+          return doc;
+        }).toList();
+      });
+    }
   }
 }
