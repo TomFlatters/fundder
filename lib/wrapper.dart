@@ -5,8 +5,47 @@ import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/feed_web.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
-class Wrapper extends StatelessWidget {
+class Wrapper extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _WrapperState();
+  }
+}
+
+class _WrapperState extends State<Wrapper> {
+  @override
+  void initState() {
+    super.initState();
+    this.initDynamicLinks();
+  }
+
+  void initDynamicLinks() async {
+    print('init dynamic links');
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData dynamicLink) async {
+      final Uri deepLink = dynamicLink?.link;
+
+      if (deepLink != null) {
+        print('deep link received, path: ' + deepLink.toString());
+        Navigator.pushNamed(context, deepLink.path);
+      }
+    }, onError: (OnLinkErrorException e) async {
+      print('onLinkError');
+      print(e.message);
+    });
+
+    final PendingDynamicLinkData data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    final Uri deepLink = data?.link;
+
+    if (deepLink != null) {
+      print('opened with deep link');
+      Navigator.pushNamed(context, deepLink.path);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // context passes down the user data, this is how we get it:

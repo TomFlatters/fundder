@@ -3,7 +3,7 @@ import 'package:fundder/main.dart';
 import 'helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
-class SharePost extends StatelessWidget{
+class SharePost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -16,7 +16,7 @@ class SharePost extends StatelessWidget{
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(10),
             topRight: const Radius.circular(10),
-            ),
+          ),
         ),
       ),
     );
@@ -27,24 +27,29 @@ class SharePost extends StatelessWidget{
       children: <Widget>[
         ListTile(
           title: Container(
-            margin: EdgeInsets.only(left:10),
-            child: Text('Share to:',style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),),
+            margin: EdgeInsets.only(left: 10),
+            child: Text(
+              'Share to:',
+              style: TextStyle(
+                fontFamily: 'Quicksand',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
           ),
-          onTap: (){},
+          onTap: () {},
         ),
-        ListTile(
+        /*ListTile(
           leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.facebook_messenger)),
           title: Text('Messenger'),
           onTap: (){},
-        ), ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome.link)),
+        ), */
+        ListTile(
+          leading:
+              Container(width: 30, height: 30, child: Icon(FontAwesome.link)),
           title: Text('Copy Link'),
-          onTap: (){},
-        ),ListTile(
+          onTap: () {},
+        ), /*ListTile(
           leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.snapchat_ghost)),
           title: Text('Snapchat'),
           onTap: (){},
@@ -76,10 +81,8 @@ class SharePost extends StatelessWidget{
           leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.twitter)),
           title: Text('Twitter'),
           onTap: (){},
-        ),
+        ),*/
       ],
-      );
+    );
   }
 }
-
-
