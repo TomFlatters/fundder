@@ -155,7 +155,7 @@ class _StepsPageState extends State<StepsPage> {
           authorUsername: fetchedUsername,
           charity: template.charity,
           noLikes: 0,
-          comments: [],
+          // comments: [],
           timestamp: DateTime.now(),
           amountRaised: "0",
           targetAmount: amount,
