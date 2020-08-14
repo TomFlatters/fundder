@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'dart:math' as math;
 import 'dart:async';
 import 'package:flutter/animation.dart';
+import 'package:flutter/cupertino.dart';
 
 class Loading extends StatefulWidget {
   Loading({Key key}) : super(key: key);
@@ -20,7 +21,7 @@ class _LoadingState extends State<Loading> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    /*_controller = AnimationController(
         duration: const Duration(milliseconds: 750), vsync: this);
     animation = Tween<double>(begin: 50, end: 100).animate(_controller)
       ..addListener(() {
@@ -39,7 +40,7 @@ class _LoadingState extends State<Loading> with TickerProviderStateMixin {
           _controller.forward();
         }
       });
-    _controller.forward();
+    _controller.forward();*/
   }
 
   @override
@@ -53,9 +54,10 @@ class _LoadingState extends State<Loading> with TickerProviderStateMixin {
             child: Center(
               child: Container(
                 // Use the properties stored in the State class.
-                width: animation.value,
+                /*width: animation.value,
                 height: animation.value,
-                child: Image.asset('assets/images/fundder_loading.png'),
+                child: Image.asset('assets/images/fundder_loading.png'),*/
+                child: CupertinoActivityIndicator(),
               ),
               // Define how long the animation should take.
               // Provide an optional curve to make the animation feel smoother.
@@ -69,7 +71,7 @@ class _LoadingState extends State<Loading> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.dispose();
+    //_controller.dispose();
     super.dispose();
   }
 }

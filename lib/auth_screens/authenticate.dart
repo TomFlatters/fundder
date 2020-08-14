@@ -1,6 +1,7 @@
 // root authentication widget
 
 import "package:flutter/material.dart";
+import 'package:flutter/services.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:fundder/shared/constants.dart';
@@ -16,7 +17,8 @@ class _AuthenticateState extends State<Authenticate>
     with SingleTickerProviderStateMixin {
   final AuthService _auth = AuthService();
   // key associated with form. Tracks state of form
-  final _formKey = GlobalKey<FormState>();
+  final _signinKey = GlobalKey<FormState>();
+  final _registerKey = GlobalKey<FormState>();
 
   // is the screen loading? show loading widget if so
   bool loading = false;
@@ -27,7 +29,8 @@ class _AuthenticateState extends State<Authenticate>
   String password = '';
   String username = '';
 
-  String error = '';
+  String signinerror = '';
+  String registrationerror = '';
 
   int _currentIndex = 0;
 
@@ -71,7 +74,7 @@ class _AuthenticateState extends State<Authenticate>
                   child: Container(
                     width: 150,
                     height: 150,
-                    child: Image.asset('assets/images/fundder_loading.png'),
+                    child: Image.asset('assets/images/pink_bear.png'),
                   ),
                 ),
               ),
@@ -97,11 +100,15 @@ class _AuthenticateState extends State<Authenticate>
     return Container(
         padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
         child: Form(
-            key: _formKey,
+            key: _signinKey,
             child: Column(
               children: <Widget>[
                 SizedBox(height: 30.0),
                 TextFormField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                  ],
+                  initialValue: email,
                   decoration: textInputDecoration.copyWith(hintText: 'Email'),
                   validator: (val) => val.isEmpty ? 'Enter an email' : null,
                   onChanged: (val) {
@@ -112,6 +119,9 @@ class _AuthenticateState extends State<Authenticate>
                 ),
                 SizedBox(height: 20.0),
                 TextFormField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                  ],
                   decoration:
                       textInputDecoration.copyWith(hintText: 'Password'),
                   validator: (val) => val.length < 6
@@ -131,22 +141,42 @@ class _AuthenticateState extends State<Authenticate>
                 PrimaryFundderButton(
                   text: 'Log In',
                   onPressed: () async {
-                    if (_formKey.currentState.validate()) {
+                    if (_signinKey.currentState.validate()) {
                       setState(() => loading = true);
-                      dynamic result = await _auth.signInWithEmailAndPassword(
+                      String result = await _auth.signInWithEmailAndPassword(
                           email, password);
                       if (result == null) {
                         setState(() {
-                          error = 'Failed to sign in user';
+                          signinerror = 'Failed to sign in user';
+                          loading = false;
+                        });
+                      } else {
+                        setState(() {
+                          signinerror = result;
                           loading = false;
                         });
                       }
                     }
                   },
                 ),
+                //SizedBox(height: 6.0),
+                EditFundderButton(
+                    text: 'Forgot Password',
+                    onPressed: () async {
+                      if (email != '') {
+                        signinerror = await _auth.forgotPassword(email);
+                        setState(() {});
+                      } else {
+                        setState(() {
+                          signinerror =
+                              'Please enter your email for us to send a reset link';
+                        });
+                      }
+                    }),
                 SizedBox(height: 12.0),
                 Text(
-                  error,
+                  signinerror,
+                  textAlign: TextAlign.center,
                 )
               ],
             ))
@@ -159,11 +189,15 @@ class _AuthenticateState extends State<Authenticate>
     return Container(
         padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 50.0),
         child: Form(
-            key: _formKey,
+            key: _registerKey,
             child: Column(
               children: <Widget>[
                 SizedBox(height: 20.0),
                 TextFormField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                  ],
+                  initialValue: username,
                   decoration:
                       textInputDecoration.copyWith(hintText: 'Username'),
                   validator: (val) => val.isEmpty ? 'Enter a username' : null,
@@ -175,6 +209,10 @@ class _AuthenticateState extends State<Authenticate>
                 ),
                 SizedBox(height: 20.0),
                 TextFormField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                  ],
+                  initialValue: email,
                   decoration: textInputDecoration.copyWith(hintText: 'Email'),
                   validator: (val) => val.isEmpty ? 'Enter an email' : null,
                   onChanged: (val) {
@@ -185,6 +223,9 @@ class _AuthenticateState extends State<Authenticate>
                 ),
                 SizedBox(height: 20.0),
                 TextFormField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                  ],
                   decoration:
                       textInputDecoration.copyWith(hintText: 'Password'),
                   validator: (val) => val.length < 6
@@ -199,6 +240,9 @@ class _AuthenticateState extends State<Authenticate>
                 ),
                 SizedBox(height: 20.0),
                 TextFormField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                  ],
                   decoration: textInputDecoration.copyWith(
                       hintText: 'Confirm password'),
                   validator: (val) =>
@@ -219,23 +263,33 @@ class _AuthenticateState extends State<Authenticate>
                 PrimaryFundderButton(
                   text: 'Register',
                   onPressed: () async {
-                    if (_formKey.currentState.validate()) {
+                    if (_registerKey.currentState.validate()) {
                       setState(() => loading = true);
                       dynamic result =
                           await _auth.registerWithEmailPasswordUsername(
-                              email, password, username);
+                              email.trimRight(),
+                              password,
+                              username.trimRight());
                       if (result == null) {
                         setState(() {
-                          error = 'An error occurred';
+                          registrationerror = 'An error occurred';
                           loading = false;
                         });
+                      } else {
+                        if (mounted) {
+                          setState(() {
+                            registrationerror = result;
+                            loading = false;
+                          });
+                        }
                       }
                     }
                   },
                 ),
                 SizedBox(height: 12.0),
                 Text(
-                  error,
+                  registrationerror,
+                  textAlign: TextAlign.center,
                 )
               ],
             )));

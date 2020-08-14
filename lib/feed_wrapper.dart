@@ -6,7 +6,6 @@ import 'feed.dart';
 import 'package:flutter/cupertino.dart';
 import 'helper_classes.dart';
 import 'services/database.dart';
-import 'models/post.dart';
 
 // This class adds the refresh indicator to feeds not in the profile
 
@@ -43,11 +42,18 @@ class _FeedWrapperState extends State<FeedWrapper> {
   void _onRefresh() async {
     // monitor network fetch
     loadingTimestamp = Timestamp.now();
-    List<Post> futurePost = await DatabaseService()
-        .refreshPosts(widget.status, limit, loadingTimestamp);
+    List<Post> futurePost;
+    if (widget.status == 'hashtag') {
+      futurePost = await DatabaseService()
+          .refreshHashtag(widget.identifier, limit, loadingTimestamp);
+    } else {
+      futurePost = await DatabaseService()
+          .refreshPosts(widget.status, limit, loadingTimestamp);
+    }
     postList = [
-      FeedView(
-          widget.feedChoice, widget.identifier, HexColor('ff6b6c'), futurePost)
+      FeedView(futurePost, () {
+        _onRefresh();
+      }, widget.status == 'hashtag' ? widget.identifier : null)
     ];
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
@@ -64,13 +70,20 @@ class _FeedWrapperState extends State<FeedWrapper> {
   void _onLoading() async {
     // monitor network fetch
 
-    List<Post> futurePost = await DatabaseService()
-        .refreshPosts(widget.status, limit, loadingTimestamp);
+    List<Post> futurePost;
+    if (widget.status == 'hashtag') {
+      futurePost = await DatabaseService()
+          .refreshHashtag(widget.identifier, limit, loadingTimestamp);
+    } else {
+      futurePost = await DatabaseService()
+          .refreshPosts(widget.status, limit, loadingTimestamp);
+    }
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
         print('futurePost' + futurePost.toString());
-        postList.add(FeedView(widget.feedChoice, widget.identifier,
-            HexColor('ff6b6c'), futurePost));
+        postList.add(FeedView(futurePost, () {
+          _onRefresh();
+        }, widget.status == 'hashtag' ? widget.identifier : null));
         Post post = futurePost.last;
         loadingTimestamp = post.timestamp;
       }

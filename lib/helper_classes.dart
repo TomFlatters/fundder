@@ -57,11 +57,13 @@ class _ProfilePicState extends State<ProfilePic> {
         .document(widget.uid)
         .get()
         .then((value) {
-      setState(() {
-        if (value.data != null) {
-          url = value.data["profilePic"];
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (value.data != null) {
+            url = value.data["profilePic"];
+          }
+        });
+      }
     });
   }
 
@@ -86,7 +88,10 @@ class ProfilePicFromUrl extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: size / 2,
-      backgroundImage: CachedNetworkImageProvider(url),
+      backgroundImage: url == null
+          ? CachedNetworkImageProvider(
+              'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283')
+          : CachedNetworkImageProvider(url),
       backgroundColor: Colors.transparent,
     );
   }
