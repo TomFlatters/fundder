@@ -70,7 +70,10 @@ class ViewPost extends StatelessWidget with RouteAware {
                 ),
               )),
               Expanded(
-                child: ShareBar(),
+                child: ShareBar(
+                  postId: postData.id,
+                  postTitle: postData.title,
+                ),
               ),
             ]),
           ),

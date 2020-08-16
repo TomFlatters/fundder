@@ -3,11 +3,19 @@ import 'package:flutter/widgets.dart';
 import 'package:fundder/share_post_view.dart';
 
 class ShareBar extends StatelessWidget {
+  final String postId;
+  final String postTitle;
+
+  ShareBar({@required this.postId, @required this.postTitle});
+
   void _showShare(context) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return SharePost();
+          return SharePost(
+            postId: this.postId,
+            postTitle: this.postTitle,
+          );
         });
   }
 
