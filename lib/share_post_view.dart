@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
+import 'package:universal_html/prefer_universal/js.dart';
 import 'helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:flutter/services.dart';
 
 class SharePost extends StatelessWidget {
+  final String postId;
+  final String postTitle;
+  SharePost(this.postId, this.postTitle);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,7 +55,41 @@ class SharePost extends StatelessWidget {
           leading:
               Container(width: 30, height: 30, child: Icon(FontAwesome.link)),
           title: Text('Copy Link'),
-          onTap: () {},
+          onTap: () async {
+            final DynamicLinkParameters parameters = DynamicLinkParameters(
+              uriPrefix: 'https://fundder.page.link',
+              link: Uri.parse('https://fundder.co'),
+              androidParameters: AndroidParameters(
+                packageName: 'com.example.fundder',
+                minimumVersion: 125,
+              ),
+              iosParameters: IosParameters(
+                bundleId: 'com.example.fundder',
+                minimumVersion: '1.0.0',
+                appStoreId: '123456789',
+              ),
+              googleAnalyticsParameters: GoogleAnalyticsParameters(
+                campaign: 'example-promo',
+                medium: 'social',
+                source: 'orkut',
+              ),
+              itunesConnectAnalyticsParameters:
+                  ItunesConnectAnalyticsParameters(
+                providerToken: '123456',
+                campaignToken: 'example-promo',
+              ),
+              socialMetaTagParameters: SocialMetaTagParameters(
+                title: this.postTitle,
+                description: 'Help support this fundraiser!',
+              ),
+            );
+
+            final ShortDynamicLink shortDynamicLink =
+                await parameters.buildShortLink();
+            final Uri shortUrl = shortDynamicLink.shortUrl;
+            print(shortUrl.toString());
+            Clipboard.setData(new ClipboardData(text: shortUrl.toString()));
+          },
         ), /*ListTile(
           leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.snapchat_ghost)),
           title: Text('Snapchat'),
