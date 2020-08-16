@@ -52,7 +52,8 @@ class _WrapperState extends State<Wrapper> {
     final user = Provider.of<User>(context);
 
     if (kIsWeb == true) {
-      Future.microtask(() => Navigator.pushReplacementNamed(context, '/about'));
+      Future.microtask(
+          () => Navigator.pushReplacementNamed(context, '/web/search'));
       return Scaffold(
         body: Text(
           "Redirecting",
