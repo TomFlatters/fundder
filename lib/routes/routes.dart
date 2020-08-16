@@ -12,6 +12,7 @@ import 'package:fundder/challenge_steps_view.dart';
 import 'package:fundder/view_followers_controller.dart';
 import 'package:fundder/profile_controller.dart';
 import 'package:fundder/edit_profile_controller.dart';
+import 'package:fundder/view_template_controller.dart';
 import 'package:fundder/feed_controller.dart';
 import 'package:fundder/web_pages/feed_web.dart';
 import 'package:fundder/web_pages/about_page.dart';
@@ -30,6 +31,12 @@ import 'package:fundder/search/hashtag_feed.dart';
 
 class FluroRouter {
   static Router router = Router();
+  // static Handler _postHandler = Handler(
+  //     handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+  //         ViewPost(postData: params['id'][0]));
+  static Handler _templateHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ViewTemplate(templateData: params['id'][0]));
 
   static Handler _postHandler =
       Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
@@ -139,7 +146,12 @@ class FluroRouter {
 
   static void setupRouter() {
     router.define(
-      '/post/:id', // /:noLikes/:isLiked/:uid',
+      '/template/:id',
+      handler: _templateHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+    router.define(
+      '/post/:id',
       handler: _postHandler,
       transitionType: TransitionType.fadeIn,
     );
