@@ -369,7 +369,8 @@ class _AddPostState extends State<AddPost> {
                       ? FlatButton(
                           onPressed: () {
                             if (hashtags.contains(hashtagController.text) ==
-                                false) {
+                                    false &&
+                                hashtagController.text != "") {
                               setState(() {
                                 hashtags
                                     .add(hashtagController.text.toLowerCase());
