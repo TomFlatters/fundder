@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:fundder/global_widgets/buttons.dart';
 import 'package:fundder/services/followers.dart';
 
+// need a new button for activity feed
+
 class FollowButton extends StatefulWidget {
   final bool initialState;
   final String profileOwnerId;
