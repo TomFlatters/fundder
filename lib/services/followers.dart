@@ -65,8 +65,9 @@ class FollowersService {
 }
 
 class GeneralFollowerServices {
+  static CollectionReference userCollection =
+      Firestore.instance.collection('users');
   static Future<int> howManyFollowers(String uid) async {
-    CollectionReference userCollection = Firestore.instance.collection('users');
     Map<String, dynamic> doc;
     await userCollection.document(uid).get().then((value) => doc = value.data);
 
@@ -74,10 +75,58 @@ class GeneralFollowerServices {
   }
 
   static Future<int> howManyFollowing(String uid) async {
-    CollectionReference userCollection = Firestore.instance.collection('users');
     Map<String, dynamic> doc;
     await userCollection.document(uid).get().then((value) => doc = value.data);
 
     return (doc.containsKey('noFollowing') ? doc['noFollowing'] : 0);
+  }
+
+  static Future<String> mapIDtoName(String uid) async {
+    //returns corresponding username to uid
+    var doc = await userCollection.document(uid).get();
+    return doc.data['username'];
+  }
+
+///////////////////////////// change after launch to give ten at time kind of thing////////
+  static Future<List<String>> idsFollowingUser(String uid) async {
+    //returns the user id of all users following user 'uid'
+    QuerySnapshot q = await userCollection
+        .document(uid)
+        .collection('myFollowers')
+        .getDocuments();
+    //remember that the doc ids are the user ids of the followers]
+    return (q.documents.map((e) => e.documentID).toList());
+  }
+
+  static Future<List<String>> unamesFollowingUser(String uid) async {
+    //return the usernames of all users following the user
+    var uids = await GeneralFollowerServices.idsFollowingUser(uid);
+    List<String> res = [];
+    for (var i; i < uids.length; i++) {
+      var uname = await mapIDtoName(uids[i]);
+      res.add(uname);
+    }
+    return res;
+  }
+
+  static Future<List<String>> idsFollowedByUser(String uid) async {
+    //returns the user id of all users following user 'uid'
+    QuerySnapshot q = await userCollection
+        .document(uid)
+        .collection('following')
+        .getDocuments();
+    //remember that the doc ids are the user ids of the followers]
+    return (q.documents.map((e) => e.documentID).toList());
+  }
+
+  static Future<List<String>> unamesFollowedByUser(String uid) async {
+    //return the usernames of all users following the user
+    var uids = await GeneralFollowerServices.idsFollowedByUser(uid);
+    List<String> res = [];
+    for (var i; i < uids.length; i++) {
+      var uname = await mapIDtoName(uids[i]);
+      res.add(uname);
+    }
+    return res;
   }
 }
