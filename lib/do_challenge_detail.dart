@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'helper_classes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'shared/loading.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_pages/web_menu.dart';
+
+import 'models/template.dart';
+import 'package:fundder/services/database.dart';
 import 'global_widgets/buttons.dart';
+import 'web_pages/web_menu.dart';
+import 'shared/loading.dart';
+import 'package:fundder/shared/helper_functions.dart';
 
 class ChallengeDetail extends StatefulWidget {
-  @override
   final String challengeId;
   ChallengeDetail({this.challengeId});
 
@@ -15,144 +17,151 @@ class ChallengeDetail extends StatefulWidget {
 }
 
 class _ChallengeDetailState extends State<ChallengeDetail> {
-  final List<String> whoDoes = <String>[
-    "A specific person",
-    'Myself',
-    'Anyone'
-  ];
-  final List<String> charities = <String>[
-    "Cancer Research",
-    'British Heart Foundation',
-    'Oxfam'
-  ];
-  int selected = -1;
-  int charity = -1;
+  Future<Template> _getTemplate() async {
+    Template template =
+        await DatabaseService().getTemplateById(widget.challengeId);
+    return template;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: kIsWeb == true
-          ? null
-          : AppBar(
-              centerTitle: true,
-              title: Text("Do a challenge"),
-              actions: <Widget>[
-                new IconButton(
-                  icon: new Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(null),
-                )
-              ],
-              leading: new Container(),
-            ),
-      body: Column(children: [
-        kIsWeb == true ? WebMenu(-1) : Container(),
-        Expanded(
-          child: ListView(
-            children: <Widget>[
-              Container(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: kIsWeb == true
-                      ? Image.network(
-                          'https://i.pinimg.com/originals/99/d9/fa/99d9fa7c22ca5ca5856cf4dd30db692e.jpg')
-                      : CachedNetworkImage(
-                          imageUrl:
-                              'https://i.pinimg.com/originals/99/d9/fa/99d9fa7c22ca5ca5856cf4dd30db692e.jpg',
-                          placeholder: (context, url) => Loading(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                        ),
-                ),
-                margin: EdgeInsets.symmetric(vertical: 10.0),
-              ),
-              Container(
-                  color: Colors.white,
-                  child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 10.0),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 0),
-                            height: 30,
-                            child: Row(children: <Widget>[
-                              Expanded(
-                                child: Center(
-                                    child: Text(
-                                  "£450,000 raised",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                  ),
-                                )),
-                              ),
-                              Expanded(
-                                child: Center(
-                                    child: Text(
-                                  "8181 participants",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                  ),
-                                )),
-                              ),
-                              Expanded(
-                                child: Center(
-                                    child: Text(
-                                  "17 days left",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                  ),
-                                )),
-                              ),
-                            ]),
-                          ),
-                          Container(
-                              alignment: Alignment.topLeft,
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              child: Text(
-                                'Sleep 2 nights in the garden',
-                                style: TextStyle(
-                                  fontFamily: 'Roboto Mono',
-                                  fontSize: 16,
-                                  //fontWeight: FontWeight.bold,
+    return FutureBuilder(
+        future: _getTemplate(),
+        builder: (BuildContext context, AsyncSnapshot<Template> snapshot) {
+          if (snapshot.hasData) {
+            return Scaffold(
+              appBar: kIsWeb == true
+                  ? null
+                  : AppBar(
+                      centerTitle: true,
+                      title: Text("Do a challenge"),
+                      actions: <Widget>[
+                        new IconButton(
+                          icon: new Icon(Icons.close),
+                          onPressed: () => Navigator.of(context).pop(null),
+                        )
+                      ],
+                      leading: new Container(),
+                    ),
+              body: Column(children: [
+                kIsWeb == true ? WebMenu(-1) : Container(),
+                Expanded(
+                  child: ListView(
+                    children: <Widget>[
+                      Container(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width * 9 / 16,
+                          child: kIsWeb == true
+                              ? Image.network(snapshot.data.imageUrl)
+                              : CachedNetworkImage(
+                                  imageUrl: snapshot.data.imageUrl,
+                                  placeholder: (context, url) => Loading(),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
                                 ),
-                              )),
-                          Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              child: Text(
-                                  'Sleep 4 nights in the garden to raise money for Help Refugees')),
-                          Padding(
-                            padding: EdgeInsets.all(20),
-                          ),
-                          PrimaryFundderButton(
-                              text: 'Join Now',
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context,
-                                    '/challenge/' +
-                                        widget.challengeId +
-                                        '/steps');
-                              }),
-                          SecondaryFundderButton(
-                              text: 'View Completed',
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context,
-                                    '/challenge/' +
-                                        widget.challengeId +
-                                        '/steps');
-                              }),
-                        ],
-                      )))
-            ],
-          ),
-        ),
-      ]),
-    );
+                        ),
+                        margin: EdgeInsets.symmetric(vertical: 10.0),
+                      ),
+                      Container(
+                          color: Colors.white,
+                          child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 10.0),
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 0),
+                                    height: 30,
+                                    child: Row(children: <Widget>[
+                                      Expanded(
+                                        child: Center(
+                                            child: Text(
+                                          "£${snapshot.data.amountRaised} raised",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey,
+                                          ),
+                                        )),
+                                      ),
+                                      Expanded(
+                                        child: Center(
+                                            child: Text(
+                                          "${snapshot.data.acceptedBy.length} participants",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey,
+                                          ),
+                                        )),
+                                      ),
+                                      Expanded(
+                                        child: Center(
+                                            child: Text(
+                                          "${howLongAgo(snapshot.data.timestamp)}",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey,
+                                          ),
+                                        )),
+                                      ),
+                                    ]),
+                                  ),
+                                  Container(
+                                      alignment: Alignment.topLeft,
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      child: Text(
+                                        snapshot.data.title,
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto Mono',
+                                          fontSize: 16,
+                                        ),
+                                      )),
+                                  Container(
+                                      alignment: Alignment.centerLeft,
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      child: Text(snapshot.data.subtitle)),
+                                  Container(
+                                      alignment: Alignment.centerLeft,
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      child: Text(
+                                          'A challenge by ${snapshot.data.charity}')),
+                                  Padding(
+                                    padding: EdgeInsets.all(20),
+                                  ),
+                                  PrimaryFundderButton(
+                                      text: 'Join Now',
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                            context,
+                                            '/challenge/' +
+                                                widget.challengeId +
+                                                '/steps',
+                                            arguments: {
+                                              'template': snapshot.data
+                                            });
+                                      }),
+                                  SecondaryFundderButton(
+                                      text: 'View Completed',
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                            context,
+                                            '/challenge/' +
+                                                widget.challengeId +
+                                                '/steps');
+                                      }),
+                                ],
+                              )))
+                    ],
+                  ),
+                ),
+              ]),
+            );
+          } else {
+            return Center(child: Container(child: Text('Loading...')));
+          }
+        });
   }
 }

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/post.dart';
+import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,6 +19,8 @@ class DatabaseService {
       Firestore.instance.collection('users');
   final CollectionReference postsCollection =
       Firestore.instance.collection('posts');
+  final CollectionReference templatesCollection =
+      Firestore.instance.collection('templates');
 
   // -------------
   // 1. User CRUD:
@@ -95,6 +98,10 @@ class DatabaseService {
         gender: doc.data['gender'],
         profilePic: doc.data['profilePic']);
   }
+
+  // -------------
+  // 2. Posts CRUD:
+  // -------------
 
   // Given a document return a Post type object
   Post _makePost(DocumentSnapshot doc) {
@@ -241,6 +248,7 @@ class DatabaseService {
           "timestamp": post.timestamp,
           "imageUrl": post.imageUrl,
           'status': post.status,
+          'templateTag': post.templateTag,
           'aspectRatio': post.aspectRatio,
           "hashtags": post.hashtags
         })
@@ -248,6 +256,13 @@ class DatabaseService {
         .catchError((error) => {print(error)});
   }
 
+  // // Get a post from Firestore given a known id: if the post id is bracketted these are automatically removed
+  // Future getPostById(String documentId) async {
+  //   String formattedId = (documentId.substring(0, 1) == "{" &&
+  //           documentId.substring(documentId.length - 1) == "}")
+  //       ? documentId.substring(1, documentId.length - 1)
+  //       : documentId;
+  //   print('Formatted data: ' + formattedId);
   // Get a post from Firestore given a known id
   Future<Post> getPostById(String documentId) async {
     String formattedId = documentId.substring(0,
@@ -256,7 +271,7 @@ class DatabaseService {
     return await docRef.get().then((DocumentSnapshot doc) {
       print(doc);
       if (doc.exists) {
-        print("Document data:" + doc.data.toString());
+        print("Document data: " + doc.data.toString());
         return _makePost(doc);
       } else {
         // doc.data() will be undefined in this case
@@ -268,6 +283,95 @@ class DatabaseService {
       return null;
     });
   }
+
+  // ------------------
+  // 3. Templates CRUD:
+  // ------------------
+
+  // Given a document return a Template object
+  Template _makeTemplate(DocumentSnapshot doc) {
+    return Template(
+        author: doc.data['author'],
+        title: doc.data['title'],
+        charity: doc.data['charity'],
+        amountRaised: doc.data['amountRaised'],
+        targetAmount: doc.data['targetAmount'],
+        likes: doc.data['likes'],
+        comments: doc.data['comments'],
+        subtitle: doc.data['subtitle'],
+        timestamp: doc.data['timestamp'],
+        imageUrl: doc.data['imageUrl'],
+        id: doc.documentID,
+        whoDoes: doc.data['whoDoes'],
+        acceptedBy: doc.data['acceptedBy'],
+        completedBy: doc.data['completedBy'],
+        active: doc.data['active']);
+  }
+
+  // Get a post from Firestore given a known id: if the id is bracketed these are automatically removed
+  Future getTemplateById(String documentId) async {
+    String formattedId = (documentId.substring(0, 1) == "{" &&
+            documentId.substring(documentId.length - 1) == "}")
+        ? documentId.substring(1, documentId.length - 1)
+        : documentId;
+    print(formattedId);
+    DocumentReference docRef = templatesCollection.document(formattedId);
+    return await docRef.get().then((DocumentSnapshot doc) {
+      print(doc);
+      if (doc.exists) {
+        print("Document data:" + doc.data.toString());
+        return _makeTemplate(doc);
+      } else {
+        // doc.data() will be undefined in this case
+        print("Error - the post you are looking for doesn't exist.");
+        return null;
+      }
+    }).catchError((error) {
+      print("Error getting document: " + error);
+      return null;
+    });
+  }
+
+  Future uploadTemplate(Template t) async {
+    return await templatesCollection
+        .add({
+          "author": t.author,
+          "title": t.title,
+          "charity": t.charity,
+          "amountRaised": t.amountRaised,
+          "targetAmount": t.targetAmount,
+          "likes": t.likes,
+          "comments": t.comments,
+          "subtitle": t.subtitle,
+          "timestamp": t.timestamp,
+          "imageUrl": t.imageUrl,
+          "whoDoes": t.whoDoes,
+          "acceptedBy": t.acceptedBy,
+          "completedBy": t.completedBy,
+          "active": t.active
+        })
+        .then((DocumentReference docRef) => {docRef.documentID.toString()})
+        .catchError((error) => {print(error)});
+  }
+
+  // Get templates list is mapped to the Template object
+  List<Template> _templatesDataFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((DocumentSnapshot doc) {
+      return _makeTemplate(doc);
+    }).toList();
+  }
+
+  Future<List<Template>> getTemplates() {
+    return templatesCollection
+        .limit(10)
+        .orderBy("timestamp", descending: true)
+        .getDocuments()
+        .then((snapshot) => _templatesDataFromSnapshot(snapshot));
+  }
+
+  // -----------------------------------
+  // 4. Firebase Storage (image upload):
+  // -----------------------------------
 
   // Storage ref:
   // Images are stored as <root>/images/<uid>/<milliseconds-from-epoch>
