@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
+import 'package:fundder/services/followers.dart';
 import 'helper_classes.dart';
+import 'shared/loading.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter/cupertino.dart';
 
 class ViewFollowers extends StatefulWidget {
   @override
@@ -12,24 +16,16 @@ class ViewFollowers extends StatefulWidget {
 
 class _ViewFollowersState extends State<ViewFollowers>
     with SingleTickerProviderStateMixin {
-  final List<String> entries = <String>[
-    'username_abcd',
-    'username_ultra_long',
-    'username_uotra_ultra_long'
-  ];
-  final List<String> buttons = <String>[
-    'Follow back',
-    'Following',
-    'Following'
-  ];
-  int selected = -1;
-  int charity = -1;
+  List<Map> followersList = [];
+  List<Map> followingList = [];
+  bool firstLoadDone = false;
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   TabController _tabController;
   @override
   void dispose() {
     _tabController.dispose();
-
     super.dispose();
   }
 
@@ -37,7 +33,19 @@ class _ViewFollowersState extends State<ViewFollowers>
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
+    _getLists();
     super.initState();
+  }
+
+  void _getLists() async {
+    followingList =
+        await GeneralFollowerServices.unamesFollowedByUser(widget.uid);
+    followersList =
+        await GeneralFollowerServices.unamesFollowingUser(widget.uid);
+    _refreshController.refreshCompleted();
+    setState(() {
+      firstLoadDone = true;
+    });
   }
 
   _handleTabSelection() {
@@ -47,6 +55,12 @@ class _ViewFollowersState extends State<ViewFollowers>
 
   @override
   Widget build(BuildContext context) {
+    List usedList = [];
+    if (_tabController.index == 0) {
+      usedList = followersList;
+    } else {
+      usedList = followingList;
+    }
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -59,96 +73,51 @@ class _ViewFollowersState extends State<ViewFollowers>
           ],
           leading: new Container(),
         ),
-        body: Column(children: [
-          Container(
-              height: 50,
-              child: TabBar(
-                tabs: [Tab(text: 'Followers'), Tab(text: 'Following')],
-                controller: _tabController,
-              )),
-          Expanded(
-              child: ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            itemCount: 12,
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                  color: Colors.white,
-                  child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            height: 60,
-                            child: Row(
-                              children: <Widget>[
-                                Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: GestureDetector(
-                                      child: AspectRatio(
-                                          aspectRatio: 1 / 1,
-                                          child: Container(
-                                            child: ProfilePic(
-                                                "hkKCaiUeWUYhKwRLA0zDOoEuKxW2",
-                                                40),
-                                            margin: EdgeInsets.all(10.0),
-                                          )),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context,
-                                            '/user/' +
-                                                'hkKCaiUeWUYhKwRLA0zDOoEuKxW2');
-                                      },
-                                    )),
-                                Expanded(
-                                    child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text('${entries[index % 3]}'))),
-                                Container(
-                                    width: 110,
-                                    child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: GestureDetector(
-                                          child: Container(
-                                            width: 110,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 5, horizontal: 5),
-                                            margin: EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.grey, width: 1),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5)),
-                                            ),
-                                            child: Text(
-                                              "${buttons[index % 3]}",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            final snackBar = SnackBar(
-                                                content: Text(
-                                                    "Follow thing pressed"));
-                                            Scaffold.of(context)
-                                                .showSnackBar(snackBar);
-                                          },
-                                        ))),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )));
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return SizedBox(
-                height: 10,
-              );
-            },
-          )),
-        ]));
+        body: firstLoadDone == false
+            ? Loading()
+            : Column(children: [
+                Container(
+                    height: 50,
+                    child: TabBar(
+                      tabs: [Tab(text: 'Followers'), Tab(text: 'Following')],
+                      controller: _tabController,
+                    )),
+                Expanded(
+                    child: SmartRefresher(
+                        enablePullDown: true,
+                        enablePullUp: false,
+                        header: WaterDropHeader(),
+                        footer: CustomFooter(
+                          builder: (BuildContext context, LoadStatus mode) {
+                            Widget body;
+                            if (mode == LoadStatus.idle) {
+                              body = Text("pull up load");
+                            } else if (mode == LoadStatus.loading) {
+                              body = CupertinoActivityIndicator();
+                            } else if (mode == LoadStatus.failed) {
+                              body = Text("Load Failed!Click retry!");
+                            } else if (mode == LoadStatus.canLoading) {
+                              body = Text("release to load more");
+                            } else {
+                              body = Text("No more Data");
+                            }
+                            return Container(
+                              height: 55.0,
+                              child: Center(child: body),
+                            );
+                          },
+                        ),
+                        controller: _refreshController,
+                        onRefresh: _getLists,
+                        child: ListView.builder(
+                          itemCount: usedList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                              leading: ProfilePic(usedList[index]['uid'], 40),
+                              title: Text(usedList[index]['username']),
+                            );
+                          },
+                        ))),
+              ]));
   }
 }

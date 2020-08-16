@@ -172,7 +172,10 @@ class _ActivityState extends State<LikedController> {
                                                                     5)),
                                                       ),
                                                       child: Text(
-                                                        "View",
+                                                        likedItem['category'] ==
+                                                                'new follower'
+                                                            ? "View User"
+                                                            : "View Post",
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: TextStyle(
@@ -193,10 +196,6 @@ class _ActivityState extends State<LikedController> {
                                                               isEqualTo:
                                                                   likedItem[
                                                                       'postId'])
-                                                          .where('category',
-                                                              isEqualTo:
-                                                                  likedItem[
-                                                                      'category'])
                                                           .getDocuments()
                                                           .then((response) => {
                                                                 if (response !=
@@ -206,11 +205,21 @@ class _ActivityState extends State<LikedController> {
                                                                         response)
                                                                   }
                                                               });
-                                                      Navigator.pushNamed(
-                                                          context,
-                                                          '/post/' +
-                                                              likedItem[
-                                                                  'postId']);
+                                                      if (likedItem[
+                                                              'category'] ==
+                                                          'new follower') {
+                                                        Navigator.pushNamed(
+                                                            context,
+                                                            '/user/' +
+                                                                likedItem[
+                                                                    'postId']);
+                                                      } else {
+                                                        Navigator.pushNamed(
+                                                            context,
+                                                            '/post/' +
+                                                                likedItem[
+                                                                    'postId']);
+                                                      }
                                                     },
                                                   ))),
                                         ]),
@@ -239,8 +248,14 @@ class _ActivityState extends State<LikedController> {
       case 'post donated to completed':
         return TextSpan(text: 'completed a challenge that you donated to');
 
+      case 'new post from following':
+        return TextSpan(text: 'who you follow, has posted');
+
+      case 'new follower':
+        return TextSpan(text: 'has started following you');
+
       default:
-        return TextSpan(text: 'has done an action on a post');
+        return TextSpan(text: 'has done an action');
     }
   }
 
@@ -255,6 +270,7 @@ class _ActivityState extends State<LikedController> {
         .collection('users')
         .document(uid)
         .collection('activity')
+        .orderBy("seen", descending: false)
         .orderBy("timestamp", descending: true)
         .limit(30)
         .snapshots()
