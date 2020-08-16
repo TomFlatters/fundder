@@ -74,7 +74,7 @@ class _ViewTemplateState extends State<ViewTemplate> {
                                       child: AspectRatio(
                                           aspectRatio: 1 / 1,
                                           child: Container(
-                                            child: ProfilePic(
+                                            child: ProfilePicFromUrl(
                                                 "https://i.imgur.com/BoN9kdC.png",
                                                 40),
                                             margin: EdgeInsets.all(10.0),
