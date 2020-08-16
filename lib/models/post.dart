@@ -54,6 +54,17 @@ class Post {
   double percentRaised() {
     double processAmount(String s) =>
         double.parse(s.contains(",") ? s.replaceAll(",", "") : s);
-    return processAmount(amountRaised) / processAmount(targetAmount);
+    //print("percent Raised" +
+    //(processAmount(amountRaised) / processAmount(targetAmount)).toString());
+    //print("Amount raised" + processAmount(amountRaised).toString());
+    //print("Amount target" + processAmount(targetAmount).toString());
+    if (moneyRaised != null && moneyRaised / processAmount(targetAmount) <= 1) {
+      return moneyRaised / processAmount(targetAmount);
+    } else if (moneyRaised != null &&
+        moneyRaised / processAmount(targetAmount) > 1) {
+      return 1;
+    } else {
+      return 0;
+    }
   }
 }

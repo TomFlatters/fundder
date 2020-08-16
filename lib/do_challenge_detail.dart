@@ -55,7 +55,9 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                           child: kIsWeb == true
                               ? Image.network(snapshot.data.imageUrl)
                               : CachedNetworkImage(
-                                  imageUrl: snapshot.data.imageUrl,
+                                  imageUrl: snapshot.data.imageUrl != null
+                                      ? snapshot.data.imageUrl
+                                      : "",
                                   placeholder: (context, url) => Loading(),
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
