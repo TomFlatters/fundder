@@ -98,13 +98,16 @@ class GeneralFollowerServices {
     return (q.documents.map((e) => e.documentID).toList());
   }
 
-  static Future<List<String>> unamesFollowingUser(String uid) async {
+  static Future<List<Map>> unamesFollowingUser(String uid) async {
     //return the usernames of all users following the user
-    var uids = await GeneralFollowerServices.idsFollowingUser(uid);
-    List<String> res = [];
-    for (var i; i < uids.length; i++) {
-      var uname = await mapIDtoName(uids[i]);
-      res.add(uname);
+    List<String> uids = await GeneralFollowerServices.idsFollowingUser(uid);
+    List<Map> res = [];
+    if (uids != null) {
+      print("uids: " + uids.toString());
+      for (int i = 0; i < uids.length; i++) {
+        var uname = await mapIDtoName(uids[i]);
+        res.add(<String, String>{"username": uname, "uid": uids[i]});
+      }
     }
     return res;
   }
@@ -119,13 +122,16 @@ class GeneralFollowerServices {
     return (q.documents.map((e) => e.documentID).toList());
   }
 
-  static Future<List<String>> unamesFollowedByUser(String uid) async {
+  static Future<List<Map>> unamesFollowedByUser(String uid) async {
     //return the usernames of all users following the user
-    var uids = await GeneralFollowerServices.idsFollowedByUser(uid);
-    List<String> res = [];
-    for (var i; i < uids.length; i++) {
-      var uname = await mapIDtoName(uids[i]);
-      res.add(uname);
+    List<String> uids = await GeneralFollowerServices.idsFollowedByUser(uid);
+    List<Map> res = [];
+    if (uids != null) {
+      print("uids: " + uids.toString());
+      for (int i = 0; i < uids.length; i++) {
+        var uname = await mapIDtoName(uids[i]);
+        res.add(<String, String>{"username": uname, "uid": uids[i]});
+      }
     }
     return res;
   }
