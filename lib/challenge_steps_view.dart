@@ -30,7 +30,16 @@ class _StepsPageState extends State<StepsPage> {
     }
 
     return (template == null)
-        ? null
+        ? Scaffold(
+            appBar: AppBar(
+              actions: <Widget>[
+                new IconButton(
+                  icon: new Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(null),
+                )
+              ],
+            ),
+          )
         : Scaffold(
             appBar: AppBar(
               centerTitle: true,

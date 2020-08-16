@@ -73,6 +73,7 @@ class _DoChallengeState extends State<DoChallenge> {
                                   child: kIsWeb == true
                                       ? Image.network(template.imageUrl)
                                       : CachedNetworkImage(
+                                          fit: BoxFit.cover,
                                           imageUrl: '${template.imageUrl}',
                                           placeholder: (context, url) =>
                                               Loading(),
