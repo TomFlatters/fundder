@@ -1,0 +1,18 @@
+Some info relevant to features regarding payments
+
+
+
+Test the integration
+
+By this point you should have an integration that:
+
+Collects and saves card details without charging the customer by using a SetupIntent
+Charges the card off-session and has a recovery flow to handle declines and authentication requests
+There are several test cards you can use to make sure this integration is ready for production. Use them with any CVC, postal code, and future expiration date.
+
+NUMBER	            DESCRIPTION
+4242424242424242	Succeeds and immediately processes the payment.
+4000002500003155	Requires authentication for the initial purchase, but succeeds for subsequent payments (including off-session ones) as long as the card is setup with setup_future_usage.
+4000002760003184	Requires authentication for the initial purchase, and fails for subsequent payments (including off-session ones) with an authentication_required decline code.
+4000008260003178	Requires authentication for the initial purchase, but fails for subsequent payments (including off-session ones) with an insufficient_funds decline code.
+4000000000009995	Always fails (including the initial purchase) with a decline code of insufficient_funds.

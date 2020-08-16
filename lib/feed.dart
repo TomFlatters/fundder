@@ -187,6 +187,7 @@ class _FeedViewState extends State<FeedView> {
               // LikesModel likeState = LikesModel(isLiked, noLikes,
               //     uid: uid, postId: pid);
               if (likesModel != null) {
+                print("a post clicked");
                 var newState = await Navigator.push(
                     context,
                     MaterialPageRoute(

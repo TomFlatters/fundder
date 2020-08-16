@@ -21,8 +21,10 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  webview_flutter: ^0.3.22+1
+  awesome_card: ^1.1.0
   stripe_payment: ^1.0.7
-
+  stripe_sdk: ^3.0.1+1
   universal_html: ^1.2.1
   flutter:
     sdk: flutter
