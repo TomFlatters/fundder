@@ -410,15 +410,10 @@ class _AddPostState extends State<AddPost> {
 
   // _choosePerson state:
   int selected = -1;
-  final List<String> whoDoes = <String>[
-    "A specific person",
-    'Myself',
-    'Anyone'
-  ];
+  final List<String> whoDoes = <String>['Myself', 'Someone Else'];
   final List<String> subWho = <String>[
-    "Does not have to be a Fundder user",
     'Raise money for your own challenge',
-    'Will be public and anyone will be able to accept the challenge. This appears in the custom challenges in the do tab in the Feed'
+    'Will be public and anyone will be able to accept the challenge. This appears in the "Do" tab in the Feed'
   ];
 
   Widget _choosePerson() {

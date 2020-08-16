@@ -41,6 +41,14 @@ class Template {
   double percentRaised() {
     double processAmount(String s) =>
         double.parse(s.contains(",") ? s.replaceAll(",", "") : amountRaised);
-    return processAmount(amountRaised) / processAmount(targetAmount);
+    if (processAmount(amountRaised) != null &&
+        processAmount(amountRaised) / processAmount(targetAmount) <= 1) {
+      return processAmount(amountRaised) / processAmount(targetAmount);
+    } else if (processAmount(amountRaised) != null &&
+        processAmount(amountRaised) / processAmount(targetAmount) > 1) {
+      return 1;
+    } else {
+      return 0;
+    }
   }
 }
