@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 class SharePost extends StatelessWidget {
   final String postId;
   final String postTitle;
-  SharePost(this.postId, this.postTitle);
+  SharePost({@required this.postId, @required this.postTitle});
 
   @override
   Widget build(BuildContext context) {
