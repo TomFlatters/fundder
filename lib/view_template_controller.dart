@@ -195,7 +195,8 @@ class _ViewTemplateState extends State<ViewTemplate> {
                                               )))
                                     ]),
                                     onPressed: () {
-                                      _showShare();
+                                      _showShare(
+                                          templateData.id, templateData.title);
                                     },
                                   ),
                                 )
@@ -279,11 +280,14 @@ class _ViewTemplateState extends State<ViewTemplate> {
           );
   }
 
-  void _showShare() {
+  void _showShare(String id, String title) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return SharePost();
+          return SharePost(
+            postId: id,
+            postTitle: title,
+          );
         });
   }
 }

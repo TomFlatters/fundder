@@ -160,7 +160,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
               ]),
             );
           } else {
-            return Center(child: Container(child: Text('Loading...')));
+            return Loading();
           }
         });
   }
