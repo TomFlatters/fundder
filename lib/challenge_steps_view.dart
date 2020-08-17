@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/services/database.dart';
+import 'package:fundder/shared/helper_functions.dart';
 import 'package:provider/provider.dart';
 
-import 'package:fundder/models/post.dart';
 import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'global_widgets/buttons.dart';
@@ -145,17 +145,12 @@ class _StepsPageState extends State<StepsPage> {
 
   void _makePostFromTemplate(Template template, User user, String amount) {
     // Get username
-    String fetchedUsername;
-    DatabaseService(uid: user.uid)
-        .readUserData()
-        .then((fetchedUser) => {fetchedUsername = fetchedUser.username})
-        .then((_) =>
-            _uploadPostFromTemplate(template, user, amount, fetchedUsername));
+    getUsernameFromUID(user.uid).then((fetchedUsername) =>
+        _uploadPostFromTemplate(template, user, amount, fetchedUsername));
   }
 
   void _uploadPostFromTemplate(
       Template template, User user, String amount, String fetchedUsername) {
-    // Upload post
     Map<String, dynamic> postData = {
       'title': template.title,
       'subtitle': template.subtitle,
@@ -174,6 +169,7 @@ class _StepsPageState extends State<StepsPage> {
       'hashtags': template.hashtags
     };
     DatabaseService(uid: user.uid)
+        // Batch update
         .uploadPostFromTemplate(template, user, postData, fetchedUsername)
         // Reroute to new post page
         .then((postId) => {
