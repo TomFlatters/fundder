@@ -156,30 +156,34 @@ class _StepsPageState extends State<StepsPage> {
   void _uploadPostFromTemplate(
       Template template, User user, String amount, String fetchedUsername) {
     // Upload post
+    Map<String, dynamic> postData = {
+      'title': template.title,
+      'subtitle': template.subtitle,
+      'author': user.uid,
+      'authorUsername': fetchedUsername,
+      'charity': template.charity,
+      'noLikes': 0,
+      // comments: [],
+      'timestamp': DateTime.now(),
+      'amountRaised': "0",
+      'targetAmount': amount,
+      'imageUrl': template.imageUrl,
+      'status': 'fund',
+      'templateTag': template.id,
+      'aspectRatio': template.aspectRatio,
+      'hashtags': template.hashtags
+    };
     DatabaseService(uid: user.uid)
-        .uploadPost(new Post(
-          title: template.title,
-          subtitle: template.subtitle,
-          author: user.uid,
-          authorUsername: fetchedUsername,
-          charity: template.charity,
-          noLikes: 0,
-          // comments: [],
-          timestamp: DateTime.now(),
-          amountRaised: "0",
-          targetAmount: amount,
-          imageUrl: template.imageUrl,
-          status: 'fund',
-          templateTag: template.id,
-        ))
+        .uploadPostFromTemplate(template, user, postData, fetchedUsername)
         // Reroute to new post page
         .then((postId) => {
-              Navigator.pushReplacementNamed(
-                  context,
-                  '/post/' +
-                      postId
-                          .toString()
-                          .substring(1, postId.toString().length - 1))
+              print(postId)
+              // Navigator.pushReplacementNamed(
+              //     context,
+              //     '/post/' +
+              //         postId
+              //             .toString()
+              //             .substring(1, postId.toString().length - 1))
             });
   }
 }

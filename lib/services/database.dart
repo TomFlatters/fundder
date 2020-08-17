@@ -305,7 +305,9 @@ class DatabaseService {
         whoDoes: doc.data['whoDoes'],
         acceptedBy: doc.data['acceptedBy'],
         completedBy: doc.data['completedBy'],
-        active: doc.data['active']);
+        active: doc.data['active'],
+        aspectRatio: doc.data['aspectRatio'],
+        hashtags: doc.data['hashtags']);
   }
 
   // Get a post from Firestore given a known id: if the id is bracketed these are automatically removed
@@ -348,7 +350,9 @@ class DatabaseService {
           "whoDoes": t.whoDoes,
           "acceptedBy": t.acceptedBy,
           "completedBy": t.completedBy,
-          "active": t.active
+          "active": t.active,
+          "aspectRatio": t.aspectRatio,
+          "hashtags": t.hashtags
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
@@ -367,6 +371,19 @@ class DatabaseService {
         .orderBy("timestamp", descending: true)
         .getDocuments()
         .then((snapshot) => _templatesDataFromSnapshot(snapshot));
+  }
+
+  // Batch query to add a post from a template when a user accepts challenge
+  Future uploadPostFromTemplate(Template template, User user,
+      Map<String, dynamic> postData, String fetchedUsername) async {
+    var batch = Firestore.instance.batch();
+    // Update accepted by
+    batch.updateData(templatesCollection.document(template.id), {
+      'acceptedBy': [...template.acceptedBy, fetchedUsername]
+    });
+    // Add new post with given data
+    batch.setData(postsCollection.document(), postData);
+    return await batch.commit();
   }
 
   // -----------------------------------
