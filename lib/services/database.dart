@@ -382,8 +382,9 @@ class DatabaseService {
       'acceptedBy': [...template.acceptedBy, fetchedUsername]
     });
     // Add new post with given data
-    batch.setData(postsCollection.document(), postData);
-    return await batch.commit();
+    DocumentReference postId = postsCollection.document();
+    batch.setData(postId, postData);
+    return await batch.commit().then((_) => postId);
   }
 
   // -----------------------------------

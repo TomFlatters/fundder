@@ -177,13 +177,9 @@ class _StepsPageState extends State<StepsPage> {
         .uploadPostFromTemplate(template, user, postData, fetchedUsername)
         // Reroute to new post page
         .then((postId) => {
-              print(postId)
-              // Navigator.pushReplacementNamed(
-              //     context,
-              //     '/post/' +
-              //         postId
-              //             .toString()
-              //             .substring(1, postId.toString().length - 1))
+              // print(postId.documentID)
+              Navigator.pushReplacementNamed(
+                  context, '/post/' + postId.documentID.toString())
             });
   }
 }
