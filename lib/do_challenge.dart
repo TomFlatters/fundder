@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:fundder/services/database.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/template.dart';
 import 'shared/loading.dart';
 
@@ -12,41 +15,110 @@ class DoChallenge extends StatefulWidget {
 }
 
 class _DoChallengeState extends State<DoChallenge> {
+  List<Template> templates;
+
+  int limit = 10;
+  Timestamp loadingTimestamp;
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
   Future<List<Template>> _getTemplates() async {
-    List<Template> templateList = await DatabaseService().getTemplates();
-    return templateList;
+    loadingTimestamp = Timestamp.now();
+    List<Template> templateList =
+        await DatabaseService().refreshTemplates(limit, loadingTimestamp);
+    print("GOT NEW TEMPLATES:");
+    print(templateList);
+    Template t = templateList.last;
+    loadingTimestamp = t.timestamp;
+    templates = templateList;
+    if (mounted) setState(() {});
+    _refreshController.refreshCompleted();
+  }
+
+  Future<List<Template>> _loadTemplates() async {
+    List<Template> templateList =
+        await DatabaseService().refreshTemplates(limit, loadingTimestamp);
+    print(templateList.length);
+    if (templateList.length != 0) {
+      Template t = templateList.last;
+      loadingTimestamp = t.timestamp;
+      return templateList;
+    } else {
+      return [];
+    }
+  }
+
+  void _onLoading() async {
+    // monitor network fetch
+    // await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+    List<Template> newTemplates = await _loadTemplates();
+    print("GOT NEW TEMPLATES:");
+    print(newTemplates);
+    if (newTemplates != []) {
+      setState(() {});
+      _refreshController.loadNoData();
+    } else {
+      templates = templates + newTemplates;
+      if (mounted) setState(() {});
+      _refreshController.loadComplete();
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    _getTemplates();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Template>>(
-        future: _getTemplates(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<Template>> snapshot) {
-          if (snapshot.hasData) {
-            return ListView.separated(
-              physics: AlwaysScrollableScrollPhysics(),
-              shrinkWrap: true,
-              padding: const EdgeInsets.only(top: 10.0),
-              itemCount: snapshot.data.length,
-              itemBuilder: (BuildContext context, int index) {
-                return _templateListView(snapshot.data[index]);
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: 10,
-                );
-              },
+    return Scaffold(
+      body: SmartRefresher(
+        enablePullDown: true,
+        enablePullUp: true,
+        header: WaterDropHeader(),
+        footer: CustomFooter(
+          builder: (BuildContext context, LoadStatus mode) {
+            Widget body;
+            if (mode == LoadStatus.idle) {
+              body = Text("Pull up to load");
+            } else if (mode == LoadStatus.loading) {
+              body = CupertinoActivityIndicator();
+            } else if (mode == LoadStatus.failed) {
+              body = Text("Load Failed! Click retry!");
+            } else if (mode == LoadStatus.canLoading) {
+              body = Text("Release to load more");
+            } else {
+              body = Text("No more data");
+            }
+            return Container(
+              height: 55.0,
+              child: Center(child: body),
             );
-          } else {
-            return Center(child: Container(child: Text('Loading...')));
-          }
-        });
+          },
+        ),
+        controller: _refreshController,
+        onRefresh: () async {
+          _getTemplates();
+        },
+        onLoading: _onLoading,
+        child: templates == null
+            ? Container()
+            : ListView.separated(
+                separatorBuilder: (BuildContext context, int index) {
+                  return SizedBox(
+                    height: 10,
+                  );
+                },
+                itemBuilder: (c, i) => _templateListView(templates[i]),
+                itemCount: templates.length,
+                padding: const EdgeInsets.only(top: 10.0),
+                shrinkWrap: true,
+                physics: AlwaysScrollableScrollPhysics(),
+              ),
+      ),
+    );
   }
 
   Widget _templateListView(Template template) {

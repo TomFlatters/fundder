@@ -387,6 +387,20 @@ class DatabaseService {
     return await batch.commit().then((_) => postId);
   }
 
+  // For the DO feed
+  Future<List<Template>> refreshTemplates(int limit, Timestamp startTimestamp) {
+    print('limit: ' + limit.toString());
+    return templatesCollection
+        .orderBy("timestamp", descending: true)
+        .startAfter([startTimestamp])
+        .limit(limit)
+        .getDocuments()
+        .then((snapshot) {
+          print(_templatesDataFromSnapshot(snapshot));
+          return _templatesDataFromSnapshot(snapshot);
+        });
+  }
+
   // -----------------------------------
   // 4. Firebase Storage (image upload):
   // -----------------------------------
