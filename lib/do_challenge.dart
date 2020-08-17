@@ -113,7 +113,7 @@ class _DoChallengeState extends State<DoChallenge> {
                                         Align(
                                           alignment: Alignment.bottomLeft,
                                           child: Text(
-                                            '${template.acceptedBy.length} people, 16 days left',
+                                            '${template.acceptedBy.length} people, ${template.daysLeft() != -1 ? template.daysLeft() : 0} days left',
                                             style: TextStyle(
                                               fontSize: 13,
                                               color: Colors.grey,
