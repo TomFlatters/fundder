@@ -55,4 +55,14 @@ class Template {
       return 0;
     }
   }
+
+  // Use the timestamp to calculate the number of days left in the challenge.
+  // For now, all templates have 30 days by default.
+  int daysLeft() {
+    var postedAt = DateTime.parse(timestamp.toDate().toString());
+    var thisInstant = new DateTime.now();
+    var timeElapsed = thisInstant.difference(postedAt);
+    var inDays = timeElapsed.inDays;
+    return inDays < 31 ? 30 - inDays : -1;
+  }
 }
