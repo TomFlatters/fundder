@@ -10,6 +10,7 @@ class Template {
   final timestamp;
   String imageUrl;
   String id;
+  final double aspectRatio;
 
   // the user can choose if a specific person or anyone can use this template
   String whoDoes;
@@ -17,6 +18,7 @@ class Template {
   // each template should record who has accepted and completed the challenge,
   List acceptedBy;
   List completedBy;
+  final List<dynamic> hashtags;
 
   // we also record whether the challenge is "active" or not
   bool active;
@@ -36,7 +38,9 @@ class Template {
       this.whoDoes,
       this.acceptedBy,
       this.completedBy,
-      this.active});
+      this.active,
+      this.aspectRatio,
+      this.hashtags});
 
   double percentRaised() {
     double processAmount(String s) =>
