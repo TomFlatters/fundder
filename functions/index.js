@@ -418,4 +418,17 @@ exports.postDone = functions.firestore
    }*/
 
 
+   //////FUNCTIONS TO HANDLE DELETION OF POSTS AND USERS
+
+   exports.deleteUser = functions.firestore
+    .document('users/{userID}')
+    .onDelete((snap, context) => {
+      // Get an object representing the document prior to deletion
+      // e.g. {'name': 'Marie', 'age': 66}
+      const deletedValue = snap.data();
+
+      // perform desired operations ...
+    });
+
+
 

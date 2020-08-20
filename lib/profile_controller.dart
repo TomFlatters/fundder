@@ -402,7 +402,11 @@ class _ProfileState extends State<ProfileController>
           return ListTile(
             leading: ProfilePic(post.author, 40),
             title: Text(post.title),
-            subtitle: Text(post.subtitle),
+            subtitle: Text(
+              post.subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               post.status == 'done'
                   ? Icon(
