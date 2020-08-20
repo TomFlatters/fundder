@@ -8,6 +8,7 @@ import 'view_post_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/models/post.dart';
+import 'package:fundder/models/template.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -87,10 +88,10 @@ class _AddPostState extends State<AddPost> {
                                     .then((downloadUrl) => {
                                           print("Successful image upload"),
                                           print(downloadUrl),
-                                          _pushPost(downloadUrl, user)
+                                          _pushItem(downloadUrl, user)
                                         });
                               } else {
-                                _pushPost(null, user);
+                                _pushItem(null, user);
                               }
                             } catch (e) {
                               setState(() {
@@ -166,9 +167,10 @@ class _AddPostState extends State<AddPost> {
     });
   }
 
-  void _pushPost(String downloadUrl, User user) {
-    if (titleController.text == "" ||
-        subtitleController.text == "" ||
+  void _pushItem(String downloadUrl, User user) {
+    // Validate form
+    if (titleController.text == null ||
+        subtitleController.text == null ||
         charity == -1 ||
         moneyController.text == "0.00" ||
         hashtags.length < 2) {
@@ -177,53 +179,78 @@ class _AddPostState extends State<AddPost> {
       });
       _showErrorDialog('You have not filled all the required fields');
     } else {
-      DatabaseService(uid: user.uid)
-          .uploadPost(new Post(
-              title: titleController.text.toString().trimRight(),
-              subtitle: subtitleController.text.toString().trimRight(),
-              author: user.uid,
-              authorUsername: user.username,
-              charity: charities[charity],
-              noLikes: 0,
-              noComments: 0,
-              timestamp: DateTime.now(),
-              amountRaised: "0",
-              moneyRaised: 0,
-              targetAmount: moneyController.text.toString(),
-              imageUrl: downloadUrl,
-              status: 'fund',
-              aspectRatio: aspectRatio,
-              hashtags: hashtags))
-          .then((postId) => {
-                if (postId == null)
-                  {
-                    setState(() {
-                      _submitting = false;
-                    })
-                  }
-                else
-                  {
-                    print("The doc id is " +
-                        postId
-                            .toString()
-                            .substring(1, postId.toString().length - 1)),
-                    HashtagsService(uid: user.uid)
-                        .addHashtag(postId.toString(), hashtags),
+      if (whoDoes[selected] == "Myself") {
+        DatabaseService(uid: user.uid)
+            .uploadPost(new Post(
+                title: titleController.text.toString().trimRight(),
+                subtitle: subtitleController.text.toString().trimRight(),
+                author: user.uid,
+                authorUsername: user.username,
+                charity: charities[charity],
+                noLikes: 0,
+                noComments: 0,
+                timestamp: DateTime.now(),
+                amountRaised: "0",
+                moneyRaised: 0,
+                targetAmount: moneyController.text.toString(),
+                imageUrl: downloadUrl,
+                status: 'fund',
+                aspectRatio: aspectRatio,
+                hashtags: hashtags))
+            .then((postId) => {
+                  if (postId == null)
+                    {
+                      setState(() {
+                        _submitting = false;
+                      })
+                    }
+                  else
+                    {
+                      print("The doc id is " +
+                          postId
+                              .toString()
+                              .substring(1, postId.toString().length - 1)),
+                      HashtagsService(uid: user.uid)
+                          .addHashtag(postId.toString(), hashtags),
 
-                    // if the post is successfully added, view the post
-                    /*DatabaseService(uid: user.uid).getPostById(postId.toString())
-                    .then((post) => {
-                      Navigator.of(context)
-                        .pushReplacement(_viewPost(post))
-                    })*/
-                    Navigator.pushReplacementNamed(
-                        context,
-                        '/post/' +
-                            postId
-                                .toString()
-                                .substring(1, postId.toString().length - 1))
-                  } //the substring is very important as postId.toString() is in brackets
-              });
+                      // if the post is successfully added, view the post
+                      /*DatabaseService(uid: user.uid).getPostById(postId.toString())
+                      .then((post) => {
+                        Navigator.of(context)
+                          .pushReplacement(_viewPost(post))
+                      })*/
+                      Navigator.pushReplacementNamed(
+                          context,
+                          '/post/' +
+                              postId
+                                  .toString()
+                                  .substring(1, postId.toString().length - 1))
+                    } //the substring is very important as postId.toString() is in brackets
+                });
+      } else {
+        // Create a template
+        DatabaseService(uid: user.uid)
+            .uploadTemplate(new Template(
+                title: titleController.text.toString(),
+                subtitle: subtitleController.text.toString(),
+                author: user.uid,
+                charity: charities[charity],
+                likes: [],
+                comments: {},
+                timestamp: DateTime.now(),
+                amountRaised: "0",
+                targetAmount: moneyController.text.toString(),
+                imageUrl: downloadUrl,
+                whoDoes: whoDoes[selected].toString(),
+                acceptedBy: [],
+                completedBy: [],
+                active: true))
+            .then((templateId) => {
+                  // if the post is successfully added, view the post
+                  Navigator.pushReplacementNamed(
+                      context, '/template/' + templateId.toString())
+                });
+      }
     }
   }
 
@@ -383,15 +410,10 @@ class _AddPostState extends State<AddPost> {
 
   // _choosePerson state:
   int selected = -1;
-  final List<String> whoDoes = <String>[
-    "A specific person",
-    'Myself',
-    'Anyone'
-  ];
+  final List<String> whoDoes = <String>['Myself', 'Someone Else'];
   final List<String> subWho = <String>[
-    "Does not have to be a Fundder user",
     'Raise money for your own challenge',
-    'Will be public and anyone will be able to accept the challenge. This appears in the custom challenges in the do tab in the Feed'
+    'Will be public and anyone will be able to accept the challenge. This appears in the "Do" tab in the Feed'
   ];
 
   Widget _choosePerson() {
