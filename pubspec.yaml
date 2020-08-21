@@ -21,6 +21,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  url_launcher: ^5.5.0
   webview_flutter: ^0.3.22+1
   awesome_card: ^1.1.0
   stripe_payment: ^1.0.7
