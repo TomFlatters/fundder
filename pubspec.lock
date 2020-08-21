@@ -8,10 +8,14 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
 <<<<<<< HEAD
+<<<<<<< HEAD
     version: "2.5.0-nullsafety"
 =======
     version: "2.4.1"
 >>>>>>> 1bfec72a41e71a81f32b76e7eb397cc8f2b15f8c
+=======
+    version: "2.4.2"
+>>>>>>> a24948685362ae6e231cea30df4a571a8de4a439
   awesome_card:
     dependency: "direct main"
     description:
@@ -598,7 +602,11 @@ packages:
       name: stack_trace
       url: "https://pub.dartlang.org"
     source: hosted
+<<<<<<< HEAD
     version: "1.10.0-nullsafety"
+=======
+    version: "1.9.5"
+>>>>>>> a24948685362ae6e231cea30df4a571a8de4a439
   stream_channel:
     dependency: transitive
     description:

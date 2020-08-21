@@ -21,7 +21,7 @@ class FollowButton extends StatefulWidget {
 }
 
 class _FollowButtonState extends State<FollowButton> {
-  bool isFollowed;
+  bool isFollowed = false;
   _FollowButtonState(this.isFollowed);
   void followPressed() {
     if (isFollowed) {

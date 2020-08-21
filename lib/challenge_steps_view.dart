@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/services/database.dart';
+import 'package:fundder/shared/helper_functions.dart';
 import 'package:provider/provider.dart';
 
-import 'package:fundder/models/post.dart';
 import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'global_widgets/buttons.dart';
@@ -145,41 +145,37 @@ class _StepsPageState extends State<StepsPage> {
 
   void _makePostFromTemplate(Template template, User user, String amount) {
     // Get username
-    String fetchedUsername;
-    DatabaseService(uid: user.uid)
-        .readUserData()
-        .then((fetchedUser) => {fetchedUsername = fetchedUser.username})
-        .then((_) =>
-            _uploadPostFromTemplate(template, user, amount, fetchedUsername));
+    getUsernameFromUID(user.uid).then((fetchedUsername) =>
+        _uploadPostFromTemplate(template, user, amount, fetchedUsername));
   }
 
   void _uploadPostFromTemplate(
       Template template, User user, String amount, String fetchedUsername) {
-    // Upload post
+    Map<String, dynamic> postData = {
+      'title': template.title,
+      'subtitle': template.subtitle,
+      'author': user.uid,
+      'authorUsername': fetchedUsername,
+      'charity': template.charity,
+      'noLikes': 0,
+      // comments: [],
+      'timestamp': DateTime.now(),
+      'amountRaised': "0",
+      'targetAmount': amount,
+      'imageUrl': template.imageUrl,
+      'status': 'fund',
+      'templateTag': template.id,
+      'aspectRatio': template.aspectRatio,
+      'hashtags': template.hashtags
+    };
     DatabaseService(uid: user.uid)
-        .uploadPost(new Post(
-          title: template.title,
-          subtitle: template.subtitle,
-          author: user.uid,
-          authorUsername: fetchedUsername,
-          charity: template.charity,
-          noLikes: 0,
-          // comments: [],
-          timestamp: DateTime.now(),
-          amountRaised: "0",
-          targetAmount: amount,
-          imageUrl: template.imageUrl,
-          status: 'fund',
-          templateTag: template.id,
-        ))
+        // Batch update
+        .uploadPostFromTemplate(template, user, postData, fetchedUsername)
         // Reroute to new post page
         .then((postId) => {
+              // print(postId.documentID)
               Navigator.pushReplacementNamed(
-                  context,
-                  '/post/' +
-                      postId
-                          .toString()
-                          .substring(1, postId.toString().length - 1))
+                  context, '/post/' + postId.documentID.toString())
             });
   }
 }
