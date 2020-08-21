@@ -335,13 +335,14 @@ class _ProfileState extends State<ProfileController>
                                         .doesXfollowY(x: user.uid, y: _uid),
                                     builder: (context, initialState) {
                                       if (initialState.connectionState ==
-                                          ConnectionState.done) {
+                                              ConnectionState.done &&
+                                          initialState.data != null) {
                                         return FollowButton(initialState.data,
                                             profileOwnerId: _uid,
                                             myId: user.uid);
                                       } else {
                                         return EditFundderButton(
-                                            text: "Follow", onPressed: () {});
+                                            text: "", onPressed: () {});
                                       }
                                     },
                                   ),
