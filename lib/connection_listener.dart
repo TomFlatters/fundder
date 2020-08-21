@@ -18,6 +18,10 @@ class _ConnectionListenerState extends State<ConnectionListener> {
         .listen((ConnectivityResult result) {
       setState(() => connectionStatus = result);
     });
+    print('connection status' + connectionStatus.toString());
+    connectionStatus = Connectivity()
+        .checkConnectivity()
+        .then((value) => setState(() => connectionStatus = value));
     super.initState();
   }
 
