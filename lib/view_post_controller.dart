@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+
 import 'package:fundder/post_widgets/commentBar.dart';
 import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/post_widgets/postBody.dart';
@@ -7,23 +7,15 @@ import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/post_widgets/shareBar.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'post_widgets/postHeader.dart';
-import 'helper_classes.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'models/post.dart';
-import 'share_post_view.dart';
-import 'donation/donate_page_controller.dart';
-import 'comment_view_controller.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'services/database.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
-import 'video_item.dart';
 import 'global_widgets/buttons.dart';
 
 class ViewPost extends StatelessWidget with RouteAware {
@@ -196,27 +188,28 @@ class ViewPost extends StatelessWidget with RouteAware {
                                                     context),
                                                 PrimaryFundderButton(
                                                     text: 'Donate',
-                                                    onPressed: () {
+                                                    onPressed: () async {
+                                                      //This is the old code for redirecting to a donation page within the app
+                                                      //apple and google don't allow this without taking a 30% cut
+
                                                       /*Navigator.of(context).push(_openDonate());*/
                                                       // Navigator.pushNamed(
                                                       //     context,
                                                       //     '/post/' +
                                                       //         postData.id +
                                                       //         '/donate');
-
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    WebView(
-                                                                      initialUrl:
-                                                                          'https://fundder.co/',
-                                                                      javascriptMode:
-                                                                          JavascriptMode
-                                                                              .unrestricted,
-                                                                    )),
-                                                      );
+                                                      var url =
+                                                          "https://fundder.co/";
+                                                      if (await canLaunch(
+                                                          url)) {
+                                                        await launch(
+                                                          url,
+                                                          forceSafariVC: false,
+                                                          forceWebView: false,
+                                                        );
+                                                      } else {
+                                                        throw 'Could not launch $url';
+                                                      }
                                                     }),
                                                 user.uid != postData.author ||
                                                         postData.status !=
