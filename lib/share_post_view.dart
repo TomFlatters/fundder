@@ -61,7 +61,7 @@ class SharePost extends StatelessWidget {
               link: Uri.parse('https://fundder.co'),
               androidParameters: AndroidParameters(
                 packageName: 'com.example.fundder',
-                minimumVersion: 125,
+                minimumVersion: 0,
               ),
               iosParameters: IosParameters(
                 bundleId: 'com.example.fundder',
