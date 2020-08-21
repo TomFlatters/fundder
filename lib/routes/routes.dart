@@ -1,4 +1,5 @@
 import 'package:fluro/fluro.dart';
+import 'package:fluro/src/router.dart' as Router;
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
@@ -26,7 +27,7 @@ import 'package:fundder/auth_screens/check_verified.dart';
 import 'package:fundder/search/hashtag_feed.dart';
 
 class FluroRouter {
-  static Router router = Router();
+  static Router.Router router = Router.Router();
   // static Handler _postHandler = Handler(
   //     handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
   //         ViewPost(postData: params['id'][0]));
