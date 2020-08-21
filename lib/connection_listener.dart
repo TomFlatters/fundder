@@ -18,11 +18,14 @@ class _ConnectionListenerState extends State<ConnectionListener> {
         .listen((ConnectivityResult result) {
       setState(() => connectionStatus = result);
     });
-    checkInternetConnectivity();
+    print('connection status' + connectionStatus.toString());
+    connectionStatus = Connectivity()
+        .checkConnectivity()
+        .then((value) => setState(() => connectionStatus = value));
     super.initState();
   }
 
-  checkInternetConnectivity() {
+  Widget checkInternetConnectivity() {
     if (connectionStatus == ConnectivityResult.none) {
       return Container(
         color: HexColor('ff6b6c'),
