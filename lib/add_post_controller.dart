@@ -244,6 +244,8 @@ class _AddPostState extends State<AddPost> {
                 whoDoes: whoDoes[selected].toString(),
                 acceptedBy: [],
                 completedBy: [],
+                aspectRatio: aspectRatio,
+                hashtags: hashtags,
                 active: true))
             .then((templateId) => {
                   // if the post is successfully added, view the post
