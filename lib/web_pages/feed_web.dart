@@ -82,7 +82,7 @@ class _WebFeedState extends State<WebFeed> with SingleTickerProviderStateMixin {
                             ),
                             Expanded(
                                 child: [
-                              DoChallenge(),
+                              DoChallenge(user),
                               FeedWrapper("Fund", null, "fund"),
                               FeedWrapper("Done", null, "done"),
                             ][_tabController.index]),

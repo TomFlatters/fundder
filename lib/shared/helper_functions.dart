@@ -23,10 +23,11 @@ howLongAgo(timestamp) {
 }
 
 // Get the username of logged in user directly from firebase using UID as a string
-Future<String> getUsernameFromUID(uid) {
-  return DatabaseService(uid: uid)
+Future<String> getUsernameFromUID(uid) async {
+  String username = await DatabaseService(uid: uid)
       .readUserData()
       .then((fetchedUser) => {fetchedUser.username})
       .then((username) =>
           username.toString().substring(1, username.toString().length - 1));
+  return username;
 }
