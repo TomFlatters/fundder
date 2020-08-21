@@ -3,8 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:fundder/models/user.dart';
 
 import 'package:fundder/services/database.dart';
+import 'package:fundder/shared/helper_functions.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/template.dart';
 import 'shared/loading.dart';
@@ -12,6 +14,9 @@ import 'shared/loading.dart';
 class DoChallenge extends StatefulWidget {
   @override
   _DoChallengeState createState() => _DoChallengeState();
+
+  final user;
+  DoChallenge(this.user);
 }
 
 class _DoChallengeState extends State<DoChallenge> {
@@ -24,6 +29,7 @@ class _DoChallengeState extends State<DoChallenge> {
 
   Future<List<Template>> _getTemplates() async {
     loadingTimestamp = Timestamp.now();
+    // print(widget.user.uid);
     List<Template> templateList =
         await DatabaseService().refreshTemplates(limit, loadingTimestamp);
     print("GOT NEW TEMPLATES:");
@@ -202,7 +208,10 @@ class _DoChallengeState extends State<DoChallenge> {
                 ],
               ))),
       onTap: () {
-        Navigator.pushNamed(context, '/challenge/' + template.id);
+        getUsernameFromUID(widget.user.uid).then((username) => {
+              Navigator.pushNamed(context, '/challenge/' + template.id,
+                  arguments: {'username': username, 'uid': widget.user.uid})
+            });
       },
     );
   }

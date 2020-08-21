@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:fundder/profile_controller.dart';
 
 import 'models/template.dart';
 import 'package:fundder/services/database.dart';
@@ -25,10 +26,23 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
 
   @override
   Widget build(BuildContext context) {
+    bool hasAccepted = false;
+    String username = '';
+    String uid = '';
+    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
+    if (arguments != null) {
+      username = arguments['username'].toString();
+      uid = arguments['uid'].toString();
+    }
+
     return FutureBuilder(
         future: _getTemplate(),
         builder: (BuildContext context, AsyncSnapshot<Template> snapshot) {
           if (snapshot.hasData) {
+            print('Username: ' + username);
+            if (snapshot.data.acceptedBy.contains(username.toString())) {
+              hasAccepted = true;
+            }
             return Scaffold(
               appBar: kIsWeb == true
                   ? null
@@ -134,16 +148,27 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                     padding: EdgeInsets.all(20),
                                   ),
                                   PrimaryFundderButton(
-                                      text: 'Join Now',
+                                      text: hasAccepted
+                                          ? 'Your Post'
+                                          : 'Join Now',
                                       onPressed: () {
-                                        Navigator.pushNamed(
-                                            context,
-                                            '/challenge/' +
-                                                widget.challengeId +
-                                                '/steps',
-                                            arguments: {
-                                              'template': snapshot.data
-                                            });
+                                        if (hasAccepted) {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProfileController(
+                                                          uid: uid)));
+                                        } else {
+                                          Navigator.pushNamed(
+                                              context,
+                                              '/challenge/' +
+                                                  widget.challengeId +
+                                                  '/steps',
+                                              arguments: {
+                                                'template': snapshot.data
+                                              });
+                                        }
                                       }),
                                   SecondaryFundderButton(
                                       text: 'View Completed',
