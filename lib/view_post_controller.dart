@@ -174,6 +174,7 @@ class ViewPost extends StatelessWidget with RouteAware {
                       new IconButton(
                           icon: new Icon(Icons.close),
                           onPressed: () {
+                            print("Going back from ViewPost to Feed");
                             Navigator.of(context).pop();
                           })
                     ],

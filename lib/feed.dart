@@ -1,8 +1,6 @@
 //!!!!!!!!!!!!!!This file is way way tooooo big
 //really needs to be refactored
-
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
@@ -11,23 +9,14 @@ import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/post_widgets/postBody.dart';
 import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/post_widgets/shareBar.dart';
-import 'package:fundder/services/database.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'package:fundder/view_post_controller.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'models/post.dart';
-import 'share_post_view.dart';
-import 'helper_classes.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'video_item.dart';
 import 'services/likes.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -107,11 +96,15 @@ class _FeedViewState extends State<FeedView> {
                       StreamBuilder(
                           stream: rebuildLikesButton,
                           builder: (context, snapshot) {
+                            print("Building Stream Builder");
                             if (snapshot.hasData) {
+                              print(
+                                  "New data in stream. Creating new Like Button");
                               currLikeButton = createLikesFutureBuilder(
                                   likesService, postData, user.uid);
                               return currLikeButton;
                             } else {
+                              print("Using old LikeButton");
                               return currLikeButton;
                             }
                           }),
