@@ -52,31 +52,33 @@ class ViewPost extends StatelessWidget with RouteAware {
             targetCharity: postData.charity,
           ),
           PostBody(postData: postData),
-          Container(
-            //action bar
-            key: GlobalKey(),
-            height: 30,
-            child: Row(children: <Widget>[
-              Expanded(
-                //like bar
-                child: ChangeNotifierProvider(
-                    create: (context) => likesModel, child: LikeBar()),
-              ),
-              Expanded(
-                  child: Align(
-                alignment: Alignment.centerLeft,
-                child: CommentButton(
-                  pid: postData.id,
-                ),
-              )),
-              Expanded(
-                child: ShareBar(
-                  postId: postData.id,
-                  postTitle: postData.title,
-                ),
-              ),
-            ]),
-          ),
+          uid != "123"
+              ? Container(
+                  //action bar
+                  key: GlobalKey(),
+                  height: 30,
+                  child: Row(children: <Widget>[
+                    Expanded(
+                      //like bar
+                      child: ChangeNotifierProvider(
+                          create: (context) => likesModel, child: LikeBar()),
+                    ),
+                    Expanded(
+                        child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CommentButton(
+                        pid: postData.id,
+                      ),
+                    )),
+                    Expanded(
+                      child: ShareBar(
+                        postId: postData.id,
+                        postTitle: postData.title,
+                      ),
+                    ),
+                  ]),
+                )
+              : Container(),
           Row(children: [
             Expanded(
               child: Container(
@@ -115,7 +117,10 @@ class ViewPost extends StatelessWidget with RouteAware {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    LikesService likesService = LikesService(uid: user.uid);
+    LikesService likesService = LikesService(uid: "123");
+    if (user != null) {
+      likesService = LikesService(uid: user.uid);
+    }
 
     bool initiallyHasLiked;
     int initialLikesNo;
@@ -154,7 +159,12 @@ class ViewPost extends StatelessWidget with RouteAware {
                           initialLikesNo = noLikes.data;
                           var likesModel = LikesModel(
                               initiallyHasLiked, initialLikesNo,
-                              uid: user.uid, postId: postData.id);
+                              uid: "123", postId: postData.id);
+                          if (user != null) {
+                            likesModel = LikesModel(
+                                initiallyHasLiked, initialLikesNo,
+                                uid: user.uid, postId: postData.id);
+                          }
                           print(
                               'In viewpost, just made a likesModel and the values are ${likesModel.noLikes} and ${likesModel.isLiked}');
                           return Scaffold(
@@ -189,11 +199,17 @@ class ViewPost extends StatelessWidget with RouteAware {
                                                 vertical: 10.0),
                                             child: Column(
                                               children: <Widget>[
-                                                createPostUI(
-                                                    postData,
-                                                    likesModel,
-                                                    user.uid,
-                                                    context),
+                                                user != null
+                                                    ? createPostUI(
+                                                        postData,
+                                                        likesModel,
+                                                        user.uid,
+                                                        context)
+                                                    : createPostUI(
+                                                        postData,
+                                                        likesModel,
+                                                        "123",
+                                                        context),
                                                 PrimaryFundderButton(
                                                     text: 'Donate',
                                                     onPressed: () {
@@ -218,20 +234,25 @@ class ViewPost extends StatelessWidget with RouteAware {
                                                                     )),
                                                       );
                                                     }),
-                                                user.uid != postData.author ||
-                                                        postData.status !=
-                                                            'fund'
-                                                    ? Container()
-                                                    : PrimaryFundderButton(
-                                                        text:
-                                                            'Complete Challenge',
-                                                        onPressed: () {
-                                                          Navigator.pushNamed(
-                                                              context,
-                                                              '/post/' +
-                                                                  postData.id +
-                                                                  '/uploadProof');
-                                                        }),
+                                                user != null
+                                                    ? user.uid !=
+                                                                postData
+                                                                    .author ||
+                                                            postData.status !=
+                                                                'fund'
+                                                        ? Container()
+                                                        : PrimaryFundderButton(
+                                                            text:
+                                                                'Complete Challenge',
+                                                            onPressed: () {
+                                                              Navigator.pushNamed(
+                                                                  context,
+                                                                  '/post/' +
+                                                                      postData
+                                                                          .id +
+                                                                      '/uploadProof');
+                                                            })
+                                                    : Container(),
                                               ],
                                             )))
                                   ],
