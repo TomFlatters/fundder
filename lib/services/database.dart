@@ -55,6 +55,7 @@ class DatabaseService {
     return await userCollection.document(uid).setData({
       'email': email,
       'username': username,
+      'search_username': username.toLowerCase(),
       'name': name,
       'profilePic': profilePic,
       'seenTutorial': false,
@@ -474,7 +475,7 @@ class DatabaseService {
 
   Future<List<DocumentSnapshot>> usersContainingString(String queryText) {
     return userCollection
-        .orderBy('username', descending: false)
+        .orderBy('search_username', descending: false)
         .startAt([queryText])
         .endAt([queryText + '\uf8ff'])
         .limit(20)
