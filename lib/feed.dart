@@ -1,6 +1,8 @@
 //!!!!!!!!!!!!!!This file is way way tooooo big
 //really needs to be refactored
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
@@ -71,8 +73,15 @@ class _FeedViewState extends State<FeedView> {
           //building an individual post
           Post postData = widget.postList[index];
           // print(postData)
-          bool initiallyHasLiked;
-          int initialLikesNo;
+
+          //arbitrarily chosen int
+          StreamController<void> likesManager = StreamController<int>();
+          Stream rebuildLikesButton = likesManager.stream;
+
+          //the previous state of like before it's changed
+          var currLikeButton =
+              createLikesFutureBuilder(likesService, postData, user.uid);
+
           return GestureDetector(
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -94,40 +103,19 @@ class _FeedViewState extends State<FeedView> {
                     key: GlobalKey(),
                     height: 30,
                     child: Row(children: <Widget>[
-                      FutureBuilder(
-                          future: likesService.hasUserLikedPost(postData.id),
-                          builder: (context, hasLiked) {
-                            if (hasLiked.connectionState ==
-                                ConnectionState.done) {
-                              initiallyHasLiked = hasLiked.data;
-                              return FutureBuilder(
-                                future: likesService.noOfLikes(postData.id),
-                                builder: (context, noLikes) {
-                                  if (noLikes.connectionState ==
-                                      ConnectionState.done) {
-                                    initialLikesNo = noLikes.data;
-
-                                    return Expanded(
-                                        //like bar
-                                        child: NewLikeButton(
-                                      initiallyHasLiked,
-                                      initialLikesNo,
-                                      uid: user.uid,
-                                      postId: postData.id,
-                                    ));
-                                  } else {
-                                    return Expanded(
-                                      child: Container(),
-                                    );
-                                  }
-                                },
-                              );
+                      //likeButton goes here
+                      StreamBuilder(
+                          stream: rebuildLikesButton,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              currLikeButton = createLikesFutureBuilder(
+                                  likesService, postData, user.uid);
+                              return currLikeButton;
                             } else {
-                              return Expanded(
-                                child: Container(),
-                              );
+                              return currLikeButton;
                             }
                           }),
+
                       Expanded(
                           child: Align(
                         alignment: Alignment.centerLeft,
@@ -189,6 +177,7 @@ class _FeedViewState extends State<FeedView> {
               print("a post clicked");
               var newState = await Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ViewPost(postData)));
+              likesManager.add(1);
             },
           );
         },
@@ -241,4 +230,41 @@ class _FeedViewState extends State<FeedView> {
       },
     );
   }
+}
+
+FutureBuilder createLikesFutureBuilder(likesService, postData, uid) {
+  bool initiallyHasLiked;
+  int initialLikesNo;
+  return FutureBuilder(
+      future: likesService.hasUserLikedPost(postData.id),
+      builder: (context, hasLiked) {
+        if (hasLiked.connectionState == ConnectionState.done) {
+          initiallyHasLiked = hasLiked.data;
+          return FutureBuilder(
+            future: likesService.noOfLikes(postData.id),
+            builder: (context, noLikes) {
+              if (noLikes.connectionState == ConnectionState.done) {
+                initialLikesNo = noLikes.data;
+
+                return Expanded(
+                    //like bar
+                    child: NewLikeButton(
+                  initiallyHasLiked,
+                  initialLikesNo,
+                  uid: uid,
+                  postId: postData.id,
+                ));
+              } else {
+                return Expanded(
+                  child: Container(),
+                );
+              }
+            },
+          );
+        } else {
+          return Expanded(
+            child: Container(),
+          );
+        }
+      });
 }
