@@ -56,7 +56,6 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
-    LikesModel likesModel;
     print("feed being built");
     final user = Provider.of<User>(context);
     final LikesService likesService = LikesService(uid: user.uid);
@@ -107,15 +106,15 @@ class _FeedViewState extends State<FeedView> {
                                   if (noLikes.connectionState ==
                                       ConnectionState.done) {
                                     initialLikesNo = noLikes.data;
-                                    likesModel = LikesModel(
-                                        initiallyHasLiked, initialLikesNo,
-                                        uid: user.uid, postId: postData.id);
+
                                     return Expanded(
-                                      //like bar
-                                      child: ChangeNotifierProvider(
-                                          create: (context) => likesModel,
-                                          child: LikeBar()),
-                                    );
+                                        //like bar
+                                        child: NewLikeButton(
+                                      initiallyHasLiked,
+                                      initialLikesNo,
+                                      uid: user.uid,
+                                      postId: postData.id,
+                                    ));
                                   } else {
                                     return Expanded(
                                       child: Container(),
@@ -186,15 +185,10 @@ class _FeedViewState extends State<FeedView> {
               // //passing state into ViewPost screen
               // LikesModel likeState = LikesModel(isLiked, noLikes,
               //     uid: uid, postId: pid);
-              if (likesModel != null) {
-                print("a post clicked");
-                var newState = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ViewPost(postData)));
-                likesModel.manuallySetState(
-                    newState['noLikes'], newState['isLiked']);
-              }
+
+              print("a post clicked");
+              var newState = await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ViewPost(postData)));
             },
           );
         },
