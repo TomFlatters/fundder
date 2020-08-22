@@ -19,6 +19,7 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+  // VERY IMPORTANT - if in future we want to change username, we also need to change search_username which is a .toLowerCase() version of it for the search bar
   String _username = "Username";
   String _name = "Name";
   String _uid;
