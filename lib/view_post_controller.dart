@@ -142,9 +142,6 @@ class ViewPost extends StatelessWidget with RouteAware {
     final user = Provider.of<User>(context);
     LikesService likesService = LikesService(uid: user.uid);
 
-    bool initiallyHasLiked;
-    int initialLikesNo;
-
     print("View post controller");
 
     if (postData == null) {
@@ -175,7 +172,10 @@ class ViewPost extends StatelessWidget with RouteAware {
                     title: Text(postData.title),
                     actions: <Widget>[
                       new IconButton(
-                          icon: new Icon(Icons.close), onPressed: () {})
+                          icon: new Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          })
                     ],
                     leading: new Container(),
                   ),

@@ -175,7 +175,7 @@ class _FeedViewState extends State<FeedView> {
               //     uid: uid, postId: pid);
 
               print("a post clicked");
-              var newState = await Navigator.push(context,
+              await Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ViewPost(postData)));
               likesManager.add(1);
             },
