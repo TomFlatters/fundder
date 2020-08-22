@@ -86,3 +86,76 @@ class LikeBar extends StatelessWidget {
             ])));
   }
 }
+
+class NewLikeButton extends StatefulWidget {
+  //LOOk UP WHERE STATE IS ACTUALLY KEPT IN THESE WIDGETS
+  final bool initialIsLiked;
+  final int initialNoLikes;
+  final String postId;
+  final String uid;
+  final LikesService likesService;
+  NewLikeButton(this.initialIsLiked, this.initialNoLikes,
+      {@required this.uid, @required this.postId})
+      : this.likesService = LikesService(uid: uid);
+
+  @override
+  _NewLikeButtonState createState() => _NewLikeButtonState();
+}
+
+class _NewLikeButtonState extends State<NewLikeButton> {
+  bool isLiked;
+  int noLikes;
+
+  @override
+  void initState() {
+    super.initState();
+    isLiked = widget.initialIsLiked;
+    noLikes = widget.initialNoLikes;
+  }
+
+  void likePressed() {
+    setState(() {
+      if (isLiked) {
+        widget.likesService.unlikePost(widget.postId);
+        noLikes -= 1;
+        isLiked = false;
+      } else {
+        widget.likesService.likePost(widget.postId);
+        noLikes += 1;
+        isLiked = true;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+        onPressed: likePressed,
+        child: Container(
+            height: 40,
+            child: Row(children: <Widget>[
+              Expanded(
+                  child: Row(children: [
+                Container(
+                  width: 25,
+                  height: 25,
+                  padding: const EdgeInsets.all(0.0),
+                  child: (isLiked)
+                      ? Image.asset('assets/images/like_selected.png',
+                          color: HexColor('ff6b6c'))
+                      : Image.asset('assets/images/like.png',
+                          color: Colors.grey[850]),
+                ),
+                Expanded(
+                    child: Container(
+                        margin: EdgeInsets.only(left: 10),
+                        child: Text(
+                          noLikes != null ? noLikes.toString() : "",
+                          style:
+                              TextStyle(fontSize: 15, color: Colors.grey[850]),
+                          textAlign: TextAlign.left,
+                        )))
+              ]))
+            ])));
+  }
+}
