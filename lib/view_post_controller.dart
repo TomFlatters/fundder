@@ -207,20 +207,20 @@ class ViewPost extends StatelessWidget with RouteAware {
                                       //         '/donate');
 
                                       var donatePage =
-                                          "https://donate.fundder.co/" +
+                                          "https://donate-fundder.web.app/" +
                                               user.uid +
                                               '/' +
                                               postData.id;
 
-                                      var url = "https://fundder.co/";
-                                      if (await canLaunch(url)) {
+                                      // var url = "https://fundder.co/";
+                                      if (await canLaunch(donatePage)) {
                                         await launch(
-                                          url,
+                                          donatePage,
                                           forceSafariVC: false,
                                           forceWebView: false,
                                         );
                                       } else {
-                                        throw 'Could not launch $url';
+                                        throw 'Could not launch $donatePage';
                                       }
                                     }),
                                 user.uid != postData.author ||
