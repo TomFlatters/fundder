@@ -50,7 +50,10 @@ class FluroRouter {
     //       (isLiked == 'true') ? true : false, int.parse(noLikes),
     //       uid: uid, postId: pid);
     var user = Provider.of<User>(context);
-    var databaseServices = DatabaseService(uid: user.uid);
+    var databaseServices = DatabaseService(uid: "123");
+    if (user != null) {
+      databaseServices = DatabaseService(uid: user.uid);
+    }
     return FutureBuilder(
       future: databaseServices.getPostById(pid),
       builder: (context, post) {

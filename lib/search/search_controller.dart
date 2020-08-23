@@ -51,6 +51,7 @@ class _SearchState extends State<SearchController>
 
   // Call search function here. search is the term to be searched.
   Future<List<DocumentSnapshot>> search(String search) async {
+    search = search.toLowerCase();
     if (_tabController.index == 0) {
       return DatabaseService(uid: uid).usersContainingString(search);
     } else {
@@ -95,7 +96,9 @@ class _SearchState extends State<SearchController>
                 onCancelled: () {
                   FocusScope.of(context).unfocus();
                 },
-                hintText: 'search accounts',
+                hintText: _tabController.index == 0
+                    ? 'search accounts'
+                    : 'search hashtags',
                 onSearch: search,
                 emptyWidget: SearchDescriptor(),
                 minimumChars: 0,
