@@ -195,7 +195,7 @@ class _AuthenticateState extends State<Authenticate>
                 SizedBox(height: 20.0),
                 TextFormField(
                   inputFormatters: [
-                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                    FilteringTextInputFormatter.deny(RegExp("[ ]")),
                   ],
                   initialValue: username,
                   decoration:

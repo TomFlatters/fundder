@@ -420,12 +420,13 @@ exports.postDone = functions.firestore
 
    //////FUNCTIONS TO HANDLE DELETION OF POSTS AND USERS
 
-   exports.deleteUser = functions.firestore
-    .document('users/{userID}')
-    .onDelete((snap, context) => {
+   exports.deletePost = functions.firestore
+    .document('posts/{postID}')
+    .onDelete(async (snap, context) => {
+      const postId = context.params.postId;
       // Get an object representing the document prior to deletion
       // e.g. {'name': 'Marie', 'age': 66}
-      const deletedValue = snap.data();
+      const res = await admin.firestore().doc(`deletedPosts/${snap.id}`).set(snap.data());
 
       // perform desired operations ...
     });

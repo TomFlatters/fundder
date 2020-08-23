@@ -58,10 +58,10 @@ class SharePost extends StatelessWidget {
           onTap: () async {
             final DynamicLinkParameters parameters = DynamicLinkParameters(
               uriPrefix: 'https://fundder.page.link',
-              link: Uri.parse('https://fundder.co'),
+              link: Uri.parse('https://fundder.co/?post=${this.postId}'),
               androidParameters: AndroidParameters(
                 packageName: 'com.example.fundder',
-                minimumVersion: 125,
+                minimumVersion: 0,
               ),
               iosParameters: IosParameters(
                 bundleId: 'com.example.fundder',
