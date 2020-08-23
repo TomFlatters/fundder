@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fundder/helper_classes.dart';
+import 'package:fundder/models/charity.dart';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
@@ -21,6 +22,8 @@ class DatabaseService {
       Firestore.instance.collection('posts');
   final CollectionReference templatesCollection =
       Firestore.instance.collection('templates');
+  final CollectionReference charitiesCollection =
+      Firestore.instance.collection('charities');
 
   // -------------
   // 1. User CRUD:
@@ -514,4 +517,28 @@ class DatabaseService {
       });
     }
   }
+}
+
+// -----------------------------------
+// 5. Charities:
+// -----------------------------------
+
+// Use this function to get the data to display about the charity when their
+// logo is clicked.
+Future<Charity> readCharitiesData(name) async {
+  DocumentSnapshot charityData = await charitiesCollection
+      .where('status', isEqualTo: name)
+      .limit(1)
+      .getDocuments();
+  Charity fetchedCharity = _charityDataFromDoc(charityData);
+  return fetchedCharity;
+}
+
+Charity _charityDataFromDoc(doc) {
+  return Charity(
+      name: doc.data.name,
+      id: doc.data.id,
+      bio: doc.data.bio,
+      location: doc.data.location,
+      image: doc.data.image);
 }
