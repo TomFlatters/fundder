@@ -555,6 +555,13 @@ class _AddPostState extends State<AddPost> {
                         }
                       }),
                       title: Text('${charities[index].name}'),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, '/charity/' + charities[index].id);
+                        },
+                        child: Icon(Icons.info_outline),
+                      ),
                       onTap: () {
                         charity = index;
                         setState(() {});

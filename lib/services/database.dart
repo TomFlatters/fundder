@@ -258,7 +258,8 @@ class DatabaseService {
           'status': post.status,
           'templateTag': post.templateTag,
           'aspectRatio': post.aspectRatio,
-          "hashtags": post.hashtags
+          "hashtags": post.hashtags,
+          'charityLogo': post.charityLogo
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});

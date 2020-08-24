@@ -12,7 +12,6 @@ import 'package:fundder/challenge_steps_view.dart';
 import 'package:fundder/view_followers_controller.dart';
 import 'package:fundder/profile_controller.dart';
 import 'package:fundder/edit_profile_controller.dart';
-import 'package:fundder/view_template_controller.dart';
 import 'package:fundder/feed_controller.dart';
 import 'package:fundder/web_pages/feed_web.dart';
 import 'package:fundder/web_pages/about_page.dart';
@@ -28,15 +27,13 @@ import 'package:fundder/welcome_pages/tutorial.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/auth_screens/check_verified.dart';
 import 'package:fundder/search/hashtag_feed.dart';
+import 'package:fundder/charity_view_controller.dart';
 
 class FluroRouter {
   static Router router = Router();
   // static Handler _postHandler = Handler(
   //     handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
   //         ViewPost(postData: params['id'][0]));
-  static Handler _templateHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ViewTemplate(templateData: params['id'][0]));
 
   static Handler _postHandler =
       Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
@@ -75,6 +72,10 @@ class FluroRouter {
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(pid: params['id'][0]));
+
+  static Handler _charityHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          CharityView(charityId: params['id'][0]));
 
   static Handler _donateHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
@@ -149,8 +150,8 @@ class FluroRouter {
 
   static void setupRouter() {
     router.define(
-      '/template/:id',
-      handler: _templateHandler,
+      '/charity/:id',
+      handler: _charityHandler,
       transitionType: TransitionType.fadeIn,
     );
     router.define(

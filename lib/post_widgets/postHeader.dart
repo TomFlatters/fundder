@@ -51,15 +51,20 @@ class PostHeader extends StatelessWidget {
           Expanded(
               child: Align(
                   alignment: Alignment.centerRight,
-                  child: Container(
-                      height: 60,
-                      //color: Colors.blue,
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      margin: EdgeInsets.all(10.0),
-                      child: CachedNetworkImage(
-                        imageUrl: this.charityLogo,
-                        //color: Colors.red,
-                      )))),
+                  child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, '/charity/' + this.targetCharity);
+                      },
+                      child: Container(
+                          height: 60,
+                          //color: Colors.blue,
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          margin: EdgeInsets.all(10.0),
+                          child: CachedNetworkImage(
+                            imageUrl: this.charityLogo,
+                            //color: Colors.red,
+                          ))))),
           this.postStatus == 'done'
               ? Row(children: [
                   Icon(
