@@ -144,7 +144,7 @@ class _DoChallengeState extends State<DoChallenge> {
                           alignment: Alignment.centerLeft,
                           child: Container(
                               margin:
-                                  EdgeInsets.only(left: 20, right: 20, top: 0),
+                                  EdgeInsets.only(left: 10, right: 10, top: 0),
                               child: AspectRatio(
                                 aspectRatio: 1 / 1,
                                 child: Container(
@@ -165,14 +165,22 @@ class _DoChallengeState extends State<DoChallenge> {
                           child: Column(children: [
                             Align(
                                 alignment: Alignment.topLeft,
-                                child: Text(
-                                  '${template.title}',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: 'Roboto Mono',
-                                    fontSize: 16,
-                                  ),
-                                )),
+                                child: Row(children: [
+                                  Expanded(
+                                      child: Text(
+                                    '${template.title}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto Mono',
+                                      fontSize: 16,
+                                    ),
+                                  )),
+                                  Container(
+                                      margin: EdgeInsets.only(right: 10),
+                                      height: 15,
+                                      child: CachedNetworkImage(
+                                          imageUrl: template.charityLogo)),
+                                ])),
                             Padding(padding: EdgeInsets.all(2)),
                             Align(
                                 alignment: Alignment.topLeft,

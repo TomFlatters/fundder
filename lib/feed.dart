@@ -85,7 +85,8 @@ class _FeedViewState extends State<FeedView> {
                       postAuthorId: postData.author,
                       postAuthorUserName: postData.authorUsername,
                       targetCharity: postData.charity,
-                      postStatus: postData.status),
+                      postStatus: postData.status,
+                      charityLogo: postData.charityLogo),
                   PostBody(
                     postData: postData,
                     hashtag: widget.hashtag,
