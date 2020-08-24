@@ -209,7 +209,7 @@ class DatabaseService {
   }
 
   Future<List<Post>> likedPosts(String id, List likesList) {
-    print('gettig liked posts by author: ' + id);
+    print('getting liked posts by author: ' + id);
     return postsCollection
         .where(FieldPath.documentId, whereIn: likesList)
         .getDocuments()
