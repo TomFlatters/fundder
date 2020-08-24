@@ -156,7 +156,9 @@ class _DoChallengeState extends State<DoChallenge> {
                                           placeholder: (context, url) =>
                                               Loading(),
                                           errorWidget: (context, url, error) =>
-                                              Icon(Icons.error),
+                                              Container(
+                                            color: Colors.grey[100],
+                                          ),
                                         ),
                                 ),
                               )),
