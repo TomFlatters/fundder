@@ -47,10 +47,10 @@ class ViewPost extends StatelessWidget with RouteAware {
         margin: EdgeInsets.only(left: 0, right: 0, top: 0),
         child: Column(children: <Widget>[
           PostHeader(
-            postAuthorId: postData.author,
-            postAuthorUserName: postData.authorUsername,
-            targetCharity: postData.charity,
-          ),
+              postAuthorId: postData.author,
+              postAuthorUserName: postData.authorUsername,
+              targetCharity: postData.charity,
+              charityLogo: postData.charityLogo),
           PostBody(postData: postData),
           uid != "123"
               ? Container(

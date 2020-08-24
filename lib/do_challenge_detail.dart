@@ -126,13 +126,23 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                       alignment: Alignment.topLeft,
                                       margin: EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
-                                      child: Text(
-                                        snapshot.data.title,
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto Mono',
-                                          fontSize: 16,
-                                        ),
-                                      )),
+                                      child: Row(children: [
+                                        Expanded(
+                                            child: Text(
+                                          snapshot.data.title,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontFamily: 'Roboto Mono',
+                                            fontSize: 16,
+                                          ),
+                                        )),
+                                        Container(
+                                            margin: EdgeInsets.only(right: 10),
+                                            height: 20,
+                                            child: CachedNetworkImage(
+                                                imageUrl:
+                                                    snapshot.data.charityLogo)),
+                                      ])),
                                   Container(
                                       alignment: Alignment.centerLeft,
                                       margin: EdgeInsets.symmetric(
@@ -170,7 +180,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                               });
                                         }
                                       }),
-                                  SecondaryFundderButton(
+                                  /*SecondaryFundderButton(
                                       text: 'View Completed',
                                       onPressed: () {
                                         Navigator.pushNamed(
@@ -178,7 +188,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             '/challenge/' +
                                                 widget.challengeId +
                                                 '/steps');
-                                      }),
+                                      }),*/
                                 ],
                               )))
                     ],

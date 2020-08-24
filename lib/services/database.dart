@@ -113,26 +113,30 @@ class DatabaseService {
 
     //print("printing noLikes:" + doc["noLikes"]);
     return Post(
-        noLikes: (doc.data["noLikes"] == null)
-            ? (doc['likes'].length)
-            : (doc["noLikes"]),
-        peopleThatLikedThis: Set(),
-        author: doc.data['author'],
-        authorUsername: doc.data['authorUsername'],
-        title: doc.data['title'],
-        charity: doc.data['charity'],
-        amountRaised: doc.data['amountRaised'],
-        moneyRaised: doc.data['moneyRaised'],
-        targetAmount: doc.data['targetAmount'],
-        likes: doc.data['likes'],
-        noComments: doc.data['noComments'],
-        subtitle: doc.data['subtitle'],
-        timestamp: doc.data['timestamp'],
-        imageUrl: doc.data['imageUrl'],
-        id: doc.documentID,
-        status: doc.data['status'],
-        aspectRatio: doc.data['aspectRatio'],
-        hashtags: doc.data['hashtags']);
+      noLikes: (doc.data["noLikes"] == null)
+          ? (doc['likes'].length)
+          : (doc["noLikes"]),
+      peopleThatLikedThis: Set(),
+      author: doc.data['author'],
+      authorUsername: doc.data['authorUsername'],
+      title: doc.data['title'],
+      charity: doc.data['charity'],
+      amountRaised: doc.data['amountRaised'],
+      moneyRaised: doc.data['moneyRaised'],
+      targetAmount: doc.data['targetAmount'],
+      likes: doc.data['likes'],
+      noComments: doc.data['noComments'],
+      subtitle: doc.data['subtitle'],
+      timestamp: doc.data['timestamp'],
+      imageUrl: doc.data['imageUrl'],
+      id: doc.documentID,
+      status: doc.data['status'],
+      aspectRatio: doc.data['aspectRatio'],
+      hashtags: doc.data['hashtags'],
+      charityLogo: doc.data['charityLogo'] != null
+          ? doc.data['charityLogo']
+          : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
+    );
   }
 
   // Get posts list stream is mapped to the Post object
@@ -311,7 +315,10 @@ class DatabaseService {
         completedBy: doc.data['completedBy'],
         active: doc.data['active'],
         aspectRatio: doc.data['aspectRatio'],
-        hashtags: doc.data['hashtags']);
+        hashtags: doc.data['hashtags'],
+        charityLogo: doc.data['charityLogo'] != null
+            ? doc.data['charityLogo']
+            : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a');
   }
 
   // Get a post from Firestore given a known id: if the id is bracketed these are automatically removed
@@ -356,7 +363,8 @@ class DatabaseService {
           "completedBy": t.completedBy,
           "active": t.active,
           "aspectRatio": t.aspectRatio,
-          "hashtags": t.hashtags
+          "hashtags": t.hashtags,
+          "charityLogo": t.charityLogo
         })
         .then((DocumentReference docRef) => {docRef.documentID.toString()})
         .catchError((error) => {print(error)});
@@ -518,7 +526,6 @@ class DatabaseService {
       });
     }
   }
-}
 
 // -----------------------------------
 // 5. Charities:
@@ -526,20 +533,26 @@ class DatabaseService {
 
 // Use this function to get the data to display about the charity when their
 // logo is clicked.
-Future<Charity> readCharitiesData(name) async {
-  DocumentSnapshot charityData = await charitiesCollection
-      .where('status', isEqualTo: name)
-      .limit(1)
-      .getDocuments();
-  Charity fetchedCharity = _charityDataFromDoc(charityData);
-  return fetchedCharity;
-}
+  Future<Charity> readCharitiesData(name) async {
+    DocumentSnapshot charityData =
+        await charitiesCollection.document(name).get();
+    Charity fetchedCharity = _charityDataFromDoc(charityData);
+    return fetchedCharity;
+  }
 
-Charity _charityDataFromDoc(doc) {
-  return Charity(
-      name: doc.data.name,
-      id: doc.data.id,
-      bio: doc.data.bio,
-      location: doc.data.location,
-      image: doc.data.image);
+  Charity _charityDataFromDoc(DocumentSnapshot doc) {
+    return Charity(
+        name: doc.data['name'],
+        id: doc.documentID,
+        bio: doc.data['bio'],
+        location: doc.data['location'],
+        image: doc.data['image']);
+  }
+
+  Future<List<Charity>> getCharityNameList() async {
+    QuerySnapshot charitiesSnapshot = await charitiesCollection.getDocuments();
+    return charitiesSnapshot.documents.map((DocumentSnapshot doc) {
+      return _charityDataFromDoc(doc);
+    }).toList();
+  }
 }
