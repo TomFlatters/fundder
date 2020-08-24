@@ -175,11 +175,19 @@ class _DoChallengeState extends State<DoChallenge> {
                                       fontSize: 16,
                                     ),
                                   )),
-                                  Container(
-                                      margin: EdgeInsets.only(right: 10),
-                                      height: 15,
-                                      child: CachedNetworkImage(
-                                          imageUrl: template.charityLogo)),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(context,
+                                            '/charity/' + template.charity);
+                                      },
+                                      child: Container(
+                                          height: 20,
+                                          //color: Colors.blue,
+                                          margin: EdgeInsets.only(right: 10.0),
+                                          child: CachedNetworkImage(
+                                            imageUrl: template.charityLogo,
+                                            //color: Colors.red,
+                                          )))
                                 ])),
                             Padding(padding: EdgeInsets.all(2)),
                             Align(

@@ -136,12 +136,23 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             fontSize: 16,
                                           ),
                                         )),
-                                        Container(
-                                            margin: EdgeInsets.only(right: 10),
-                                            height: 20,
-                                            child: CachedNetworkImage(
-                                                imageUrl:
-                                                    snapshot.data.charityLogo)),
+                                        GestureDetector(
+                                            onTap: () {
+                                              Navigator.pushNamed(
+                                                  context,
+                                                  '/charity/' +
+                                                      snapshot.data.charity);
+                                            },
+                                            child: Container(
+                                                height: 20,
+                                                //color: Colors.blue,
+                                                margin: EdgeInsets.only(
+                                                    right: 10.0),
+                                                child: CachedNetworkImage(
+                                                  imageUrl:
+                                                      snapshot.data.charityLogo,
+                                                  //color: Colors.red,
+                                                )))
                                       ])),
                                   Container(
                                       alignment: Alignment.centerLeft,
