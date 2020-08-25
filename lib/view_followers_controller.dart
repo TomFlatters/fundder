@@ -115,6 +115,11 @@ class _ViewFollowersState extends State<ViewFollowers>
                             return ListTile(
                               leading: ProfilePic(usedList[index]['uid'], 40),
                               title: Text(usedList[index]['username']),
+                              onTap: () {
+                                print('/user/' + usedList[index]['uid']);
+                                Navigator.pushNamed(
+                                    context, '/user/' + usedList[index]['uid']);
+                              },
                             );
                           },
                         ))),

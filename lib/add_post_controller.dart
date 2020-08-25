@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fundder/models/charity.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
@@ -186,7 +187,7 @@ class _AddPostState extends State<AddPost> {
                 subtitle: subtitleController.text.toString().trimRight(),
                 author: user.uid,
                 authorUsername: user.username,
-                charity: charities[charity],
+                charity: charities[charity].id,
                 noLikes: 0,
                 noComments: 0,
                 timestamp: DateTime.now(),
@@ -196,7 +197,8 @@ class _AddPostState extends State<AddPost> {
                 imageUrl: downloadUrl,
                 status: 'fund',
                 aspectRatio: aspectRatio,
-                hashtags: hashtags))
+                hashtags: hashtags,
+                charityLogo: charities[charity].image))
             .then((postId) => {
                   if (postId == null)
                     {
@@ -234,7 +236,7 @@ class _AddPostState extends State<AddPost> {
                 title: titleController.text.toString(),
                 subtitle: subtitleController.text.toString(),
                 author: user.uid,
-                charity: charities[charity],
+                charity: charities[charity].id,
                 likes: [],
                 comments: {},
                 timestamp: DateTime.now(),
@@ -246,11 +248,12 @@ class _AddPostState extends State<AddPost> {
                 completedBy: [],
                 aspectRatio: aspectRatio,
                 hashtags: hashtags,
-                active: true))
+                active: true,
+                charityLogo: charities[charity].image))
             .then((templateId) => {
                   // if the post is successfully added, view the post
                   Navigator.pushReplacementNamed(
-                      context, '/template/' + templateId.toString())
+                      context, '/challenge/' + templateId.toString())
                 });
       }
     }
@@ -510,14 +513,16 @@ class _AddPostState extends State<AddPost> {
   }
 
   // _chooseCharity state:
-  final List<String> charities = <String>[
-    "Cancer Research",
-    'British Heart Foundation',
-    'Oxfam'
-  ];
+  List<Charity> charities = <Charity>[];
   int charity = -1;
 
+  void _loadCharityList() async {
+    charities = await DatabaseService(uid: "123").getCharityNameList();
+    setState(() {});
+  }
+
   Widget _chooseCharity() {
+    _loadCharityList();
     return ListView(children: <Widget>[
       Container(
           color: Colors.white,
@@ -549,7 +554,14 @@ class _AddPostState extends State<AddPost> {
                           return Icon(Icons.check_circle_outline);
                         }
                       }),
-                      title: Text('${charities[index]}'),
+                      title: Text('${charities[index].name}'),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, '/charity/' + charities[index].id);
+                        },
+                        child: Icon(Icons.info_outline),
+                      ),
                       onTap: () {
                         charity = index;
                         setState(() {});
