@@ -95,7 +95,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                       Expanded(
                                         child: Center(
                                             child: Text(
-                                          "£${snapshot.data.moneyRaised} raised",
+                                          "£${snapshot.data.moneyRaised.toStringAsFixed(2)} raised",
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: Colors.grey,
