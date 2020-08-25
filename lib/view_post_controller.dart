@@ -43,7 +43,11 @@ class ViewPost extends StatelessWidget with RouteAware {
               postAuthorUserName: postData.authorUsername,
               targetCharity: postData.charity,
               charityLogo: postData.charityLogo),
-          PostBody(postData: postData),
+          PostBody(
+            postData: postData,
+            hashtag: null,
+            maxLines: 999999999999999,
+          ),
           uid == "123"
               ? Container()
               : Container(

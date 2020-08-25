@@ -17,7 +17,7 @@ class SharePost extends StatelessWidget {
       color: Color(0xFF737373),
       height: 350,
       child: Container(
-        child: _buildBottomNavigationMenu(),
+        child: _buildBottomNavigationMenu(context),
         decoration: BoxDecoration(
           color: Theme.of(context).canvasColor,
           borderRadius: BorderRadius.only(
@@ -29,7 +29,7 @@ class SharePost extends StatelessWidget {
     );
   }
 
-  ListView _buildBottomNavigationMenu() {
+  ListView _buildBottomNavigationMenu(BuildContext context) {
     return ListView(
       children: <Widget>[
         ListTile(

@@ -200,14 +200,18 @@ class _DoChallengeState extends State<DoChallenge> {
                             Align(
                                 alignment: Alignment.topLeft,
                                 child: RichText(
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     text: TextSpan(
-                                  children: _returnHashtags(template.hashtags,
-                                      context, template.subtitle),
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                  ),
-                                ))),
+                                      children: _returnHashtags(
+                                          template.hashtags,
+                                          context,
+                                          template.subtitle),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                    ))),
                             Expanded(
                                 child: Align(
                                     alignment: Alignment.bottomLeft,
@@ -259,6 +263,7 @@ class _DoChallengeState extends State<DoChallenge> {
               }));
       }
     }
+    hashtagText.add(TextSpan(text: " "));
     return hashtagText;
   }
 }
