@@ -7,6 +7,7 @@ import 'package:fundder/shared/loading.dart';
 import 'package:fundder/shared/constants.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/global_widgets/buttons.dart';
+import 'terms_of_use.dart';
 
 class Authenticate extends StatefulWidget {
   @override
@@ -173,7 +174,18 @@ class _AuthenticateState extends State<Authenticate>
                         });
                       }
                     }),
-                SizedBox(height: 12.0),
+                SizedBox(height: 6.0),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => TermsView()));
+                  },
+                  child: Text(
+                    'Terms of use',
+                    style: TextStyle(color: HexColor('ff6b6c')),
+                  ),
+                ),
+                SizedBox(height: 6.0),
                 Text(
                   signinerror,
                   textAlign: TextAlign.center,
@@ -186,6 +198,7 @@ class _AuthenticateState extends State<Authenticate>
   }
 
   Widget _register() {
+    bool termsAccepted = false;
     return Container(
         padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 50.0),
         child: Form(
@@ -256,29 +269,65 @@ class _AuthenticateState extends State<Authenticate>
                     }
                   },
                 ),
-                SizedBox(height: 20.0),
+                SizedBox(height: 30.0),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => TermsView()));
+                  },
+                  child: Text(
+                    'Terms of use',
+                    style: TextStyle(color: HexColor('ff6b6c')),
+                  ),
+                ),
+                StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                  return CheckboxListTile(
+                    activeColor: Colors.grey,
+                    title: Text("I accept the Fundder terms of use",
+                        style: TextStyle(fontSize: 13)),
+                    value: termsAccepted,
+                    onChanged: (newValue) {
+                      setState(() {
+                        termsAccepted = newValue;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity
+                        .leading, //  <-- leading Checkbox
+                  );
+                }),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 15),
+                  padding: EdgeInsets.symmetric(vertical: 10),
                 ),
                 PrimaryFundderButton(
                   text: 'Register',
                   onPressed: () async {
                     if (_registerKey.currentState.validate()) {
-                      setState(() => loading = true);
-                      dynamic result =
-                          await _auth.registerWithEmailPasswordUsername(
-                              email.trimRight(),
-                              password,
-                              username.trimRight());
-                      if (result == null) {
-                        setState(() {
-                          registrationerror = 'An error occurred';
-                          loading = false;
-                        });
+                      if (termsAccepted == true) {
+                        setState(() => loading = true);
+                        dynamic result =
+                            await _auth.registerWithEmailPasswordUsername(
+                                email.trimRight(),
+                                password,
+                                username.trimRight());
+                        if (result == null) {
+                          setState(() {
+                            registrationerror = 'An error occurred';
+                            loading = false;
+                          });
+                        } else {
+                          if (mounted) {
+                            setState(() {
+                              registrationerror = result;
+                              loading = false;
+                            });
+                          }
+                        }
                       } else {
                         if (mounted) {
                           setState(() {
-                            registrationerror = result;
+                            registrationerror =
+                                'Please accept our terms of use';
                             loading = false;
                           });
                         }
@@ -286,7 +335,8 @@ class _AuthenticateState extends State<Authenticate>
                     }
                   },
                 ),
-                SizedBox(height: 12.0),
+                SizedBox(height: 6.0),
+                SizedBox(height: 6.0),
                 Text(
                   registrationerror,
                   textAlign: TextAlign.center,
