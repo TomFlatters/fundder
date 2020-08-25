@@ -14,7 +14,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 class PostBody extends StatelessWidget {
   final Post postData;
   final String hashtag;
-  PostBody({this.postData, this.hashtag});
+  final int maxLines;
+  PostBody({this.postData, this.hashtag, this.maxLines});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -28,6 +29,8 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
             child: RichText(
+                maxLines: this.maxLines,
+                overflow: TextOverflow.ellipsis,
                 text: TextSpan(
                     children: _returnHashtags(postData.hashtags, context)))),
         Container(
