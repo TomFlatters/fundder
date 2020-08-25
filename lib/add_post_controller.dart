@@ -235,6 +235,7 @@ class _AddPostState extends State<AddPost> {
                 title: titleController.text.toString(),
                 subtitle: subtitleController.text.toString(),
                 author: user.uid,
+                authorUsername: user.username,
                 charity: charities[charity].id,
                 likes: [],
                 comments: {},
