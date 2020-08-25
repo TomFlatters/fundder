@@ -74,7 +74,9 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                       : "",
                                   placeholder: (context, url) => Loading(),
                                   errorWidget: (context, url, error) =>
-                                      Icon(Icons.error),
+                                      Container(
+                                    color: Colors.grey[100],
+                                  ),
                                 ),
                         ),
                         margin: EdgeInsets.symmetric(vertical: 10.0),
