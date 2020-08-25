@@ -46,64 +46,66 @@ class ViewPost extends StatelessWidget with RouteAware {
           PostBody(postData: postData),
           uid == "123"
               ? Container()
-          : Container(
-            //action bar
-            key: GlobalKey(),
-            height: 30,
-            child: Row(children: <Widget>[
-              Expanded(
+              : Container(
+                  //action bar
+                  key: GlobalKey(),
+                  height: 30,
+                  child: Row(children: <Widget>[
+                    /*Expanded(
                 //like bar
-                child: FutureBuilder(
-                    future: likesService.hasUserLikedPost(postData.id),
-                    builder: (context, hasLiked) {
-                      bool initiallyHasLiked;
-                      if (hasLiked.connectionState == ConnectionState.done) {
-                        initiallyHasLiked = hasLiked.data;
-                        return FutureBuilder(
-                          future: likesService.noOfLikes(postData.id),
-                          builder: (context, noLikes) {
-                            int initialLikesNo;
-                            if (noLikes.connectionState ==
-                                ConnectionState.done) {
-                              initialLikesNo = noLikes.data;
+                child:*/
+                    FutureBuilder(
+                        future: likesService.hasUserLikedPost(postData.id),
+                        builder: (context, hasLiked) {
+                          bool initiallyHasLiked;
+                          if (hasLiked.connectionState ==
+                              ConnectionState.done) {
+                            initiallyHasLiked = hasLiked.data;
+                            return FutureBuilder(
+                              future: likesService.noOfLikes(postData.id),
+                              builder: (context, noLikes) {
+                                int initialLikesNo;
+                                if (noLikes.connectionState ==
+                                    ConnectionState.done) {
+                                  initialLikesNo = noLikes.data;
 
-                              return Expanded(
-                                  //like bar
-                                  child: NewLikeButton(
-                                initiallyHasLiked,
-                                initialLikesNo,
-                                uid: uid,
-                                postId: postData.id,
-                              ));
-                            } else {
-                              return Expanded(
-                                child: Container(),
-                              );
-                            }
-                          },
-                        );
-                      } else {
-                        return Expanded(
-                          child: Container(),
-                        );
-                      }
-                    }),
-              ),
-              Expanded(
-                  child: Align(
-                alignment: Alignment.centerLeft,
-                child: CommentButton(
-                  pid: postData.id,
+                                  return Expanded(
+                                      //like bar
+                                      child: NewLikeButton(
+                                    initiallyHasLiked,
+                                    initialLikesNo,
+                                    uid: uid,
+                                    postId: postData.id,
+                                  ));
+                                } else {
+                                  return Expanded(
+                                    child: Container(),
+                                  );
+                                }
+                              },
+                            );
+                          } else {
+                            return Expanded(
+                              child: Container(),
+                            );
+                          }
+                        }),
+                    //),
+                    Expanded(
+                        child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CommentButton(
+                        pid: postData.id,
+                      ),
+                    )),
+                    Expanded(
+                      child: ShareBar(
+                        postId: postData.id,
+                        postTitle: postData.title,
+                      ),
+                    ),
+                  ]),
                 ),
-              )),
-              Expanded(
-                child: ShareBar(
-                  postId: postData.id,
-                  postTitle: postData.title,
-                ),
-              ),
-            ]),
-          ),
           Row(children: [
             Expanded(
               child: Container(
@@ -196,8 +198,11 @@ class ViewPost extends StatelessWidget with RouteAware {
                             margin: EdgeInsets.symmetric(vertical: 10.0),
                             child: Column(
                               children: <Widget>[
-                                createPostUI(
-                                    postData, user.uid, context, likesService),
+                                user != null
+                                    ? createPostUI(postData, user.uid, context,
+                                        likesService)
+                                    : createPostUI(
+                                        postData, '123', context, likesService),
                                 PrimaryFundderButton(
                                     text: 'Donate',
                                     onPressed: () async {
@@ -210,10 +215,15 @@ class ViewPost extends StatelessWidget with RouteAware {
                                       //     '/post/' +
                                       //         postData.id +
                                       //         '/donate');
-
+                                      String uid;
+                                      if (user != null) {
+                                        uid = user.uid;
+                                      } else {
+                                        uid = '123';
+                                      }
                                       var donatePage =
                                           "https://donate-fundder.web.app/" +
-                                              user.uid +
+                                              uid +
                                               '/' +
                                               postData.id;
 
@@ -228,18 +238,20 @@ class ViewPost extends StatelessWidget with RouteAware {
                                         throw 'Could not launch $donatePage';
                                       }
                                     }),
-                                user.uid != postData.author ||
-                                        postData.status != 'fund'
-                                    ? Container()
-                                    : PrimaryFundderButton(
-                                        text: 'Complete Challenge',
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                              context,
-                                              '/post/' +
-                                                  postData.id +
-                                                  '/uploadProof');
-                                        }),
+                                user != null
+                                    ? user.uid != postData.author ||
+                                            postData.status != 'fund'
+                                        ? Container()
+                                        : PrimaryFundderButton(
+                                            text: 'Complete Challenge',
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                  context,
+                                                  '/post/' +
+                                                      postData.id +
+                                                      '/uploadProof');
+                                            })
+                                    : Container(),
                               ],
                             )))
                   ],
