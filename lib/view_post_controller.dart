@@ -176,7 +176,7 @@ class ViewPost extends StatelessWidget with RouteAware {
                 ? null
                 : AppBar(
                     centerTitle: true,
-                    title: Text(postData.status),
+                    title: Text(postData.status.inCaps),
                     actions: <Widget>[
                       new IconButton(
                           icon: new Icon(Icons.close),
@@ -322,4 +322,9 @@ class ViewPost extends StatelessWidget with RouteAware {
       },
     );
   }
+}
+
+extension CapExtension on String {
+  String get inCaps => '${this[0].toUpperCase()}${this.substring(1)}';
+  String get allInCaps => this.toUpperCase();
 }
