@@ -62,12 +62,12 @@ class _DoChallengeState extends State<DoChallenge> {
     print("GOT NEW TEMPLATES:");
     print(newTemplates);
     if (newTemplates != []) {
-      setState(() {});
-      _refreshController.loadNoData();
-    } else {
       templates = templates + newTemplates;
       if (mounted) setState(() {});
       _refreshController.loadComplete();
+    } else {
+      setState(() {});
+      _refreshController.loadNoData();
     }
   }
 
