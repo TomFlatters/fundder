@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -79,52 +80,56 @@ class _DoChallengeState extends State<DoChallenge> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: true,
-        header: WaterDropHeader(),
-        footer: CustomFooter(
-          builder: (BuildContext context, LoadStatus mode) {
-            Widget body;
-            if (mode == LoadStatus.idle) {
-              body = Text("Pull up to load");
-            } else if (mode == LoadStatus.loading) {
-              body = CupertinoActivityIndicator();
-            } else if (mode == LoadStatus.failed) {
-              body = Text("Load Failed! Click retry!");
-            } else if (mode == LoadStatus.canLoading) {
-              body = Text("Release to load more");
-            } else {
-              body = Text("No more data");
-            }
-            return Container(
-              height: 55.0,
-              child: Center(child: body),
-            );
+    if (templates == null) {
+      return Loading();
+    } else {
+      return Scaffold(
+        body: SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: true,
+          header: WaterDropHeader(),
+          footer: CustomFooter(
+            builder: (BuildContext context, LoadStatus mode) {
+              Widget body;
+              if (mode == LoadStatus.idle) {
+                body = Text("Pull up to load");
+              } else if (mode == LoadStatus.loading) {
+                body = CupertinoActivityIndicator();
+              } else if (mode == LoadStatus.failed) {
+                body = Text("Load Failed! Click retry!");
+              } else if (mode == LoadStatus.canLoading) {
+                body = Text("Release to load more");
+              } else {
+                body = Text("No more data");
+              }
+              return Container(
+                height: 55.0,
+                child: Center(child: body),
+              );
+            },
+          ),
+          controller: _refreshController,
+          onRefresh: () async {
+            _getTemplates();
           },
+          onLoading: _onLoading,
+          child: templates == null
+              ? Container()
+              : ListView.separated(
+                  separatorBuilder: (BuildContext context, int index) {
+                    return SizedBox(
+                      height: 10,
+                    );
+                  },
+                  itemBuilder: (c, i) => _templateListView(templates[i]),
+                  itemCount: templates.length,
+                  padding: const EdgeInsets.only(top: 10.0),
+                  shrinkWrap: true,
+                  physics: AlwaysScrollableScrollPhysics(),
+                ),
         ),
-        controller: _refreshController,
-        onRefresh: () async {
-          _getTemplates();
-        },
-        onLoading: _onLoading,
-        child: templates == null
-            ? Container()
-            : ListView.separated(
-                separatorBuilder: (BuildContext context, int index) {
-                  return SizedBox(
-                    height: 10,
-                  );
-                },
-                itemBuilder: (c, i) => _templateListView(templates[i]),
-                itemCount: templates.length,
-                padding: const EdgeInsets.only(top: 10.0),
-                shrinkWrap: true,
-                physics: AlwaysScrollableScrollPhysics(),
-              ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _templateListView(Template template) {
@@ -194,13 +199,15 @@ class _DoChallengeState extends State<DoChallenge> {
                             Padding(padding: EdgeInsets.all(2)),
                             Align(
                                 alignment: Alignment.topLeft,
-                                child: Text(
-                                  '${template.subtitle}',
+                                child: RichText(
+                                    text: TextSpan(
+                                  children: _returnHashtags(template.hashtags,
+                                      context, template.subtitle),
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Colors.grey,
                                   ),
-                                )),
+                                ))),
                             Expanded(
                                 child: Align(
                                     alignment: Alignment.bottomLeft,
@@ -232,5 +239,26 @@ class _DoChallengeState extends State<DoChallenge> {
             });
       },
     );
+  }
+
+  List<TextSpan> _returnHashtags(
+      List hashtags, BuildContext context, String templateText) {
+    List<TextSpan> hashtagText = [
+      TextSpan(text: templateText + " ", style: TextStyle(color: Colors.black))
+    ];
+    if (hashtags != null) {
+      for (var i = 0; i < hashtags.length; i++) {
+        hashtagText.add(TextSpan(
+            text: "#" + hashtags[i].toString() + " ",
+            style:
+                TextStyle(color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                Navigator.pushNamed(
+                    context, '/hashtag/' + hashtags[i].toString());
+              }));
+      }
+    }
+    return hashtagText;
   }
 }
