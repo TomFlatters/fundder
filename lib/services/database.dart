@@ -303,6 +303,7 @@ class DatabaseService {
   Template _makeTemplate(DocumentSnapshot doc) {
     return Template(
         author: doc.data['author'],
+        authorUsername: doc.data['authorUsername'],
         title: doc.data['title'],
         charity: doc.data['charity'],
         moneyRaised: doc.data['moneyRaised'].toDouble(),
@@ -352,6 +353,7 @@ class DatabaseService {
     return await templatesCollection
         .add({
           "author": t.author,
+          "authorUsername": t.authorUsername,
           "title": t.title,
           "charity": t.charity,
           "moneyRaised": t.moneyRaised,

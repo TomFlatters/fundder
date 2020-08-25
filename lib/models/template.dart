@@ -1,5 +1,6 @@
 class Template {
   final String author;
+  final String authorUsername;
   final String title;
   final String charity;
   final double moneyRaised;
@@ -27,6 +28,7 @@ class Template {
 
   Template(
       {this.author,
+      this.authorUsername,
       this.title,
       this.charity,
       this.moneyRaised,
