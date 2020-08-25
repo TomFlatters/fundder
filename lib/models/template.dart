@@ -2,7 +2,7 @@ class Template {
   final String author;
   final String title;
   final String charity;
-  final String amountRaised;
+  final double moneyRaised;
   final String targetAmount;
   final List likes;
   final comments;
@@ -29,7 +29,7 @@ class Template {
       {this.author,
       this.title,
       this.charity,
-      this.amountRaised,
+      this.moneyRaised,
       this.targetAmount,
       this.subtitle,
       this.likes,
@@ -47,16 +47,18 @@ class Template {
 
   double percentRaised() {
     double processAmount(String s) =>
-        double.parse(s.contains(",") ? s.replaceAll(",", "") : amountRaised);
-    if (processAmount(amountRaised) != null &&
-        processAmount(amountRaised) / processAmount(targetAmount) <= 1) {
-      return processAmount(amountRaised) / processAmount(targetAmount);
-    } else if (processAmount(amountRaised) != null &&
-        processAmount(amountRaised) / processAmount(targetAmount) > 1) {
-      return 1;
-    } else {
-      return 0;
-    }
+        double.parse(s.contains(",") ? s.replaceAll(",", "") : s);
+    // if (processAmount(amountRaised) != null &&
+    //     processAmount(amountRaised) / processAmount(targetAmount) <= 1) {
+    //   return processAmount(amountRaised) / processAmount(targetAmount);
+    // } else if (processAmount(amountRaised) != null &&
+    //     processAmount(amountRaised) / processAmount(targetAmount) > 1) {
+    //   return 1;
+    // } else {
+    //   return 0;
+    // }
+
+    return (moneyRaised / processAmount(targetAmount));
   }
 
   // Use the timestamp to calculate the number of days left in the challenge.

@@ -158,7 +158,7 @@ class _ProfileState extends State<ProfileController>
                       'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
                 }
                 if (snapshot.data['amountDonated'] != null) {
-                  _amountDonated = snapshot.data['amountDonated'];
+                  _amountDonated = snapshot.data['amountDonated'].toDouble();
                 }
                 print("profile controller has data");
                 _noFollowing = snapshot.data['noFollowing'] != null

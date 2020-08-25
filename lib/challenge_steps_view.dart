@@ -160,7 +160,7 @@ class _StepsPageState extends State<StepsPage> {
       'noLikes': 0,
       // comments: [],
       'timestamp': DateTime.now(),
-      'amountRaised': "0",
+      //'amountRaised': "0",
       'targetAmount': amount,
       'imageUrl': template.imageUrl,
       'status': 'fund',
