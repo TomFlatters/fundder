@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -11,14 +12,17 @@ class PostHeader extends StatelessWidget {
 
   final String targetCharity;
   final String postStatus;
+  final String charityLogo;
   PostHeader(
       {this.postAuthorId,
       this.postAuthorUserName,
       this.targetCharity,
-      this.postStatus});
+      this.postStatus,
+      this.charityLogo});
 
   @override
   Widget build(BuildContext context) {
+    print('charity logo: ' + this.charityLogo);
     return Container(
       height: 60,
       child: Row(
@@ -37,18 +41,30 @@ class PostHeader extends StatelessWidget {
                   Navigator.pushNamed(context, '/user/' + postAuthorId);
                 },
               )),
+          Align(
+              alignment: Alignment.centerLeft,
+              child: Text(postAuthorUserName,
+                  style: TextStyle(
+                    fontFamily: 'Quicksand',
+                    fontWeight: FontWeight.w600,
+                  ))),
           Expanded(
               child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(postAuthorUserName,
-                      style: TextStyle(
-                        fontFamily: 'Quicksand',
-                        fontWeight: FontWeight.w600,
-                      )))),
-          Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                  margin: EdgeInsets.all(10.0), child: Text(targetCharity))),
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, '/charity/' + this.targetCharity);
+                      },
+                      child: Container(
+                          height: 60,
+                          //color: Colors.blue,
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          margin: EdgeInsets.all(10.0),
+                          child: CachedNetworkImage(
+                            imageUrl: this.charityLogo,
+                            //color: Colors.red,
+                          ))))),
           this.postStatus == 'done'
               ? Row(children: [
                   Icon(

@@ -166,7 +166,8 @@ class _StepsPageState extends State<StepsPage> {
       'status': 'fund',
       'templateTag': template.id,
       'aspectRatio': template.aspectRatio,
-      'hashtags': template.hashtags
+      'hashtags': template.hashtags,
+      'charityLogo': template.charityLogo
     };
     DatabaseService(uid: user.uid)
         // Batch update
