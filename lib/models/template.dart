@@ -23,6 +23,8 @@ class Template {
   // we also record whether the challenge is "active" or not
   bool active;
 
+  String charityLogo;
+
   Template(
       {this.author,
       this.title,
@@ -40,7 +42,8 @@ class Template {
       this.completedBy,
       this.active,
       this.aspectRatio,
-      this.hashtags});
+      this.hashtags,
+      this.charityLogo});
 
   double percentRaised() {
     double processAmount(String s) =>
