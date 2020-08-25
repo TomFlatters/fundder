@@ -207,7 +207,7 @@ class ViewPost extends StatelessWidget with RouteAware {
                                       //         '/donate');
 
                                       var donatePage =
-                                          "https://donate-fundder.web.app/" +
+                                          "https://donate.fundder.co/" +
                                               user.uid +
                                               '/' +
                                               postData.id;
