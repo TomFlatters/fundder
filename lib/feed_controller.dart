@@ -33,7 +33,7 @@ class FeedController extends StatelessWidget {
         ),
         body: //FeedView('Do', HexColor('ff6b6c'))
             TabBarView(children: [
-          DoChallenge(),
+          DoChallenge(user),
           FeedWrapper("Fund", null, "fund"),
           FeedWrapper("Done", null, "done"),
         ]),

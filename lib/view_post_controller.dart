@@ -39,12 +39,14 @@ class ViewPost extends StatelessWidget with RouteAware {
         margin: EdgeInsets.only(left: 0, right: 0, top: 0),
         child: Column(children: <Widget>[
           PostHeader(
-            postAuthorId: postData.author,
-            postAuthorUserName: postData.authorUsername,
-            targetCharity: postData.charity,
-          ),
+              postAuthorId: postData.author,
+              postAuthorUserName: postData.authorUsername,
+              targetCharity: postData.charity,
+              charityLogo: postData.charityLogo),
           PostBody(postData: postData),
-          Container(
+          uid == "123"
+              ? Container()
+          : Container(
             //action bar
             key: GlobalKey(),
             height: 30,
@@ -140,7 +142,10 @@ class ViewPost extends StatelessWidget with RouteAware {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    LikesService likesService = LikesService(uid: user.uid);
+    LikesService likesService = LikesService(uid: "123");
+    if (user != null) {
+      likesService = LikesService(uid: user.uid);
+    }
 
     print("View post controller");
 

@@ -25,24 +25,31 @@ class _WrapperState extends State<Wrapper> {
     print('init dynamic links');
     FirebaseDynamicLinks.instance.onLink(
         onSuccess: (PendingDynamicLinkData dynamicLink) async {
-      final Uri deepLink = dynamicLink?.link;
-
-      if (deepLink != null) {
-        print('deep link received, path: ' + deepLink.toString());
-        Navigator.pushNamed(context, deepLink.path);
-      }
+      handleLinkData(dynamicLink);
     }, onError: (OnLinkErrorException e) async {
       print('onLinkError');
       print(e.message);
     });
 
-    final PendingDynamicLinkData data =
+    final PendingDynamicLinkData dynamicLink =
         await FirebaseDynamicLinks.instance.getInitialLink();
-    final Uri deepLink = data?.link;
+    if (dynamicLink != null) {
+      handleLinkData(dynamicLink);
+    }
+  }
 
-    if (deepLink != null) {
-      print('opened with deep link');
-      Navigator.pushNamed(context, deepLink.path);
+  void handleLinkData(PendingDynamicLinkData data) {
+    final Uri uri = data?.link;
+    print("uri: " + uri.toString());
+    if (uri != null) {
+      final queryParams = uri.queryParameters;
+      if (queryParams.length > 0 && queryParams['post'] != null) {
+        String post = queryParams["post"];
+        print("pushing " + post);
+        Navigator.pushNamed(context, "/post/" + post);
+        // verify the username is parsed correctly
+
+      }
     }
   }
 

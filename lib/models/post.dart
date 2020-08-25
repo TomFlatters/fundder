@@ -28,6 +28,8 @@ class Post {
   final Set<String> peopleThatLikedThis;
 
   final String templateTag;
+  final String charityLogo;
+  final String charityId;
 
   Post(
       {this.noComments,
@@ -49,7 +51,9 @@ class Post {
       this.templateTag = 'None',
       this.aspectRatio,
       this.moneyRaised,
-      this.hashtags});
+      this.hashtags,
+      this.charityLogo,
+      this.charityId});
 
   double percentRaised() {
     double processAmount(String s) =>
