@@ -1,6 +1,6 @@
 //!!!!!!!!!!!!!!This file is way way tooooo big
 //really needs to be refactored
-
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
@@ -9,23 +9,14 @@ import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/post_widgets/postBody.dart';
 import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/post_widgets/shareBar.dart';
-import 'package:fundder/services/database.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'package:fundder/view_post_controller.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'models/post.dart';
-import 'share_post_view.dart';
-import 'helper_classes.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'video_item.dart';
 import 'services/likes.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -56,7 +47,6 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
-    LikesModel likesModel;
     print("feed being built");
     final user = Provider.of<User>(context);
     final LikesService likesService = LikesService(uid: user.uid);
@@ -72,8 +62,15 @@ class _FeedViewState extends State<FeedView> {
           //building an individual post
           Post postData = widget.postList[index];
           // print(postData)
-          bool initiallyHasLiked;
-          int initialLikesNo;
+
+          //arbitrarily chosen int
+          StreamController<void> likesManager = StreamController<int>();
+          Stream rebuildLikesButton = likesManager.stream;
+
+          //the previous state of like before it's changed
+          var currLikeButton =
+              createLikesFutureBuilder(likesService, postData, user.uid);
+
           return GestureDetector(
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -96,40 +93,23 @@ class _FeedViewState extends State<FeedView> {
                     key: GlobalKey(),
                     height: 30,
                     child: Row(children: <Widget>[
-                      FutureBuilder(
-                          future: likesService.hasUserLikedPost(postData.id),
-                          builder: (context, hasLiked) {
-                            if (hasLiked.connectionState ==
-                                ConnectionState.done) {
-                              initiallyHasLiked = hasLiked.data;
-                              return FutureBuilder(
-                                future: likesService.noOfLikes(postData.id),
-                                builder: (context, noLikes) {
-                                  if (noLikes.connectionState ==
-                                      ConnectionState.done) {
-                                    initialLikesNo = noLikes.data;
-                                    likesModel = LikesModel(
-                                        initiallyHasLiked, initialLikesNo,
-                                        uid: user.uid, postId: postData.id);
-                                    return Expanded(
-                                      //like bar
-                                      child: ChangeNotifierProvider(
-                                          create: (context) => likesModel,
-                                          child: LikeBar()),
-                                    );
-                                  } else {
-                                    return Expanded(
-                                      child: Container(),
-                                    );
-                                  }
-                                },
-                              );
+                      //likeButton goes here
+                      StreamBuilder(
+                          stream: rebuildLikesButton,
+                          builder: (context, snapshot) {
+                            print("Building Stream Builder");
+                            if (snapshot.hasData) {
+                              print(
+                                  "New data in stream. Creating new Like Button");
+                              currLikeButton = createLikesFutureBuilder(
+                                  likesService, postData, user.uid);
+                              return currLikeButton;
                             } else {
-                              return Expanded(
-                                child: Container(),
-                              );
+                              print("Using old LikeButton");
+                              return currLikeButton;
                             }
                           }),
+
                       Expanded(
                           child: Align(
                         alignment: Alignment.centerLeft,
@@ -187,15 +167,11 @@ class _FeedViewState extends State<FeedView> {
               // //passing state into ViewPost screen
               // LikesModel likeState = LikesModel(isLiked, noLikes,
               //     uid: uid, postId: pid);
-              if (likesModel != null) {
-                print("a post clicked");
-                var newState = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ViewPost(postData)));
-                likesModel.manuallySetState(
-                    newState['noLikes'], newState['isLiked']);
-              }
+
+              print("a post clicked");
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ViewPost(postData)));
+              likesManager.add(1);
             },
           );
         },
@@ -248,4 +224,41 @@ class _FeedViewState extends State<FeedView> {
       },
     );
   }
+}
+
+FutureBuilder createLikesFutureBuilder(likesService, postData, uid) {
+  bool initiallyHasLiked;
+  int initialLikesNo;
+  return FutureBuilder(
+      future: likesService.hasUserLikedPost(postData.id),
+      builder: (context, hasLiked) {
+        if (hasLiked.connectionState == ConnectionState.done) {
+          initiallyHasLiked = hasLiked.data;
+          return FutureBuilder(
+            future: likesService.noOfLikes(postData.id),
+            builder: (context, noLikes) {
+              if (noLikes.connectionState == ConnectionState.done) {
+                initialLikesNo = noLikes.data;
+
+                return Expanded(
+                    //like bar
+                    child: NewLikeButton(
+                  initiallyHasLiked,
+                  initialLikesNo,
+                  uid: uid,
+                  postId: postData.id,
+                ));
+              } else {
+                return Expanded(
+                  child: Container(),
+                );
+              }
+            },
+          );
+        } else {
+          return Expanded(
+            child: Container(),
+          );
+        }
+      });
 }

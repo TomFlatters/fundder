@@ -1,7 +1,7 @@
 import 'package:fluro/fluro.dart';
+import 'package:fluro/src/router.dart' as Router;
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
-import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
@@ -16,10 +16,8 @@ import 'package:fundder/feed_controller.dart';
 import 'package:fundder/web_pages/feed_web.dart';
 import 'package:fundder/web_pages/about_page.dart';
 import 'package:fundder/web_pages/login_web.dart';
-import 'package:fundder/web_pages/logging_out.dart';
 import 'package:fundder/search/search_controller.dart';
 import 'package:fundder/liked_controller.dart';
-import 'package:fundder/profile_controller.dart';
 import 'package:fundder/web_pages/temparary_upload_page.dart';
 import 'package:fundder/upload_proof_controller.dart';
 import 'package:fundder/welcome_pages/profilepic_setter.dart';
@@ -30,7 +28,7 @@ import 'package:fundder/search/hashtag_feed.dart';
 import 'package:fundder/charity_view_controller.dart';
 
 class FluroRouter {
-  static Router router = Router();
+  static Router.Router router = Router.Router();
   // static Handler _postHandler = Handler(
   //     handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
   //         ViewPost(postData: params['id'][0]));
