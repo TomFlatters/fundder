@@ -176,7 +176,7 @@ class ViewPost extends StatelessWidget with RouteAware {
                 ? null
                 : AppBar(
                     centerTitle: true,
-                    title: Text(postData.title),
+                    title: Text(postData.status),
                     actions: <Widget>[
                       new IconButton(
                           icon: new Icon(Icons.close),
