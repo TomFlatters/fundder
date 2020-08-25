@@ -122,7 +122,7 @@ class DatabaseService {
       title: doc.data['title'],
       charity: doc.data['charity'],
       amountRaised: doc.data['amountRaised'],
-      moneyRaised: doc.data['moneyRaised'],
+      moneyRaised: doc.data['moneyRaised'].toDouble(),
       targetAmount: doc.data['targetAmount'],
       likes: doc.data['likes'],
       noComments: doc.data['noComments'],
