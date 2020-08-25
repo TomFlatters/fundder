@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -132,7 +133,6 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                         Expanded(
                                             child: Text(
                                           snapshot.data.title,
-                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontFamily: 'Roboto Mono',
                                             fontSize: 16,
@@ -160,13 +160,23 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                       alignment: Alignment.centerLeft,
                                       margin: EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
-                                      child: Text(snapshot.data.subtitle)),
+                                      child: RichText(
+                                          text: TextSpan(
+                                        children: _returnHashtags(
+                                            snapshot.data.hashtags,
+                                            context,
+                                            snapshot.data.subtitle),
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey,
+                                        ),
+                                      ))),
                                   Container(
                                       alignment: Alignment.centerLeft,
                                       margin: EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       child: Text(
-                                          'A challenge by ${snapshot.data.charity}')),
+                                          'A challenge for ${snapshot.data.charity} by ${snapshot.data.authorUsername}')),
                                   Padding(
                                     padding: EdgeInsets.all(20),
                                   ),
@@ -213,5 +223,26 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
             return Loading();
           }
         });
+  }
+
+  List<TextSpan> _returnHashtags(
+      List hashtags, BuildContext context, String templateText) {
+    List<TextSpan> hashtagText = [
+      TextSpan(text: templateText + " ", style: TextStyle(color: Colors.black))
+    ];
+    if (hashtags != null) {
+      for (var i = 0; i < hashtags.length; i++) {
+        hashtagText.add(TextSpan(
+            text: "#" + hashtags[i].toString() + " ",
+            style:
+                TextStyle(color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                Navigator.pushNamed(
+                    context, '/hashtag/' + hashtags[i].toString());
+              }));
+      }
+    }
+    return hashtagText;
   }
 }
