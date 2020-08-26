@@ -12,9 +12,15 @@ class ShareBar extends StatelessWidget {
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return SharePost(
-            postId: this.postId,
-            postTitle: this.postTitle,
+          return Container(
+            height: 350,
+            child: Scaffold(
+              appBar: null,
+              body: SharePost(
+                postId: this.postId,
+                postTitle: this.postTitle,
+              ),
+            ),
           );
         });
   }
