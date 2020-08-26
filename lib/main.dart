@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
             stream: AuthService().user,
             builder: (context, snapshot) {
               return MaterialApp(
+                  debugShowCheckedModeBanner: false,
                   initialRoute: '/',
                   onGenerateRoute: FluroRouter.router.generator,
                   title: 'Fundder',
