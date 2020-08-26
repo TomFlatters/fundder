@@ -608,6 +608,7 @@ class _AddPostState extends State<AddPost> {
         child: _decideImageView(),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width * 9 / 16,
+        margin: EdgeInsets.only(bottom: 10),
       ),
       EditFundderButton(
         text: "Select an image",
