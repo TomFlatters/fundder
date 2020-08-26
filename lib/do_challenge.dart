@@ -118,7 +118,7 @@ class _DoChallengeState extends State<DoChallenge> {
               : ListView.separated(
                   separatorBuilder: (BuildContext context, int index) {
                     return SizedBox(
-                      height: 10,
+                      height: 20,
                     );
                   },
                   itemBuilder: (c, i) => _templateListView(templates[i]),
@@ -188,9 +188,10 @@ class _DoChallengeState extends State<DoChallenge> {
                                             '/charity/' + template.charity);
                                       },
                                       child: Container(
-                                          height: 20,
+                                          margin: EdgeInsets.only(
+                                              left: 20, right: 10),
+                                          height: 25,
                                           //color: Colors.blue,
-                                          margin: EdgeInsets.only(right: 10.0),
                                           child: CachedNetworkImage(
                                             imageUrl: template.charityLogo,
                                             //color: Colors.red,

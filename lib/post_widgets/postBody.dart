@@ -20,6 +20,18 @@ class PostBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
+        (postData.imageUrl == null)
+            ? Container()
+            : Container(
+                child: postData.aspectRatio == null
+                    ? SizedBox(child: _previewImageVideo(postData))
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.width /
+                            postData.aspectRatio,
+                        child: _previewImageVideo(postData)),
+                margin: EdgeInsets.symmetric(vertical: 10.0),
+              ),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.all(10),
@@ -51,18 +63,6 @@ class PostBody extends StatelessWidget {
             progressColor: HexColor('ff6b6c'),
           ),
         ),
-        (postData.imageUrl == null)
-            ? Container()
-            : Container(
-                child: postData.aspectRatio == null
-                    ? SizedBox(child: _previewImageVideo(postData))
-                    : SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.width /
-                            postData.aspectRatio,
-                        child: _previewImageVideo(postData)),
-                margin: EdgeInsets.symmetric(vertical: 10.0),
-              ),
       ],
     );
   }
