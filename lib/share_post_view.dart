@@ -89,6 +89,10 @@ class SharePost extends StatelessWidget {
             final Uri shortUrl = shortDynamicLink.shortUrl;
             print(shortUrl.toString());
             Clipboard.setData(new ClipboardData(text: shortUrl.toString()));
+            final snackBar = SnackBar(content: Text('Link Copied'));
+
+// Find the Scaffold in the widget tree and use it to show a SnackBar.
+            Scaffold.of(context).showSnackBar(snackBar);
           },
         ), /*ListTile(
           leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.snapchat_ghost)),
