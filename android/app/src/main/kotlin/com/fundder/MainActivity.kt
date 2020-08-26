@@ -1,4 +1,4 @@
-package com.example.fundder
+package com.fundder
 
 import io.flutter.embedding.android.FlutterActivity
 
