@@ -428,6 +428,34 @@ exports.postDone = functions.firestore
       // e.g. {'name': 'Marie', 'age': 66}
       const res = await admin.firestore().doc(`deletedPosts/${snap.id}`).set(snap.data());
 
+      const userLiking = await admin.firestore().collection('users').where('likes', 'array-contains',
+        snap.id).get();
+
+      userLiking.forEach(function (documentSnapshot) {
+        const doc = documentSnapshot;
+        console.log(doc.id);
+
+        const arrayWithLike = doc.data()['likes'];
+        var index = arrayWithLike.indexOf(snap.id);
+        if (index > -1) {
+          arrayWithLike.splice(index, 1);
+        }
+
+        admin.firestore().collection('users').doc(doc.id).update({
+          "likes": arrayWithLike});
+        // do something with the data of each document.
+      });
+
+      const hashtags = snap.data()['hashtags'];
+
+      const FieldValue = require('firebase-admin').firestore.FieldValue;
+
+      for(var a=0; a<hashtags.length; a++){
+
+        const hashtag = hashtags[a];
+        admin.firestore().collection('hashtags').doc(hashtag).collection('posts').doc('{' + snap.id + '}').delete();
+        admin.firestore().collection('hashtags').doc(hashtag).update({'count': FieldValue.increment(-1)});
+      }
       // perform desired operations ...
     });
 
