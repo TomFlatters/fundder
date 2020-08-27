@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:256734528568:android:633cf0106f679c816a52cd",
         "android_client_info": {
-          "package_name": "com.example.fundder"
+          "package_name": "com.fundder"
         }
       },
       "oauth_client": [
@@ -35,7 +35,7 @@
               "client_id": "256734528568-0jo2ar8d8hj0n0dbkisurv3ph37u2s65.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.fundder"
+                "bundle_id": "com.fundder"
               }
             }
           ]

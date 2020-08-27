@@ -60,11 +60,11 @@ class SharePost extends StatelessWidget {
               uriPrefix: 'https://fundder.page.link',
               link: Uri.parse('https://fundder.co/?post=${this.postId}'),
               androidParameters: AndroidParameters(
-                packageName: 'com.example.fundder',
+                packageName: 'com.fundder',
                 minimumVersion: 0,
               ),
               iosParameters: IosParameters(
-                bundleId: 'com.example.fundder',
+                bundleId: 'com.fundder',
                 minimumVersion: '1.0.0',
                 appStoreId: '123456789',
               ),
