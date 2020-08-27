@@ -297,6 +297,26 @@ exports.postDone = functions.firestore
     .onCreate(async (snapshot, context) => {
 
       const postId = context.params.postId;
+        // currently if no template, then this is done on phone. Need to move this in future
+        if(snapshot.data()['templateTag'] !== 'None') {
+          const hashtags = snapshot.data()['hashtags'];
+          var batch = admin.firestore().batch();
+          for (var ind = 0; ind < hashtags.length; ind++) {
+            batch.set(
+              admin.firestore().collection('hashtags').doc(hashtags[ind]),
+                {'count': admin.firestore.FieldValue.increment(1)},
+                {merge: true});
+            batch.set(
+              admin.firestore()
+                    .collection('hashtags')
+                    .doc(hashtags[ind])
+                    .collection('posts')
+                    .doc(snapshot.id),
+                {postId: true},
+                {merge: true});
+          }
+          batch.commit();
+        }
         
 
         var tokens = [];
