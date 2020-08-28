@@ -492,12 +492,17 @@ class _ProfileState extends State<ProfileController>
           Post post = futurePost.last;
           print('postList' + authorPostList.toString());
           loadingTimestamp = post.timestamp;
+        } else {
+          authorPostList = [];
         }
+      } else {
+        authorPostList = [];
       }
     }
     if ((_tabController.index == 1 || initial == true) &&
         _likesList != null &&
-        _likesList != []) {
+        _likesList != [] &&
+        _likesList.isEmpty == false) {
       if (_likesList.length > 10) {
         _startIndex = _likesList.length - 10;
         _lastIndex = _likesList.length;
@@ -526,6 +531,9 @@ class _ProfileState extends State<ProfileController>
           loadingTimestamp = post.timestamp;
         }
       }
+    }
+    if (_likesList == null || _likesList == [] || _likesList.isEmpty == true) {
+      likedPostList = [];
     }
     if (mounted) setState(() {});
     // if failed,use refreshFailed()
