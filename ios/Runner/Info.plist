@@ -27,7 +27,7 @@
 			<string>Fundder</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.fundder</string>
+				<string>com.example.fundder</string>
 			</array>
 		</dict>
 	</array>
