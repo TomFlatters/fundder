@@ -297,6 +297,26 @@ exports.postDone = functions.firestore
     .onCreate(async (snapshot, context) => {
 
       const postId = context.params.postId;
+        // currently if no template, then this is done on phone. Need to move this in future
+        if(snapshot.data()['templateTag'] !== 'None') {
+          const hashtags = snapshot.data()['hashtags'];
+          var batch = admin.firestore().batch();
+          for (var ind = 0; ind < hashtags.length; ind++) {
+            batch.set(
+              admin.firestore().collection('hashtags').doc(hashtags[ind]),
+                {'count': admin.firestore.FieldValue.increment(1)},
+                {merge: true});
+            batch.set(
+              admin.firestore()
+                    .collection('hashtags')
+                    .doc(hashtags[ind])
+                    .collection('posts')
+                    .doc(snapshot.id),
+                {postId: true},
+                {merge: true});
+          }
+          batch.commit();
+        }
         
 
         var tokens = [];
@@ -428,6 +448,45 @@ exports.postDone = functions.firestore
       // e.g. {'name': 'Marie', 'age': 66}
       const res = await admin.firestore().doc(`deletedPosts/${snap.id}`).set(snap.data());
 
+      const userLiking = await admin.firestore().collection('users').where('likes', 'array-contains',
+        snap.id).get();
+
+      userLiking.forEach(function (documentSnapshot) {
+        const doc = documentSnapshot;
+        console.log(doc.id);
+
+        const arrayWithLike = doc.data()['likes'];
+        var index = arrayWithLike.indexOf(snap.id);
+        if (index > -1) {
+          arrayWithLike.splice(index, 1);
+        }
+
+        admin.firestore().collection('users').doc(doc.id).update({
+          "likes": arrayWithLike});
+        // do something with the data of each document.
+      });
+
+      const hashtags = snap.data()['hashtags'];
+
+      const FieldValue = require('firebase-admin').firestore.FieldValue;
+
+      for(var a=0; a<hashtags.length; a++){
+
+        const hashtag = hashtags[a];
+        admin.firestore().collection('hashtags').doc(hashtag).collection('posts').doc('{' + snap.id + '}').delete();
+        admin.firestore().collection('hashtags').doc(hashtag).update({'count': FieldValue.increment(-1)});
+      }
+
+      if(snap.data()['templateTag'] !== 'None') {
+        const template = await admin.firestore().collection('templates').doc(snap.data()['templateTag']).get();
+        const acceptedByArray = template.data()['acceptedBy'];
+        var index2 = acceptedByArray.indexOf(snap.data()['authorUsername']);
+        if (index2 > -1) {
+          acceptedByArray.splice(index2, 1);
+        }
+        admin.firestore().collection('templates').doc(snap.data()['templateTag']).update({
+          "acceptedBy": acceptedByArray});
+      }
       // perform desired operations ...
     });
 
