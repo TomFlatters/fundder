@@ -476,6 +476,17 @@ exports.postDone = functions.firestore
         admin.firestore().collection('hashtags').doc(hashtag).collection('posts').doc('{' + snap.id + '}').delete();
         admin.firestore().collection('hashtags').doc(hashtag).update({'count': FieldValue.increment(-1)});
       }
+
+      if(snap.data()['templateTag'] !== 'None') {
+        const template = await admin.firestore().collection('templates').doc(snap.data()['templateTag']).get();
+        const acceptedByArray = template.data()['acceptedBy'];
+        var index2 = acceptedByArray.indexOf(snap.data()['authorUsername']);
+        if (index2 > -1) {
+          acceptedByArray.splice(index2, 1);
+        }
+        admin.firestore().collection('templates').doc(snap.data()['templateTag']).update({
+          "acceptedBy": acceptedByArray});
+      }
       // perform desired operations ...
     });
 

@@ -495,7 +495,9 @@ class _ProfileState extends State<ProfileController>
         }
       }
     }
-    if ((_tabController.index == 1 || initial == true) && _likesList != null) {
+    if ((_tabController.index == 1 || initial == true) &&
+        _likesList != null &&
+        _likesList != []) {
       if (_likesList.length > 10) {
         _startIndex = _likesList.length - 10;
         _lastIndex = _likesList.length;
