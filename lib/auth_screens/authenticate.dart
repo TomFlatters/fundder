@@ -54,7 +54,9 @@ class _AuthenticateState extends State<Authenticate>
     if (_tabController.indexIsChanging) {
       //index = _tabController.index;
       //colorChanged = false;
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     }
     print(_tabController.animation.value);
   }
@@ -152,10 +154,12 @@ class _AuthenticateState extends State<Authenticate>
                           loading = false;
                         });
                       } else {
-                        setState(() {
-                          signinerror = result;
-                          loading = false;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            signinerror = result;
+                            loading = false;
+                          });
+                        }
                       }
                     }
                   },

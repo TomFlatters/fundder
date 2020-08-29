@@ -17,6 +17,7 @@ import 'models/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'services/likes.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'routes/FadeTransition.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -170,8 +171,8 @@ class _FeedViewState extends State<FeedView> {
               //     uid: uid, postId: pid);
 
               print("a post clicked");
-              await Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ViewPost(postData)));
+              await Navigator.push(
+                  context, FadeRoute(page: ViewPost(postData)));
               likesManager.add(1);
             },
           );
