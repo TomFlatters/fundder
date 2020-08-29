@@ -26,8 +26,8 @@ class _TutorialState extends State<Tutorial> {
           centerTitle: true,
           title: Text(''),
           actions: <Widget>[
-            new IconButton(
-                icon: new Text('Next'),
+            new FlatButton(
+                child: new Text('Next'),
                 onPressed: _current == 3
                     ? () {
                         Firestore.instance
