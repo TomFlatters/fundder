@@ -10,6 +10,7 @@ import 'global_widgets/buttons.dart';
 import 'web_pages/web_menu.dart';
 import 'shared/loading.dart';
 import 'package:fundder/shared/helper_functions.dart';
+import 'routes/FadeTransition.dart';
 
 class ChallengeDetail extends StatefulWidget {
   final String challengeId;
@@ -188,10 +189,9 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                         if (hasAccepted) {
                                           Navigator.push(
                                               context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProfileController(
-                                                          uid: uid)));
+                                              FadeRoute(
+                                                  page: ProfileController(
+                                                      uid: uid)));
                                         } else {
                                           Navigator.pushNamed(
                                               context,
