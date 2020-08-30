@@ -118,12 +118,12 @@ class _DoChallengeState extends State<DoChallenge> {
               : ListView.separated(
                   separatorBuilder: (BuildContext context, int index) {
                     return SizedBox(
-                      height: 20,
+                      height: 5,
                     );
                   },
                   itemBuilder: (c, i) => _templateListView(templates[i]),
                   itemCount: templates.length,
-                  padding: const EdgeInsets.only(top: 10.0),
+                  padding: const EdgeInsets.only(top: 5.0),
                   shrinkWrap: true,
                   physics: AlwaysScrollableScrollPhysics(),
                 ),
@@ -149,7 +149,7 @@ class _DoChallengeState extends State<DoChallenge> {
                           alignment: Alignment.centerLeft,
                           child: Container(
                               margin:
-                                  EdgeInsets.only(left: 10, right: 10, top: 0),
+                                  EdgeInsets.only(left: 10, right: 10, top: 10),
                               child: AspectRatio(
                                 aspectRatio: 1 / 1,
                                 child: Container(
@@ -188,9 +188,11 @@ class _DoChallengeState extends State<DoChallenge> {
                                             '/charity/' + template.charity);
                                       },
                                       child: Container(
+                                          constraints:
+                                              BoxConstraints(maxWidth: 100),
                                           margin: EdgeInsets.only(
                                               left: 20, right: 10),
-                                          height: 25,
+                                          height: 30,
                                           //color: Colors.blue,
                                           child: CachedNetworkImage(
                                             imageUrl: template.charityLogo,
