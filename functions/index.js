@@ -59,7 +59,7 @@ exports.onLike = functions.firestore
     if (tokens.length > 0) {
     // Send notifications to all tokens.
     const response = await admin.messaging().sendToDevice(tokens, payload);
-    await cleanupTokens(response, tokens);
+    await cleanupTokens(response, tokens, author);
     console.log('Notifications have been sent and tokens cleaned up.');
     }
 });
@@ -113,7 +113,7 @@ exports.onComment = functions.firestore
     if (tokens.length > 0) {
     // Send notifications to all tokens.
     const response = await admin.messaging().sendToDevice(tokens, payload);
-    //await cleanupTokens(response, tokens);
+    await cleanupTokens(response, tokens, postOwner.id);
     console.log('Notifications have been sent and tokens cleaned up.');
     }
 });
@@ -165,7 +165,7 @@ exports.onDonate = functions.firestore
     if (tokens.length > 0) {
     // Send notifications to all tokens.
     const response = await admin.messaging().sendToDevice(tokens, payload);
-    //await cleanupTokens(response, tokens);
+    await cleanupTokens(response, tokens, postOwner.id);
     console.log('Notifications have been sent and tokens cleaned up.');
     }
 });
@@ -412,16 +412,18 @@ exports.postDone = functions.firestore
         if (tokens.length > 0) {
             // Send notifications to all tokens.
             const response = await admin.messaging().sendToDevice(tokens, payload);
-            //await cleanupTokens(response, tokens);
+            await cleanupTokens(response, tokens, user.id);
             console.log('Notifications have been sent and tokens cleaned up.');
             }
       // perform desired operations ...
     });
 
 // Cleans up the tokens that are no longer valid.
-/*function cleanupTokens(response, tokens) {
+  function cleanupTokens(response, tokens, uid) {
     // For each notification we check if there was an error.
-    const tokensDelete = [];
+    console.log("cleanup tokens v12");
+    var tokensDelete = [];
+    var batch = admin.firestore().batch();
     response.results.forEach((result, index) => {
       const error = result.error;
       if (error) {
@@ -429,13 +431,17 @@ exports.postDone = functions.firestore
         // Cleanup the tokens who are not registered anymore.
         if (error.code === 'messaging/invalid-registration-token' ||
             error.code === 'messaging/registration-token-not-registered') {
-          const deleteTask = admin.firestore().collection('fcmTokens').doc(tokens[index]).delete();
-          tokensDelete.push(deleteTask);
+          console.log("token to delete: ", [tokens[index]]);
+          const FieldValue = require('firebase-admin').firestore.FieldValue;
+          batch.update(admin.firestore().collection('users').doc(uid), {
+            'fcm': FieldValue.arrayRemove(tokens[index])
+          });
         }
       }
     });
-    return Promise.all(tokensDelete);
-   }*/
+    batch.commit();
+    
+   }
 
 
    //////FUNCTIONS TO HANDLE DELETION OF POSTS AND USERS
