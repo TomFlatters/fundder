@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.fundder</string>
+	<string>com.fundder</string>
 	<key>PROJECT_ID</key>
 	<string>fundder-c4a64</string>
 	<key>STORAGE_BUCKET</key>
