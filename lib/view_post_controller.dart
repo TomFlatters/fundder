@@ -252,7 +252,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                           }
                                           var donatePage =
                                               "https://donate.fundder.co/" +
-                                                  user.uid +
+                                                  uid +
                                                   '/' +
                                                   postData.id;
 
