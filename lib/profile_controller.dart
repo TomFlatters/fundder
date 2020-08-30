@@ -346,36 +346,52 @@ class _ProfileState extends State<ProfileController>
                                       }
                                     },
                                   ),
-                            DefaultTabController(
-                              length: 2,
-                              initialIndex: 0,
-                              child: Column(
-                                children: [
-                                  TabBar(
-                                    onTap: (index) {
-                                      if (user.uid != widget.uid) {
-                                        setState(() {
-                                          _tabController.index = 0;
-                                        });
-                                      }
-                                    },
-                                    tabs: [
-                                      Tab(text: 'Posts'),
-                                      Tab(
-                                          child: Text('Liked',
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                              )))
-                                    ],
-                                    controller: _tabController,
-                                  ),
-                                  [
-                                    _profileView(user.uid, 0),
-                                    _profileView(user.uid, 1)
-                                  ][_tabController.index]
-                                ],
-                              ),
-                            )
+                            _uid != user.uid
+                                ? DefaultTabController(
+                                    length: 1,
+                                    initialIndex: 0,
+                                    child: Column(
+                                      children: [
+                                        TabBar(
+                                          onTap: (index) {},
+                                          tabs: [
+                                            Tab(text: 'Posts'),
+                                          ],
+                                        ),
+                                        _profileView(user.uid, 0),
+                                      ],
+                                    ),
+                                  )
+                                : DefaultTabController(
+                                    length: 2,
+                                    initialIndex: 0,
+                                    child: Column(
+                                      children: [
+                                        TabBar(
+                                          onTap: (index) {
+                                            if (user.uid != widget.uid) {
+                                              setState(() {
+                                                _tabController.index = 0;
+                                              });
+                                            }
+                                          },
+                                          tabs: [
+                                            Tab(text: 'Posts'),
+                                            Tab(
+                                                child: Text('Liked',
+                                                    style: TextStyle(
+                                                      color: Colors.grey,
+                                                    )))
+                                          ],
+                                          controller: _tabController,
+                                        ),
+                                        [
+                                          _profileView(user.uid, 0),
+                                          _profileView(user.uid, 1)
+                                        ][_tabController.index]
+                                      ],
+                                    ),
+                                  )
                           ]),
                         ),
                       ),
