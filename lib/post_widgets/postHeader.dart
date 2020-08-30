@@ -57,10 +57,10 @@ class PostHeader extends StatelessWidget {
                             context, '/charity/' + this.targetCharity);
                       },
                       child: Container(
-                          height: 60,
+                          constraints: BoxConstraints(maxWidth: 100),
+                          margin: EdgeInsets.only(left: 20, right: 10),
+                          height: 30,
                           //color: Colors.blue,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          margin: EdgeInsets.all(10.0),
                           child: CachedNetworkImage(
                             imageUrl: this.charityLogo,
                             //color: Colors.red,

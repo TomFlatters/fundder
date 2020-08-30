@@ -57,7 +57,7 @@ class _FeedViewState extends State<FeedView> {
       return ListView.separated(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        padding: const EdgeInsets.only(top: 10.0),
+        //padding: const EdgeInsets.only(top: 10.0),
         itemCount: widget.postList.length,
         itemBuilder: (BuildContext context, int index) {
           //building an individual post

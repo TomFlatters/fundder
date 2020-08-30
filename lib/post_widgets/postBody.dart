@@ -30,7 +30,7 @@ class PostBody extends StatelessWidget {
                         height: MediaQuery.of(context).size.width /
                             postData.aspectRatio,
                         child: _previewImageVideo(postData)),
-                margin: EdgeInsets.symmetric(vertical: 10.0),
+                margin: EdgeInsets.only(bottom: 10.0),
               ),
         Container(
             alignment: Alignment.centerLeft,
