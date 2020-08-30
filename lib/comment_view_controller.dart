@@ -59,6 +59,7 @@ class _CommentPageState extends State<CommentPage> {
             body: Column(children: [
               Expanded(
                   child: ListView.separated(
+                reverse: true,
                 padding: const EdgeInsets.symmetric(vertical: 10.0),
                 itemCount: comments.length,
                 itemBuilder: (BuildContext context, int index) {
