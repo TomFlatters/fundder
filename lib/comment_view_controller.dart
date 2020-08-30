@@ -63,6 +63,11 @@ class _CommentPageState extends State<CommentPage> {
                 itemCount: comments.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, '/user/' + comments[index]['uid']);
+                    },
+                    leading: ProfilePic(comments[index]['uid'], 40),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -75,9 +80,6 @@ class _CommentPageState extends State<CommentPage> {
                                 fontFamily: 'Muli',
                                 fontWeight: FontWeight.bold),
                           ),
-                          onTap: () {
-                            Navigator.pushNamed(context, '/username');
-                          },
                         ),
                         Text(comments[index]["text"]),
                         Row(children: [
