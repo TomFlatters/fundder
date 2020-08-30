@@ -23,6 +23,7 @@ class FeedController extends StatelessWidget {
           centerTitle: true,
           title: Text('Feed'),
           bottom: TabBar(
+            physics: NeverScrollableScrollPhysics(),
             //indicatorColor: HexColor(colors[_tabController.index]),
             tabs: [
               Tab(text: 'Do'),
@@ -32,7 +33,7 @@ class FeedController extends StatelessWidget {
           ),
         ),
         body: //FeedView('Do', HexColor('ff6b6c'))
-            TabBarView(children: [
+            TabBarView(physics: NeverScrollableScrollPhysics(), children: [
           DoChallenge(user),
           FeedWrapper("Fund", null, "fund"),
           FeedWrapper("Done", null, "done"),
