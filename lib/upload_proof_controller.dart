@@ -69,8 +69,9 @@ class _UploadProofState extends State<UploadProofScreen> {
                                             downloadUrl,
                                             'done',
                                             Timestamp.now(),
-                                            aspectRatio),
-                                    Navigator.of(context).pop(null)
+                                            aspectRatio)
+                                        .then((value) =>
+                                            {Navigator.of(context).pop(null)}),
                                   });
                         } else {
                           DatabaseService(uid: user.uid)
@@ -84,8 +85,9 @@ class _UploadProofState extends State<UploadProofScreen> {
                                             downloadUrl,
                                             'done',
                                             Timestamp.now(),
-                                            aspectRatio),
-                                    Navigator.of(context).pop(null)
+                                            aspectRatio)
+                                        .then((value) =>
+                                            {Navigator.of(context).pop(null)}),
                                   });
                         }
                       }
