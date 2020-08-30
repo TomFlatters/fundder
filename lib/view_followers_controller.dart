@@ -11,7 +11,8 @@ class ViewFollowers extends StatefulWidget {
   _ViewFollowersState createState() => _ViewFollowersState();
 
   final String uid;
-  ViewFollowers({this.uid});
+  final int startIndex;
+  ViewFollowers({this.uid, @required this.startIndex});
 }
 
 class _ViewFollowersState extends State<ViewFollowers>
@@ -33,6 +34,7 @@ class _ViewFollowersState extends State<ViewFollowers>
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
+    _tabController.index = widget.startIndex;
     _getLists();
     super.initState();
   }
@@ -64,7 +66,7 @@ class _ViewFollowersState extends State<ViewFollowers>
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text("View Followers"),
+          title: Text(""),
           actions: <Widget>[
             new IconButton(
               icon: new Icon(Icons.close),

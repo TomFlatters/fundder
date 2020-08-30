@@ -248,33 +248,6 @@ class _ProfileState extends State<ProfileController>
                                         children: <Widget>[
                                           Container(
                                             alignment: Alignment.topCenter,
-                                            child: Text(_noFollowing.toString(),
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                )),
-                                          ),
-                                          Expanded(
-                                              child: Container(
-                                            alignment: Alignment.bottomCenter,
-                                            child: Text("Following"),
-                                          )),
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context,
-                                            '/user/' +
-                                                widget.uid +
-                                                '/followers');
-                                      },
-                                    )),
-                                    Expanded(
-                                        child: GestureDetector(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Container(
-                                            alignment: Alignment.topCenter,
                                             child: Text(_noFollowers.toString(),
                                                 style: TextStyle(
                                                   fontSize: 20,
@@ -294,6 +267,33 @@ class _ProfileState extends State<ProfileController>
                                             '/user/' +
                                                 widget.uid +
                                                 '/followers');
+                                      },
+                                    )),
+                                    Expanded(
+                                        child: GestureDetector(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            alignment: Alignment.topCenter,
+                                            child: Text(_noFollowing.toString(),
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                )),
+                                          ),
+                                          Expanded(
+                                              child: Container(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Text("Following"),
+                                          )),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                            context,
+                                            '/user/' +
+                                                widget.uid +
+                                                '/following');
                                       },
                                     )),
                                     _uid == user.uid
