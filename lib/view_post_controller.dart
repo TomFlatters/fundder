@@ -17,18 +17,34 @@ import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
 import 'global_widgets/buttons.dart';
+import 'services/database.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
-class ViewPost extends StatelessWidget with RouteAware {
+class ViewPost extends StatefulWidget {
+  @override
+  _ViewPostState createState() => _ViewPostState();
+
+  final Post startPost;
+  ViewPost(
+    this.startPost,
+    /*{this.noLikes, this.hasLiked}*/
+  );
+}
+
+class _ViewPostState extends State<ViewPost> with RouteAware {
   final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
-  final Post postData;
   // int noLikes;
   // bool hasLiked;
 
-  ViewPost(
-    this.postData,
-    /*{this.noLikes, this.hasLiked}*/
-  );
+  Post postData;
+  bool willNeedUpdate = false;
+
+  @override
+  void initState() {
+    postData = widget.startPost;
+    super.initState();
+  }
 
   Container createPostUI(
       Post postData, String uid, context, LikesService likesService) {
@@ -176,155 +192,114 @@ class ViewPost extends StatelessWidget with RouteAware {
       return WillPopScope(
           onWillPop: () async => false,
           child: Scaffold(
-            appBar: kIsWeb == true
-                ? null
-                : AppBar(
-                    centerTitle: true,
-                    title: Text(postData.status.inCaps),
-                    actions: <Widget>[
-                      new IconButton(
-                          icon: new Icon(Icons.close),
-                          onPressed: () {
-                            print("Going back from ViewPost to Feed");
-                            Navigator.of(context).pop();
-                          })
-                    ],
-                    leading: new Container(),
+              appBar: kIsWeb == true
+                  ? null
+                  : AppBar(
+                      centerTitle: true,
+                      title: Text(postData.status.inCaps),
+                      actions: <Widget>[
+                        new IconButton(
+                            icon: new Icon(Icons.close),
+                            onPressed: () {
+                              print("Going back from ViewPost to Feed");
+                              Navigator.of(context).pop();
+                            })
+                      ],
+                      leading: new Container(),
+                    ),
+              body: VisibilityDetector(
+                key: UniqueKey(),
+                onVisibilityChanged: (VisibilityInfo info) {
+                  debugPrint("${info.visibleFraction} of my widget is visible");
+                  if (info.visibleFraction > 0 && willNeedUpdate == true) {
+                    reloadPost();
+                  }
+                },
+                child: Column(children: [
+                  kIsWeb == true ? WebMenu(-1) : Container(),
+                  Expanded(
+                    child: ListView(
+                      children: <Widget>[
+                        Container(
+                            color: Colors.white,
+                            child: Container(
+                                margin: EdgeInsets.symmetric(vertical: 10.0),
+                                child: Column(
+                                  children: <Widget>[
+                                    user != null
+                                        ? createPostUI(postData, user.uid,
+                                            context, likesService)
+                                        : createPostUI(postData, '123', context,
+                                            likesService),
+                                    PrimaryFundderButton(
+                                        text: 'Donate',
+                                        onPressed: () async {
+                                          willNeedUpdate = true;
+                                          //This is the old code for redirecting to a donation page within the app
+                                          //apple and google don't allow this without taking a 30% cut
+
+                                          /*Navigator.of(context).push(_openDonate());*/
+                                          // Navigator.pushNamed(
+                                          //     context,
+                                          //     '/post/' +
+                                          //         postData.id +
+                                          //         '/donate');
+                                          String uid;
+                                          if (user != null) {
+                                            uid = user.uid;
+                                          } else {
+                                            uid = '123';
+                                          }
+                                          var donatePage =
+                                              "https://donate.fundder.co/" +
+                                                  user.uid +
+                                                  '/' +
+                                                  postData.id;
+
+                                          // var url = "https://fundder.co/";
+                                          if (await canLaunch(donatePage)) {
+                                            await launch(
+                                              donatePage,
+                                              forceSafariVC: false,
+                                              forceWebView: false,
+                                            );
+                                          } else {
+                                            throw 'Could not launch $donatePage';
+                                          }
+                                        }),
+                                    user != null
+                                        ? user.uid != postData.author ||
+                                                postData.status != 'fund'
+                                            ? Container()
+                                            : PrimaryFundderButton(
+                                                text: 'Complete Challenge',
+                                                onPressed: () {
+                                                  willNeedUpdate = true;
+                                                  Navigator.pushNamed(
+                                                      context,
+                                                      '/post/' +
+                                                          postData.id +
+                                                          '/uploadProof');
+                                                })
+                                        : Container(),
+                                  ],
+                                )))
+                      ],
+                    ),
                   ),
-            body: Column(children: [
-              kIsWeb == true ? WebMenu(-1) : Container(),
-              Expanded(
-                child: ListView(
-                  children: <Widget>[
-                    Container(
-                        color: Colors.white,
-                        child: Container(
-                            margin: EdgeInsets.symmetric(vertical: 10.0),
-                            child: Column(
-                              children: <Widget>[
-                                user != null
-                                    ? createPostUI(postData, user.uid, context,
-                                        likesService)
-                                    : createPostUI(
-                                        postData, '123', context, likesService),
-                                PrimaryFundderButton(
-                                    text: 'Donate',
-                                    onPressed: () async {
-                                      //This is the old code for redirecting to a donation page within the app
-                                      //apple and google don't allow this without taking a 30% cut
-
-                                      /*Navigator.of(context).push(_openDonate());*/
-                                      // Navigator.pushNamed(
-                                      //     context,
-                                      //     '/post/' +
-                                      //         postData.id +
-                                      //         '/donate');
-                                      String uid;
-                                      if (user != null) {
-                                        uid = user.uid;
-                                      } else {
-                                        uid = '123';
-                                      }
-                                      var donatePage =
-                                          "https://donate.fundder.co/" +
-                                              user.uid +
-                                              '/' +
-                                              postData.id;
-
-                                      // var url = "https://fundder.co/";
-                                      if (await canLaunch(donatePage)) {
-                                        await launch(
-                                          donatePage,
-                                          forceSafariVC: false,
-                                          forceWebView: false,
-                                        );
-                                      } else {
-                                        throw 'Could not launch $donatePage';
-                                      }
-                                    }),
-                                user != null
-                                    ? user.uid != postData.author ||
-                                            postData.status != 'fund'
-                                        ? Container()
-                                        : PrimaryFundderButton(
-                                            text: 'Complete Challenge',
-                                            onPressed: () {
-                                              Navigator.pushNamed(
-                                                  context,
-                                                  '/post/' +
-                                                      postData.id +
-                                                      '/uploadProof');
-                                            })
-                                    : Container(),
-                              ],
-                            )))
-                  ],
-                ),
-              ),
-            ]),
-          ));
+                ]),
+              )));
     }
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   routeObserver.subscribe(this, ModalRoute.of(context)); //Subscribe it here
-  //   super.didChangeDependencies();
-  // }
-
-  // @override
-  // void didPopNext() {
-  //   print("didPopNext");
-  //   setState(() {
-  //     print("Did pop controller above");
-  //   });
-  //   super.didPopNext();
-  // }
-
-  // @override
-  // void didPush() {
-  //   print("didPush");
-  //   super.didPush();
-  // }
-
-  Future<void> _showDeleteDialog(Post post, context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Delete Post?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                    'Once you delete this post, all the money donated will be refunded unless you have uploaded proof of challenge completion. This cannot be undone.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Delete'),
-              onPressed: () {
-                Firestore.instance
-                    .collection('posts')
-                    .document(post.id)
-                    .delete()
-                    .then((value) {
-                  Navigator.of(context).pop();
-                });
-              },
-            ),
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  void reloadPost() async {
+    print('reloading');
+    postData = await DatabaseService(uid: "123").getPostById(this.postData.id);
+    if (mounted) {
+      setState(() {
+        willNeedUpdate = false;
+      });
+    }
   }
 }
 
