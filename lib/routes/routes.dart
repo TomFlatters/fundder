@@ -165,6 +165,12 @@ class FluroRouter {
       transitionType: TransitionType.fadeIn,
     );
     router.define(
+      '/?post=:id',
+      handler: _postHandler,
+      transitionType: TransitionType.fadeIn,
+    );
+
+    router.define(
       '/post/:id/comments',
       handler: _commentHandler,
       transitionType: TransitionType.fadeIn,
