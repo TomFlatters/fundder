@@ -46,23 +46,23 @@ class PostBody extends StatelessWidget {
                 text: TextSpan(
                     children: _returnHashtags(postData.hashtags, context)))),
         Container(
-            alignment: Alignment.centerLeft,
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            child: Text(
-              '£${postData.moneyRaised == null ? 0.00.toStringAsFixed(2) : postData.moneyRaised.toStringAsFixed(2)} raised of £${postData.targetAmount} target',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            )),
-        Container(
           //alignment: Alignment.centerLeft,
-          margin: EdgeInsets.only(top: 5, bottom: 15, left: 0, right: 0),
+          margin: EdgeInsets.only(top: 10, bottom: 5, left: 0, right: 0),
           child: LinearPercentIndicator(
-            linearStrokeCap: LinearStrokeCap.butt,
-            lineHeight: 3,
+            linearStrokeCap: LinearStrokeCap.roundAll,
+            lineHeight: 5,
             percent: postData.percentRaised(),
             backgroundColor: HexColor('CCCCCC'),
             progressColor: HexColor('ff6b6c'),
           ),
         ),
+        Container(
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.only(bottom: 15, top: 0, left: 10, right: 10),
+            child: Text(
+              '£${postData.moneyRaised == null ? 0.00.toStringAsFixed(2) : postData.moneyRaised.toStringAsFixed(2)} raised of £${postData.targetAmount} target',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            )),
       ],
     );
   }

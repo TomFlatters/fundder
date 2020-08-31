@@ -78,7 +78,7 @@ class _CommentPageState extends State<CommentPage> {
                             style: TextStyle(
                                 fontSize: 14.0,
                                 color: Colors.black,
-                                fontFamily: 'Muli',
+                                fontFamily: 'Sohne',
                                 fontWeight: FontWeight.bold),
                           ),
                         ),

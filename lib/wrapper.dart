@@ -72,7 +72,7 @@ class _WrapperState extends State<Wrapper> {
         body: Text(
           "Redirecting",
           style: TextStyle(
-              fontFamily: 'Quicksand',
+              fontFamily: 'Sohne',
               fontSize: 20,
               color: Colors.black,
               decoration: null),

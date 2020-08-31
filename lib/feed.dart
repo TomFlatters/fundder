@@ -57,7 +57,7 @@ class _FeedViewState extends State<FeedView> {
       return ListView.separated(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        //padding: const EdgeInsets.only(top: 10.0),
+        padding: const EdgeInsets.only(top: 10.0),
         itemCount: widget.postList.length,
         itemBuilder: (BuildContext context, int index) {
           //building an individual post
@@ -74,8 +74,12 @@ class _FeedViewState extends State<FeedView> {
 
           return GestureDetector(
             child: Container(
+              decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.all(
+                    Radius.circular(10.0),
+                  )),
               width: MediaQuery.of(context).size.width,
-              color: Colors.white,
               child: Container(
                 margin: EdgeInsets.only(left: 0, right: 0, top: 0),
                 child: Column(children: <Widget>[

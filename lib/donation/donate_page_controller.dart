@@ -60,7 +60,7 @@ class _DonatePageState extends State<DonatePage> {
                     Text(
                       'Thank you for your genorisity. \nPlease enter your donation amount.',
                       style: TextStyle(
-                        fontFamily: 'Quicksand',
+                        fontFamily: 'Sohne',
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),

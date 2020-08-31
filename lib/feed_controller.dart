@@ -19,6 +19,7 @@ class FeedController extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        backgroundColor: Colors.grey[200],
         appBar: AppBar(
           centerTitle: true,
           title: Text('Feed'),

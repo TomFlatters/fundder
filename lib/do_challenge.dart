@@ -84,6 +84,7 @@ class _DoChallengeState extends State<DoChallenge> {
       return Loading();
     } else {
       return Scaffold(
+        backgroundColor: Colors.grey[200],
         body: SmartRefresher(
           enablePullDown: true,
           enablePullUp: true,
@@ -118,12 +119,12 @@ class _DoChallengeState extends State<DoChallenge> {
               : ListView.separated(
                   separatorBuilder: (BuildContext context, int index) {
                     return SizedBox(
-                      height: 5,
+                      height: 10,
                     );
                   },
                   itemBuilder: (c, i) => _templateListView(templates[i]),
                   itemCount: templates.length,
-                  padding: const EdgeInsets.only(top: 5.0),
+                  padding: const EdgeInsets.only(top: 10.0),
                   shrinkWrap: true,
                   physics: AlwaysScrollableScrollPhysics(),
                 ),
@@ -135,24 +136,37 @@ class _DoChallengeState extends State<DoChallenge> {
   Widget _templateListView(Template template) {
     return GestureDetector(
       child: Container(
-          color: Colors.white,
+          margin: EdgeInsets.only(left: 0, right: 0, top: 0),
+          decoration: new BoxDecoration(
+            color: Colors.white,
+            borderRadius: new BorderRadius.all(
+              Radius.circular(10.0),
+            ),
+          ),
           child: Container(
               margin: EdgeInsets.only(left: 0, right: 0, top: 0),
               child: Column(
                 children: <Widget>[
                   Container(
                     height: 80,
-                    margin: EdgeInsets.only(left: 0, right: 0, top: 0),
+                    margin:
+                        EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 0),
                     child: Row(
                       children: <Widget>[
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Container(
-                              margin:
-                                  EdgeInsets.only(left: 10, right: 10, top: 10),
+                              margin: EdgeInsets.only(
+                                  left: 10, right: 10, top: 0, bottom: 0),
                               child: AspectRatio(
                                 aspectRatio: 1 / 1,
-                                child: Container(
+                                child: ClipRRect(
+                                  borderRadius: new BorderRadius.only(
+                                    topLeft: Radius.circular(10.0),
+                                    bottomLeft: Radius.circular(10.0),
+                                    topRight: Radius.circular(10.0),
+                                    bottomRight: Radius.circular(10.0),
+                                  ),
                                   child: kIsWeb == true
                                       ? Image.network(template.imageUrl)
                                       : CachedNetworkImage(
@@ -169,74 +183,74 @@ class _DoChallengeState extends State<DoChallenge> {
                               )),
                         ),
                         Expanded(
-                          child: Column(children: [
-                            Align(
-                                alignment: Alignment.topLeft,
-                                child: Row(children: [
-                                  Expanded(
-                                      child: Text(
-                                    '${template.title}',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontFamily: 'Roboto Mono',
-                                      fontSize: 16,
-                                    ),
-                                  )),
-                                  GestureDetector(
-                                      onTap: () {
-                                        Navigator.pushNamed(context,
-                                            '/charity/' + template.charity);
-                                      },
-                                      child: Container(
-                                          constraints:
-                                              BoxConstraints(maxWidth: 100),
-                                          margin: EdgeInsets.only(
-                                              left: 20, right: 10),
-                                          height: 30,
-                                          //color: Colors.blue,
-                                          child: CachedNetworkImage(
-                                            imageUrl: template.charityLogo,
-                                            //color: Colors.red,
-                                          )))
-                                ])),
-                            Padding(padding: EdgeInsets.all(2)),
-                            Align(
-                                alignment: Alignment.topLeft,
-                                child: RichText(
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    text: TextSpan(
-                                      children: _returnHashtags(
-                                          template.hashtags,
-                                          context,
-                                          template.subtitle),
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey,
-                                      ),
-                                    ))),
-                            Expanded(
-                                child: Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: Row(
-                                      children: <Widget>[
-                                        Align(
-                                          alignment: Alignment.bottomLeft,
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Row(children: [
+                                      Expanded(
                                           child: Text(
-                                            '${template.acceptedBy.length} people, ${template.daysLeft() != -1 ? template.daysLeft() : 0} days left',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.grey,
-                                            ),
+                                        '${template.title}',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontFamily: 'Sohne',
+                                            fontWeight: FontWeight.bold),
+                                      )),
+                                    ])),
+                                Padding(padding: EdgeInsets.all(2)),
+                                Align(
+                                    alignment: Alignment.topLeft,
+                                    child: RichText(
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        text: TextSpan(
+                                          children: _returnHashtags(
+                                              template.hashtags,
+                                              context,
+                                              template.subtitle),
+                                          style: TextStyle(
+                                            color: Colors.grey,
                                           ),
-                                        ),
-                                      ],
-                                    )))
-                          ]),
+                                        ))),
+                              ]),
                         ),
                       ],
                     ),
                   ),
+                  Container(
+                      margin: EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.bottomLeft,
+                              child: Text(
+                                '${template.acceptedBy.length} people, ${template.daysLeft() != -1 ? template.daysLeft() : 0} days left',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, '/charity/' + template.charity);
+                            },
+                            child: Container(
+                                constraints: BoxConstraints(maxWidth: 100),
+                                margin: EdgeInsets.only(left: 20, right: 10),
+                                height: 30,
+                                //color: Colors.blue,
+                                child: CachedNetworkImage(
+                                  imageUrl: template.charityLogo,
+                                  //color: Colors.red,
+                                )),
+                          )
+                        ],
+                      ))
                 ],
               ))),
       onTap: () {
