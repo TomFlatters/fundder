@@ -18,7 +18,9 @@ class _WrapperState extends State<Wrapper> {
   @override
   void initState() {
     super.initState();
-    this.initDynamicLinks();
+    if (kIsWeb == false) {
+      this.initDynamicLinks();
+    }
   }
 
   void initDynamicLinks() async {
@@ -34,7 +36,10 @@ class _WrapperState extends State<Wrapper> {
     final PendingDynamicLinkData dynamicLink =
         await FirebaseDynamicLinks.instance.getInitialLink();
     if (dynamicLink != null) {
-      handleLinkData(dynamicLink);
+      if (dynamicLink != null) {
+        Navigator.pushNamed(context, dynamicLink.link.path);
+      }
+      //handleLinkData(dynamicLink);
     }
   }
 
@@ -42,7 +47,9 @@ class _WrapperState extends State<Wrapper> {
     final Uri uri = data?.link;
     print("uri: " + uri.toString());
     if (uri != null) {
-      final queryParams = uri.queryParameters;
+      Navigator.pushNamed(context, uri.path);
+    }
+    /*final queryParams = uri.queryParameters;
       if (queryParams.length > 0 && queryParams['post'] != null) {
         String post = queryParams["post"];
         print("pushing " + post);
@@ -50,7 +57,7 @@ class _WrapperState extends State<Wrapper> {
         // verify the username is parsed correctly
 
       }
-    }
+    }*/
   }
 
   @override
@@ -60,7 +67,7 @@ class _WrapperState extends State<Wrapper> {
 
     if (kIsWeb == true) {
       Future.microtask(
-          () => Navigator.pushReplacementNamed(context, '/web/search'));
+          () => Navigator.pushReplacementNamed(context, '/web/feed'));
       return Scaffold(
         body: Text(
           "Redirecting",
