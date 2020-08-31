@@ -27,27 +27,30 @@ class PostHeader extends StatelessWidget {
       height: 60,
       child: Row(
         children: <Widget>[
-          Align(
-              alignment: Alignment.centerLeft,
-              child: GestureDetector(
+          GestureDetector(
+            child: Row(children: [
+              Align(
+                alignment: Alignment.centerLeft,
                 child: AspectRatio(
                     aspectRatio: 1 / 1,
                     child: Container(
                       child: ProfilePic(postAuthorId, 40),
                       margin: EdgeInsets.all(10.0),
                     )),
-                onTap: () {
-                  print('/user/' + postAuthorId);
-                  Navigator.pushNamed(context, '/user/' + postAuthorId);
-                },
-              )),
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Text(postAuthorUserName,
-                  style: TextStyle(
-                    fontFamily: 'Quicksand',
-                    fontWeight: FontWeight.w600,
-                  ))),
+              ),
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(postAuthorUserName,
+                      style: TextStyle(
+                        fontFamily: 'Quicksand',
+                        fontWeight: FontWeight.w600,
+                      )))
+            ]),
+            onTap: () {
+              print('/user/' + postAuthorId);
+              Navigator.pushNamed(context, '/user/' + postAuthorId);
+            },
+          ),
           Expanded(
               child: Align(
                   alignment: Alignment.centerRight,
