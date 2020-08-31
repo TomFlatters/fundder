@@ -100,115 +100,117 @@ class _AuthenticateState extends State<Authenticate>
   }
 
   Widget _signIn() {
-    return Container(
-        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-        child: Form(
-            key: _signinKey,
-            child: Column(
-              children: <Widget>[
-                SizedBox(height: 30.0),
-                TextFormField(
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
-                  ],
-                  initialValue: email,
-                  decoration: textInputDecoration.copyWith(hintText: 'Email'),
-                  validator: (val) => val.isEmpty ? 'Enter an email' : null,
-                  onChanged: (val) {
-                    setState(() {
-                      email = val;
-                    });
-                  },
-                ),
-                SizedBox(height: 20.0),
-                TextFormField(
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(RegExp("[ ]"))
-                  ],
-                  decoration:
-                      textInputDecoration.copyWith(hintText: 'Password'),
-                  validator: (val) => val.length < 6
-                      ? 'Enter a password longer than 5 characters'
-                      : null,
-                  obscureText: true,
-                  onChanged: (val) {
-                    setState(() {
-                      password = val;
-                    });
-                  },
-                ),
-                SizedBox(height: 20.0),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                ),
-                PrimaryFundderButton(
-                  text: 'Log In',
-                  onPressed: () async {
-                    if (_signinKey.currentState.validate()) {
-                      setState(() => loading = true);
-                      String result = await _auth.signInWithEmailAndPassword(
-                          email, password);
-                      if (result == null) {
-                        setState(() {
-                          signinerror = 'Failed to sign in user';
-                          loading = false;
-                        });
-                      } else {
-                        if (mounted) {
-                          setState(() {
-                            signinerror = result;
-                            loading = false;
-                          });
-                        }
-                      }
-                    }
-                  },
-                ),
-                //SizedBox(height: 6.0),
-                EditFundderButton(
-                    text: 'Forgot Password',
-                    onPressed: () async {
-                      if (email != '') {
-                        signinerror = await _auth.forgotPassword(email);
-                        setState(() {});
-                      } else {
-                        setState(() {
-                          signinerror =
-                              'Please enter your email for us to send a reset link';
-                        });
-                      }
-                    }),
-                SizedBox(height: 6.0),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => TermsView()));
-                  },
-                  child: Text(
-                    'Terms of use',
-                    style: TextStyle(color: HexColor('ff6b6c')),
+    return Column(
+      children: [
+        Container(
+            padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+            child: Form(
+                key: _signinKey,
+                child: Column(children: <Widget>[
+                  SizedBox(height: 30.0),
+                  TextFormField(
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                    ],
+                    initialValue: email,
+                    decoration: textInputDecoration.copyWith(hintText: 'Email'),
+                    validator: (val) => val.isEmpty ? 'Enter an email' : null,
+                    onChanged: (val) {
+                      setState(() {
+                        email = val;
+                      });
+                    },
                   ),
-                ),
-                SizedBox(height: 6.0),
-                Text(
-                  signinerror,
-                  textAlign: TextAlign.center,
-                )
-              ],
-            ))
-        //)
-        //),
-        );
+                  SizedBox(height: 20.0),
+                  TextFormField(
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(RegExp("[ ]"))
+                    ],
+                    decoration:
+                        textInputDecoration.copyWith(hintText: 'Password'),
+                    validator: (val) => val.length < 6
+                        ? 'Enter a password longer than 5 characters'
+                        : null,
+                    obscureText: true,
+                    onChanged: (val) {
+                      setState(() {
+                        password = val;
+                      });
+                    },
+                  ),
+                  SizedBox(height: 20.0),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                  )
+                ]))),
+        PrimaryFundderButton(
+          text: 'Log In',
+          onPressed: () async {
+            if (_signinKey.currentState.validate()) {
+              setState(() => loading = true);
+              String result =
+                  await _auth.signInWithEmailAndPassword(email, password);
+              if (result == null) {
+                setState(() {
+                  signinerror = 'Failed to sign in user';
+                  loading = false;
+                });
+              } else {
+                if (mounted) {
+                  setState(() {
+                    signinerror = result;
+                    loading = false;
+                  });
+                }
+              }
+            }
+          },
+        ),
+        //SizedBox(height: 6.0),
+        EditFundderButton(
+            text: 'Forgot Password',
+            onPressed: () async {
+              if (email != '') {
+                signinerror = await _auth.forgotPassword(email);
+                setState(() {});
+              } else {
+                setState(() {
+                  signinerror =
+                      'Please enter your email for us to send a reset link';
+                });
+              }
+            }),
+        SizedBox(height: 6.0),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => TermsView()));
+          },
+          child: Text(
+            'Terms of use',
+            style: TextStyle(color: HexColor('ff6b6c')),
+          ),
+        ),
+        SizedBox(height: 6.0),
+        Text(
+          signinerror,
+          textAlign: TextAlign.center,
+        )
+      ],
+    );
+    //)
+    //),
   }
 
   Widget _register() {
     bool termsAccepted = false;
-    return Container(
-        padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 50.0),
-        child: Form(
-            key: _registerKey,
-            child: Column(
-              children: <Widget>[
+    return Column(
+      children: [
+        Container(
+            padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 50.0),
+            child: Form(
+              key: _registerKey,
+              child: Column(children: <Widget>[
                 SizedBox(height: 20.0),
                 TextFormField(
                   inputFormatters: [
@@ -300,52 +302,50 @@ class _AuthenticateState extends State<Authenticate>
                         .leading, //  <-- leading Checkbox
                   );
                 }),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                ),
-                PrimaryFundderButton(
-                  text: 'Register',
-                  onPressed: () async {
-                    if (_registerKey.currentState.validate()) {
-                      if (termsAccepted == true) {
-                        setState(() => loading = true);
-                        dynamic result =
-                            await _auth.registerWithEmailPasswordUsername(
-                                email.trimRight(),
-                                password,
-                                username.trimRight());
-                        if (result == null) {
-                          setState(() {
-                            registrationerror = 'An error occurred';
-                            loading = false;
-                          });
-                        } else {
-                          if (mounted) {
-                            setState(() {
-                              registrationerror = result;
-                              loading = false;
-                            });
-                          }
-                        }
-                      } else {
-                        if (mounted) {
-                          setState(() {
-                            registrationerror =
-                                'Please accept our terms of use';
-                            loading = false;
-                          });
-                        }
-                      }
-                    }
-                  },
-                ),
-                SizedBox(height: 6.0),
-                SizedBox(height: 6.0),
-                Text(
-                  registrationerror,
-                  textAlign: TextAlign.center,
-                )
-              ],
-            )));
+              ]),
+            )),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 10),
+        ),
+        PrimaryFundderButton(
+          text: 'Register',
+          onPressed: () async {
+            if (_registerKey.currentState.validate()) {
+              if (termsAccepted == true) {
+                setState(() => loading = true);
+                dynamic result = await _auth.registerWithEmailPasswordUsername(
+                    email.trimRight(), password, username.trimRight());
+                if (result == null) {
+                  setState(() {
+                    registrationerror = 'An error occurred';
+                    loading = false;
+                  });
+                } else {
+                  if (mounted) {
+                    setState(() {
+                      registrationerror = result;
+                      loading = false;
+                    });
+                  }
+                }
+              } else {
+                if (mounted) {
+                  setState(() {
+                    registrationerror = 'Please accept our terms of use';
+                    loading = false;
+                  });
+                }
+              }
+            }
+          },
+        ),
+        SizedBox(height: 6.0),
+        SizedBox(height: 6.0),
+        Text(
+          registrationerror,
+          textAlign: TextAlign.center,
+        )
+      ],
+    );
   }
 }
