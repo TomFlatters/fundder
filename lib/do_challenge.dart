@@ -203,7 +203,7 @@ class _DoChallengeState extends State<DoChallenge> {
                             Align(
                                 alignment: Alignment.topLeft,
                                 child: RichText(
-                                    maxLines: 2,
+                                    maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     text: TextSpan(
                                       children: _returnHashtags(
