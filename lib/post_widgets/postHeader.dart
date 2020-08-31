@@ -42,7 +42,7 @@ class PostHeader extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(postAuthorUserName,
                       style: TextStyle(
-                        fontFamily: 'Quicksand',
+                        fontFamily: 'Sohne',
                         fontWeight: FontWeight.w600,
                       )))
             ]),

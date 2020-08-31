@@ -50,7 +50,7 @@ class _ActivityState extends State<LikedController> {
         body: Text(
           "Redirecting",
           style: TextStyle(
-              fontFamily: 'Quicksand',
+              fontFamily: 'Sohne',
               fontSize: 20,
               color: Colors.black,
               decoration: null),
@@ -135,7 +135,7 @@ class _ActivityState extends State<LikedController> {
                                                           style: TextStyle(
                                                             fontSize: 14.0,
                                                             color: Colors.black,
-                                                            fontFamily: 'Muli',
+                                                            fontFamily: 'Sohne',
                                                           ),
                                                           children: [
                                                         TextSpan(

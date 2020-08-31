@@ -68,7 +68,7 @@ class _StepsPageState extends State<StepsPage> {
                               template.title,
                               style: TextStyle(
                                 fontSize: 20,
-                                fontFamily: 'Quicksand',
+                                fontFamily: 'Sohne',
                               ),
                             ),
                           ),
@@ -79,7 +79,7 @@ class _StepsPageState extends State<StepsPage> {
                               template.subtitle,
                               style: TextStyle(
                                 fontSize: 16,
-                                fontFamily: 'Quicksand',
+                                fontFamily: 'Sohne',
                               ),
                             ),
                           ),
@@ -90,7 +90,7 @@ class _StepsPageState extends State<StepsPage> {
                               'Raising money for ${template.charity}',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontFamily: 'Quicksand',
+                                fontFamily: 'Sohne',
                               ),
                             ),
                           ),
@@ -103,7 +103,7 @@ class _StepsPageState extends State<StepsPage> {
                                     Text(
                                       'Set your fundraising target:',
                                       style: TextStyle(
-                                        fontFamily: 'Quicksand',
+                                        fontFamily: 'Sohne',
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
@@ -113,7 +113,7 @@ class _StepsPageState extends State<StepsPage> {
                                         '£',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w100,
-                                          fontFamily: 'Roboto Mono',
+                                          fontFamily: 'Sohne',
                                           fontSize: 45,
                                         ),
                                       ),
@@ -123,7 +123,7 @@ class _StepsPageState extends State<StepsPage> {
                                                   TextInputType.number,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w100,
-                                                fontFamily: 'Roboto Mono',
+                                                fontFamily: 'Sohne',
                                                 fontSize: 45,
                                               ),
                                               controller: moneyController,

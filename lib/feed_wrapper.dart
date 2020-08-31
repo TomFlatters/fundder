@@ -95,6 +95,7 @@ class _FeedWrapperState extends State<FeedWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       body: SmartRefresher(
         enablePullDown: true,
         enablePullUp: true,

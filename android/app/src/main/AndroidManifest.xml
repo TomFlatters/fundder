@@ -40,9 +40,9 @@
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"
                 android:resource="@drawable/ic_stat_pink_bear" />
-            <meta-data
+            <!-- <meta-data
                 android:name="com.google.firebase.messaging.default_notification_color"
-                android:resource="@color/colorPrimary" />
+                android:resource="@color/colorPrimary" /> -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <action android:name="android.intent.action.MAIN"/>
