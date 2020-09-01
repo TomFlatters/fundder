@@ -36,7 +36,7 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.all(10),
             child: Text(postData.title,
-                style: TextStyle(fontWeight: FontWeight.bold))),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
@@ -47,7 +47,7 @@ class PostBody extends StatelessWidget {
                     children: _returnHashtags(postData.hashtags, context)))),
         Container(
           //alignment: Alignment.centerLeft,
-          margin: EdgeInsets.only(top: 10, bottom: 5, left: 0, right: 0),
+          margin: EdgeInsets.only(top: 10, bottom: 10, left: 0, right: 0),
           child: LinearPercentIndicator(
             linearStrokeCap: LinearStrokeCap.roundAll,
             lineHeight: 5,
