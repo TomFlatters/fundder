@@ -76,13 +76,16 @@ class _CommentPageState extends State<CommentPage> {
                           child: Text(
                             comments[index]["username"],
                             style: TextStyle(
-                                fontSize: 14.0,
+                                //fontSize: 14.0,
                                 color: Colors.black,
                                 fontFamily: 'Founders Grotesk',
-                                fontWeight: FontWeight.bold),
+                                fontWeight: FontWeight.w500),
                           ),
                         ),
-                        Text(comments[index]["text"]),
+                        Text(
+                          comments[index]["text"],
+                          style: TextStyle(fontFamily: 'Founders Grotesk'),
+                        ),
                         Row(children: [
                           Container(
                             alignment: Alignment.centerLeft,
@@ -90,7 +93,7 @@ class _CommentPageState extends State<CommentPage> {
                             child:
                                 Text(howLongAgo(comments[index]["timestamp"]),
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      //fontSize: 14,
                                       color: Colors.grey,
                                     )),
                           ),

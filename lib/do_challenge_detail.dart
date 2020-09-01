@@ -67,7 +67,8 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                       Container(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.width * 9 / 16,
+                          height: MediaQuery.of(context).size.width /
+                              snapshot.data.aspectRatio,
                           child: kIsWeb == true
                               ? Image.network(snapshot.data.imageUrl)
                               : CachedNetworkImage(
@@ -81,7 +82,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                   ),
                                 ),
                         ),
-                        margin: EdgeInsets.symmetric(vertical: 10.0),
+                        margin: EdgeInsets.symmetric(vertical: 0.0),
                       ),
                       Container(
                           color: Colors.white,
@@ -135,9 +136,9 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             child: Text(
                                           snapshot.data.title,
                                           style: TextStyle(
-                                            fontFamily: 'Founders Grotesk',
-                                            fontSize: 16,
-                                          ),
+                                              fontFamily: 'Founders Grotesk',
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
                                         )),
                                         GestureDetector(
                                             onTap: () {
@@ -177,7 +178,10 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                       margin: EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       child: Text(
-                                          'A challenge for ${snapshot.data.charity} by ${snapshot.data.authorUsername}')),
+                                        'A challenge for ${snapshot.data.charity} by ${snapshot.data.authorUsername}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      )),
                                   Padding(
                                     padding: EdgeInsets.all(20),
                                   ),
@@ -228,14 +232,17 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
   List<TextSpan> _returnHashtags(
       List hashtags, BuildContext context, String templateText) {
     List<TextSpan> hashtagText = [
-      TextSpan(text: templateText + " ", style: TextStyle(color: Colors.black))
+      TextSpan(
+          text: templateText + " ",
+          style: TextStyle(color: Colors.black, fontFamily: 'Founders Grotesk'))
     ];
     if (hashtags != null) {
       for (var i = 0; i < hashtags.length; i++) {
         hashtagText.add(TextSpan(
             text: "#" + hashtags[i].toString() + " ",
-            style:
-                TextStyle(color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/),
+            style: TextStyle(
+                color: Colors.blueGrey[700],
+                fontFamily: 'Founders Grotesk' /*HexColor('ff6b6c')*/),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Navigator.pushNamed(

@@ -148,7 +148,8 @@ class _NewLikeButtonState extends State<NewLikeButton> {
                 ),
                 Expanded(
                     child: Container(
-                        margin: EdgeInsets.only(left: 10),
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.only(left: 10, top: 5),
                         child: Text(
                           noLikes != null ? noLikes.toString() : "",
                           style:
