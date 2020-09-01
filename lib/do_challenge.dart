@@ -217,7 +217,7 @@ class _DoChallengeState extends State<DoChallenge> {
                                         ),
                                       )),
                                     ])),
-                                Padding(padding: EdgeInsets.all(2)),
+                                Padding(padding: EdgeInsets.all(1.5)),
                                 Align(
                                     alignment: Alignment.topLeft,
                                     child: Container(
@@ -288,17 +288,19 @@ class _DoChallengeState extends State<DoChallenge> {
       TextSpan(
           text: templateText + " ",
           style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Founders Grotesk',
-          ))
+              color: Colors.black,
+              fontFamily: 'Founders Grotesk',
+              fontSize: 15))
     ];
     if (hashtags != null) {
       for (var i = 0; i < hashtags.length; i++) {
         hashtagText.add(TextSpan(
             text: "#" + hashtags[i].toString() + " ",
             style: TextStyle(
-                color: Colors.blueGrey[700],
-                fontFamily: 'Founders Grotesk' /*HexColor('ff6b6c')*/),
+              color: Colors.blueGrey[700],
+              fontFamily: 'Founders Grotesk' /*HexColor('ff6b6c')*/,
+              fontSize: 15,
+            ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Navigator.pushNamed(

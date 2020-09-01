@@ -71,7 +71,10 @@ class PostBody extends StatelessWidget {
     List<TextSpan> hashtagText = [
       TextSpan(
           text: postData.subtitle + " ",
-          style: TextStyle(color: Colors.black, fontFamily: 'Founders Grotesk'))
+          style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Founders Grotesk',
+              fontSize: 15))
     ];
     if (hashtags != null) {
       for (var i = 0; i < hashtags.length; i++) {
@@ -79,7 +82,8 @@ class PostBody extends StatelessWidget {
             text: "#" + hashtags[i].toString() + " ",
             style: TextStyle(
                 color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/,
-                fontFamily: 'Founders Grotesk'),
+                fontFamily: 'Founders Grotesk',
+                fontSize: 15),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 if (hashtags[i].toString() != hashtag) {
