@@ -165,7 +165,7 @@ class _DoChallengeState extends State<DoChallenge> {
                   Container(
                     height: 60,
                     margin:
-                        EdgeInsets.only(left: 0, right: 0, top: 15, bottom: 0),
+                        EdgeInsets.only(left: 0, right: 0, top: 20, bottom: 0),
                     child: Row(
                       children: <Widget>[
                         Align(
@@ -237,7 +237,7 @@ class _DoChallengeState extends State<DoChallenge> {
                     ),
                   ),
                   Container(
-                      margin: EdgeInsets.only(left: 10, bottom: 5, top: 5),
+                      margin: EdgeInsets.only(left: 10, bottom: 15, top: 5),
                       child: Row(
                         children: <Widget>[
                           Expanded(
