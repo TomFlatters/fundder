@@ -18,7 +18,9 @@ class SearchDescriptor extends StatelessWidget {
                   'Search for posts by hashtag or for users by username',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: Colors.grey, fontSize: 15, fontFamily: 'Sohne'),
+                      color: Colors.grey,
+                      fontSize: 15,
+                      fontFamily: 'Neue Haas Unica'),
                 )),
           ])),
     );

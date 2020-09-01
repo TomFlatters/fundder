@@ -163,7 +163,7 @@ class _DoChallengeState extends State<DoChallenge> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    height: 70,
+                    height: 60,
                     margin:
                         EdgeInsets.only(left: 0, right: 0, top: 15, bottom: 0),
                     child: Row(
@@ -210,13 +210,13 @@ class _DoChallengeState extends State<DoChallenge> {
                                         '${template.title}',
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontFamily: 'Sohne',
-                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'Neue Haas Unica',
+                                          fontWeight: FontWeight.bold,
                                           //fontSize: 16
                                         ),
                                       )),
                                     ])),
-                                Padding(padding: EdgeInsets.all(1)),
+                                Padding(padding: EdgeInsets.all(4)),
                                 Align(
                                     alignment: Alignment.topLeft,
                                     child: RichText(
@@ -237,7 +237,7 @@ class _DoChallengeState extends State<DoChallenge> {
                     ),
                   ),
                   Container(
-                      margin: EdgeInsets.only(left: 10, bottom: 10, top: 5),
+                      margin: EdgeInsets.only(left: 10, bottom: 5, top: 5),
                       child: Row(
                         children: <Widget>[
                           Expanded(

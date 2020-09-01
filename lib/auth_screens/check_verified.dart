@@ -59,8 +59,8 @@ class _VerificationState extends State<CheckVerified> {
                           height: 5,
                         ),
                         Text(user != null ? user.email : "user email",
-                            style:
-                                TextStyle(fontFamily: "Sohne", fontSize: 17)),
+                            style: TextStyle(
+                                fontFamily: "Neue Haas Unica", fontSize: 17)),
                         Expanded(
                           child: Container(),
                         ),
