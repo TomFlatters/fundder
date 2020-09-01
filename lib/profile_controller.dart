@@ -368,20 +368,9 @@ class _ProfileState extends State<ProfileController>
                                     child: Column(
                                       children: [
                                         TabBar(
-                                          onTap: (index) {
-                                            if (user.uid != widget.uid) {
-                                              setState(() {
-                                                _tabController.index = 0;
-                                              });
-                                            }
-                                          },
                                           tabs: [
                                             Tab(text: 'Posts'),
-                                            Tab(
-                                                child: Text('Liked',
-                                                    style: TextStyle(
-                                                      color: Colors.grey,
-                                                    )))
+                                            Tab(text: 'Liked')
                                           ],
                                           controller: _tabController,
                                         ),
