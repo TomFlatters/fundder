@@ -148,7 +148,7 @@ class _DoChallengeState extends State<DoChallenge> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    height: 80,
+                    height: 70,
                     margin:
                         EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 0),
                     child: Row(
@@ -196,14 +196,15 @@ class _DoChallengeState extends State<DoChallenge> {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                             fontFamily: 'Sohne',
-                                            fontWeight: FontWeight.bold),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
                                       )),
                                     ])),
                                 Padding(padding: EdgeInsets.all(2)),
                                 Align(
                                     alignment: Alignment.topLeft,
                                     child: RichText(
-                                        maxLines: 3,
+                                        maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         text: TextSpan(
                                           children: _returnHashtags(
