@@ -22,6 +22,7 @@ import 'global_widgets/buttons.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/post.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -175,6 +176,7 @@ class _ProfileState extends State<ProfileController>
             return _username == null
                 ? Loading()
                 : Scaffold(
+                    backgroundColor: Colors.grey[200],
                     appBar: kIsWeb == true
                         ? null
                         : AppBar(
@@ -224,164 +226,214 @@ class _ProfileState extends State<ProfileController>
                           controller: _refreshController,
                           onRefresh: _onRefresh,
                           onLoading: _onLoading,
-                          child: ListView(shrinkWrap: true, children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(top: 20, bottom: 10),
-                              alignment: Alignment.center,
-                              child: Container(
-                                child: ProfilePicFromUrl(_profilePic, 90),
-                                margin: EdgeInsets.all(10.0),
-                              ),
-                            ),
-                            Center(
-                              child: Text(_username),
-                            ),
-                            Container(
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 50, vertical: 20),
-                                height: 50,
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                        child: GestureDetector(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Container(
-                                            alignment: Alignment.topCenter,
-                                            child: Text(_noFollowers.toString(),
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                )),
-                                          ),
-                                          Expanded(
-                                              child: Container(
-                                            alignment: Alignment.bottomCenter,
-                                            child: Text("Followers"),
-                                          )),
-                                        ],
+                          child: ListView(
+                              //shrinkWrap: true,
+                              padding: EdgeInsets.only(top: 10),
+                              children: <Widget>[
+                                Container(
+                                    constraints: BoxConstraints(
+                                        minHeight:
+                                            MediaQuery.of(context).size.height -
+                                                140),
+                                    decoration: new BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: new BorderRadius.all(
+                                          Radius.circular(10.0),
+                                        )),
+                                    child: Column(children: [
+                                      Container(
+                                        color: Colors.white,
+                                        margin: EdgeInsets.only(
+                                            top: 20, bottom: 10),
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          child: ProfilePicFromUrl(
+                                              _profilePic, 90),
+                                          margin: EdgeInsets.all(10.0),
+                                        ),
                                       ),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context,
-                                            '/user/' +
-                                                widget.uid +
-                                                '/followers');
-                                      },
-                                    )),
-                                    Expanded(
-                                        child: GestureDetector(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Container(
-                                            alignment: Alignment.topCenter,
-                                            child: Text(_noFollowing.toString(),
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                )),
-                                          ),
-                                          Expanded(
-                                              child: Container(
-                                            alignment: Alignment.bottomCenter,
-                                            child: Text("Following"),
-                                          )),
-                                        ],
+                                      Center(
+                                        child: Container(
+                                          color: Colors.white,
+                                          child: Text(_username),
+                                        ),
                                       ),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context,
-                                            '/user/' +
-                                                widget.uid +
-                                                '/following');
-                                      },
-                                    )),
-                                    _uid == user.uid
-                                        ? Expanded(
-                                            child: Column(
+                                      Container(
+                                          color: Colors.white,
+                                          margin: EdgeInsets.symmetric(
+                                              horizontal: 50, vertical: 20),
+                                          height: 45,
+                                          child: Row(
                                             children: <Widget>[
-                                              Container(
-                                                alignment: Alignment.topCenter,
-                                                child: Text(
-                                                    "£" +
-                                                        _amountDonated
-                                                            .toStringAsFixed(2),
-                                                    style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    )),
-                                              ),
                                               Expanded(
-                                                  child: Container(
-                                                alignment:
-                                                    Alignment.bottomCenter,
-                                                child: Text("Raised"),
+                                                  child: FlatButton(
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Container(
+                                                      alignment:
+                                                          Alignment.topCenter,
+                                                      child: Text(
+                                                          _noFollowers
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          )),
+                                                    ),
+                                                    Expanded(
+                                                        child: Container(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: Text(
+                                                        "Followers",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal),
+                                                      ),
+                                                    )),
+                                                  ],
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pushNamed(
+                                                      context,
+                                                      '/user/' +
+                                                          widget.uid +
+                                                          '/followers');
+                                                },
                                               )),
+                                              Expanded(
+                                                  child: FlatButton(
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Container(
+                                                      alignment:
+                                                          Alignment.topCenter,
+                                                      child: Text(
+                                                          _noFollowing
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          )),
+                                                    ),
+                                                    Expanded(
+                                                        child: Container(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: Text("Following",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal)),
+                                                    )),
+                                                  ],
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pushNamed(
+                                                      context,
+                                                      '/user/' +
+                                                          widget.uid +
+                                                          '/following');
+                                                },
+                                              )),
+                                              _uid == user.uid
+                                                  ? Expanded(
+                                                      child: Column(
+                                                      children: <Widget>[
+                                                        Container(
+                                                          alignment: Alignment
+                                                              .topCenter,
+                                                          child: Text(
+                                                              "£" +
+                                                                  _amountDonated
+                                                                      .toStringAsFixed(
+                                                                          2),
+                                                              style: TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              )),
+                                                        ),
+                                                        Expanded(
+                                                            child: Container(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          child: Text("Raised"),
+                                                        )),
+                                                      ],
+                                                    ))
+                                                  : Container()
                                             ],
-                                          ))
-                                        : Container()
-                                  ],
-                                )),
-                            widget.uid == user.uid
-                                ? EditFundderButton(
-                                    text: 'Edit Profile',
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                          context, '/account/edit');
-                                    })
-                                : FutureBuilder(
-                                    future: FollowersService(uid: user.uid)
-                                        .doesXfollowY(x: user.uid, y: _uid),
-                                    builder: (context, initialState) {
-                                      if (initialState.connectionState ==
-                                              ConnectionState.done &&
-                                          initialState.data != null) {
-                                        return FollowButton(initialState.data,
-                                            profileOwnerId: _uid,
-                                            myId: user.uid);
-                                      } else {
-                                        return EditFundderButton(
-                                            text: "", onPressed: () {});
-                                      }
-                                    },
-                                  ),
-                            _uid != user.uid
-                                ? DefaultTabController(
-                                    length: 1,
-                                    initialIndex: 0,
-                                    child: Column(
-                                      children: [
-                                        TabBar(
-                                          onTap: (index) {},
-                                          tabs: [
-                                            Tab(text: 'Posts'),
-                                          ],
-                                        ),
-                                        _profileView(user.uid, 0),
-                                      ],
-                                    ),
-                                  )
-                                : DefaultTabController(
-                                    length: 2,
-                                    initialIndex: 0,
-                                    child: Column(
-                                      children: [
-                                        TabBar(
-                                          tabs: [
-                                            Tab(text: 'Posts'),
-                                            Tab(text: 'Liked')
-                                          ],
-                                          controller: _tabController,
-                                        ),
-                                        [
-                                          _profileView(user.uid, 0),
-                                          _profileView(user.uid, 1)
-                                        ][_tabController.index]
-                                      ],
-                                    ),
-                                  )
-                          ]),
+                                          )),
+                                      widget.uid == user.uid
+                                          ? EditFundderButton(
+                                              text: 'Edit Profile',
+                                              onPressed: () {
+                                                Navigator.pushNamed(
+                                                    context, '/account/edit');
+                                              })
+                                          : FutureBuilder(
+                                              future: FollowersService(
+                                                      uid: user.uid)
+                                                  .doesXfollowY(
+                                                      x: user.uid, y: _uid),
+                                              builder: (context, initialState) {
+                                                if (initialState
+                                                            .connectionState ==
+                                                        ConnectionState.done &&
+                                                    initialState.data != null) {
+                                                  return FollowButton(
+                                                      initialState.data,
+                                                      profileOwnerId: _uid,
+                                                      myId: user.uid);
+                                                } else {
+                                                  return EditFundderButton(
+                                                      text: "",
+                                                      onPressed: () {});
+                                                }
+                                              },
+                                            ),
+                                      _uid != user.uid
+                                          ? DefaultTabController(
+                                              length: 1,
+                                              initialIndex: 0,
+                                              child: Column(
+                                                children: [
+                                                  TabBar(
+                                                    onTap: (index) {},
+                                                    tabs: [
+                                                      Tab(text: 'Posts'),
+                                                    ],
+                                                  ),
+                                                  _profileView(user.uid, 0),
+                                                ],
+                                              ),
+                                            )
+                                          : DefaultTabController(
+                                              length: 2,
+                                              initialIndex: 0,
+                                              child: Column(
+                                                children: [
+                                                  TabBar(
+                                                    tabs: [
+                                                      Tab(text: 'Posts'),
+                                                      Tab(text: 'Liked')
+                                                    ],
+                                                    controller: _tabController,
+                                                  ),
+                                                  [
+                                                    _profileView(user.uid, 0),
+                                                    _profileView(user.uid, 1)
+                                                  ][_tabController.index]
+                                                ],
+                                              ),
+                                            )
+                                    ]))
+                              ]),
                         ),
                       ),
                     ]),
@@ -399,48 +451,92 @@ class _ProfileState extends State<ProfileController>
       postList = likedPostList;
     }
 
-    return ListView.builder(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: postList != null ? postList.length : 0,
-        itemBuilder: (BuildContext context, int index) {
-          Post post = postList[index];
-          return ListTile(
-            leading: ProfilePic(post.author, 40),
-            title: Text(post.title),
-            subtitle: Text(
-              post.subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-              post.status == 'done'
-                  ? Icon(
-                      Ionicons.ios_checkmark_circle,
-                      color: HexColor('ff6b6c'),
-                    )
-                  : Container(width: 0),
-              post.author != uid
-                  ? Container(width: 0)
-                  : FlatButton(
-                      onPressed: () {
-                        print('button pressed');
-                        _showDeleteDialog(post);
-                      },
-                      child: Text('Delete',
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
+    return Container(
+        child: ListView.separated(
+            separatorBuilder: (BuildContext context, int index) {
+              return Divider(
+                color: Colors.grey,
+                height: 0,
+                thickness: 0.3,
+                indent: 20,
+                endIndent: 0,
+              );
+            },
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            padding: EdgeInsets.only(bottom: 10),
+            itemCount: postList != null ? postList.length : 0,
+            itemBuilder: (BuildContext context, int index) {
+              Post post = postList[index];
+              return Container(
+                  decoration: new BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: index == postList.length - 1
+                        ? BorderRadius.only(
+                            bottomLeft: Radius.circular(10.0),
+                            bottomRight: Radius.circular(10.0),
+                          )
+                        : BorderRadius.only(
+                            bottomLeft: Radius.circular(0.0),
+                            bottomRight: Radius.circular(0.0),
+                          ),
+                  ),
+                  child: ListTile(
+                    leading: AspectRatio(
+                      aspectRatio: 1,
+                      child: Container(
+                          height: 60,
+                          child: ClipRRect(
+                            borderRadius: new BorderRadius.only(
+                              topLeft: Radius.circular(10.0),
+                              bottomLeft: Radius.circular(10.0),
+                              topRight: Radius.circular(10.0),
+                              bottomRight: Radius.circular(10.0),
+                            ),
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: post.imageUrl,
+                              placeholder: (context, url) => Loading(),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey[100],
+                              ),
+                            ),
                           )),
                     ),
-            ]),
-            onTap: () {
-              print("Going onto view post from activity yayy");
-              Navigator.pushNamed(context, '/post/${post.id}');
-            },
-          );
-        });
+                    title: Text(post.title),
+                    subtitle: Text(
+                      post.subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                      post.status == 'done'
+                          ? Icon(
+                              Ionicons.ios_checkmark_circle,
+                              color: HexColor('ff6b6c'),
+                            )
+                          : Container(width: 0),
+                      post.author != uid
+                          ? Container(width: 0)
+                          : FlatButton(
+                              onPressed: () {
+                                print('button pressed');
+                                _showDeleteDialog(post);
+                              },
+                              child: Text('Delete',
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  )),
+                            ),
+                    ]),
+                    onTap: () {
+                      print("Going onto view post from activity yayy");
+                      Navigator.pushNamed(context, '/post/${post.id}');
+                    },
+                  ));
+            }));
   }
 
   Future<void> _showDeleteDialog(Post post) async {
