@@ -20,7 +20,7 @@ class SearchDescriptor extends StatelessWidget {
                   style: TextStyle(
                       color: Colors.grey,
                       fontSize: 15,
-                      fontFamily: 'Neue Haas Unica'),
+                      fontFamily: 'Founders Grotesk'),
                 )),
           ])),
     );

@@ -151,6 +151,44 @@ flutter:
           weight: 500
         - asset: fonts/NeueHaasUnica-Bold.ttf
           weight: 700
+    - family: Calibre
+      fonts:
+        - asset: fonts/Calibre-Regular.ttf
+        - asset: fonts/Calibre-Light.otf
+          weight: 300
+        - asset: fonts/Calibre-Medium.otf
+          weight: 500
+        - asset: fonts/Calibre-Bold.otf
+          weight: 700
+    - family: Founders Grotesk
+      fonts:
+        - asset: fonts/FoundersGrotesk-Regular.otf
+        - asset: fonts/FoundersGrotesk-Light.otf
+          weight: 300
+        - asset: fonts/FoundersGrotesk-Medium.otf
+          weight: 500
+        - asset: fonts/FoundersGrotesk-SemiBold.ttf
+          weight: 600
+        - asset: fonts/FoundersGrotesk-Bold.otf
+          weight: 700
+    - family: Maison Neue
+      fonts:
+        - asset: fonts/MaisonNeue-Book.otf
+        - asset: fonts/MaisonNeue-Light.otf
+          weight: 300
+        - asset: fonts/Maison-Neue-Medium.otf
+          weight: 500
+        - asset: fonts/MaisonNeue-Demi.otf
+          weight: 600
+        - asset: fonts/MaisonNeue-Bold.otf
+          weight: 700
+    - family: Monument Grotesk
+      fonts:
+        - asset: fonts/MonumentGrotesk-Regular.ttf
+        - asset: fonts/MonumentGrotesk-Medium.ttf
+          weight: 500
+        - asset: fonts/MonumentGrotesk-Bold.ttf
+          weight: 700
 
   assets:
      - assets/images/

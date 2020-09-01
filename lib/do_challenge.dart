@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/user.dart';
 
 import 'package:fundder/services/database.dart';
@@ -210,13 +211,13 @@ class _DoChallengeState extends State<DoChallenge> {
                                         '${template.title}',
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontFamily: 'Neue Haas Unica',
-                                          fontWeight: FontWeight.bold,
-                                          //fontSize: 16
+                                          fontFamily: 'Founders Grotesk',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
                                         ),
                                       )),
                                     ])),
-                                Padding(padding: EdgeInsets.all(4)),
+                                Padding(padding: EdgeInsets.all(2)),
                                 Align(
                                     alignment: Alignment.topLeft,
                                     child: RichText(
@@ -282,14 +283,20 @@ class _DoChallengeState extends State<DoChallenge> {
   List<TextSpan> _returnHashtags(
       List hashtags, BuildContext context, String templateText) {
     List<TextSpan> hashtagText = [
-      TextSpan(text: templateText + " ", style: TextStyle(color: Colors.black))
+      TextSpan(
+          text: templateText + " ",
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'Founders Grotesk',
+          ))
     ];
     if (hashtags != null) {
       for (var i = 0; i < hashtags.length; i++) {
         hashtagText.add(TextSpan(
             text: "#" + hashtags[i].toString() + " ",
-            style:
-                TextStyle(color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/),
+            style: TextStyle(
+                color: Colors.blueGrey[700],
+                fontFamily: 'Founders Grotesk' /*HexColor('ff6b6c')*/),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Navigator.pushNamed(

@@ -38,7 +38,7 @@ class SharePost extends StatelessWidget {
             child: Text(
               'Share to:',
               style: TextStyle(
-                fontFamily: 'Neue Haas Unica',
+                fontFamily: 'Founders Grotesk',
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),

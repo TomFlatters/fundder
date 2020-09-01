@@ -46,7 +46,7 @@ class WebMenu extends StatelessWidget {
                               'Fundder',
                               style: TextStyle(
                                   fontSize: 22,
-                                  fontFamily: 'Neue Haas Unica',
+                                  fontFamily: 'Founders Grotesk',
                                   color: selected == 0
                                       ? HexColor('000000')
                                       : HexColor('#80000000')),

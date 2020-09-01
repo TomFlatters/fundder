@@ -120,7 +120,7 @@ class _ProfileState extends State<ProfileController>
         body: Text(
           "Redirecting",
           style: TextStyle(
-              fontFamily: 'Neue Haas Unica',
+              fontFamily: 'Founders Grotesk',
               fontSize: 20,
               color: Colors.black,
               decoration: null),

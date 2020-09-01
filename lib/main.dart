@@ -62,17 +62,17 @@ class MyApp extends StatelessWidget {
                           headline6: TextStyle(
                               //fontWeight: FontWeight.w600,
                               fontSize: 20,
-                              fontFamily: 'Neue Haas Unica')),
+                              fontFamily: 'Founders Grotesk')),
                       tabBarTheme: TabBarTheme(
                           labelStyle: TextStyle(
-                              fontFamily: 'Neue Haas Unica',
+                              fontFamily: 'Founders Grotesk',
                               fontWeight: FontWeight.bold),
                           unselectedLabelStyle:
-                              TextStyle(fontFamily: 'Neue Haas Unica'),
+                              TextStyle(fontFamily: 'Founders Grotesk'),
                           indicator: UnderlineTabIndicator(
                               borderSide:
                                   BorderSide(width: 2.0, color: Colors.grey))),
-                      fontFamily: 'Neue Haas Unica',
+                      fontFamily: 'Founders Grotesk',
                       appBarTheme: AppBarTheme(elevation: 0)));
             }));
   }
