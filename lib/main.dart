@@ -63,6 +63,11 @@ class MyApp extends StatelessWidget {
                               //fontWeight: FontWeight.w600,
                               fontSize: 20,
                               fontFamily: 'Founders Grotesk')),
+                      textTheme: TextTheme(
+                          bodyText2: TextStyle(
+                              //fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              fontFamily: 'Founders Grotesk')),
                       tabBarTheme: TabBarTheme(
                           labelStyle: TextStyle(
                               fontFamily: 'Founders Grotesk',
