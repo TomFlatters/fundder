@@ -30,6 +30,9 @@ class FeedView extends StatefulWidget {
 }
 
 class _FeedViewState extends State<FeedView> {
+  bool previousHasLiked;
+  int previousLikesNo;
+
   ScrollPhysics physics;
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
     functionName: 'addMessage',
@@ -100,21 +103,23 @@ class _FeedViewState extends State<FeedView> {
                     height: 30,
                     child: Row(children: <Widget>[
                       //likeButton goes here
-                      StreamBuilder(
-                          stream: rebuildLikesButton,
-                          builder: (context, snapshot) {
-                            print("Building Stream Builder");
-                            if (snapshot.hasData) {
-                              print(
-                                  "New data in stream. Creating new Like Button");
-                              currLikeButton = createLikesFutureBuilder(
-                                  likesService, postData, user.uid);
-                              return currLikeButton;
-                            } else {
-                              print("Using old LikeButton");
-                              return currLikeButton;
-                            }
-                          }),
+                      Expanded(
+                        child: StreamBuilder(
+                            stream: rebuildLikesButton,
+                            builder: (context, snapshot) {
+                              print("Building Stream Builder");
+                              if (snapshot.hasData) {
+                                print(
+                                    "New data in stream. Creating new Like Button");
+                                currLikeButton = createLikesFutureBuilder(
+                                    likesService, postData, user.uid);
+                                return currLikeButton;
+                              } else {
+                                print("Using old LikeButton");
+                                return currLikeButton;
+                              }
+                            }),
+                      ),
 
                       Expanded(
                           child: Align(
@@ -230,41 +235,58 @@ class _FeedViewState extends State<FeedView> {
       },
     );
   }
-}
 
-FutureBuilder createLikesFutureBuilder(likesService, postData, uid) {
-  bool initiallyHasLiked;
-  int initialLikesNo;
-  return FutureBuilder(
-      future: likesService.hasUserLikedPost(postData.id),
-      builder: (context, hasLiked) {
-        if (hasLiked.connectionState == ConnectionState.done) {
-          initiallyHasLiked = hasLiked.data;
-          return FutureBuilder(
-            future: likesService.noOfLikes(postData.id),
-            builder: (context, noLikes) {
-              if (noLikes.connectionState == ConnectionState.done) {
-                initialLikesNo = noLikes.data;
+  FutureBuilder createLikesFutureBuilder(likesService, postData, uid) {
+    bool initiallyHasLiked;
+    int initialLikesNo;
+    return FutureBuilder(
+        future: likesService.hasUserLikedPost(postData.id),
+        builder: (context, hasLiked) {
+          Widget child1 = Container(
+            width: 0,
+          );
+          if (hasLiked.connectionState == ConnectionState.done) {
+            initiallyHasLiked = hasLiked.data;
+            previousHasLiked = initiallyHasLiked;
+            return FutureBuilder(
+              future: likesService.noOfLikes(postData.id),
+              builder: (context, noLikes) {
+                Widget child;
+                if (noLikes.connectionState == ConnectionState.done) {
+                  initialLikesNo = noLikes.data;
+                  previousLikesNo = initialLikesNo;
 
-                return Expanded(
-                    //like bar
-                    child: NewLikeButton(
-                  initiallyHasLiked,
-                  initialLikesNo,
-                  uid: uid,
-                  postId: postData.id,
-                ));
-              } else {
-                return Expanded(
-                  child: Container(),
+                  child = NewLikeButton(
+                    initiallyHasLiked,
+                    initialLikesNo,
+                    uid: uid,
+                    postId: postData.id,
+                  );
+                } else {
+                  child =
+                      /*previousLikesNo != null && previousHasLiked != null
+                        ? NewLikeButton(previousHasLiked, previousLikesNo,
+                            uid: uid, postId: postData.id)
+                        :*/
+                      Container(
+                    width: 0,
+                  );
+                }
+                return AnimatedSwitcher(
+                  duration: Duration(milliseconds: 200),
+                  child: child,
                 );
-              }
-            },
+              },
+            );
+          } else {
+            child1 = Container(
+              width: 0,
+            );
+          }
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 200),
+            child: child1,
           );
-        } else {
-          return Expanded(
-            child: Container(),
-          );
-        }
-      });
+        });
+  }
 }
