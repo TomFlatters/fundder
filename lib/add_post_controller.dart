@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fundder/models/charity.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
@@ -7,9 +9,16 @@ import 'view_post_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/models/post.dart';
+import 'package:fundder/models/template.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'shared/loading.dart';
+import 'global_widgets/buttons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'services/hashtags.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -17,109 +26,263 @@ class AddPost extends StatefulWidget {
 }
 
 class _AddPostState extends State<AddPost> {
+  User user;
+  bool _submitting = false;
   int _current = 0;
   CarouselController _carouselController = CarouselController();
+  double aspectRatio;
+
+  @override
+  void initState() {
+    _retrieveUser();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Create Fundder"),
-        actions: <Widget>[
-          new FlatButton(
-            child: _current == 4
-                ? Text('Submit', style: TextStyle(fontWeight: FontWeight.bold))
-                : Text('Next', style: TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: _current == 4
-                ? () {
-                    // add image to firebase storage
-                    final String fileLocation = user.uid +
-                        "/" +
-                        DateTime.now().microsecondsSinceEpoch.toString();
-                    DatabaseService(uid: user.uid)
-                        .uploadImage(imageFile, fileLocation)
-                        .then((downloadUrl) => {
-                              print("Successful image upload"),
-                              print(downloadUrl),
-
-                              // create post from the state and image url, and add that post to firebase
-                              DatabaseService(uid: user.uid)
-                                  .uploadPost(new Post(
-                                    title: titleController.text.toString(),
-                                    subtitle:
-                                        subtitleController.text.toString(),
-                                    author: user.uid,
-                                    charity: charities[charity],
-                                    likes: [],
-                                    comments: {},
-                                    timestamp: DateTime.now(),
-                                    amountRaised: "0",
-                                    targetAmount:
-                                        moneyController.text.toString(),
-                                    imageUrl: downloadUrl,
-                                  ))
-                                  .then((postId) => {
-                                        print("The doc id is " +
-                                            postId.toString().substring(1,
-                                                postId.toString().length - 1)),
-
-                                        // if the post is successfully added, view the post
-                                        /*DatabaseService(uid: user.uid).getPostById(postId.toString())
-                    .then((post) => {
-                      Navigator.of(context)
-                        .pushReplacement(_viewPost(post))
-                    })*/
-                                        Navigator.pushReplacementNamed(
-                                            context,
-                                            '/post/' +
-                                                postId.toString().substring(
-                                                    1,
-                                                    postId.toString().length -
-                                                        1)) //the substring is very important as postId.toString() is in brackets
-                                      })
-                            });
-                  }
-                : () {
-                    /*Navigator.of(context).pushReplacement(_viewPost());*/
-                    _carouselController.nextPage(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.linear);
-                  },
-          )
-        ],
-        leading: new IconButton(
-          icon: new Icon(Icons.close),
-          onPressed: () => Navigator.of(context).pop(null),
+    //final user = Provider.of<User>(context);
+    if (user == null && kIsWeb == true) {
+      Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
+      return Scaffold(
+        body: Text(
+          "Redirecting",
+          style: TextStyle(
+              fontFamily: 'Founders Grotesk',
+              fontSize: 20,
+              color: Colors.black,
+              decoration: null),
         ),
-      ),
-      body: Builder(
-        builder: (context) {
-          final double height = MediaQuery.of(context).size.height;
-          return CarouselSlider(
-            carouselController: _carouselController,
-            options: CarouselOptions(
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
+      );
+    } else
+    // This size provide us total height and width  of our screen
+    {
+      return _submitting == true
+          ? Loading()
+          : Scaffold(
+              appBar: AppBar(
+                centerTitle: true,
+                title: Text("Create Fundder"),
+                actions: <Widget>[
+                  new FlatButton(
+                    child: _current == 4
+                        ? Text('Submit',
+                            style: TextStyle(fontWeight: FontWeight.bold))
+                        : Text('Next',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: _current == 4
+                        ? () {
+                            try {
+                              setState(() {
+                                _submitting = true;
+                              });
+
+                              // add image to firebase storage
+                              if (imageFile != null) {
+                                final String fileLocation = user.uid +
+                                    "/" +
+                                    DateTime.now()
+                                        .microsecondsSinceEpoch
+                                        .toString();
+                                DatabaseService(uid: user.uid)
+                                    .uploadImage(
+                                        File(imageFile.path), fileLocation)
+                                    .then((downloadUrl) => {
+                                          print("Successful image upload"),
+                                          print(downloadUrl),
+                                          _pushItem(downloadUrl, user)
+                                        });
+                              } else {
+                                _pushItem(null, user);
+                              }
+                            } catch (e) {
+                              setState(() {
+                                _submitting = false;
+                              });
+                              _showErrorDialog(e.toString());
+                            }
+                          }
+                        : () {
+                            /*Navigator.of(context).pushReplacement(_viewPost());*/
+                            _carouselController.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.linear);
+                          },
+                  )
+                ],
+                leading: new IconButton(
+                  icon: new Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(null),
+                ),
+              ),
+              body: Builder(
+                builder: (context) {
+                  final double height = MediaQuery.of(context).size.height;
+                  return CarouselSlider(
+                    carouselController: _carouselController,
+                    options: CarouselOptions(
+                      onPageChanged: (index, reason) {
+                        _changePage();
+                        setState(() {
+                          _current = index;
+                        });
+                      },
+                      enableInfiniteScroll: false,
+                      height: height,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      // autoPlay: false,
+                    ),
+                    items: [
+                      _defineDescription(),
+                      _choosePerson(),
+                      _setMoney(),
+                      _chooseCharity(),
+                      _imageUpload()
+                    ],
+                  );
+                },
+              ),
+            );
+    }
+  }
+
+  void _changePage() {
+    FocusScope.of(context).unfocus();
+  }
+
+  void _retrieveUser() async {
+    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(firebaseUser.uid)
+        .get()
+        .then((value) {
+      setState(() {
+        user = User(
+            uid: firebaseUser.uid,
+            name: value.data["name"],
+            username: value.data['username'],
+            email: firebaseUser.email,
+            profilePic: value.data["profilePic"]);
+      });
+    });
+  }
+
+  void _pushItem(String downloadUrl, User user) {
+    // Validate form
+    if (titleController.text == null ||
+        subtitleController.text == null ||
+        charity == -1 ||
+        moneyController.text == "0.00" ||
+        hashtags.length < 2) {
+      setState(() {
+        _submitting = false;
+      });
+      _showErrorDialog('You have not filled all the required fields');
+    } else {
+      if (whoDoes[selected] == "Myself") {
+        DatabaseService(uid: user.uid)
+            .uploadPost(new Post(
+                title: titleController.text.toString().trimRight(),
+                subtitle: subtitleController.text.toString().trimRight(),
+                author: user.uid,
+                authorUsername: user.username,
+                charity: charities[charity].id,
+                noLikes: 0,
+                noComments: 0,
+                timestamp: DateTime.now(),
+                moneyRaised: 0,
+                targetAmount: moneyController.text.toString(),
+                imageUrl: downloadUrl,
+                status: 'fund',
+                aspectRatio: aspectRatio,
+                hashtags: hashtags,
+                charityLogo: charities[charity].image))
+            .then((postId) => {
+                  if (postId == null)
+                    {
+                      setState(() {
+                        _submitting = false;
+                      })
+                    }
+                  else
+                    {
+                      print("The doc id is " +
+                          postId
+                              .toString()
+                              .substring(1, postId.toString().length - 1)),
+                      HashtagsService(uid: user.uid)
+                          .addHashtag(postId.toString(), hashtags),
+
+                      // if the post is successfully added, view the post
+                      /*DatabaseService(uid: user.uid).getPostById(postId.toString())
+                      .then((post) => {
+                        Navigator.of(context)
+                          .pushReplacement(_viewPost(post))
+                      })*/
+                      Navigator.pushReplacementNamed(
+                          context,
+                          '/post/' +
+                              postId
+                                  .toString()
+                                  .substring(1, postId.toString().length - 1))
+                    } //the substring is very important as postId.toString() is in brackets
                 });
-              },
-              enableInfiniteScroll: false,
-              height: height,
-              viewportFraction: 1.0,
-              enlargeCenterPage: false,
-              // autoPlay: false,
+      } else {
+        // Create a template
+        DatabaseService(uid: user.uid)
+            .uploadTemplate(new Template(
+                title: titleController.text.toString(),
+                subtitle: subtitleController.text.toString(),
+                author: user.uid,
+                authorUsername: user.username,
+                charity: charities[charity].id,
+                likes: [],
+                comments: {},
+                timestamp: DateTime.now(),
+                moneyRaised: 0,
+                targetAmount: moneyController.text.toString(),
+                imageUrl: downloadUrl,
+                whoDoes: whoDoes[selected].toString(),
+                acceptedBy: [],
+                completedBy: [],
+                aspectRatio: aspectRatio,
+                hashtags: hashtags,
+                active: true,
+                charityLogo: charities[charity].image))
+            .then((templateId) => {
+                  // if the post is successfully added, view the post
+                  Navigator.pushReplacementNamed(
+                      context, '/challenge/' + templateId.toString())
+                });
+      }
+    }
+  }
+
+  Future<void> _showErrorDialog(String string) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error Creating Challenge'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(string),
+              ],
             ),
-            items: [
-              _defineDescription(),
-              _choosePerson(),
-              _setMoney(),
-              _chooseCharity(),
-              _imageUpload()
-            ],
-          );
-        },
-      ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
   // Define widgets for each of the form stages:
@@ -127,10 +290,12 @@ class _AddPostState extends State<AddPost> {
   // _defineDescription state:
   final titleController = TextEditingController();
   final subtitleController = TextEditingController();
+  final hashtagController = TextEditingController();
   final descriptionController = TextEditingController();
+  List<String> hashtags = [];
 
   Widget _defineDescription() {
-    return ListView(children: <Widget>[
+    return ListView(shrinkWrap: true, children: <Widget>[
       Container(
           color: Colors.white,
           margin: EdgeInsets.symmetric(vertical: 5),
@@ -143,7 +308,7 @@ class _AddPostState extends State<AddPost> {
                   child: Text(
                     'Title of Challenge',
                     style: TextStyle(
-                      fontFamily: 'Quicksand',
+                      fontFamily: 'Founders Grotesk',
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -157,7 +322,7 @@ class _AddPostState extends State<AddPost> {
                   child: Text(
                     'Subtitle',
                     style: TextStyle(
-                      fontFamily: 'Quicksand',
+                      fontFamily: 'Founders Grotesk',
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -168,40 +333,92 @@ class _AddPostState extends State<AddPost> {
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: InputDecoration(
-                        hintText:
-                            'This will appear under the title in the feed')),
+                        hintText: 'This will appear under the title')),
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Description',
-                    style: TextStyle(
-                      fontFamily: 'Quicksand',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                TextField(
-                    controller: descriptionController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                        hintText: 'A long description for detailed view'))
-              ]))
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: RichText(
+                        text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.black,
+                              fontFamily: 'Founders Grotesk',
+                            ),
+                            children: [
+                          TextSpan(
+                              text: 'Hashtags ',
+                              style: TextStyle(
+                                fontFamily: 'Founders Grotesk',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              )),
+                          TextSpan(
+                              text: 'minimum 2, maximum 5',
+                              style: TextStyle(
+                                fontFamily: 'Founders Grotesk',
+                                fontSize: 12,
+                              )),
+                        ]))),
+                Row(children: [
+                  Expanded(
+                      child: TextField(
+                          inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]"))
+                      ],
+                          controller: hashtagController,
+                          keyboardType: TextInputType.text,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                              hintText:
+                                  'Only text allowed, press add for each hashtag'))),
+                  hashtags.length < 5
+                      ? FlatButton(
+                          onPressed: () {
+                            if (hashtags.contains(hashtagController.text) ==
+                                    false &&
+                                hashtagController.text != "") {
+                              setState(() {
+                                hashtags
+                                    .add(hashtagController.text.toLowerCase());
+                                hashtagController.text = "";
+                              });
+                            }
+                          },
+                          child: Text('Add'))
+                      : Container()
+                ]),
+                ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: hashtags.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        dense: true,
+                        title: Text("#" + hashtags[index]),
+                        trailing: FlatButton(
+                          child: Text('Delete',
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              )),
+                          onPressed: () {
+                            setState(() {
+                              hashtags.removeAt(index);
+                            });
+                          },
+                        ),
+                      );
+                    })
+              ])),
     ]);
   }
 
   // _choosePerson state:
   int selected = -1;
-  final List<String> whoDoes = <String>[
-    "A specific person",
-    'Myself',
-    'Anyone'
-  ];
+  final List<String> whoDoes = <String>['Myself', 'Someone Else'];
   final List<String> subWho = <String>[
-    "Does not have to be a Fundder user",
     'Raise money for your own challenge',
-    'Will be public and anyone will be able to accept the challenge. This appears in the custom challenges in the do tab in the Feed'
+    'Will be public and anyone will be able to accept the challenge. This appears in the "Do" tab in the Feed'
   ];
 
   Widget _choosePerson() {
@@ -216,7 +433,7 @@ class _AddPostState extends State<AddPost> {
               Text(
                 'Who do you want to do it',
                 style: TextStyle(
-                  fontFamily: 'Quicksand',
+                  fontFamily: 'Founders Grotesk',
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -266,7 +483,7 @@ class _AddPostState extends State<AddPost> {
             Text(
               'What is the target amount:',
               style: TextStyle(
-                fontFamily: 'Quicksand',
+                fontFamily: 'Founders Grotesk',
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -276,7 +493,7 @@ class _AddPostState extends State<AddPost> {
                 '£',
                 style: TextStyle(
                   fontWeight: FontWeight.w100,
-                  fontFamily: 'Roboto Mono',
+                  fontFamily: 'Founders Grotesk',
                   fontSize: 45,
                 ),
               ),
@@ -285,7 +502,7 @@ class _AddPostState extends State<AddPost> {
                       keyboardType: TextInputType.number,
                       style: TextStyle(
                         fontWeight: FontWeight.w100,
-                        fontFamily: 'Roboto Mono',
+                        fontFamily: 'Founders Grotesk',
                         fontSize: 45,
                       ),
                       controller: moneyController,
@@ -296,14 +513,16 @@ class _AddPostState extends State<AddPost> {
   }
 
   // _chooseCharity state:
-  final List<String> charities = <String>[
-    "Cancer Research",
-    'British Heart Foundation',
-    'Oxfam'
-  ];
+  List<Charity> charities = <Charity>[];
   int charity = -1;
 
+  void _loadCharityList() async {
+    charities = await DatabaseService(uid: "123").getCharityNameList();
+    setState(() {});
+  }
+
   Widget _chooseCharity() {
+    _loadCharityList();
     return ListView(children: <Widget>[
       Container(
           color: Colors.white,
@@ -315,7 +534,7 @@ class _AddPostState extends State<AddPost> {
               Text(
                 'Which charity are you raising for?',
                 style: TextStyle(
-                  fontFamily: 'Quicksand',
+                  fontFamily: 'Founders Grotesk',
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -335,7 +554,14 @@ class _AddPostState extends State<AddPost> {
                           return Icon(Icons.check_circle_outline);
                         }
                       }),
-                      title: Text('${charities[index]}'),
+                      title: Text('${charities[index].name}'),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, '/charity/' + charities[index].id);
+                        },
+                        child: Icon(Icons.info_outline),
+                      ),
                       onTap: () {
                         charity = index;
                         setState(() {});
@@ -353,42 +579,40 @@ class _AddPostState extends State<AddPost> {
   Widget _imageUpload() {
     return ListView(children: <Widget>[
       Container(
-        color: Colors.white,
-        margin: EdgeInsets.symmetric(vertical: 5),
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-        child: Text(
-          'Add a photo to make your Fundder more recognisable',
-          style: TextStyle(
-            fontFamily: 'Quicksand',
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-      ),
+          color: Colors.white,
+          margin: EdgeInsets.symmetric(vertical: 5),
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          child: RichText(
+              text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.black,
+                    fontFamily: 'Founders Grotesk',
+                  ),
+                  children: [
+                TextSpan(
+                    text: 'Add a photo to make your Fundder more recognisable ',
+                    style: TextStyle(
+                      fontFamily: 'Founders Grotesk',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    )),
+                TextSpan(
+                    text: 'optional',
+                    style: TextStyle(
+                      fontFamily: 'Founders Grotesk',
+                      fontSize: 12,
+                    )),
+              ]))),
       Container(
         child: _decideImageView(),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width * 9 / 16,
+        margin: EdgeInsets.only(bottom: 10),
       ),
-      GestureDetector(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          margin: EdgeInsets.only(left: 70, right: 70, bottom: 20, top: 20),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 1),
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-          ),
-          child: Text(
-            "Select Image",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        onTap: () {
+      EditFundderButton(
+        text: "Select an image",
+        onPressed: () {
           _changePic();
         },
       ),
@@ -436,8 +660,18 @@ class _AddPostState extends State<AddPost> {
     if (imageFile == null) {
       return Center(child: Text('No image selected'));
     } else {
-      return Image.file(File(imageFile.path));
+      File image =
+          new File(imageFile.path); // Or any other way to get a File instance.
+      _findAspectRatio(image);
+      return Image.file(image);
     }
+  }
+
+  void _findAspectRatio(File image) async {
+    var decodedImage = await decodeImageFromList(image.readAsBytesSync());
+    print(decodedImage.width);
+    print(decodedImage.height);
+    aspectRatio = decodedImage.width / decodedImage.height;
   }
 
   ListView _buildBottomNavigationMenu(context) {

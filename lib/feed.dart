@@ -1,303 +1,292 @@
+//!!!!!!!!!!!!!!This file is way way tooooo big
+//really needs to be refactored
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
-import 'package:fundder/services/database.dart';
+import 'package:fundder/post_widgets/commentBar.dart';
+import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/post_widgets/postBody.dart';
+import 'package:fundder/post_widgets/postHeader.dart';
+import 'package:fundder/post_widgets/shareBar.dart';
+import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+import 'package:fundder/view_post_controller.dart';
 import 'package:provider/provider.dart';
 import 'models/post.dart';
-import 'view_post_controller.dart';
-import 'share_post_view.dart';
-import 'helper_classes.dart';
-import 'comment_view_controller.dart';
-import 'other_user_profile.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'services/likes.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'routes/FadeTransition.dart';
 
 class FeedView extends StatefulWidget {
   @override
   _FeedViewState createState() => _FeedViewState();
 
-  final Color colorChoice;
-  final String feedChoice;
-  final String identifier;
-  final Stream<List<Post>> postsStream;
-  FeedView(
-      this.feedChoice, this.identifier, this.colorChoice, this.postsStream);
+  final VoidCallback onDeletePressed;
+  final List<Post> postList;
+  final String hashtag;
+  FeedView(this.postList, this.onDeletePressed, this.hashtag, {Key key});
 }
 
 class _FeedViewState extends State<FeedView> {
+  bool previousHasLiked;
+  int previousLikesNo;
+
   ScrollPhysics physics;
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'addMessage',
+  );
 
   @override
   void initState() {
     super.initState();
-    if (widget.feedChoice == 'user') {
-      physics = NeverScrollableScrollPhysics();
-      print('user');
-    } else {
-      physics = AlwaysScrollableScrollPhysics();
-      print('nonuser');
-    }
   }
 
   @override
   void didUpdateWidget(FeedView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.feedChoice == 'user') {
-      physics = NeverScrollableScrollPhysics();
-      print('user');
-    } else {
-      physics = AlwaysScrollableScrollPhysics();
-      print('nonuser');
-    }
+    //setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return new StreamBuilder(
-        stream: widget.postsStream,
-        // widget.feedChoice == 'user'
-        //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
-        //   : Firestore.instance.collection("posts").snapshots(),
-        builder: (context, snapshot) {
-          // print(snapshot.data);
-          if (!snapshot.hasData) {
-            return Text("No data...");
-          } else {
-            return ListView.separated(
-              physics: physics,
-              shrinkWrap: true,
-              padding: const EdgeInsets.only(top: 10.0),
-              itemCount: snapshot.data.length,
-              itemBuilder: (BuildContext context, int index) {
-                Post postData = snapshot.data[index];
-                // print(postData);
-                return GestureDetector(
-                  child: Container(
-                      color: Colors.white,
+    print("feed being built");
+    final user = Provider.of<User>(context);
+    final LikesService likesService = LikesService(uid: user.uid);
+    if (widget.postList == null) {
+      return Text("No data...");
+    } else {
+      return ListView.separated(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        padding: const EdgeInsets.only(top: 10.0),
+        itemCount: widget.postList.length,
+        itemBuilder: (BuildContext context, int index) {
+          //building an individual post
+          Post postData = widget.postList[index];
+          // print(postData)
+
+          //arbitrarily chosen int
+          StreamController<void> likesManager = StreamController<int>();
+          Stream rebuildLikesButton = likesManager.stream;
+
+          //the previous state of like before it's changed
+          var currLikeButton =
+              createLikesFutureBuilder(likesService, postData, user.uid);
+
+          return GestureDetector(
+            child: Container(
+              decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.all(
+                    Radius.circular(10.0),
+                  )),
+              width: MediaQuery.of(context).size.width,
+              child: Container(
+                margin: EdgeInsets.only(left: 0, right: 0, top: 0),
+                child: Column(children: <Widget>[
+                  PostHeader(
+                      postAuthorId: postData.author,
+                      postAuthorUserName: postData.authorUsername,
+                      targetCharity: postData.charity,
+                      postStatus: postData.status,
+                      charityLogo: postData.charityLogo),
+                  PostBody(
+                    postData: postData,
+                    hashtag: widget.hashtag,
+                    maxLines: 2,
+                  ),
+                  Container(
+                    //action bar
+                    key: GlobalKey(),
+                    height: 30,
+                    child: Row(children: <Widget>[
+                      //likeButton goes here
+                      Expanded(
+                        child: StreamBuilder(
+                            stream: rebuildLikesButton,
+                            builder: (context, snapshot) {
+                              print("Building Stream Builder");
+                              if (snapshot.hasData) {
+                                print(
+                                    "New data in stream. Creating new Like Button");
+                                currLikeButton = createLikesFutureBuilder(
+                                    likesService, postData, user.uid);
+                                return currLikeButton;
+                              } else {
+                                print("Using old LikeButton");
+                                return currLikeButton;
+                              }
+                            }),
+                      ),
+
+                      Expanded(
+                          child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: CommentButton(
+                          pid: postData.id,
+                        ),
+                      )),
+                      Expanded(
+                        child: ShareBar(
+                          postId: postData.id,
+                          postTitle: postData.title,
+                        ),
+                      ),
+                    ]),
+                  ),
+                  Row(children: [
+                    Expanded(
                       child: Container(
-                          margin: EdgeInsets.only(left: 0, right: 0, top: 0),
-                          child: Column(
-                            children: <Widget>[
-                              Container(
-                                height: 60,
-                                child: Row(
-                                  children: <Widget>[
-                                    Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: GestureDetector(
-                                          child: AspectRatio(
-                                              aspectRatio: 1 / 1,
-                                              child: Container(
-                                                child: ProfilePic(
-                                                    "https://i.imgur.com/BoN9kdC.png",
-                                                    40),
-                                                margin: EdgeInsets.all(10.0),
-                                              )),
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                                context, '/username');
-                                          },
-                                        )),
-                                    Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(postData.author
-                                            /*style: TextStyle(
-                                    fontFamily: 'Roboto Mono'
-                                  ),*/
-                                            )),
-                                    Expanded(
-                                        child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Container(
-                                                margin: EdgeInsets.all(10.0),
-                                                child:
-                                                    Text(postData.charity)))),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                  alignment: Alignment.centerLeft,
-                                  margin: EdgeInsets.all(10),
-                                  child: Text(postData.subtitle)),
-                              Container(
-                                  alignment: Alignment.centerLeft,
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 10),
-                                  child: Text(
-                                    '£${postData.amountRaised} raised of £${postData.targetAmount} target',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  )),
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.only(
-                                    top: 5, bottom: 15, left: 0, right: 0),
-                                child: LinearPercentIndicator(
-                                  linearStrokeCap: LinearStrokeCap.butt,
-                                  lineHeight: 3,
-                                  percent: double.parse(postData.amountRaised) /
-                                      double.parse(postData.targetAmount),
-                                  backgroundColor: HexColor('CCCCCC'),
-                                  progressColor: HexColor('ff6b6c'),
-                                ),
-                              ),
-                              Container(
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.width *
-                                      9 /
-                                      16,
-                                  child: CachedNetworkImage(
-                                    imageUrl: (postData.imageUrl != null)
-                                        ? postData.imageUrl
-                                        : 'https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg',
-                                    placeholder: (context, url) => Loading(),
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.error),
-                                  ), //Image.network('https://ichef.bbci.co.uk/news/1024/branded_pidgin/EE19/production/_111835906_954176c6-5c0f-46e5-9bdc-6e30073588ef.jpg'),
-                                ),
-                                margin: EdgeInsets.symmetric(vertical: 10.0),
-                              ),
-                              Container(
-                                height: 30,
-                                child: Row(children: <Widget>[
-                                  Expanded(
-                                    child: FlatButton(
-                                      child: Row(children: [
-                                        Container(
-                                          width: 20,
-                                          height: 20,
-                                          padding: const EdgeInsets.all(0.0),
-                                          child: Image.asset(
-                                              'assets/images/like.png'),
-                                        ),
-                                        Expanded(
-                                            child: Container(
-                                                margin:
-                                                    EdgeInsets.only(left: 10),
-                                                child: Text(
-                                                  postData.likes.length
-                                                      .toString(),
-                                                  textAlign: TextAlign.left,
-                                                )))
-                                      ]),
-                                      onPressed: () {
-                                        final snackBar = SnackBar(
-                                            content: Text("Like passed"));
-                                        Scaffold.of(context)
-                                            .showSnackBar(snackBar);
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: FlatButton(
-                                      child: Row(children: [
-                                        Container(
-                                          width: 20,
-                                          height: 20,
-                                          padding: const EdgeInsets.all(0.0),
-                                          child: Image.asset(
-                                              'assets/images/comment.png'),
-                                        ),
-                                        Expanded(
-                                            child: Container(
-                                                margin:
-                                                    EdgeInsets.only(left: 10),
-                                                child: Text(
-                                                  postData.comments.length
-                                                      .toString(),
-                                                  textAlign: TextAlign.left,
-                                                )))
-                                      ]),
-                                      onPressed: () {
-                                        /*Navigator.of(context)
-                                            .push(_showComments());*/
-                                        Navigator.pushNamed(
-                                            context,
-                                            '/post/' +
-                                                postData.id +
-                                                '/comments');
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: FlatButton(
-                                      child: Row(children: [
-                                        Container(
-                                          width: 20,
-                                          height: 20,
-                                          padding: const EdgeInsets.all(0.0),
-                                          child: Image.asset(
-                                              'assets/images/share.png'),
-                                        ),
-                                        Expanded(
-                                            child: Container(
-                                                margin:
-                                                    EdgeInsets.only(left: 10),
-                                                child: Text(
-                                                  'Share',
-                                                  textAlign: TextAlign.left,
-                                                )))
-                                      ]),
-                                      onPressed: () {
-                                        _showShare();
-                                      },
-                                    ),
-                                  )
-                                ]),
-                              ),
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                margin: EdgeInsets.all(10),
-                                child: Text(howLongAgo(postData.timestamp),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    )),
-                              )
-                            ],
-                          ))),
-                  onTap: () {
-                    print(postData);
-                    Navigator.pushNamed(context, '/post/' + postData.id);
-                  },
-                );
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.all(10),
+                        child: Text(
+                          howLongAgo(postData.timestamp),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                    postData.author != user.uid
+                        ? Container()
+                        : FlatButton(
+                            onPressed: () {
+                              print('button pressed');
+                              _showDeleteDialog(postData);
+                            },
+                            child: Text('Delete',
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                )),
+                          ),
+                  ])
+                ]),
+              ),
+            ),
+            onTap: () async {
+              //
+              //throw StateError('Uncaught error thrown by app.');
+              // var pid = postData.id;
+              // var noLikes = likesModel.noLikes;
+              // var isLiked = likesModel.isLiked;
+              // var uid = user.uid;
+              // //passing state into ViewPost screen
+              // LikesModel likeState = LikesModel(isLiked, noLikes,
+              //     uid: uid, postId: pid);
+
+              print("a post clicked");
+              await Navigator.push(
+                  context, FadeRoute(page: ViewPost(postData)));
+              likesManager.add(1);
+            },
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return SizedBox(
+            height: 10,
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _showDeleteDialog(Post post) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Post?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Once you delete this post, all the money donated will be refunded unless you have uploaded proof of challenge completion. This cannot be undone.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Firestore.instance
+                    .collection('posts')
+                    .document(post.id)
+                    .delete()
+                    .then((value) {
+                  Navigator.of(context).pop();
+                  widget.onDeletePressed();
+                });
               },
-              separatorBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: 10,
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  FutureBuilder createLikesFutureBuilder(likesService, postData, uid) {
+    bool initiallyHasLiked;
+    int initialLikesNo;
+    return FutureBuilder(
+        future: likesService.hasUserLikedPost(postData.id),
+        builder: (context, hasLiked) {
+          Widget child1 = Container(
+            width: 0,
+          );
+          if (hasLiked.connectionState == ConnectionState.done) {
+            initiallyHasLiked = hasLiked.data;
+            previousHasLiked = initiallyHasLiked;
+            return FutureBuilder(
+              future: likesService.noOfLikes(postData.id),
+              builder: (context, noLikes) {
+                Widget child;
+                if (noLikes.connectionState == ConnectionState.done) {
+                  initialLikesNo = noLikes.data;
+                  previousLikesNo = initialLikesNo;
+
+                  child = NewLikeButton(
+                    initiallyHasLiked,
+                    initialLikesNo,
+                    uid: uid,
+                    postId: postData.id,
+                  );
+                } else {
+                  child =
+                      /*previousLikesNo != null && previousHasLiked != null
+                        ? NewLikeButton(previousHasLiked, previousLikesNo,
+                            uid: uid, postId: postData.id)
+                        :*/
+                      Container(
+                    width: 0,
+                  );
+                }
+                return AnimatedSwitcher(
+                  duration: Duration(milliseconds: 200),
+                  child: child,
                 );
               },
             );
+          } else {
+            child1 = Container(
+              width: 0,
+            );
           }
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 200),
+            child: child1,
+          );
         });
-  }
-
-  void _showShare() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SharePost();
-        });
-  }
-
-  List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.documents.map((doc) {
-      //print(doc.data);
-      return Post(
-        author: doc.data['author'],
-        title: doc.data['title'],
-        charity: doc.data['charity'],
-        amountRaised: doc.data['amountRaised'],
-        targetAmount: doc.data['targetAmount'],
-        likes: doc.data['likes'],
-        comments: doc.data['comments'],
-        subtitle: doc.data['subtitle'],
-        timestamp: doc.data['timestamp'],
-        id: doc.documentID,
-      );
-    }).toList();
   }
 }
