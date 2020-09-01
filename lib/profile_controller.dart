@@ -503,7 +503,12 @@ class _ProfileState extends State<ProfileController>
                             ),
                           )),
                     ),
-                    title: Text(post.title),
+                    title: Text(
+                      post.title,
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     subtitle: Text(
                       post.subtitle,
                       maxLines: 1,
