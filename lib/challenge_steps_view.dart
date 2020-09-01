@@ -68,7 +68,7 @@ class _StepsPageState extends State<StepsPage> {
                               template.title,
                               style: TextStyle(
                                 fontSize: 20,
-                                fontFamily: 'Neue Haas Unica',
+                                fontFamily: 'Founders Grotesk',
                               ),
                             ),
                           ),
@@ -79,7 +79,7 @@ class _StepsPageState extends State<StepsPage> {
                               template.subtitle,
                               style: TextStyle(
                                 fontSize: 16,
-                                fontFamily: 'Neue Haas Unica',
+                                fontFamily: 'Founders Grotesk',
                               ),
                             ),
                           ),
@@ -90,7 +90,7 @@ class _StepsPageState extends State<StepsPage> {
                               'Raising money for ${template.charity}',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontFamily: 'Neue Haas Unica',
+                                fontFamily: 'Founders Grotesk',
                               ),
                             ),
                           ),
@@ -103,7 +103,7 @@ class _StepsPageState extends State<StepsPage> {
                                     Text(
                                       'Set your fundraising target:',
                                       style: TextStyle(
-                                        fontFamily: 'Neue Haas Unica',
+                                        fontFamily: 'Founders Grotesk',
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
@@ -113,7 +113,7 @@ class _StepsPageState extends State<StepsPage> {
                                         '£',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w100,
-                                          fontFamily: 'Neue Haas Unica',
+                                          fontFamily: 'Founders Grotesk',
                                           fontSize: 45,
                                         ),
                                       ),
@@ -123,7 +123,7 @@ class _StepsPageState extends State<StepsPage> {
                                                   TextInputType.number,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w100,
-                                                fontFamily: 'Neue Haas Unica',
+                                                fontFamily: 'Founders Grotesk',
                                                 fontSize: 45,
                                               ),
                                               controller: moneyController,

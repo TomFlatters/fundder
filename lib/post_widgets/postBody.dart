@@ -36,9 +36,7 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.all(10),
             child: Text(postData.title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold, /*fontSize: 16*/
-                ))),
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16))),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
@@ -72,14 +70,16 @@ class PostBody extends StatelessWidget {
   List<TextSpan> _returnHashtags(List hashtags, BuildContext context) {
     List<TextSpan> hashtagText = [
       TextSpan(
-          text: postData.subtitle + " ", style: TextStyle(color: Colors.black))
+          text: postData.subtitle + " ",
+          style: TextStyle(color: Colors.black, fontFamily: 'Founders Grotesk'))
     ];
     if (hashtags != null) {
       for (var i = 0; i < hashtags.length; i++) {
         hashtagText.add(TextSpan(
             text: "#" + hashtags[i].toString() + " ",
-            style:
-                TextStyle(color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/),
+            style: TextStyle(
+                color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/,
+                fontFamily: 'Founders Grotesk'),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 if (hashtags[i].toString() != hashtag) {

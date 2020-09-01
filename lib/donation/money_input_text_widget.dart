@@ -7,7 +7,7 @@ Widget moneyInputWidget(MoneyMaskedTextController moneyController) {
       '£',
       style: TextStyle(
         fontWeight: FontWeight.w100,
-        fontFamily: 'Neue Haas Unica',
+        fontFamily: 'Founders Grotesk',
         fontSize: 45,
       ),
     ),
@@ -16,7 +16,7 @@ Widget moneyInputWidget(MoneyMaskedTextController moneyController) {
             keyboardType: TextInputType.number,
             style: TextStyle(
               fontWeight: FontWeight.w100,
-              fontFamily: 'Neue Haas Unica',
+              fontFamily: 'Founders Grotesk',
               fontSize: 45,
             ),
             controller: moneyController,

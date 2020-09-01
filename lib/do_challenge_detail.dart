@@ -135,7 +135,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             child: Text(
                                           snapshot.data.title,
                                           style: TextStyle(
-                                            fontFamily: 'Neue Haas Unica',
+                                            fontFamily: 'Founders Grotesk',
                                             fontSize: 16,
                                           ),
                                         )),
