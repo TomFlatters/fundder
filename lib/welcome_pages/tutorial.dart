@@ -104,14 +104,15 @@ class _TutorialState extends State<Tutorial> {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontFamily: 'Sohne', fontSize: 25),
+                style: TextStyle(fontFamily: 'Neue Haas Unica', fontSize: 25),
               ),
               Container(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                   child: Text(
                     subtitle,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: 'Sohne', fontSize: 15),
+                    style:
+                        TextStyle(fontFamily: 'Neue Haas Unica', fontSize: 15),
                   ))
             ],
           ),

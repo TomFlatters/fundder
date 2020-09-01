@@ -47,7 +47,7 @@ class _AddPostState extends State<AddPost> {
         body: Text(
           "Redirecting",
           style: TextStyle(
-              fontFamily: 'Sohne',
+              fontFamily: 'Neue Haas Unica',
               fontSize: 20,
               color: Colors.black,
               decoration: null),
@@ -308,7 +308,7 @@ class _AddPostState extends State<AddPost> {
                   child: Text(
                     'Title of Challenge',
                     style: TextStyle(
-                      fontFamily: 'Sohne',
+                      fontFamily: 'Neue Haas Unica',
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -322,7 +322,7 @@ class _AddPostState extends State<AddPost> {
                   child: Text(
                     'Subtitle',
                     style: TextStyle(
-                      fontFamily: 'Sohne',
+                      fontFamily: 'Neue Haas Unica',
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -341,20 +341,20 @@ class _AddPostState extends State<AddPost> {
                             style: TextStyle(
                               fontSize: 14.0,
                               color: Colors.black,
-                              fontFamily: 'Sohne',
+                              fontFamily: 'Neue Haas Unica',
                             ),
                             children: [
                           TextSpan(
                               text: 'Hashtags ',
                               style: TextStyle(
-                                fontFamily: 'Sohne',
+                                fontFamily: 'Neue Haas Unica',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               )),
                           TextSpan(
                               text: 'minimum 2, maximum 5',
                               style: TextStyle(
-                                fontFamily: 'Sohne',
+                                fontFamily: 'Neue Haas Unica',
                                 fontSize: 12,
                               )),
                         ]))),
@@ -433,7 +433,7 @@ class _AddPostState extends State<AddPost> {
               Text(
                 'Who do you want to do it',
                 style: TextStyle(
-                  fontFamily: 'Sohne',
+                  fontFamily: 'Neue Haas Unica',
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -483,7 +483,7 @@ class _AddPostState extends State<AddPost> {
             Text(
               'What is the target amount:',
               style: TextStyle(
-                fontFamily: 'Sohne',
+                fontFamily: 'Neue Haas Unica',
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -493,7 +493,7 @@ class _AddPostState extends State<AddPost> {
                 '£',
                 style: TextStyle(
                   fontWeight: FontWeight.w100,
-                  fontFamily: 'Sohne',
+                  fontFamily: 'Neue Haas Unica',
                   fontSize: 45,
                 ),
               ),
@@ -502,7 +502,7 @@ class _AddPostState extends State<AddPost> {
                       keyboardType: TextInputType.number,
                       style: TextStyle(
                         fontWeight: FontWeight.w100,
-                        fontFamily: 'Sohne',
+                        fontFamily: 'Neue Haas Unica',
                         fontSize: 45,
                       ),
                       controller: moneyController,
@@ -534,7 +534,7 @@ class _AddPostState extends State<AddPost> {
               Text(
                 'Which charity are you raising for?',
                 style: TextStyle(
-                  fontFamily: 'Sohne',
+                  fontFamily: 'Neue Haas Unica',
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -587,20 +587,20 @@ class _AddPostState extends State<AddPost> {
                   style: TextStyle(
                     fontSize: 14.0,
                     color: Colors.black,
-                    fontFamily: 'Sohne',
+                    fontFamily: 'Neue Haas Unica',
                   ),
                   children: [
                 TextSpan(
                     text: 'Add a photo to make your Fundder more recognisable ',
                     style: TextStyle(
-                      fontFamily: 'Sohne',
+                      fontFamily: 'Neue Haas Unica',
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     )),
                 TextSpan(
                     text: 'optional',
                     style: TextStyle(
-                      fontFamily: 'Sohne',
+                      fontFamily: 'Neue Haas Unica',
                       fontSize: 12,
                     )),
               ]))),

@@ -106,7 +106,7 @@ class _UploadProofState extends State<UploadProofScreen> {
                 child: Text(
                   'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
                   style: TextStyle(
-                    fontFamily: 'Sohne',
+                    fontFamily: 'Neue Haas Unica',
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),

@@ -142,6 +142,15 @@ flutter:
           weight: 600
         - asset: fonts/Sohne-Fett.otf
           weight: 700
+    - family: Neue Haas Unica
+      fonts:
+        - asset: fonts/NeueHaasUnica-Regular.ttf
+        - asset: fonts/NeueHaasUnica-Light.ttf
+          weight: 300
+        - asset: fonts/NeueHaasUnica-Medium.ttf
+          weight: 500
+        - asset: fonts/NeueHaasUnica-Bold.ttf
+          weight: 700
 
   assets:
      - assets/images/
