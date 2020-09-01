@@ -118,11 +118,15 @@ class _DoChallengeState extends State<DoChallenge> {
               ? Container()
               : ListView.separated(
                   separatorBuilder: (BuildContext context, int index) {
-                    return SizedBox(
-                      height: 10,
+                    return Divider(
+                      color: Colors.grey,
+                      height: 0,
+                      thickness: 0.3,
+                      indent: 20,
+                      endIndent: 0,
                     );
                   },
-                  itemBuilder: (c, i) => _templateListView(templates[i]),
+                  itemBuilder: (c, i) => _templateListView(templates[i], i),
                   itemCount: templates.length,
                   padding: const EdgeInsets.only(top: 10.0),
                   shrinkWrap: true,
@@ -133,15 +137,26 @@ class _DoChallengeState extends State<DoChallenge> {
     }
   }
 
-  Widget _templateListView(Template template) {
+  Widget _templateListView(Template template, int index) {
     return GestureDetector(
       child: Container(
           margin: EdgeInsets.only(left: 0, right: 0, top: 0),
           decoration: new BoxDecoration(
             color: Colors.white,
-            borderRadius: new BorderRadius.all(
-              Radius.circular(10.0),
-            ),
+            borderRadius: index == 0
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0),
+                  )
+                : index == templates.length - 1
+                    ? BorderRadius.only(
+                        bottomLeft: Radius.circular(10.0),
+                        bottomRight: Radius.circular(10.0),
+                      )
+                    : BorderRadius.only(
+                        bottomLeft: Radius.circular(0.0),
+                        bottomRight: Radius.circular(0.0),
+                      ),
           ),
           child: Container(
               margin: EdgeInsets.only(left: 0, right: 0, top: 0),
@@ -150,14 +165,14 @@ class _DoChallengeState extends State<DoChallenge> {
                   Container(
                     height: 70,
                     margin:
-                        EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 0),
+                        EdgeInsets.only(left: 0, right: 0, top: 15, bottom: 0),
                     child: Row(
                       children: <Widget>[
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Container(
                               margin: EdgeInsets.only(
-                                  left: 10, right: 10, top: 0, bottom: 0),
+                                  left: 10, right: 15, top: 0, bottom: 0),
                               child: AspectRatio(
                                 aspectRatio: 1 / 1,
                                 child: ClipRRect(
@@ -200,7 +215,7 @@ class _DoChallengeState extends State<DoChallenge> {
                                             fontSize: 16),
                                       )),
                                     ])),
-                                Padding(padding: EdgeInsets.all(2)),
+                                Padding(padding: EdgeInsets.all(4)),
                                 Align(
                                     alignment: Alignment.topLeft,
                                     child: RichText(
@@ -221,7 +236,7 @@ class _DoChallengeState extends State<DoChallenge> {
                     ),
                   ),
                   Container(
-                      margin: EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                      margin: EdgeInsets.only(left: 10, bottom: 10, top: 5),
                       child: Row(
                         children: <Widget>[
                           Expanded(
