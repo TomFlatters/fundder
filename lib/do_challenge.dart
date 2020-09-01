@@ -210,12 +210,13 @@ class _DoChallengeState extends State<DoChallenge> {
                                         '${template.title}',
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                            fontFamily: 'Sohne',
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16),
+                                          fontFamily: 'Sohne',
+                                          fontWeight: FontWeight.w500,
+                                          //fontSize: 16
+                                        ),
                                       )),
                                     ])),
-                                Padding(padding: EdgeInsets.all(4)),
+                                Padding(padding: EdgeInsets.all(1)),
                                 Align(
                                     alignment: Alignment.topLeft,
                                     child: RichText(

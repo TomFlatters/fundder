@@ -36,7 +36,7 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.all(10),
             child: Text(postData.title,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16))),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
@@ -61,7 +61,7 @@ class PostBody extends StatelessWidget {
             margin: EdgeInsets.only(bottom: 15, top: 0, left: 10, right: 10),
             child: Text(
               '£${postData.moneyRaised == null ? 0.00.toStringAsFixed(2) : postData.moneyRaised.toStringAsFixed(2)} raised of £${postData.targetAmount} target',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.w500),
             )),
       ],
     );
