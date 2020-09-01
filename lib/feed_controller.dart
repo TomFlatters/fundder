@@ -2,16 +2,26 @@
 // feed.dart controls the actual feed content
 
 import 'package:flutter/material.dart';
-import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
-import 'feed.dart';
-import 'helper_classes.dart';
 import 'do_challenge.dart';
 import 'models/user.dart';
-import 'push_notifications.dart';
 import 'feed_wrapper.dart';
 
-class FeedController extends StatelessWidget {
+class FeedController extends StatefulWidget {
+  @override
+  _FeedControllerState createState() => _FeedControllerState();
+}
+
+class _FeedControllerState extends State<FeedController>
+    with SingleTickerProviderStateMixin {
+  TabController _tabController;
+  @override
+  void initState() {
+    _tabController = new TabController(length: 3, vsync: this, initialIndex: 1);
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     print('feed controller instantiated');
@@ -24,6 +34,7 @@ class FeedController extends StatelessWidget {
           centerTitle: true,
           title: Text('Feed'),
           bottom: TabBar(
+            controller: _tabController,
             physics: NeverScrollableScrollPhysics(),
             //indicatorColor: HexColor(colors[_tabController.index]),
             tabs: [
@@ -34,11 +45,14 @@ class FeedController extends StatelessWidget {
           ),
         ),
         body: //FeedView('Do', HexColor('ff6b6c'))
-            TabBarView(physics: NeverScrollableScrollPhysics(), children: [
-          DoChallenge(user),
-          FeedWrapper("Fund", null, "fund"),
-          FeedWrapper("Done", null, "done"),
-        ]),
+            TabBarView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: _tabController,
+                children: [
+              DoChallenge(user),
+              FeedWrapper("Fund", null, "fund"),
+              FeedWrapper("Done", null, "done"),
+            ]),
       ),
     );
   }
