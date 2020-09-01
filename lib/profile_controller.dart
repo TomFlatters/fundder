@@ -234,7 +234,7 @@ class _ProfileState extends State<ProfileController>
                                     constraints: BoxConstraints(
                                         minHeight:
                                             MediaQuery.of(context).size.height -
-                                                140),
+                                                80),
                                     decoration: new BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: new BorderRadius.all(

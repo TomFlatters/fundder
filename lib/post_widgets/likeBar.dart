@@ -102,13 +102,22 @@ class NewLikeButton extends StatefulWidget {
   _NewLikeButtonState createState() => _NewLikeButtonState();
 }
 
-class _NewLikeButtonState extends State<NewLikeButton> {
+class _NewLikeButtonState extends State<NewLikeButton>
+    with TickerProviderStateMixin {
   bool isLiked;
   int noLikes;
+  AnimationController _controller;
+  Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
+    _controller = new AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _animation = Tween<double>(begin: 0.0, end: 1).animate(_controller);
+    _controller.forward();
     isLiked = widget.initialIsLiked;
     noLikes = widget.initialNoLikes;
   }
@@ -124,6 +133,7 @@ class _NewLikeButtonState extends State<NewLikeButton> {
         noLikes += 1;
         isLiked = true;
       }
+      _controller.forward(from: 0.0);
     });
   }
 
@@ -133,30 +143,34 @@ class _NewLikeButtonState extends State<NewLikeButton> {
         onPressed: likePressed,
         child: Container(
             height: 40,
-            child: Row(children: <Widget>[
-              Expanded(
-                  child: Row(children: [
-                Container(
-                  width: 25,
-                  height: 25,
-                  padding: const EdgeInsets.all(0.0),
-                  child: (isLiked)
-                      ? Image.asset('assets/images/like_selected.png',
-                          color: HexColor('ff6b6c'))
-                      : Image.asset('assets/images/like.png',
-                          color: Colors.grey[850]),
-                ),
-                Expanded(
+            child: FadeTransition(
+                opacity: _animation,
+                child: Row(children: <Widget>[
+                  Container(
+                    width: 25,
+                    height: 25,
+                    padding: const EdgeInsets.all(0.0),
+                    child: (isLiked)
+                        ? Image.asset('assets/images/like_selected.png',
+                            color: HexColor('ff6b6c'))
+                        : Image.asset('assets/images/like.png',
+                            color: Colors.grey[850]),
+                  ),
+                  Expanded(
                     child: Container(
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.only(left: 10, top: 5),
-                        child: Text(
-                          noLikes != null ? noLikes.toString() : "",
-                          style:
-                              TextStyle(fontSize: 15, color: Colors.grey[850]),
-                          textAlign: TextAlign.left,
-                        )))
-              ]))
-            ])));
+                      alignment: Alignment.centerLeft,
+                      margin: EdgeInsets.only(left: 10, top: 5),
+                      child: Text(
+                        noLikes != null ? noLikes.toString() : "",
+                        style: TextStyle(fontSize: 15, color: Colors.grey[850]),
+                        textAlign: TextAlign.left,
+                      ),
+                    ), /*Text(
+                        noLikes != null ? noLikes.toString() : "",
+                        style: TextStyle(fontSize: 15, color: Colors.grey[850]),
+                        textAlign: TextAlign.left,
+                      )*/
+                  )
+                ]))));
   }
 }
