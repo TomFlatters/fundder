@@ -96,6 +96,7 @@ class _SearchState extends State<SearchController>
                 onCancelled: () {
                   FocusScope.of(context).unfocus();
                 },
+                listPadding: EdgeInsets.only(top: 10),
                 hintText: _tabController.index == 0
                     ? 'search accounts'
                     : 'search hashtags',

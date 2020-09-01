@@ -220,18 +220,20 @@ class _DoChallengeState extends State<DoChallenge> {
                                 Padding(padding: EdgeInsets.all(2)),
                                 Align(
                                     alignment: Alignment.topLeft,
-                                    child: RichText(
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        text: TextSpan(
-                                          children: _returnHashtags(
-                                              template.hashtags,
-                                              context,
-                                              template.subtitle),
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                          ),
-                                        ))),
+                                    child: Container(
+                                        margin: EdgeInsets.only(right: 10),
+                                        child: RichText(
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            text: TextSpan(
+                                              children: _returnHashtags(
+                                                  template.hashtags,
+                                                  context,
+                                                  template.subtitle),
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            )))),
                               ]),
                         ),
                       ],

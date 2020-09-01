@@ -37,7 +37,8 @@ class ShareBar extends StatelessWidget {
         ),
         Expanded(
             child: Container(
-                margin: EdgeInsets.only(left: 10),
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.only(left: 10, top: 5),
                 child: Text(
                   'Share',
                   textAlign: TextAlign.left,
