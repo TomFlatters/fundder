@@ -255,7 +255,7 @@ class _ProfileState extends State<ProfileController>
                                       Center(
                                         child: Container(
                                           color: Colors.white,
-                                          child: Text(_username),
+                                          child: Text(_name),
                                         ),
                                       ),
                                       Container(
