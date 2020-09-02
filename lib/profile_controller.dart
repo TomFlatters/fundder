@@ -569,7 +569,10 @@ class _ProfileState extends State<ProfileController>
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('Delete'),
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.grey),
+              ),
               onPressed: () {
                 Firestore.instance
                     .collection('posts')
@@ -583,7 +586,7 @@ class _ProfileState extends State<ProfileController>
               },
             ),
             FlatButton(
-              child: Text('Cancel'),
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
