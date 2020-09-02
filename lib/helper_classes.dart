@@ -58,11 +58,12 @@ class _ProfilePicState extends State<ProfilePic> {
         .get()
         .then((value) {
       if (mounted) {
-        setState(() {
-          if (value.data != null) {
-            url = value.data["profilePic"];
-          }
-        });
+        if (mounted)
+          setState(() {
+            if (value.data != null) {
+              url = value.data["profilePic"];
+            }
+          });
       }
     });
   }

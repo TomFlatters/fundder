@@ -42,15 +42,18 @@ class _UploadProofState extends State<UploadProofScreen> {
         : Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: Text("Create Fundder"),
+              title: Text("Complete Fundder"),
               actions: <Widget>[
                 new FlatButton(
                     child: Text('Submit',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                        )),
                     onPressed: () {
-                      setState(() {
-                        _submitting = true;
-                      });
+                      if (mounted)
+                        setState(() {
+                          _submitting = true;
+                        });
                       print('Submit pressed');
                       if (_imageFile != null) {
                         print('not null');
@@ -106,10 +109,9 @@ class _UploadProofState extends State<UploadProofScreen> {
                 child: Text(
                   'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
                   style: TextStyle(
-                    fontFamily: 'Founders Grotesk',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                      fontFamily: 'Founders Grotesk',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18),
                 ),
               ),
               Center(
@@ -179,7 +181,7 @@ class _UploadProofState extends State<UploadProofScreen> {
       await _controller.initialize();
       await _controller.setLooping(true);
       await _controller.play();
-      setState(() {});
+      if (mounted) setState(() {});
     }
   }
 
@@ -198,13 +200,15 @@ class _UploadProofState extends State<UploadProofScreen> {
         final pickedFile = await _picker.getImage(
           source: source,
         );
-        setState(() {
-          _imageFile = pickedFile;
-        });
+        if (mounted)
+          setState(() {
+            _imageFile = pickedFile;
+          });
       } catch (e) {
-        setState(() {
-          _pickImageError = e;
-        });
+        if (mounted)
+          setState(() {
+            _pickImageError = e;
+          });
       }
       ;
     }
@@ -304,9 +308,10 @@ class _UploadProofState extends State<UploadProofScreen> {
         await _playVideo(response.file);
       } else {
         isVideo = false;
-        setState(() {
-          _imageFile = response.file;
-        });
+        if (mounted)
+          setState(() {
+            _imageFile = response.file;
+          });
       }
     } else {
       _retrieveDataError = response.exception.code;
@@ -353,7 +358,7 @@ class _UploadProofState extends State<UploadProofScreen> {
           title: Text('Remove Current Video'),
           onTap: () async {
             _imageFile = null;
-            this.setState(() {});
+            if (mounted) this.setState(() {});
           },
         ),
         ListTile(
@@ -386,7 +391,7 @@ class _UploadProofState extends State<UploadProofScreen> {
           title: Text('Remove Current Photo'),
           onTap: () async {
             _imageFile = null;
-            this.setState(() {});
+            if (mounted) this.setState(() {});
           },
         ),
         ListTile(
@@ -450,7 +455,7 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
     }
     if (initialized != controller.value.initialized) {
       initialized = controller.value.initialized;
-      setState(() {});
+      if (mounted) setState(() {});
     }
   }
 

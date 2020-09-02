@@ -125,7 +125,7 @@ class _CommentPageState extends State<CommentPage> {
                       child: Container(
                           height: 80,
                           margin: EdgeInsets.only(right: 20),
-                          padding: EdgeInsets.symmetric(vertical: 20),
+                          padding: EdgeInsets.only(top: 20, bottom: 20),
                           child: TextField(
                             controller: _textController,
                             decoration: InputDecoration(

@@ -12,7 +12,8 @@ class ViewFollowers extends StatefulWidget {
 
   final String uid;
   final int startIndex;
-  ViewFollowers({this.uid, @required this.startIndex});
+  final String username;
+  ViewFollowers({this.uid, @required this.startIndex, @required this.username});
 }
 
 class _ViewFollowersState extends State<ViewFollowers>
@@ -45,13 +46,14 @@ class _ViewFollowersState extends State<ViewFollowers>
     followersList =
         await GeneralFollowerServices.unamesFollowingUser(widget.uid);
     _refreshController.refreshCompleted();
-    setState(() {
-      firstLoadDone = true;
-    });
+    if (mounted)
+      setState(() {
+        firstLoadDone = true;
+      });
   }
 
   _handleTabSelection() {
-    setState(() {});
+    if (mounted) setState(() {});
     print("called");
   }
 
@@ -66,7 +68,7 @@ class _ViewFollowersState extends State<ViewFollowers>
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text(""),
+          title: Text(widget.username),
           actions: <Widget>[
             new IconButton(
               icon: new Icon(Icons.close),

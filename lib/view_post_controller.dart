@@ -19,6 +19,7 @@ import 'models/user.dart';
 import 'global_widgets/buttons.dart';
 import 'services/database.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'dart:async';
 
 class ViewPost extends StatefulWidget {
   @override
@@ -48,6 +49,9 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
 
   Container createPostUI(
       Post postData, String uid, context, LikesService likesService) {
+    StreamController<void> likesManager = StreamController<int>();
+    Stream rebuildLikesButton = likesManager.stream;
+    var currLikeButton = createLikesFutureBuilder(likesService, postData, uid);
     return Container(
       width: MediaQuery.of(context).size.width,
       color: Colors.white,
@@ -63,6 +67,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
             postData: postData,
             hashtag: null,
             maxLines: 999999999999999,
+            likesManager: likesManager,
           ),
           uid == "123"
               ? Container()
@@ -71,46 +76,24 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                   key: GlobalKey(),
                   height: 30,
                   child: Row(children: <Widget>[
-                    /*Expanded(
-                //like bar
-                child:*/
-                    FutureBuilder(
-                        future: likesService.hasUserLikedPost(postData.id),
-                        builder: (context, hasLiked) {
-                          bool initiallyHasLiked;
-                          if (hasLiked.connectionState ==
-                              ConnectionState.done) {
-                            initiallyHasLiked = hasLiked.data;
-                            return FutureBuilder(
-                              future: likesService.noOfLikes(postData.id),
-                              builder: (context, noLikes) {
-                                int initialLikesNo;
-                                if (noLikes.connectionState ==
-                                    ConnectionState.done) {
-                                  initialLikesNo = noLikes.data;
-
-                                  return Expanded(
-                                      //like bar
-                                      child: NewLikeButton(
-                                    initiallyHasLiked,
-                                    initialLikesNo,
-                                    uid: uid,
-                                    postId: postData.id,
-                                  ));
-                                } else {
-                                  return Expanded(
-                                    child: Container(),
-                                  );
-                                }
-                              },
-                            );
-                          } else {
-                            return Expanded(
-                              child: Container(),
-                            );
-                          }
-                        }),
-                    //),
+                    Expanded(
+                      //like bar
+                      child: StreamBuilder(
+                          stream: rebuildLikesButton,
+                          builder: (context, snapshot) {
+                            print("Building Stream Builder");
+                            if (snapshot.hasData) {
+                              print(
+                                  "New data in stream. Creating new Like Button");
+                              currLikeButton = createLikesFutureBuilder(
+                                  likesService, postData, uid);
+                              return currLikeButton;
+                            } else {
+                              print("Using old LikeButton");
+                              return currLikeButton;
+                            }
+                          }),
+                    ),
                     Expanded(
                         child: Align(
                       alignment: Alignment.centerLeft,
@@ -170,6 +153,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
     }
 
     print("View post controller");
+
     return Container(
         child: postData == null
             ? Scaffold(
@@ -299,10 +283,63 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
     print('reloading');
     postData = await DatabaseService(uid: "123").getPostById(this.postData.id);
     if (mounted) {
-      setState(() {
-        willNeedUpdate = false;
-      });
+      if (mounted)
+        setState(() {
+          willNeedUpdate = false;
+        });
     }
+  }
+
+  FutureBuilder createLikesFutureBuilder(likesService, postData, uid) {
+    bool initiallyHasLiked;
+    int initialLikesNo;
+    return FutureBuilder(
+        future: likesService.hasUserLikedPost(postData.id),
+        builder: (context, hasLiked) {
+          Widget child1 = Container(
+            width: 0,
+          );
+          if (hasLiked.connectionState == ConnectionState.done) {
+            initiallyHasLiked = hasLiked.data;
+            return FutureBuilder(
+              future: likesService.noOfLikes(postData.id),
+              builder: (context, noLikes) {
+                Widget child;
+                if (noLikes.connectionState == ConnectionState.done) {
+                  initialLikesNo = noLikes.data;
+
+                  child = NewLikeButton(
+                    initiallyHasLiked,
+                    initialLikesNo,
+                    uid: uid,
+                    postId: postData.id,
+                  );
+                } else {
+                  child =
+                      /*previousLikesNo != null && previousHasLiked != null
+                        ? NewLikeButton(previousHasLiked, previousLikesNo,
+                            uid: uid, postId: postData.id)
+                        :*/
+                      Container(
+                    width: 0,
+                  );
+                }
+                return AnimatedSwitcher(
+                  duration: Duration(milliseconds: 200),
+                  child: child,
+                );
+              },
+            );
+          } else {
+            child1 = Container(
+              width: 0,
+            );
+          }
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 200),
+            child: child1,
+          );
+        });
   }
 }
 

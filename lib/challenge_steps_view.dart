@@ -67,9 +67,9 @@ class _StepsPageState extends State<StepsPage> {
                             child: Text(
                               template.title,
                               style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: 'Founders Grotesk',
-                              ),
+                                  fontSize: 18,
+                                  fontFamily: 'Founders Grotesk',
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                           Padding(
@@ -104,7 +104,7 @@ class _StepsPageState extends State<StepsPage> {
                                       'Set your fundraising target:',
                                       style: TextStyle(
                                         fontFamily: 'Founders Grotesk',
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w500,
                                         fontSize: 16,
                                       ),
                                     ),
@@ -112,7 +112,7 @@ class _StepsPageState extends State<StepsPage> {
                                       Text(
                                         '£',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.w100,
+                                          fontWeight: FontWeight.normal,
                                           fontFamily: 'Founders Grotesk',
                                           fontSize: 45,
                                         ),
@@ -134,8 +134,13 @@ class _StepsPageState extends State<StepsPage> {
                           PrimaryFundderButton(
                               text: 'Accept Challenge',
                               onPressed: () {
-                                _makePostFromTemplate(template, user,
-                                    moneyController.text.toString());
+                                if (double.parse(moneyController.text) < 2) {
+                                  _showErrorDialog(
+                                      'The minimum donation target amount is £2');
+                                } else {
+                                  _makePostFromTemplate(template, user,
+                                      moneyController.text.toString());
+                                }
                               }),
                         ])),
               ],
@@ -178,5 +183,32 @@ class _StepsPageState extends State<StepsPage> {
               Navigator.pushReplacementNamed(
                   context, '/post/' + postId.documentID.toString())
             });
+  }
+
+  Future<void> _showErrorDialog(String string) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error Creating Challenge'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(string),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
