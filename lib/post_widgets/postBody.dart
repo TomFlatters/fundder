@@ -36,7 +36,9 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.all(10),
             child: Text(postData.title,
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20))),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, /*fontSize: 18*/
+                ))),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),

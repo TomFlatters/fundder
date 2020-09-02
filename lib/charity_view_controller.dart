@@ -79,8 +79,7 @@ class _CharityViewState extends State<CharityView> {
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                               fontFamily: 'Founders Grotesk',
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500),
+                                              fontWeight: FontWeight.bold),
                                         )),
                                       ])),
                                   Container(
