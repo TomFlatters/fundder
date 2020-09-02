@@ -10,12 +10,18 @@ import 'package:fundder/shared/loading.dart';
 import 'package:fundder/video_item.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:async';
 
 class PostBody extends StatelessWidget {
+  StreamController<void> likesManager;
   final Post postData;
   final String hashtag;
   final int maxLines;
-  PostBody({this.postData, this.hashtag, this.maxLines});
+  PostBody(
+      {this.postData,
+      this.hashtag,
+      this.maxLines,
+      @required this.likesManager});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -89,13 +95,17 @@ class PostBody extends StatelessWidget {
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 if (hashtags[i].toString() != hashtag) {
-                  Navigator.pushNamed(
-                      context, '/hashtag/' + hashtags[i].toString());
+                  _openFeed(context, hashtags[i]);
                 }
               }));
       }
     }
     return hashtagText;
+  }
+
+  void _openFeed(BuildContext context, String hashtag) async {
+    await Navigator.pushNamed(context, '/hashtag/' + hashtag.toString());
+    this.likesManager.add(1);
   }
 
   Widget _previewImageVideo(Post postData) {

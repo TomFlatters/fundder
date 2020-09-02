@@ -96,6 +96,7 @@ class _FeedViewState extends State<FeedView> {
                     postData: postData,
                     hashtag: widget.hashtag,
                     maxLines: 2,
+                    likesManager: likesManager,
                   ),
                   Container(
                     //action bar
