@@ -51,7 +51,10 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
       Post postData, String uid, context, LikesService likesService) {
     StreamController<void> likesManager = StreamController<int>();
     Stream rebuildLikesButton = likesManager.stream;
-    var currLikeButton = createLikesFutureBuilder(likesService, postData, uid);
+    var currLikeButton;
+    if (uid != "123") {
+      currLikeButton = createLikesFutureBuilder(likesService, postData, uid);
+    }
     return Container(
       width: MediaQuery.of(context).size.width,
       color: Colors.white,

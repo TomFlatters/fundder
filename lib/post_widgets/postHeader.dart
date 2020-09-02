@@ -2,7 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:fundder/helper_classes.dart';
+import 'package:provider/provider.dart';
+import 'package:fundder/models/user.dart';
 
 //NB* A widget that aligns its child within itself and optionally sizes itself based on the child's size.
 
@@ -22,6 +23,7 @@ class PostHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     print('charity logo: ' + this.charityLogo);
     return Container(
       height: 60,
@@ -34,7 +36,11 @@ class PostHeader extends StatelessWidget {
                 child: AspectRatio(
                     aspectRatio: 1 / 1,
                     child: Container(
-                      child: ProfilePic(postAuthorId, 40),
+                      child: user != null
+                          ? ProfilePic(postAuthorId, 40)
+                          : ProfilePicFromUrl(
+                              'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283',
+                              40),
                       margin: EdgeInsets.all(10.0),
                     )),
               ),
@@ -48,7 +54,9 @@ class PostHeader extends StatelessWidget {
             ]),
             onTap: () {
               print('/user/' + postAuthorId);
-              Navigator.pushNamed(context, '/user/' + postAuthorId);
+              if (user != null) {
+                Navigator.pushNamed(context, '/user/' + postAuthorId);
+              }
             },
           ),
           Expanded(
