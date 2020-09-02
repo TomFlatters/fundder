@@ -318,22 +318,39 @@ class _AddPostState extends State<AddPost> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Title of Challenge',
-                    style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
+                  child: RichText(
+                      text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                            fontFamily: 'Founders Grotesk',
+                          ),
+                          children: [
+                        TextSpan(
+                            text: 'Title of Challenge ',
+                            style: TextStyle(
+                              fontFamily: 'Founders Grotesk',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            )),
+                        TextSpan(
+                            text: 'maximum 50 characters',
+                            style: TextStyle(
+                              fontFamily: 'Founders Grotesk',
+                              fontSize: 12,
+                            ))
+                      ])),
                 ),
                 TextField(
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(50),
+                    ],
                     controller: titleController,
                     decoration: InputDecoration(hintText: 'Write a title')),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
                   child: Text(
-                    'Subtitle',
+                    'Description',
                     style: TextStyle(
                       fontFamily: 'Founders Grotesk',
                       fontWeight: FontWeight.bold,
@@ -365,7 +382,8 @@ class _AddPostState extends State<AddPost> {
                                 fontSize: 18,
                               )),
                           TextSpan(
-                              text: 'minimum 2, maximum 5',
+                              text:
+                                  'minimum 2, maximum 5. These help categorise your post',
                               style: TextStyle(
                                 fontFamily: 'Founders Grotesk',
                                 fontSize: 12,
