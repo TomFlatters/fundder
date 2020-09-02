@@ -176,7 +176,7 @@ class _NewLikeButtonState extends State<NewLikeButton>
   }
 
   @override
-  dispose() {
+  void dispose() {
     _controller.dispose(); // you need this
     super.dispose();
   }
