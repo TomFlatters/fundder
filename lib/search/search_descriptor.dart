@@ -13,18 +13,18 @@ class SearchDescriptor extends StatelessWidget {
                     borderRadius: new BorderRadius.all(
                       Radius.circular(10.0),
                     )),
-                padding: EdgeInsets.only(top: 100),
+                padding: EdgeInsets.only(top: 150),
                 child: Column(children: [
                   Icon(
                     AntDesign.search1,
-                    color: Colors.grey[300],
-                    size: MediaQuery.of(context).size.width / 4,
+                    color: Colors.grey,
+                    size: MediaQuery.of(context).size.width / 8,
                   ),
                   Container(
                       margin: EdgeInsets.only(
                           top: 30, left: 40, right: 40, bottom: 150),
                       child: Text(
-                        'Search for posts by hashtag or for users by username',
+                        'Search for users by username or posts by hashtag',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             color: Colors.grey,

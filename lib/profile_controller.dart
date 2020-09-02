@@ -56,6 +56,8 @@ class _ProfileState extends State<ProfileController>
   double _amountDonated = 0.00;
   int _noFollowers;
   int _noFollowing;
+  String emptyMessage =
+      "Looks like you haven't yet created a Fundder challenge. Press the plus icon in the bottom bar to create a new challenge.";
 
   @override
   void dispose() {
@@ -114,6 +116,9 @@ class _ProfileState extends State<ProfileController>
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
+    if (user.uid != widget.uid) {
+      emptyMessage = "Looks like they haven't yet created a Fundder challenge";
+    }
     // print(user.uid);
     if (user == null && kIsWeb == true) {
       Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
@@ -450,12 +455,12 @@ class _ProfileState extends State<ProfileController>
     }
   }
 
-  Widget _profileView(String uid, int index) {
+  Widget _profileView(String uid, int tabIndex) {
     //LikesService likesService = LikesService(uid: uid);
     List<Post> postList;
-    if (index == 0 && authorPostList != null) {
+    if (tabIndex == 0 && authorPostList != null) {
       postList = authorPostList;
-    } else if (index == 1 && likedPostList != null) {
+    } else if (tabIndex == 1 && likedPostList != null) {
       postList = likedPostList;
     }
 
@@ -473,82 +478,110 @@ class _ProfileState extends State<ProfileController>
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             padding: EdgeInsets.only(bottom: 10),
-            itemCount: postList != null ? postList.length : 0,
+            itemCount:
+                postList != null && postList.length != 0 ? postList.length : 1,
             itemBuilder: (BuildContext context, int index) {
-              Post post = postList[index];
-              return Container(
-                  decoration: new BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: index == postList.length - 1
-                        ? BorderRadius.only(
-                            bottomLeft: Radius.circular(10.0),
-                            bottomRight: Radius.circular(10.0),
-                          )
-                        : BorderRadius.only(
-                            bottomLeft: Radius.circular(0.0),
-                            bottomRight: Radius.circular(0.0),
-                          ),
-                  ),
-                  child: ListTile(
-                    leading: AspectRatio(
-                      aspectRatio: 1,
-                      child: Container(
-                          height: 60,
-                          child: ClipRRect(
-                            borderRadius: new BorderRadius.only(
-                              topLeft: Radius.circular(10.0),
+              if (postList == null || postList.length == 0) {
+                return Center(
+                  child: Container(
+                      padding: EdgeInsets.only(top: 40),
+                      child: Column(children: [
+                        Icon(
+                          tabIndex == 0 ? AntDesign.meh : AntDesign.hearto,
+                          color: Colors.grey,
+                          size: MediaQuery.of(context).size.width / 8,
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(
+                                top: 30, left: 40, right: 40, bottom: 20),
+                            child: Text(
+                              tabIndex == 0
+                                  ? emptyMessage
+                                  : "Looks like you haven't liked any posts yet",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                  fontFamily: 'Founders Grotesk'),
+                            )),
+                      ])),
+                );
+              } else {
+                Post post = postList[index];
+                return Container(
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: index == postList.length - 1
+                          ? BorderRadius.only(
                               bottomLeft: Radius.circular(10.0),
-                              topRight: Radius.circular(10.0),
                               bottomRight: Radius.circular(10.0),
-                            ),
-                            child: CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl: post.imageUrl,
-                              placeholder: (context, url) => Loading(),
-                              errorWidget: (context, url, error) => Container(
-                                color: Colors.grey[100],
-                              ),
-                            ),
-                          )),
-                    ),
-                    title: Text(
-                      post.title,
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      post.subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                      post.status == 'done'
-                          ? Icon(
-                              Ionicons.ios_checkmark_circle,
-                              color: HexColor('ff6b6c'),
                             )
-                          : Container(width: 0),
-                      post.author != uid
-                          ? Container(width: 0)
-                          : FlatButton(
-                              onPressed: () {
-                                print('button pressed');
-                                _showDeleteDialog(post);
-                              },
-                              child: Text('Delete',
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  )),
+                          : BorderRadius.only(
+                              bottomLeft: Radius.circular(0.0),
+                              bottomRight: Radius.circular(0.0),
                             ),
-                    ]),
-                    onTap: () {
-                      print("Going onto view post from activity yayy");
-                      Navigator.pushNamed(context, '/post/${post.id}');
-                    },
-                  ));
+                    ),
+                    child: ListTile(
+                      leading: AspectRatio(
+                        aspectRatio: 1,
+                        child: Container(
+                            height: 60,
+                            child: ClipRRect(
+                              borderRadius: new BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                bottomLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0),
+                                bottomRight: Radius.circular(10.0),
+                              ),
+                              child: CachedNetworkImage(
+                                fit: BoxFit.cover,
+                                imageUrl: post.imageUrl,
+                                placeholder: (context, url) => Loading(),
+                                errorWidget: (context, url, error) => Container(
+                                  color: Colors.grey[100],
+                                ),
+                              ),
+                            )),
+                      ),
+                      title: Text(
+                        post.title,
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(
+                        post.subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                        post.status == 'done'
+                            ? Icon(
+                                Ionicons.ios_checkmark_circle,
+                                color: HexColor('ff6b6c'),
+                              )
+                            : Container(width: 0),
+                        post.author != uid
+                            ? Container(width: 0)
+                            : FlatButton(
+                                onPressed: () {
+                                  print('button pressed');
+                                  _showDeleteDialog(post);
+                                },
+                                child: Text('Delete',
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    )),
+                              ),
+                      ]),
+                      onTap: () {
+                        print("Going onto view post from activity yayy");
+                        Navigator.pushNamed(context, '/post/${post.id}');
+                      },
+                    ));
+              }
             }));
   }
 
