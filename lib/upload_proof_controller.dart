@@ -46,7 +46,8 @@ class _UploadProofState extends State<UploadProofScreen> {
               actions: <Widget>[
                 new FlatButton(
                     child: Text('Submit',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 20)),
                     onPressed: () {
                       setState(() {
                         _submitting = true;

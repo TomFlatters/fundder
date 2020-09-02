@@ -684,11 +684,11 @@ class _AddPostState extends State<AddPost> {
             _removePhoto();
           },
         ),
-        ListTile(
+        /*ListTile(
           leading: Icon(FontAwesome5Brands.facebook_square),
           title: Text('Import from Facebook'),
           onTap: () {},
-        ),
+        ),*/
         ListTile(
           leading: Icon(FontAwesome.camera),
           title: Text('Take Photo'),

@@ -28,7 +28,7 @@ class SearchDescriptor extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             color: Colors.grey,
-                            fontSize: 15,
+                            fontSize: 16,
                             fontFamily: 'Founders Grotesk'),
                       )),
                 ])),

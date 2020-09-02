@@ -167,7 +167,7 @@ flutter:
           weight: 300
         - asset: fonts/FoundersGrotesk-Medium.otf
           weight: 500
-        - asset: fonts/FoundersGrotesk-SemiBold.ttf
+        - asset: fonts/FoundersGrotesk-Semibold.ttf
           weight: 600
         - asset: fonts/FoundersGrotesk-Bold.otf
           weight: 700
