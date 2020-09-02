@@ -67,9 +67,9 @@ class _StepsPageState extends State<StepsPage> {
                             child: Text(
                               template.title,
                               style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontFamily: 'Founders Grotesk',
-                                  fontWeight: FontWeight.w500),
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                           Padding(
@@ -104,7 +104,7 @@ class _StepsPageState extends State<StepsPage> {
                                       'Set your fundraising target:',
                                       style: TextStyle(
                                         fontFamily: 'Founders Grotesk',
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w500,
                                         fontSize: 16,
                                       ),
                                     ),
@@ -112,7 +112,7 @@ class _StepsPageState extends State<StepsPage> {
                                       Text(
                                         '£',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.w100,
+                                          fontWeight: FontWeight.normal,
                                           fontFamily: 'Founders Grotesk',
                                           fontSize: 45,
                                         ),

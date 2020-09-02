@@ -212,7 +212,7 @@ class _DoChallengeState extends State<DoChallenge> {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontFamily: 'Founders Grotesk',
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                         ),
                                       )),

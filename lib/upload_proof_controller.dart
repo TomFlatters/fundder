@@ -42,12 +42,13 @@ class _UploadProofState extends State<UploadProofScreen> {
         : Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              title: Text("Create Fundder"),
+              title: Text("Complete Fundder"),
               actions: <Widget>[
                 new FlatButton(
                     child: Text('Submit',
                         style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 20)),
+                          fontWeight: FontWeight.w500,
+                        )),
                     onPressed: () {
                       if (mounted)
                         setState(() {
@@ -108,10 +109,9 @@ class _UploadProofState extends State<UploadProofScreen> {
                 child: Text(
                   'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
                   style: TextStyle(
-                    fontFamily: 'Founders Grotesk',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                      fontFamily: 'Founders Grotesk',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18),
                 ),
               ),
               Center(

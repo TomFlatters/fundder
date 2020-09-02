@@ -137,8 +137,8 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                           snapshot.data.title,
                                           style: TextStyle(
                                               fontFamily: 'Founders Grotesk',
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500),
+                                              //fontSize: 18,
+                                              fontWeight: FontWeight.bold),
                                         )),
                                         GestureDetector(
                                             onTap: () {
