@@ -78,9 +78,10 @@ class _VerificationState extends State<CheckVerified> {
                               Navigator.pushNamed(
                                   context, '/' + user.uid + '/tutorial');
                             } else {
-                              setState(() {
-                                verificationText = 'Email not verified';
-                              });
+                              if (mounted)
+                                setState(() {
+                                  verificationText = 'Email not verified';
+                                });
                             }
                           },
                         ),
@@ -90,16 +91,18 @@ class _VerificationState extends State<CheckVerified> {
                               FirebaseUser user =
                                   await FirebaseAuth.instance.currentUser();
                               user.sendEmailVerification();
-                              setState(() {
-                                verificationText = 'Verification email sent';
-                              });
+                              if (mounted)
+                                setState(() {
+                                  verificationText = 'Verification email sent';
+                                });
                             }),
                         SecondaryFundderButton(
                           text: 'Sign out',
                           onPressed: () async {
-                            setState(() {
-                              loading = true;
-                            });
+                            if (mounted)
+                              setState(() {
+                                loading = true;
+                              });
                             await _auth.signOut();
                             Navigator.pop(context);
                           },

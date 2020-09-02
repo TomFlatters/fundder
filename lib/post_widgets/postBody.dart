@@ -10,12 +10,18 @@ import 'package:fundder/shared/loading.dart';
 import 'package:fundder/video_item.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:async';
 
 class PostBody extends StatelessWidget {
+  StreamController<void> likesManager;
   final Post postData;
   final String hashtag;
   final int maxLines;
-  PostBody({this.postData, this.hashtag, this.maxLines});
+  PostBody(
+      {this.postData,
+      this.hashtag,
+      this.maxLines,
+      @required this.likesManager});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -36,7 +42,9 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.all(10),
             child: Text(postData.title,
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16))),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, /*fontSize: 18*/
+                ))),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
@@ -74,7 +82,7 @@ class PostBody extends StatelessWidget {
           style: TextStyle(
               color: Colors.black,
               fontFamily: 'Founders Grotesk',
-              fontSize: 15))
+              fontSize: 16))
     ];
     if (hashtags != null) {
       for (var i = 0; i < hashtags.length; i++) {
@@ -83,17 +91,21 @@ class PostBody extends StatelessWidget {
             style: TextStyle(
                 color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/,
                 fontFamily: 'Founders Grotesk',
-                fontSize: 15),
+                fontSize: 16),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 if (hashtags[i].toString() != hashtag) {
-                  Navigator.pushNamed(
-                      context, '/hashtag/' + hashtags[i].toString());
+                  _openFeed(context, hashtags[i]);
                 }
               }));
       }
     }
     return hashtagText;
+  }
+
+  void _openFeed(BuildContext context, String hashtag) async {
+    await Navigator.pushNamed(context, '/hashtag/' + hashtag.toString());
+    this.likesManager.add(1);
   }
 
   Widget _previewImageVideo(Post postData) {

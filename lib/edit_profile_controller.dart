@@ -50,15 +50,16 @@ class _EditProfileState extends State<EditProfile> {
         .document(firebaseUser.uid)
         .get()
         .then((value) {
-      setState(() {
-        _uid = firebaseUser.uid;
-        _name = value.data["name"];
-        nameEntry.text = _name;
-        _username = value.data['username'];
-        _email = firebaseUser.email;
-        emailEntry.text = _email;
-        _profilePic = value.data["profilePic"];
-      });
+      if (mounted)
+        setState(() {
+          _uid = firebaseUser.uid;
+          _name = value.data["name"];
+          nameEntry.text = _name;
+          _username = value.data['username'];
+          _email = firebaseUser.email;
+          emailEntry.text = _email;
+          _profilePic = value.data["profilePic"];
+        });
     });
   }
 
@@ -77,31 +78,41 @@ class _EditProfileState extends State<EditProfile> {
           new FlatButton(
             child: Text('Save'),
             onPressed: () {
-              setState(() {
-                isLoading = true;
-              });
-              if (imageFile != null) {
-                final String fileLocation = _uid +
-                    "/" +
-                    DateTime.now().microsecondsSinceEpoch.toString();
-                DatabaseService(uid: _uid)
-                    .uploadImage(File(imageFile.path), fileLocation)
-                    .then((downloadUrl) => {
-                          print("Successful image upload"),
-                          print(downloadUrl),
+              if (mounted)
+                setState(() {
+                  isLoading = true;
+                });
+              if (nameEntry.text != '') {
+                if (imageFile != null) {
+                  final String fileLocation = _uid +
+                      "/" +
+                      DateTime.now().microsecondsSinceEpoch.toString();
+                  DatabaseService(uid: _uid)
+                      .uploadImage(File(imageFile.path), fileLocation)
+                      .then((downloadUrl) => {
+                            print("Successful image upload"),
+                            print(downloadUrl),
 
-                          // create post from the state and image url, and add that post to firebase
-                          DatabaseService(uid: _uid).updateUserData(
-                              _email, //emailEntry.text,
-                              _username,
-                              nameEntry.text,
-                              downloadUrl)
-                        });
+                            // create post from the state and image url, and add that post to firebase
+                            DatabaseService(uid: _uid).updateUserData(
+                                _email, //emailEntry.text,
+                                _username,
+                                nameEntry.text,
+                                downloadUrl)
+                          });
+                } else {
+                  DatabaseService(uid: _uid).updateUserData(
+                      emailEntry.text, _username, nameEntry.text, _profilePic);
+                }
+                Navigator.of(context).pop(setState(() {}));
               } else {
-                DatabaseService(uid: _uid).updateUserData(
-                    emailEntry.text, _username, nameEntry.text, _profilePic);
+                if (mounted) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }
+                _showErrorDialog('Name cannot be empty');
               }
-              Navigator.of(context).pop(setState(() {}));
             },
           )
         ],
@@ -212,17 +223,17 @@ class _EditProfileState extends State<EditProfile> {
   // Helper functions for the image picker
   _openGallery() async {
     imageFile = await picker.getImage(source: ImageSource.gallery);
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   _openCamera() async {
     imageFile = await picker.getImage(source: ImageSource.camera);
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   _removePhoto() {
     imageFile = null;
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   Widget _decideImageView() {
@@ -243,11 +254,11 @@ class _EditProfileState extends State<EditProfile> {
             _removePhoto();
           },
         ),
-        ListTile(
+        /*ListTile(
           leading: Icon(FontAwesome5Brands.facebook_square),
           title: Text('Import from Facebook'),
           onTap: () {},
-        ),
+        ),*/
         ListTile(
           leading: Icon(FontAwesome.camera),
           title: Text('Take Photo'),
@@ -265,75 +276,31 @@ class _EditProfileState extends State<EditProfile> {
       ],
     );
   }
-}
 
-/*class ChangePic extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Color(0xFF737373),
-      height: 350,
-      child: Container(
-        child: _buildBottomNavigationMenu(context),
-        decoration: BoxDecoration(
-          color: Theme.of(context).canvasColor,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(10),
-            topRight: const Radius.circular(10),
+  Future<void> _showErrorDialog(String string) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error Editing Profile'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(string),
+              ],
+            ),
           ),
-        ),
-      ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
-
-  ListView _buildBottomNavigationMenu(context) {
-    return ListView(
-      children: <Widget>[
-        ListTile(
-          leading: Icon(FontAwesome.trash_o),
-          title: Text('Remove Current Photo'),
-          onTap: () async {},
-        ),
-        ListTile(
-          leading: Icon(FontAwesome5Brands.facebook_square),
-          title: Text('Import from Facebook'),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(FontAwesome.camera),
-          title: Text('Take Photo'),
-          onTap: () {},
-        ),
-        ListTile(
-          leading: Icon(FontAwesome.image),
-          title: Text('Choose From Library'),
-          onTap: () {},
-        ),
-      ],
-    );
-  }
-
-    // Helper functions for the image picker
-  _openGallery() async {
-    imageFile = await picker.getImage(source: ImageSource.gallery);
-    this.setState(() {});
-  }
-
-  _openCamera() async {
-    imageFile = await picker.getImage(source: ImageSource.camera);
-    this.setState(() {});
-  }
-
-  _removePhoto() {
-    imageFile = null;
-    this.setState(() {});
-  }
-
-  Widget _decideImageView() {
-    if (imageFile == null) {
-      return Center(child: Text('No image selected'));
-    } else {
-      return Image.file(File(imageFile.path));
-    }
-  }
-}*/
+}

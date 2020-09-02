@@ -96,6 +96,7 @@ class _FeedViewState extends State<FeedView> {
                     postData: postData,
                     hashtag: widget.hashtag,
                     maxLines: 2,
+                    likesManager: likesManager,
                   ),
                   Container(
                     //action bar
@@ -212,7 +213,7 @@ class _FeedViewState extends State<FeedView> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('Delete'),
+              child: Text('Delete', style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Firestore.instance
                     .collection('posts')
@@ -225,7 +226,7 @@ class _FeedViewState extends State<FeedView> {
               },
             ),
             FlatButton(
-              child: Text('Cancel'),
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Navigator.of(context).pop();
               },

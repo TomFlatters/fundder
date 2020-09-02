@@ -51,11 +51,12 @@ class _HomeState extends State<Home> {
       },
       onMessage: (Map<String, dynamic> message) {
         print('onMessage called');
-        setState(() {
-          if (_currentIndex != 3) {
-            unreadNotifs = true;
-          }
-        });
+        if (mounted)
+          setState(() {
+            if (_currentIndex != 3) {
+              unreadNotifs = true;
+            }
+          });
       },
     );
   }
@@ -73,9 +74,10 @@ class _HomeState extends State<Home> {
         .then((snapshot) {
       if (snapshot != null) {
         if (snapshot.documents.isEmpty == false) {
-          setState(() {
-            unreadNotifs = true;
-          });
+          if (mounted)
+            setState(() {
+              unreadNotifs = true;
+            });
         }
       }
     });
@@ -90,8 +92,8 @@ class _HomeState extends State<Home> {
         .get()
         .then((snapshot) {
       if (snapshot != null && user.isEmailVerified == true) {
-        if (snapshot['dpSetterPrompted'] != null) {
-          if (snapshot['dpSetterPrompted'] != true) {
+        if (snapshot['dpSetterPrompted'] != null && snapshot['name'] != null) {
+          if (snapshot['dpSetterPrompted'] != true || snapshot['name'] == '') {
             Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
           }
         } else {
@@ -188,12 +190,13 @@ class _HomeState extends State<Home> {
 
   void onTabTapped(int index) {
     if (index != 2) {
-      setState(() {
-        _currentIndex = index;
-        if (index == 3) {
-          unreadNotifs = false;
-        }
-      });
+      if (mounted)
+        setState(() {
+          _currentIndex = index;
+          if (index == 3) {
+            unreadNotifs = false;
+          }
+        });
     } else {
       Navigator.pushNamed(context, '/addpost');
     }

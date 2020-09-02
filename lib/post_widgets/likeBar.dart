@@ -79,7 +79,7 @@ import 'package:fundder/helper_classes.dart';
 //                               ? likesModel.noLikes.toString()
 //                               : "",
 //                           style:
-//                               TextStyle(fontSize: 15, color: Colors.grey[850]),
+//                               TextStyle(fontSize: 16, color: Colors.grey[850]),
 //                           textAlign: TextAlign.left,
 //                         )))
 //               ]))
@@ -123,18 +123,19 @@ class _NewLikeButtonState extends State<NewLikeButton>
   }
 
   void likePressed() {
-    setState(() {
-      if (isLiked) {
-        widget.likesService.unlikePost(widget.postId);
-        noLikes -= 1;
-        isLiked = false;
-      } else {
-        widget.likesService.likePost(widget.postId);
-        noLikes += 1;
-        isLiked = true;
-      }
-      _controller.forward(from: 0.0);
-    });
+    if (mounted)
+      setState(() {
+        if (isLiked) {
+          widget.likesService.unlikePost(widget.postId);
+          noLikes -= 1;
+          isLiked = false;
+        } else {
+          widget.likesService.likePost(widget.postId);
+          noLikes += 1;
+          isLiked = true;
+        }
+        _controller.forward(from: 0.0);
+      });
   }
 
   @override
@@ -162,15 +163,21 @@ class _NewLikeButtonState extends State<NewLikeButton>
                       margin: EdgeInsets.only(left: 10, top: 5),
                       child: Text(
                         noLikes != null ? noLikes.toString() : "",
-                        style: TextStyle(fontSize: 15, color: Colors.grey[850]),
+                        style: TextStyle(fontSize: 16, color: Colors.grey[850]),
                         textAlign: TextAlign.left,
                       ),
                     ), /*Text(
                         noLikes != null ? noLikes.toString() : "",
-                        style: TextStyle(fontSize: 15, color: Colors.grey[850]),
+                        style: TextStyle(fontSize: 16, color: Colors.grey[850]),
                         textAlign: TextAlign.left,
                       )*/
                   )
                 ]))));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // you need this
+    super.dispose();
   }
 }

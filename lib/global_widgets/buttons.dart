@@ -81,7 +81,7 @@ class FundderButton extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: 16,
                     color: this.textColor),
               ),
             ),
