@@ -50,9 +50,10 @@ class _TutorialState extends State<Tutorial> {
           carouselController: _carouselController,
           options: CarouselOptions(
             onPageChanged: (index, reason) {
-              setState(() {
-                _current = index;
-              });
+              if (mounted)
+                setState(() {
+                  _current = index;
+                });
             },
             enableInfiniteScroll: false,
             viewportFraction: 1.0,

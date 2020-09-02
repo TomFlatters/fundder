@@ -72,9 +72,11 @@ class _AddPostState extends State<AddPost> {
                     onPressed: _current == 4
                         ? () {
                             try {
-                              setState(() {
-                                _submitting = true;
-                              });
+                              if (mounted) {
+                                setState(() {
+                                  _submitting = true;
+                                });
+                              }
 
                               // add image to firebase storage
                               if (imageFile != null) {
@@ -95,9 +97,11 @@ class _AddPostState extends State<AddPost> {
                                 _pushItem(null, user);
                               }
                             } catch (e) {
-                              setState(() {
-                                _submitting = false;
-                              });
+                              if (mounted) {
+                                setState(() {
+                                  _submitting = false;
+                                });
+                              }
                               _showErrorDialog(e.toString());
                             }
                           }
@@ -122,9 +126,11 @@ class _AddPostState extends State<AddPost> {
                     options: CarouselOptions(
                       onPageChanged: (index, reason) {
                         _changePage();
-                        setState(() {
-                          _current = index;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _current = index;
+                          });
+                        }
                       },
                       enableInfiniteScroll: false,
                       height: height,
@@ -157,14 +163,16 @@ class _AddPostState extends State<AddPost> {
         .document(firebaseUser.uid)
         .get()
         .then((value) {
-      setState(() {
-        user = User(
-            uid: firebaseUser.uid,
-            name: value.data["name"],
-            username: value.data['username'],
-            email: firebaseUser.email,
-            profilePic: value.data["profilePic"]);
-      });
+      if (mounted) {
+        setState(() {
+          user = User(
+              uid: firebaseUser.uid,
+              name: value.data["name"],
+              username: value.data['username'],
+              email: firebaseUser.email,
+              profilePic: value.data["profilePic"]);
+        });
+      }
     });
   }
 
@@ -175,9 +183,11 @@ class _AddPostState extends State<AddPost> {
         charity == -1 ||
         moneyController.text == "0.00" ||
         hashtags.length < 2) {
-      setState(() {
-        _submitting = false;
-      });
+      if (mounted) {
+        setState(() {
+          _submitting = false;
+        });
+      }
       _showErrorDialog('You have not filled all the required fields');
     } else {
       if (whoDoes[selected] == "Myself") {
@@ -201,9 +211,12 @@ class _AddPostState extends State<AddPost> {
             .then((postId) => {
                   if (postId == null)
                     {
-                      setState(() {
-                        _submitting = false;
-                      })
+                      if (mounted)
+                        {
+                          setState(() {
+                            _submitting = false;
+                          })
+                        }
                     }
                   else
                     {
@@ -376,11 +389,13 @@ class _AddPostState extends State<AddPost> {
                             if (hashtags.contains(hashtagController.text) ==
                                     false &&
                                 hashtagController.text != "") {
-                              setState(() {
-                                hashtags
-                                    .add(hashtagController.text.toLowerCase());
-                                hashtagController.text = "";
-                              });
+                              if (mounted) {
+                                setState(() {
+                                  hashtags.add(
+                                      hashtagController.text.toLowerCase());
+                                  hashtagController.text = "";
+                                });
+                              }
                             }
                           },
                           child: Text('Add'))
@@ -402,9 +417,11 @@ class _AddPostState extends State<AddPost> {
                                 color: Colors.grey,
                               )),
                           onPressed: () {
-                            setState(() {
-                              hashtags.removeAt(index);
-                            });
+                            if (mounted) {
+                              setState(() {
+                                hashtags.removeAt(index);
+                              });
+                            }
                           },
                         ),
                       );
@@ -457,7 +474,9 @@ class _AddPostState extends State<AddPost> {
                     subtitle: Text('${subWho[index]}'),
                     onTap: () {
                       selected = index;
-                      setState(() {});
+                      if (mounted) {
+                        setState(() {});
+                      }
                     },
                   );
                 },
@@ -518,7 +537,9 @@ class _AddPostState extends State<AddPost> {
 
   void _loadCharityList() async {
     charities = await DatabaseService(uid: "123").getCharityNameList();
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Widget _chooseCharity() {
@@ -564,7 +585,9 @@ class _AddPostState extends State<AddPost> {
                       ),
                       onTap: () {
                         charity = index;
-                        setState(() {});
+                        if (mounted) {
+                          setState(() {});
+                        }
                       },
                     );
                   })
@@ -643,17 +666,23 @@ class _AddPostState extends State<AddPost> {
   // Helper functions for the image picker
   _openGallery() async {
     imageFile = await picker.getImage(source: ImageSource.gallery);
-    this.setState(() {});
+    if (mounted) {
+      this.setState(() {});
+    }
   }
 
   _openCamera() async {
     imageFile = await picker.getImage(source: ImageSource.camera);
-    this.setState(() {});
+    if (mounted) {
+      this.setState(() {});
+    }
   }
 
   _removePhoto() {
     imageFile = null;
-    this.setState(() {});
+    if (mounted) {
+      this.setState(() {});
+    }
   }
 
   Widget _decideImageView() {

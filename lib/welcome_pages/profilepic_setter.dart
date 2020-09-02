@@ -38,10 +38,11 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
         .document(widget.uid)
         .get()
         .then((value) {
-      setState(() {
-        _uid = widget.uid;
-        _profilePic = value.data["profilePic"];
-      });
+      if (mounted)
+        setState(() {
+          _uid = widget.uid;
+          _profilePic = value.data["profilePic"];
+        });
     });
   }
 
@@ -55,9 +56,10 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
           new FlatButton(
               child: new Text('Set'),
               onPressed: () {
-                setState(() {
-                  _loading = true;
-                });
+                if (mounted)
+                  setState(() {
+                    _loading = true;
+                  });
                 if (imageFile != null) {
                   final String fileLocation = _uid +
                       "/" +
@@ -143,17 +145,17 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
   // Helper functions for the image picker
   _openGallery() async {
     imageFile = await picker.getImage(source: ImageSource.gallery);
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   _openCamera() async {
     imageFile = await picker.getImage(source: ImageSource.camera);
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   _removePhoto() {
     imageFile = null;
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   Widget _decideImageView() {

@@ -46,13 +46,14 @@ class _ViewFollowersState extends State<ViewFollowers>
     followersList =
         await GeneralFollowerServices.unamesFollowingUser(widget.uid);
     _refreshController.refreshCompleted();
-    setState(() {
-      firstLoadDone = true;
-    });
+    if (mounted)
+      setState(() {
+        firstLoadDone = true;
+      });
   }
 
   _handleTabSelection() {
-    setState(() {});
+    if (mounted) setState(() {});
     print("called");
   }
 

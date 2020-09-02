@@ -116,9 +116,10 @@ class _AuthenticateState extends State<Authenticate>
                     decoration: textInputDecoration.copyWith(hintText: 'Email'),
                     validator: (val) => val.isEmpty ? 'Enter an email' : null,
                     onChanged: (val) {
-                      setState(() {
-                        email = val;
-                      });
+                      if (mounted)
+                        setState(() {
+                          email = val;
+                        });
                     },
                   ),
                   SizedBox(height: 20.0),
@@ -133,9 +134,10 @@ class _AuthenticateState extends State<Authenticate>
                         : null,
                     obscureText: true,
                     onChanged: (val) {
-                      setState(() {
-                        password = val;
-                      });
+                      if (mounted)
+                        setState(() {
+                          password = val;
+                        });
                     },
                   ),
                   SizedBox(height: 20.0),
@@ -147,20 +149,22 @@ class _AuthenticateState extends State<Authenticate>
           text: 'Log In',
           onPressed: () async {
             if (_signinKey.currentState.validate()) {
-              setState(() => loading = true);
+              if (mounted) setState(() => loading = true);
               String result =
                   await _auth.signInWithEmailAndPassword(email, password);
               if (result == null) {
-                setState(() {
-                  signinerror = 'Failed to sign in user';
-                  loading = false;
-                });
-              } else {
-                if (mounted) {
+                if (mounted)
                   setState(() {
-                    signinerror = result;
+                    signinerror = 'Failed to sign in user';
                     loading = false;
                   });
+              } else {
+                if (mounted) {
+                  if (mounted)
+                    setState(() {
+                      signinerror = result;
+                      loading = false;
+                    });
                 }
               }
             }
@@ -172,12 +176,13 @@ class _AuthenticateState extends State<Authenticate>
             onPressed: () async {
               if (email != '') {
                 signinerror = await _auth.forgotPassword(email);
-                setState(() {});
+                if (mounted) setState(() {});
               } else {
-                setState(() {
-                  signinerror =
-                      'Please enter your email for us to send a reset link';
-                });
+                if (mounted)
+                  setState(() {
+                    signinerror =
+                        'Please enter your email for us to send a reset link';
+                  });
               }
             }),
         SizedBox(height: 6.0),
@@ -221,9 +226,10 @@ class _AuthenticateState extends State<Authenticate>
                       textInputDecoration.copyWith(hintText: 'Username'),
                   validator: (val) => val.isEmpty ? 'Enter a username' : null,
                   onChanged: (val) {
-                    setState(() {
-                      username = val;
-                    });
+                    if (mounted)
+                      setState(() {
+                        username = val;
+                      });
                   },
                 ),
                 SizedBox(height: 20.0),
@@ -235,9 +241,10 @@ class _AuthenticateState extends State<Authenticate>
                   decoration: textInputDecoration.copyWith(hintText: 'Email'),
                   validator: (val) => val.isEmpty ? 'Enter an email' : null,
                   onChanged: (val) {
-                    setState(() {
-                      email = val;
-                    });
+                    if (mounted)
+                      setState(() {
+                        email = val;
+                      });
                   },
                 ),
                 SizedBox(height: 20.0),
@@ -252,9 +259,10 @@ class _AuthenticateState extends State<Authenticate>
                       : null,
                   obscureText: true,
                   onChanged: (val) {
-                    setState(() {
-                      password = val;
-                    });
+                    if (mounted)
+                      setState(() {
+                        password = val;
+                      });
                   },
                 ),
                 SizedBox(height: 20.0),
@@ -294,9 +302,10 @@ class _AuthenticateState extends State<Authenticate>
                         style: TextStyle(fontSize: 13)),
                     value: termsAccepted,
                     onChanged: (newValue) {
-                      setState(() {
-                        termsAccepted = newValue;
-                      });
+                      if (mounted)
+                        setState(() {
+                          termsAccepted = newValue;
+                        });
                     },
                     controlAffinity: ListTileControlAffinity
                         .leading, //  <-- leading Checkbox
@@ -312,28 +321,31 @@ class _AuthenticateState extends State<Authenticate>
           onPressed: () async {
             if (_registerKey.currentState.validate()) {
               if (termsAccepted == true) {
-                setState(() => loading = true);
+                if (mounted) setState(() => loading = true);
                 dynamic result = await _auth.registerWithEmailPasswordUsername(
                     email.trimRight(), password, username.trimRight());
                 if (result == null) {
-                  setState(() {
-                    registrationerror = 'An error occurred';
-                    loading = false;
-                  });
-                } else {
-                  if (mounted) {
+                  if (mounted)
                     setState(() {
-                      registrationerror = result;
+                      registrationerror = 'An error occurred';
                       loading = false;
                     });
+                } else {
+                  if (mounted) {
+                    if (mounted)
+                      setState(() {
+                        registrationerror = result;
+                        loading = false;
+                      });
                   }
                 }
               } else {
                 if (mounted) {
-                  setState(() {
-                    registrationerror = 'Please accept our terms of use';
-                    loading = false;
-                  });
+                  if (mounted)
+                    setState(() {
+                      registrationerror = 'Please accept our terms of use';
+                      loading = false;
+                    });
                 }
               }
             }

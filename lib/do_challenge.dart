@@ -68,7 +68,7 @@ class _DoChallengeState extends State<DoChallenge> {
       if (mounted) setState(() {});
       _refreshController.loadComplete();
     } else {
-      setState(() {});
+      if (mounted) setState(() {});
       _refreshController.loadNoData();
     }
   }
