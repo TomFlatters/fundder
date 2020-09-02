@@ -112,7 +112,7 @@ class _TutorialState extends State<Tutorial> {
                     subtitle,
                     textAlign: TextAlign.center,
                     style:
-                        TextStyle(fontFamily: 'Founders Grotesk', fontSize: 15),
+                        TextStyle(fontFamily: 'Founders Grotesk', fontSize: 16),
                   ))
             ],
           ),

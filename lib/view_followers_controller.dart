@@ -12,7 +12,8 @@ class ViewFollowers extends StatefulWidget {
 
   final String uid;
   final int startIndex;
-  ViewFollowers({this.uid, @required this.startIndex});
+  final String username;
+  ViewFollowers({this.uid, @required this.startIndex, @required this.username});
 }
 
 class _ViewFollowersState extends State<ViewFollowers>
@@ -66,7 +67,7 @@ class _ViewFollowersState extends State<ViewFollowers>
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text(""),
+          title: Text(widget.username),
           actions: <Widget>[
             new IconButton(
               icon: new Icon(Icons.close),

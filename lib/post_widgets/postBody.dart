@@ -74,7 +74,7 @@ class PostBody extends StatelessWidget {
           style: TextStyle(
               color: Colors.black,
               fontFamily: 'Founders Grotesk',
-              fontSize: 15))
+              fontSize: 16))
     ];
     if (hashtags != null) {
       for (var i = 0; i < hashtags.length; i++) {
@@ -83,7 +83,7 @@ class PostBody extends StatelessWidget {
             style: TextStyle(
                 color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/,
                 fontFamily: 'Founders Grotesk',
-                fontSize: 15),
+                fontSize: 16),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 if (hashtags[i].toString() != hashtag) {

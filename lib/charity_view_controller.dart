@@ -78,9 +78,9 @@ class _CharityViewState extends State<CharityView> {
                                           snapshot.data.name,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
-                                            fontFamily: 'Founders Grotesk',
-                                            fontSize: 16,
-                                          ),
+                                              fontFamily: 'Founders Grotesk',
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500),
                                         )),
                                       ])),
                                   Container(

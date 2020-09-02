@@ -52,8 +52,8 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
         centerTitle: true,
         title: Text('Set a profile picture'),
         actions: <Widget>[
-          new IconButton(
-              icon: new Text('Set'),
+          new FlatButton(
+              child: new Text('Set'),
               onPressed: () {
                 setState(() {
                   _loading = true;
@@ -174,11 +174,11 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
             _removePhoto();
           },
         ),
-        ListTile(
+        /*ListTile(
           leading: Icon(FontAwesome5Brands.facebook_square),
           title: Text('Import from Facebook'),
           onTap: () {},
-        ),
+        ),*/
         ListTile(
           leading: Icon(FontAwesome.camera),
           title: Text('Take Photo'),

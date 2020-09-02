@@ -50,7 +50,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                   ? null
                   : AppBar(
                       centerTitle: true,
-                      title: Text("Do a challenge"),
+                      title: Text("Do a Challenge"),
                       actions: <Widget>[
                         new IconButton(
                           icon: new Icon(Icons.close),
@@ -100,7 +100,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             child: Text(
                                           "£${snapshot.data.moneyRaised.toStringAsFixed(2)} raised",
                                           style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: 16,
                                             color: Colors.grey,
                                           ),
                                         )),
@@ -110,7 +110,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             child: Text(
                                           "${snapshot.data.acceptedBy.length} participants",
                                           style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: 16,
                                             color: Colors.grey,
                                           ),
                                         )),
@@ -120,7 +120,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             child: Text(
                                           "${howLongAgo(snapshot.data.timestamp)}",
                                           style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: 16,
                                             color: Colors.grey,
                                           ),
                                         )),
@@ -169,7 +169,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                             context,
                                             snapshot.data.subtitle),
                                         style: TextStyle(
-                                          fontSize: 13,
+                                          fontSize: 16,
                                           color: Colors.grey,
                                         ),
                                       ))),
@@ -180,6 +180,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                       child: Text(
                                         'A challenge for ${snapshot.data.charity} by ${snapshot.data.authorUsername}',
                                         style: TextStyle(
+                                            fontSize: 16,
                                             fontWeight: FontWeight.w500),
                                       )),
                                   Padding(

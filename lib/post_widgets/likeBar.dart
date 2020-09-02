@@ -79,7 +79,7 @@ import 'package:fundder/helper_classes.dart';
 //                               ? likesModel.noLikes.toString()
 //                               : "",
 //                           style:
-//                               TextStyle(fontSize: 15, color: Colors.grey[850]),
+//                               TextStyle(fontSize: 16, color: Colors.grey[850]),
 //                           textAlign: TextAlign.left,
 //                         )))
 //               ]))
@@ -162,12 +162,12 @@ class _NewLikeButtonState extends State<NewLikeButton>
                       margin: EdgeInsets.only(left: 10, top: 5),
                       child: Text(
                         noLikes != null ? noLikes.toString() : "",
-                        style: TextStyle(fontSize: 15, color: Colors.grey[850]),
+                        style: TextStyle(fontSize: 16, color: Colors.grey[850]),
                         textAlign: TextAlign.left,
                       ),
                     ), /*Text(
                         noLikes != null ? noLikes.toString() : "",
-                        style: TextStyle(fontSize: 15, color: Colors.grey[850]),
+                        style: TextStyle(fontSize: 16, color: Colors.grey[850]),
                         textAlign: TextAlign.left,
                       )*/
                   )

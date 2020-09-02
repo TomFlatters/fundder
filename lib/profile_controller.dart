@@ -300,6 +300,8 @@ class _ProfileState extends State<ProfileController>
                                                       context,
                                                       '/user/' +
                                                           widget.uid +
+                                                          '/' +
+                                                          _username +
                                                           '/followers');
                                                 },
                                               )),
@@ -336,6 +338,8 @@ class _ProfileState extends State<ProfileController>
                                                       context,
                                                       '/user/' +
                                                           widget.uid +
+                                                          '/' +
+                                                          _username +
                                                           '/following');
                                                 },
                                               )),
@@ -362,7 +366,11 @@ class _ProfileState extends State<ProfileController>
                                                             child: Container(
                                                           alignment: Alignment
                                                               .bottomCenter,
-                                                          child: Text("Raised"),
+                                                          child: Text("Raised",
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal)),
                                                         )),
                                                       ],
                                                     ))

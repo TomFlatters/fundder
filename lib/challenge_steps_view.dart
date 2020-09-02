@@ -67,9 +67,9 @@ class _StepsPageState extends State<StepsPage> {
                             child: Text(
                               template.title,
                               style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: 'Founders Grotesk',
-                              ),
+                                  fontSize: 20,
+                                  fontFamily: 'Founders Grotesk',
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
                           Padding(
