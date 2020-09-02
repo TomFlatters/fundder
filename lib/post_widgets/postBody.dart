@@ -11,6 +11,8 @@ import 'package:fundder/video_item.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:async';
+import 'package:provider/provider.dart';
+import 'package:fundder/models/user.dart';
 
 class PostBody extends StatelessWidget {
   StreamController<void> likesManager;
@@ -24,6 +26,7 @@ class PostBody extends StatelessWidget {
       @required this.likesManager});
   @override
   Widget build(BuildContext context) {
+    final User user = Provider.of<User>(context);
     return Column(
       children: <Widget>[
         (postData.imageUrl == null)
@@ -52,7 +55,8 @@ class PostBody extends StatelessWidget {
                 maxLines: this.maxLines,
                 overflow: TextOverflow.ellipsis,
                 text: TextSpan(
-                    children: _returnHashtags(postData.hashtags, context)))),
+                    children:
+                        _returnHashtags(postData.hashtags, context, user)))),
         Container(
           //alignment: Alignment.centerLeft,
           margin: EdgeInsets.only(top: 10, bottom: 10, left: 0, right: 0),
@@ -75,7 +79,8 @@ class PostBody extends StatelessWidget {
     );
   }
 
-  List<TextSpan> _returnHashtags(List hashtags, BuildContext context) {
+  List<TextSpan> _returnHashtags(
+      List hashtags, BuildContext context, User user) {
     List<TextSpan> hashtagText = [
       TextSpan(
           text: postData.subtitle + " ",
@@ -94,8 +99,10 @@ class PostBody extends StatelessWidget {
                 fontSize: 16),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                if (hashtags[i].toString() != hashtag) {
-                  _openFeed(context, hashtags[i]);
+                if (user != null) {
+                  if (hashtags[i].toString() != hashtag) {
+                    _openFeed(context, hashtags[i]);
+                  }
                 }
               }));
       }
