@@ -164,7 +164,7 @@ class _DoChallengeState extends State<DoChallenge> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    height: 62,
+                    height: 65,
                     margin:
                         EdgeInsets.only(left: 0, right: 0, top: 20, bottom: 0),
                     child: Row(
