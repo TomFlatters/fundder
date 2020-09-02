@@ -16,7 +16,9 @@ class _ConnectionListenerState extends State<ConnectionListener> {
     subscription = Connectivity()
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
-      setState(() => connectionStatus = result);
+      if (mounted) {
+        setState(() => connectionStatus = result);
+      }
     });
     print('connection status' + connectionStatus.toString());
     connectionStatus = Connectivity()

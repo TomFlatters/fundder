@@ -123,18 +123,19 @@ class _NewLikeButtonState extends State<NewLikeButton>
   }
 
   void likePressed() {
-    setState(() {
-      if (isLiked) {
-        widget.likesService.unlikePost(widget.postId);
-        noLikes -= 1;
-        isLiked = false;
-      } else {
-        widget.likesService.likePost(widget.postId);
-        noLikes += 1;
-        isLiked = true;
-      }
-      _controller.forward(from: 0.0);
-    });
+    if (mounted)
+      setState(() {
+        if (isLiked) {
+          widget.likesService.unlikePost(widget.postId);
+          noLikes -= 1;
+          isLiked = false;
+        } else {
+          widget.likesService.likePost(widget.postId);
+          noLikes += 1;
+          isLiked = true;
+        }
+        _controller.forward(from: 0.0);
+      });
   }
 
   @override

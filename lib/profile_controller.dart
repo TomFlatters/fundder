@@ -107,7 +107,7 @@ class _ProfileState extends State<ProfileController>
 
   _handleTabSelection() {
     if (_tabController.indexIsChanging) {
-      setState(() {});
+      if (mounted) setState(() {});
     }
   }
 

@@ -50,15 +50,16 @@ class _EditProfileState extends State<EditProfile> {
         .document(firebaseUser.uid)
         .get()
         .then((value) {
-      setState(() {
-        _uid = firebaseUser.uid;
-        _name = value.data["name"];
-        nameEntry.text = _name;
-        _username = value.data['username'];
-        _email = firebaseUser.email;
-        emailEntry.text = _email;
-        _profilePic = value.data["profilePic"];
-      });
+      if (mounted)
+        setState(() {
+          _uid = firebaseUser.uid;
+          _name = value.data["name"];
+          nameEntry.text = _name;
+          _username = value.data['username'];
+          _email = firebaseUser.email;
+          emailEntry.text = _email;
+          _profilePic = value.data["profilePic"];
+        });
     });
   }
 
@@ -77,9 +78,10 @@ class _EditProfileState extends State<EditProfile> {
           new FlatButton(
             child: Text('Save'),
             onPressed: () {
-              setState(() {
-                isLoading = true;
-              });
+              if (mounted)
+                setState(() {
+                  isLoading = true;
+                });
               if (imageFile != null) {
                 final String fileLocation = _uid +
                     "/" +
@@ -212,17 +214,17 @@ class _EditProfileState extends State<EditProfile> {
   // Helper functions for the image picker
   _openGallery() async {
     imageFile = await picker.getImage(source: ImageSource.gallery);
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   _openCamera() async {
     imageFile = await picker.getImage(source: ImageSource.camera);
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   _removePhoto() {
     imageFile = null;
-    this.setState(() {});
+    if (mounted) this.setState(() {});
   }
 
   Widget _decideImageView() {

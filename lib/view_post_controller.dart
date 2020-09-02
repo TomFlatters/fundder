@@ -299,9 +299,10 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
     print('reloading');
     postData = await DatabaseService(uid: "123").getPostById(this.postData.id);
     if (mounted) {
-      setState(() {
-        willNeedUpdate = false;
-      });
+      if (mounted)
+        setState(() {
+          willNeedUpdate = false;
+        });
     }
   }
 }
