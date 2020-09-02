@@ -178,7 +178,7 @@ class _ActivityState extends State<LikedController> {
                                           vertical: 0.0),
                                       child: Container(
                                           margin: EdgeInsets.symmetric(
-                                              horizontal: 10),
+                                              horizontal: 10, vertical: 3),
                                           child: Column(children: <Widget>[
                                             Container(
                                               height: 60,
@@ -215,7 +215,7 @@ class _ActivityState extends State<LikedController> {
                                                                 style:
                                                                     TextStyle(
                                                                   fontSize:
-                                                                      14.0,
+                                                                      16.0,
                                                                   color: Colors
                                                                       .black,
                                                                   fontFamily:
@@ -241,11 +241,12 @@ class _ActivityState extends State<LikedController> {
                                                         child: GestureDetector(
                                                           child: Container(
                                                             width: 110,
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical: 5,
-                                                                    horizontal:
-                                                                        5),
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 7,
+                                                                    bottom: 3,
+                                                                    left: 5,
+                                                                    right: 5),
                                                             margin:
                                                                 EdgeInsets.all(
                                                                     10),
@@ -273,7 +274,7 @@ class _ActivityState extends State<LikedController> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                fontSize: 12,
+                                                                fontSize: 14,
                                                                 color: Colors
                                                                     .black,
                                                               ),
