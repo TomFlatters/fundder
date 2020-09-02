@@ -190,84 +190,93 @@ class _AddPostState extends State<AddPost> {
       }
       _showErrorDialog('You have not filled all the required fields');
     } else {
-      if (whoDoes[selected] == "Myself") {
-        DatabaseService(uid: user.uid)
-            .uploadPost(new Post(
-                title: titleController.text.toString().trimRight(),
-                subtitle: subtitleController.text.toString().trimRight(),
-                author: user.uid,
-                authorUsername: user.username,
-                charity: charities[charity].id,
-                noLikes: 0,
-                noComments: 0,
-                timestamp: DateTime.now(),
-                moneyRaised: 0,
-                targetAmount: moneyController.text.toString(),
-                imageUrl: downloadUrl,
-                status: 'fund',
-                aspectRatio: aspectRatio,
-                hashtags: hashtags,
-                charityLogo: charities[charity].image))
-            .then((postId) => {
-                  if (postId == null)
-                    {
-                      if (mounted)
-                        {
-                          setState(() {
-                            _submitting = false;
-                          })
-                        }
-                    }
-                  else
-                    {
-                      print("The doc id is " +
-                          postId
-                              .toString()
-                              .substring(1, postId.toString().length - 1)),
-                      HashtagsService(uid: user.uid)
-                          .addHashtag(postId.toString(), hashtags),
+      if (double.parse(moneyController.text) < 2) {
+        if (mounted) {
+          setState(() {
+            _submitting = false;
+          });
+        }
+        _showErrorDialog('The minimum donation target amount is £2');
+      } else {
+        if (whoDoes[selected] == "Myself") {
+          DatabaseService(uid: user.uid)
+              .uploadPost(new Post(
+                  title: titleController.text.toString().trimRight(),
+                  subtitle: subtitleController.text.toString().trimRight(),
+                  author: user.uid,
+                  authorUsername: user.username,
+                  charity: charities[charity].id,
+                  noLikes: 0,
+                  noComments: 0,
+                  timestamp: DateTime.now(),
+                  moneyRaised: 0,
+                  targetAmount: moneyController.text.toString(),
+                  imageUrl: downloadUrl,
+                  status: 'fund',
+                  aspectRatio: aspectRatio,
+                  hashtags: hashtags,
+                  charityLogo: charities[charity].image))
+              .then((postId) => {
+                    if (postId == null)
+                      {
+                        if (mounted)
+                          {
+                            setState(() {
+                              _submitting = false;
+                            })
+                          }
+                      }
+                    else
+                      {
+                        print("The doc id is " +
+                            postId
+                                .toString()
+                                .substring(1, postId.toString().length - 1)),
+                        HashtagsService(uid: user.uid)
+                            .addHashtag(postId.toString(), hashtags),
 
-                      // if the post is successfully added, view the post
-                      /*DatabaseService(uid: user.uid).getPostById(postId.toString())
+                        // if the post is successfully added, view the post
+                        /*DatabaseService(uid: user.uid).getPostById(postId.toString())
                       .then((post) => {
                         Navigator.of(context)
                           .pushReplacement(_viewPost(post))
                       })*/
-                      Navigator.pushReplacementNamed(
-                          context,
-                          '/post/' +
-                              postId
-                                  .toString()
-                                  .substring(1, postId.toString().length - 1))
-                    } //the substring is very important as postId.toString() is in brackets
-                });
-      } else {
-        // Create a template
-        DatabaseService(uid: user.uid)
-            .uploadTemplate(new Template(
-                title: titleController.text.toString(),
-                subtitle: subtitleController.text.toString(),
-                author: user.uid,
-                authorUsername: user.username,
-                charity: charities[charity].id,
-                likes: [],
-                comments: {},
-                timestamp: DateTime.now(),
-                moneyRaised: 0,
-                targetAmount: moneyController.text.toString(),
-                imageUrl: downloadUrl,
-                whoDoes: whoDoes[selected].toString(),
-                acceptedBy: [],
-                completedBy: [],
-                aspectRatio: aspectRatio,
-                hashtags: hashtags,
-                active: true,
-                charityLogo: charities[charity].image))
-            .then((templateId) => {
-                  // if the post is successfully added, view the post
-                  Navigator.pushReplacementNamed(
-                      context, '/challenge/' + templateId.toString())
-                });
+                        Navigator.pushReplacementNamed(
+                            context,
+                            '/post/' +
+                                postId
+                                    .toString()
+                                    .substring(1, postId.toString().length - 1))
+                      } //the substring is very important as postId.toString() is in brackets
+                  });
+        } else {
+          // Create a template
+          DatabaseService(uid: user.uid)
+              .uploadTemplate(new Template(
+                  title: titleController.text.toString(),
+                  subtitle: subtitleController.text.toString(),
+                  author: user.uid,
+                  authorUsername: user.username,
+                  charity: charities[charity].id,
+                  likes: [],
+                  comments: {},
+                  timestamp: DateTime.now(),
+                  moneyRaised: 0,
+                  targetAmount: moneyController.text.toString(),
+                  imageUrl: downloadUrl,
+                  whoDoes: whoDoes[selected].toString(),
+                  acceptedBy: [],
+                  completedBy: [],
+                  aspectRatio: aspectRatio,
+                  hashtags: hashtags,
+                  active: true,
+                  charityLogo: charities[charity].image))
+              .then((templateId) => {
+                    // if the post is successfully added, view the post
+                    Navigator.pushReplacementNamed(
+                        context, '/challenge/' + templateId.toString())
+                  });
+        }
       }
     }
   }
@@ -288,7 +297,7 @@ class _AddPostState extends State<AddPost> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('OK'),
+              child: Text('OK', style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
