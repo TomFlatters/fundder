@@ -13,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'models/post.dart';
 import 'post_widgets/postHeader.dart';
+import 'post_widgets/postBody.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -39,6 +40,10 @@ class _UploadProofState extends State<UploadProofScreen> {
   final TextEditingController maxWidthController = TextEditingController();
   final TextEditingController maxHeightController = TextEditingController();
   final TextEditingController qualityController = TextEditingController();
+  final TextEditingController completionCommentController =
+      TextEditingController();
+
+  final Key _key = UniqueKey();
 
   @override
   void initState() {
@@ -51,86 +56,114 @@ class _UploadProofState extends State<UploadProofScreen> {
     final user = Provider.of<User>(context);
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text("Complete Fundder"),
-        actions: _submitting == true
-            ? null
-            : <Widget>[
-                new FlatButton(
-                    child: _current == 2
-                        ? Text('Submit',
-                            style: TextStyle(fontWeight: FontWeight.bold))
-                        : _current == 0
-                            ? Text('Next',
-                                style: TextStyle(fontWeight: FontWeight.bold))
-                            : Text('Preview',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: _current == 2
-                        ? () {
-                            if (mounted)
-                              setState(() {
-                                _submitting = true;
-                              });
-                            print('Submit pressed');
-                            if (_imageFile != null) {
-                              print('not null');
-                              final String fileLocation = user.uid +
-                                  "/" +
-                                  DateTime.now()
-                                      .microsecondsSinceEpoch
-                                      .toString();
-                              if (isVideo == true) {
-                                DatabaseService(uid: user.uid)
-                                    .uploadVideo(
-                                        File(_imageFile.path), fileLocation)
-                                    .then((downloadUrl) => {
-                                          print("Successful image upload"),
-                                          print(downloadUrl),
-                                          DatabaseService(uid: user.uid)
-                                              .updatePostStatusImageTimestampRatio(
-                                                  widget.postId,
-                                                  downloadUrl,
-                                                  'done',
-                                                  Timestamp.now(),
-                                                  aspectRatio)
-                                              .then((value) => {
-                                                    Navigator.of(context)
-                                                        .pop(null)
-                                                  }),
-                                        });
+          centerTitle: true,
+          title: Text("Complete Fundder"),
+          actions: _submitting == true
+              ? null
+              : <Widget>[
+                  new FlatButton(
+                      child: _current == 2
+                          ? Text('Submit',
+                              style: TextStyle(fontWeight: FontWeight.bold))
+                          : _current == 0
+                              ? Text('Next',
+                                  style: TextStyle(fontWeight: FontWeight.bold))
+                              : Text('Preview',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: _current == 2
+                          ? () {
+                              if (mounted)
+                                setState(() {
+                                  _submitting = true;
+                                });
+                              print('Submit pressed');
+                              if (_imageFile != null) {
+                                print('not null');
+                                final String fileLocation = user.uid +
+                                    "/" +
+                                    DateTime.now()
+                                        .microsecondsSinceEpoch
+                                        .toString();
+                                if (isVideo == true) {
+                                  DatabaseService(uid: user.uid)
+                                      .uploadVideo(
+                                          File(_imageFile.path), fileLocation)
+                                      .then((downloadUrl) => {
+                                            print("Successful image upload"),
+                                            print(downloadUrl),
+                                            DatabaseService(uid: user.uid)
+                                                .updatePostStatusImageTimestampRatioComment(
+                                                    widget.postId,
+                                                    downloadUrl,
+                                                    'done',
+                                                    Timestamp.now(),
+                                                    aspectRatio,
+                                                    completionCommentController
+                                                        .text)
+                                                .then((value) => {
+                                                      Navigator.of(context)
+                                                          .pop(null)
+                                                    }),
+                                          });
+                                } else {
+                                  DatabaseService(uid: user.uid)
+                                      .uploadImage(
+                                          File(_imageFile.path), fileLocation)
+                                      .then((downloadUrl) => {
+                                            print("Successful image upload"),
+                                            print(downloadUrl),
+                                            DatabaseService(uid: user.uid)
+                                                .updatePostStatusImageTimestampRatioComment(
+                                                    widget.postId,
+                                                    downloadUrl,
+                                                    'done',
+                                                    Timestamp.now(),
+                                                    aspectRatio,
+                                                    completionCommentController
+                                                        .text)
+                                                .then((value) => {
+                                                      Navigator.of(context)
+                                                          .pop(null)
+                                                    }),
+                                          });
+                                }
                               } else {
-                                DatabaseService(uid: user.uid)
-                                    .uploadImage(
-                                        File(_imageFile.path), fileLocation)
-                                    .then((downloadUrl) => {
-                                          print("Successful image upload"),
-                                          print(downloadUrl),
-                                          DatabaseService(uid: user.uid)
-                                              .updatePostStatusImageTimestampRatio(
-                                                  widget.postId,
-                                                  downloadUrl,
-                                                  'done',
-                                                  Timestamp.now(),
-                                                  aspectRatio)
-                                              .then((value) => {
-                                                    Navigator.of(context)
-                                                        .pop(null)
-                                                  }),
-                                        });
+                                if (mounted)
+                                  setState(() {
+                                    _submitting = false;
+                                  });
+                                print('Error');
+                                _showErrorDialog(
+                                    'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.');
                               }
                             }
-                          }
-                        : () {
-                            _carouselController.nextPage(
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.linear);
-                          })
-              ],
-        leading: new IconButton(
-          icon: new Icon(Icons.close),
-          onPressed: () => Navigator.of(context).pop(null),
-        ),
-      ),
+                          : () {
+                              if (_imageFile != null) {
+                                _carouselController.nextPage(
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.linear);
+                              } else {
+                                _showErrorDialog(
+                                    'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.');
+                              }
+                            })
+                ],
+          leading: Container(
+              width: 100,
+              child: IconButton(
+                  icon: _current == 0
+                      ? Icon(Icons.close)
+                      : Icon(Icons.arrow_back),
+                  onPressed: _current == 0
+                      ? () {
+                          Navigator.of(context).pop(null);
+                        }
+                      : () {
+                          _carouselController.previousPage(
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.linear);
+                        }))),
       body: _submitting == true
           ? Loading()
           : Builder(
@@ -155,8 +188,8 @@ class _UploadProofState extends State<UploadProofScreen> {
                   ),
                   items: [
                     _uploadImageVideo(),
-                    _uploadImageVideo(),
-                    _uploadImageVideo()
+                    _completionComment(),
+                    _previewPost()
                   ],
                 );
               },
@@ -174,6 +207,133 @@ class _UploadProofState extends State<UploadProofScreen> {
     setState(() {
       _submitting = false;
     });
+  }
+
+  Widget _previewPost() {
+    postData.imageUrl = null;
+    if (completionCommentController.text != "") {
+      postData.completionComment = completionCommentController.text;
+    } else {
+      postData.completionComment = null;
+    }
+    return ListView(children: [
+      /*Container(
+        decoration: new BoxDecoration(
+            color: Colors.white,
+            borderRadius: new BorderRadius.all(
+              Radius.circular(10.0),
+            )),
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        child: Text(
+          'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
+          style: TextStyle(
+              fontFamily: 'Founders Grotesk',
+              fontWeight: FontWeight.w500,
+              fontSize: 18),
+        ),
+      ),*/
+      Container(
+        color: Colors.grey[200],
+        child: Container(
+          margin: EdgeInsets.only(top: 10),
+          decoration: new BoxDecoration(
+              color: Colors.white,
+              borderRadius: new BorderRadius.all(
+                Radius.circular(10.0),
+              )),
+          child: Column(children: <Widget>[
+            PostHeader(
+                postAuthorId: postData.author,
+                postAuthorUserName: postData.authorUsername,
+                targetCharity: postData.charity,
+                charityLogo: postData.charityLogo),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.width * 9 / 16),
+              color: Colors.grey[200],
+              child: Center(child: isVideo ? _previewVideo() : _previewImage()),
+            ),
+            PostBody(
+              postData: postData,
+              hashtag: null,
+              maxLines: 9999999999,
+              likesManager: null,
+            ),
+            SizedBox(
+              height: 60,
+            )
+          ]),
+        ),
+      )
+    ]);
+  }
+
+  Widget _completionComment() {
+    return ListView(children: [
+      /*Container(
+        decoration: new BoxDecoration(
+            color: Colors.white,
+            borderRadius: new BorderRadius.all(
+              Radius.circular(10.0),
+            )),
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        child: Text(
+          'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
+          style: TextStyle(
+              fontFamily: 'Founders Grotesk',
+              fontWeight: FontWeight.w500,
+              fontSize: 18),
+        ),
+      ),*/
+      Container(
+          color: Colors.grey[200],
+          child: Container(
+              margin: EdgeInsets.only(top: 10),
+              decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.all(
+                    Radius.circular(10.0),
+                  )),
+              child: Container(
+                  color: Colors.white,
+                  margin: EdgeInsets.symmetric(vertical: 5),
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                            text: TextSpan(
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  color: Colors.black,
+                                  fontFamily: 'Founders Grotesk',
+                                ),
+                                children: [
+                              TextSpan(
+                                  text: 'Add a completion comment ',
+                                  style: TextStyle(
+                                    fontFamily: 'Founders Grotesk',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  )),
+                              TextSpan(
+                                  text: 'this is optional',
+                                  style: TextStyle(
+                                    fontFamily: 'Founders Grotesk',
+                                    fontSize: 12,
+                                  ))
+                            ])),
+                        TextField(
+                          controller: completionCommentController,
+                          decoration: InputDecoration(
+                            //border: InputBorder.none,
+                            hintText: 'Name',
+                          ),
+                        ),
+                      ]))))
+    ]);
   }
 
   Widget _uploadImageVideo() {
@@ -218,42 +378,7 @@ class _UploadProofState extends State<UploadProofScreen> {
                         future: retrieveLostData(),
                         builder: (BuildContext context,
                             AsyncSnapshot<void> snapshot) {
-                          switch (snapshot.connectionState) {
-                            case ConnectionState.none:
-                            case ConnectionState.waiting:
-                              return Container(
-                                  padding: EdgeInsets.all(20),
-                                  child: Text(
-                                    'Upload proof of completing the challenge - either a photo or video.',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,
-                                  ));
-                            case ConnectionState.done:
-                              return isVideo
-                                  ? _previewVideo()
-                                  : _previewImage();
-                            default:
-                              if (snapshot.hasError) {
-                                return Container(
-                                    padding: EdgeInsets.all(20),
-                                    child: Text(
-                                      'Upload proof of completing the challenge - either a photo or video.',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ));
-                              } else {
-                                return Container(
-                                    padding: EdgeInsets.all(20),
-                                    child: Text(
-                                      'Upload proof of completing the challenge - either a photo or video.',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ));
-                              }
-                          }
+                          return isVideo ? _previewVideo() : _previewImage();
                         },
                       )
                     : (isVideo ? _previewVideo() : _previewImage()),
@@ -275,6 +400,9 @@ class _UploadProofState extends State<UploadProofScreen> {
           _changePic();
         },
       ),
+      SizedBox(
+        height: 40,
+      )
     ]);
   }
 
@@ -305,16 +433,11 @@ class _UploadProofState extends State<UploadProofScreen> {
       await _controller.setVolume(0.0);
     }
     if (isVideo) {
-      _imageFile = await _picker.getVideo(
-          source: source, maxDuration: const Duration(seconds: 10));
-      await _playVideo(_imageFile);
+      _imageFile = await _picker.getVideo(source: source);
+      _playVideo(_imageFile);
     } else {
-      /*await _displayPickImageDialog(context,
-          (double maxWidth, double maxHeight, int quality)*/
       try {
-        final pickedFile = await _picker.getImage(
-          source: source,
-        );
+        final pickedFile = await _picker.getImage(source: source);
         if (mounted)
           setState(() {
             _imageFile = pickedFile;
@@ -325,7 +448,6 @@ class _UploadProofState extends State<UploadProofScreen> {
             _pickImageError = e;
           });
       }
-      ;
     }
   }
 
@@ -374,10 +496,7 @@ class _UploadProofState extends State<UploadProofScreen> {
       aspectRatio = _controller.value.aspectRatio;
       print(aspectRatio);
     }
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: AspectRatioVideo(_controller),
-    );
+    return AspectRatioVideo(_controller);
   }
 
   Widget _previewImage() {
@@ -532,6 +651,33 @@ class _UploadProofState extends State<UploadProofScreen> {
           },
         ),
       ],
+    );
+  }
+
+  Future<void> _showErrorDialog(String string) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(string),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -135,6 +135,7 @@ class DatabaseService {
       status: doc.data['status'],
       aspectRatio: doc.data['aspectRatio'],
       hashtags: doc.data['hashtags'],
+      completionComment: doc.data['completionComment'],
       charityLogo: doc.data['charityLogo'] != null
           ? doc.data['charityLogo']
           : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
@@ -478,14 +479,20 @@ class DatabaseService {
     });
   }
 
-  Future updatePostStatusImageTimestampRatio(String postId, String downloadUrl,
-      String status, Timestamp timestamp, double aspectRatio) async {
+  Future updatePostStatusImageTimestampRatioComment(
+      String postId,
+      String downloadUrl,
+      String status,
+      Timestamp timestamp,
+      double aspectRatio,
+      String completionComment) async {
     // create or update the document with this uid
     return await postsCollection.document(postId).updateData({
       "imageUrl": downloadUrl,
       "status": status,
       "timestamp": timestamp,
-      "aspectRatio": aspectRatio
+      "aspectRatio": aspectRatio,
+      "completionComment": completionComment
     });
   }
 
