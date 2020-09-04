@@ -10,6 +10,9 @@ import 'package:cached_video_player/cached_video_player.dart';
 import 'shared/loading.dart';
 import 'global_widgets/buttons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'models/post.dart';
+import 'post_widgets/postHeader.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -20,7 +23,8 @@ class UploadProofScreen extends StatefulWidget {
 }
 
 class _UploadProofState extends State<UploadProofScreen> {
-  bool _submitting = false;
+  Post postData;
+  bool _submitting = true;
   PickedFile _imageFile;
   dynamic _pickImageError;
   bool isVideo = false;
@@ -28,6 +32,8 @@ class _UploadProofState extends State<UploadProofScreen> {
   CachedVideoPlayerController _toBeDisposed;
   String _retrieveDataError;
   double aspectRatio;
+  CarouselController _carouselController = CarouselController();
+  int _current = 0;
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController maxWidthController = TextEditingController();
@@ -35,86 +41,178 @@ class _UploadProofState extends State<UploadProofScreen> {
   final TextEditingController qualityController = TextEditingController();
 
   @override
+  void initState() {
+    reloadPost();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    return _submitting == true
-        ? Loading()
-        : Scaffold(
-            appBar: AppBar(
-              centerTitle: true,
-              title: Text("Complete Fundder"),
-              actions: <Widget>[
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("Complete Fundder"),
+        actions: _submitting == true
+            ? null
+            : <Widget>[
                 new FlatButton(
-                    child: Text('Submit',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                        )),
-                    onPressed: () {
-                      if (mounted)
-                        setState(() {
-                          _submitting = true;
-                        });
-                      print('Submit pressed');
-                      if (_imageFile != null) {
-                        print('not null');
-                        final String fileLocation = user.uid +
-                            "/" +
-                            DateTime.now().microsecondsSinceEpoch.toString();
-                        if (isVideo == true) {
-                          DatabaseService(uid: user.uid)
-                              .uploadVideo(File(_imageFile.path), fileLocation)
-                              .then((downloadUrl) => {
-                                    print("Successful image upload"),
-                                    print(downloadUrl),
-                                    DatabaseService(uid: user.uid)
-                                        .updatePostStatusImageTimestampRatio(
-                                            widget.postId,
-                                            downloadUrl,
-                                            'done',
-                                            Timestamp.now(),
-                                            aspectRatio)
-                                        .then((value) =>
-                                            {Navigator.of(context).pop(null)}),
-                                  });
-                        } else {
-                          DatabaseService(uid: user.uid)
-                              .uploadImage(File(_imageFile.path), fileLocation)
-                              .then((downloadUrl) => {
-                                    print("Successful image upload"),
-                                    print(downloadUrl),
-                                    DatabaseService(uid: user.uid)
-                                        .updatePostStatusImageTimestampRatio(
-                                            widget.postId,
-                                            downloadUrl,
-                                            'done',
-                                            Timestamp.now(),
-                                            aspectRatio)
-                                        .then((value) =>
-                                            {Navigator.of(context).pop(null)}),
-                                  });
-                        }
-                      }
-                    })
+                    child: _current == 2
+                        ? Text('Submit',
+                            style: TextStyle(fontWeight: FontWeight.bold))
+                        : _current == 0
+                            ? Text('Next',
+                                style: TextStyle(fontWeight: FontWeight.bold))
+                            : Text('Preview',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: _current == 2
+                        ? () {
+                            if (mounted)
+                              setState(() {
+                                _submitting = true;
+                              });
+                            print('Submit pressed');
+                            if (_imageFile != null) {
+                              print('not null');
+                              final String fileLocation = user.uid +
+                                  "/" +
+                                  DateTime.now()
+                                      .microsecondsSinceEpoch
+                                      .toString();
+                              if (isVideo == true) {
+                                DatabaseService(uid: user.uid)
+                                    .uploadVideo(
+                                        File(_imageFile.path), fileLocation)
+                                    .then((downloadUrl) => {
+                                          print("Successful image upload"),
+                                          print(downloadUrl),
+                                          DatabaseService(uid: user.uid)
+                                              .updatePostStatusImageTimestampRatio(
+                                                  widget.postId,
+                                                  downloadUrl,
+                                                  'done',
+                                                  Timestamp.now(),
+                                                  aspectRatio)
+                                              .then((value) => {
+                                                    Navigator.of(context)
+                                                        .pop(null)
+                                                  }),
+                                        });
+                              } else {
+                                DatabaseService(uid: user.uid)
+                                    .uploadImage(
+                                        File(_imageFile.path), fileLocation)
+                                    .then((downloadUrl) => {
+                                          print("Successful image upload"),
+                                          print(downloadUrl),
+                                          DatabaseService(uid: user.uid)
+                                              .updatePostStatusImageTimestampRatio(
+                                                  widget.postId,
+                                                  downloadUrl,
+                                                  'done',
+                                                  Timestamp.now(),
+                                                  aspectRatio)
+                                              .then((value) => {
+                                                    Navigator.of(context)
+                                                        .pop(null)
+                                                  }),
+                                        });
+                              }
+                            }
+                          }
+                        : () {
+                            _carouselController.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.linear);
+                          })
               ],
-              leading: new IconButton(
-                icon: new Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(null),
-              ),
+        leading: new IconButton(
+          icon: new Icon(Icons.close),
+          onPressed: () => Navigator.of(context).pop(null),
+        ),
+      ),
+      body: _submitting == true
+          ? Loading()
+          : Builder(
+              builder: (context) {
+                final double height = MediaQuery.of(context).size.height;
+                return CarouselSlider(
+                  carouselController: _carouselController,
+                  options: CarouselOptions(
+                    onPageChanged: (index, reason) {
+                      _changePage();
+                      if (mounted) {
+                        setState(() {
+                          _current = index;
+                        });
+                      }
+                    },
+                    enableInfiniteScroll: false,
+                    height: height,
+                    viewportFraction: 1.0,
+                    enlargeCenterPage: false,
+                    // autoPlay: false,
+                  ),
+                  items: [
+                    _uploadImageVideo(),
+                    _uploadImageVideo(),
+                    _uploadImageVideo()
+                  ],
+                );
+              },
             ),
-            body: ListView(children: [
-              Container(
-                color: Colors.white,
-                margin: EdgeInsets.symmetric(vertical: 5),
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                child: Text(
-                  'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
-                  style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 18),
-                ),
-              ),
-              Center(
+    );
+  }
+
+  void _changePage() {
+    FocusScope.of(context).unfocus();
+  }
+
+  void reloadPost() async {
+    print('reloading');
+    postData = await DatabaseService(uid: "123").getPostById(widget.postId);
+    setState(() {
+      _submitting = false;
+    });
+  }
+
+  Widget _uploadImageVideo() {
+    return ListView(children: [
+      /*Container(
+        decoration: new BoxDecoration(
+            color: Colors.white,
+            borderRadius: new BorderRadius.all(
+              Radius.circular(10.0),
+            )),
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        child: Text(
+          'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
+          style: TextStyle(
+              fontFamily: 'Founders Grotesk',
+              fontWeight: FontWeight.w500,
+              fontSize: 18),
+        ),
+      ),*/
+      Container(
+        color: Colors.grey[200],
+        child: Container(
+          margin: EdgeInsets.only(top: 10),
+          decoration: new BoxDecoration(
+              color: Colors.white,
+              borderRadius: new BorderRadius.all(
+                Radius.circular(10.0),
+              )),
+          child: Column(children: <Widget>[
+            PostHeader(
+                postAuthorId: postData.author,
+                postAuthorUserName: postData.authorUsername,
+                targetCharity: postData.charity,
+                charityLogo: postData.charityLogo),
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.width * 9 / 16),
+              color: Colors.grey[200],
+              child: Center(
                 child: !kIsWeb && Platform.isAndroid
                     ? FutureBuilder<void>(
                         future: retrieveLostData(),
@@ -123,44 +221,61 @@ class _UploadProofState extends State<UploadProofScreen> {
                           switch (snapshot.connectionState) {
                             case ConnectionState.none:
                             case ConnectionState.waiting:
-                              return const Text(
-                                'You have not yet picked an image.',
-                                textAlign: TextAlign.center,
-                              );
+                              return Container(
+                                  padding: EdgeInsets.all(20),
+                                  child: Text(
+                                    'Upload proof of completing the challenge - either a photo or video.',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ));
                             case ConnectionState.done:
                               return isVideo
                                   ? _previewVideo()
                                   : _previewImage();
                             default:
                               if (snapshot.hasError) {
-                                return Text(
-                                  'Pick image/video error: ${snapshot.error}}',
-                                  textAlign: TextAlign.center,
-                                );
+                                return Container(
+                                    padding: EdgeInsets.all(20),
+                                    child: Text(
+                                      'Upload proof of completing the challenge - either a photo or video.',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center,
+                                    ));
                               } else {
-                                return const Text(
-                                  'You have not yet picked an image.',
-                                  textAlign: TextAlign.center,
-                                );
+                                return Container(
+                                    padding: EdgeInsets.all(20),
+                                    child: Text(
+                                      'Upload proof of completing the challenge - either a photo or video.',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center,
+                                    ));
                               }
                           }
                         },
                       )
                     : (isVideo ? _previewVideo() : _previewImage()),
               ),
-              EditFundderButton(
-                text: "Select Video",
-                onPressed: () {
-                  _changeVideo();
-                },
-              ),
-              EditFundderButton(
-                text: "Select Image",
-                onPressed: () {
-                  _changePic();
-                },
-              ),
-            ]));
+            ),
+          ]),
+        ),
+      ),
+      SizedBox(height: 40),
+      PrimaryFundderButton(
+        text: "Select Video",
+        onPressed: () {
+          _changeVideo();
+        },
+      ),
+      PrimaryFundderButton(
+        text: "Select Image",
+        onPressed: () {
+          _changePic();
+        },
+      ),
+    ]);
   }
 
   Future<void> _playVideo(PickedFile file) async {
@@ -248,10 +363,13 @@ class _UploadProofState extends State<UploadProofScreen> {
       return retrieveError;
     }
     if (_controller == null) {
-      return const Text(
-        'You have not yet picked a video',
-        textAlign: TextAlign.center,
-      );
+      return Container(
+          padding: EdgeInsets.all(20),
+          child: Text(
+            'Upload proof of completing the challenge - either a photo or video.',
+            style: TextStyle(fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ));
     } else {
       aspectRatio = _controller.value.aspectRatio;
       print(aspectRatio);
@@ -283,10 +401,13 @@ class _UploadProofState extends State<UploadProofScreen> {
         textAlign: TextAlign.center,
       );
     } else {
-      return const Text(
-        'You have not yet picked an image.',
-        textAlign: TextAlign.center,
-      );
+      return Container(
+          padding: EdgeInsets.all(20),
+          child: Text(
+            'Upload proof of completing the challenge - either a photo or video.',
+            style: TextStyle(fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ));
     }
   }
 
