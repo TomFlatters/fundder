@@ -14,6 +14,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'models/post.dart';
 import 'post_widgets/postHeader.dart';
 import 'post_widgets/postBody.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -25,7 +27,7 @@ class UploadProofScreen extends StatefulWidget {
 
 class _UploadProofState extends State<UploadProofScreen> {
   Post postData;
-  bool _submitting = true;
+  bool _submitting = false;
   PickedFile _imageFile;
   dynamic _pickImageError;
   bool isVideo = false;
@@ -35,6 +37,7 @@ class _UploadProofState extends State<UploadProofScreen> {
   double aspectRatio;
   CarouselController _carouselController = CarouselController();
   int _current = 0;
+  bool _loading = true;
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController maxWidthController = TextEditingController();
@@ -164,8 +167,38 @@ class _UploadProofState extends State<UploadProofScreen> {
                               duration: Duration(milliseconds: 300),
                               curve: Curves.linear);
                         }))),
-      body: _submitting == true
-          ? Loading()
+      body: _submitting == true || _loading == true
+          ? _submitting == true
+              ? Container(
+                  color: Colors.white,
+                  child: Center(
+                    child: Container(
+                        height: MediaQuery.of(context).size.width,
+                        width: MediaQuery.of(context).size.width,
+                        child: Center(
+                          child: Container(
+                            // Use the properties stored in the State class.
+                            /*width: animation.value,
+                height: animation.value,
+                child: Image.asset('assets/images/fundder_loading.png'),*/
+                            child: Column(children: [
+                              CupertinoActivityIndicator(),
+                              SizedBox(
+                                height: 50,
+                              ),
+                              Text(
+                                  'Uploading media. This may take up to a few minutes.')
+                            ]),
+                          ),
+                          // Define how long the animation should take.
+                          // Provide an optional curve to make the animation feel smoother.
+                        )), /*SpinKitChasingDots(
+                color: Color(0xffA3D165),
+                size: 50.0,
+            ),*/
+                  ),
+                )
+              : Loading()
           : Builder(
               builder: (context) {
                 final double height = MediaQuery.of(context).size.height;
@@ -205,7 +238,7 @@ class _UploadProofState extends State<UploadProofScreen> {
     print('reloading');
     postData = await DatabaseService(uid: "123").getPostById(widget.postId);
     setState(() {
-      _submitting = false;
+      _loading = false;
     });
   }
 
@@ -741,17 +774,29 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
   @override
   Widget build(BuildContext context) {
     if (initialized) {
-      return Center(
-          child: GestureDetector(
-        onTap: _playPause,
-        child: AspectRatio(
-          aspectRatio: controller.value.aspectRatio,
-          child: CachedVideoPlayer(controller),
-        ),
-      ) //)/*AspectRatio(
-          /*aspectRatio: controller.value?.aspectRatio,
+      return VisibilityDetector(
+          key: UniqueKey(),
+          onVisibilityChanged: (VisibilityInfo info) {
+            debugPrint("${info.visibleFraction} of my widget is visible");
+            if (mounted) {
+              if (info.visibleFraction < 0.3) {
+                controller.pause();
+              } else {
+                controller.play();
+              }
+            }
+          },
+          child: Center(
+              child: GestureDetector(
+            onTap: _playPause,
+            child: AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: CachedVideoPlayer(controller),
+            ),
+          ) //)/*AspectRatio(
+              /*aspectRatio: controller.value?.aspectRatio,
           child: VideoPlayer(controller),*/
-          );
+              ));
       //);
     } else {
       return Container();
