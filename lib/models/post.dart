@@ -30,6 +30,7 @@ class Post {
   final String templateTag;
   final String charityLogo;
   final String charityId;
+  String completionComment;
 
   Post(
       {this.noComments,
@@ -53,7 +54,8 @@ class Post {
       this.moneyRaised,
       this.hashtags,
       this.charityLogo,
-      this.charityId});
+      this.charityId,
+      this.completionComment});
 
   double percentRaised() {
     double processAmount(String s) =>

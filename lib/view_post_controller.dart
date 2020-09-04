@@ -65,6 +65,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
               postAuthorId: postData.author,
               postAuthorUserName: postData.authorUsername,
               targetCharity: postData.charity,
+              postStatus: postData.status,
               charityLogo: postData.charityLogo),
           PostBody(
             postData: postData,
