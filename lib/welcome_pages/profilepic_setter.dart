@@ -53,99 +53,104 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Create profile'),
-        actions: <Widget>[
-          new FlatButton(
-            child: _current == 1
-                ? Text('Set', style: TextStyle(fontWeight: FontWeight.bold))
-                : Text('Next', style: TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: _current == 1
-                ? () async {
-                    if (mounted)
-                      setState(() {
-                        _loading = true;
-                      });
-                    if (nameEntry.text != '') {
-                      if (imageFile != null) {
-                        final String fileLocation = _uid +
-                            "/" +
-                            DateTime.now().microsecondsSinceEpoch.toString();
-                        DatabaseService(uid: _uid)
-                            .uploadImage(File(imageFile.path), fileLocation)
-                            .then((downloadUrl) => {
-                                  print("Successful image upload"),
-                                  print(downloadUrl),
+    return WillPopScope(
+        onWillPop: () async => false,
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text('Create profile'),
+            actions: <Widget>[
+              new FlatButton(
+                child: _current == 1
+                    ? Text('Set', style: TextStyle(fontWeight: FontWeight.bold))
+                    : Text('Next',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: _current == 1
+                    ? () async {
+                        if (mounted)
+                          setState(() {
+                            _loading = true;
+                          });
+                        if (nameEntry.text != '') {
+                          if (imageFile != null) {
+                            final String fileLocation = _uid +
+                                "/" +
+                                DateTime.now()
+                                    .microsecondsSinceEpoch
+                                    .toString();
+                            DatabaseService(uid: _uid)
+                                .uploadImage(File(imageFile.path), fileLocation)
+                                .then((downloadUrl) => {
+                                      print("Successful image upload"),
+                                      print(downloadUrl),
 
-                                  // create post from the state and image url, and add that post to firebase
-                                  Firestore.instance
-                                      .collection('users')
-                                      .document(_uid)
-                                      .updateData({
-                                    'profilePic': downloadUrl,
-                                    'dpSetterPrompted': true,
-                                    'name': nameEntry.text
-                                  }).then((value) => Navigator.of(context)
-                                          .pop(setState(() {})))
-                                });
-                      } else {
-                        Firestore.instance
-                            .collection('users')
-                            .document(_uid)
-                            .updateData({
-                          'dpSetterPrompted': true,
-                          'name': nameEntry.text
-                        }).then((value) =>
-                                Navigator.of(context).pop(setState(() {})));
+                                      // create post from the state and image url, and add that post to firebase
+                                      Firestore.instance
+                                          .collection('users')
+                                          .document(_uid)
+                                          .updateData({
+                                        'profilePic': downloadUrl,
+                                        'dpSetterPrompted': true,
+                                        'name': nameEntry.text
+                                      }).then((value) => Navigator.of(context)
+                                              .pop(setState(() {})))
+                                    });
+                          } else {
+                            Firestore.instance
+                                .collection('users')
+                                .document(_uid)
+                                .updateData({
+                              'dpSetterPrompted': true,
+                              'name': nameEntry.text
+                            }).then((value) =>
+                                    Navigator.of(context).pop(setState(() {})));
+                          }
+                        } else {
+                          if (mounted) {
+                            setState(() {
+                              _loading = false;
+                            });
+                          }
+                          _showErrorDialog('You have not set a name');
+                        }
                       }
-                    } else {
-                      if (mounted) {
-                        setState(() {
-                          _loading = false;
-                        });
-                      }
-                      _showErrorDialog('You have not set a name');
-                    }
-                  }
-                : () {
-                    /*Navigator.of(context).pushReplacement(_viewPost());*/
-                    _carouselController.nextPage(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.linear);
+                    : () {
+                        /*Navigator.of(context).pushReplacement(_viewPost());*/
+                        _carouselController.nextPage(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.linear);
+                      },
+              )
+            ],
+            leading: new Container(),
+          ),
+          body: _uid == null
+              ? Loading()
+              : Builder(
+                  builder: (context) {
+                    final double height = MediaQuery.of(context).size.height;
+                    return CarouselSlider(
+                      carouselController: _carouselController,
+                      options: CarouselOptions(
+                        onPageChanged: (index, reason) {
+                          _changePage();
+                          if (mounted) {
+                            setState(() {
+                              _current = index;
+                            });
+                          }
+                        },
+                        enableInfiniteScroll: false,
+                        height: height,
+                        viewportFraction: 1.0,
+                        enlargeCenterPage: false,
+                        // autoPlay: false,
+                      ),
+                      items: [_namePrompter(), _profilePicPrompter()],
+                    );
                   },
-          )
-        ],
-        leading: new Container(),
-      ),
-      body: _uid == null
-          ? Loading()
-          : Builder(
-              builder: (context) {
-                final double height = MediaQuery.of(context).size.height;
-                return CarouselSlider(
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
-                    onPageChanged: (index, reason) {
-                      _changePage();
-                      if (mounted) {
-                        setState(() {
-                          _current = index;
-                        });
-                      }
-                    },
-                    enableInfiniteScroll: false,
-                    height: height,
-                    viewportFraction: 1.0,
-                    enlargeCenterPage: false,
-                    // autoPlay: false,
-                  ),
-                  items: [_namePrompter(), _profilePicPrompter()],
-                );
-              },
-            ),
-    );
+                ),
+        ));
   }
 
   void _changePage() {
