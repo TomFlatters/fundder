@@ -77,7 +77,7 @@ class _WebFeedState extends State<WebFeed> with SingleTickerProviderStateMixin {
 
   _handleTabSelection() {
     if (_tabController.indexIsChanging) {
-      setState(() {});
+      if (mounted) setState(() {});
     }
   }
 

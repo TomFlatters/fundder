@@ -19,6 +19,7 @@ import 'models/user.dart';
 import 'global_widgets/buttons.dart';
 import 'services/database.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'dart:async';
 
 class ViewPost extends StatefulWidget {
   @override
@@ -48,6 +49,12 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
 
   Container createPostUI(
       Post postData, String uid, context, LikesService likesService) {
+    StreamController<void> likesManager = StreamController<int>();
+    Stream rebuildLikesButton = likesManager.stream;
+    var currLikeButton;
+    if (uid != "123") {
+      currLikeButton = createLikesFutureBuilder(likesService, postData, uid);
+    }
     return Container(
       width: MediaQuery.of(context).size.width,
       color: Colors.white,
@@ -58,11 +65,13 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
               postAuthorId: postData.author,
               postAuthorUserName: postData.authorUsername,
               targetCharity: postData.charity,
+              postStatus: postData.status,
               charityLogo: postData.charityLogo),
           PostBody(
             postData: postData,
             hashtag: null,
             maxLines: 999999999999999,
+            likesManager: likesManager,
           ),
           uid == "123"
               ? Container()
@@ -71,46 +80,24 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                   key: GlobalKey(),
                   height: 30,
                   child: Row(children: <Widget>[
-                    /*Expanded(
-                //like bar
-                child:*/
-                    FutureBuilder(
-                        future: likesService.hasUserLikedPost(postData.id),
-                        builder: (context, hasLiked) {
-                          bool initiallyHasLiked;
-                          if (hasLiked.connectionState ==
-                              ConnectionState.done) {
-                            initiallyHasLiked = hasLiked.data;
-                            return FutureBuilder(
-                              future: likesService.noOfLikes(postData.id),
-                              builder: (context, noLikes) {
-                                int initialLikesNo;
-                                if (noLikes.connectionState ==
-                                    ConnectionState.done) {
-                                  initialLikesNo = noLikes.data;
-
-                                  return Expanded(
-                                      //like bar
-                                      child: NewLikeButton(
-                                    initiallyHasLiked,
-                                    initialLikesNo,
-                                    uid: uid,
-                                    postId: postData.id,
-                                  ));
-                                } else {
-                                  return Expanded(
-                                    child: Container(),
-                                  );
-                                }
-                              },
-                            );
-                          } else {
-                            return Expanded(
-                              child: Container(),
-                            );
-                          }
-                        }),
-                    //),
+                    Expanded(
+                      //like bar
+                      child: StreamBuilder(
+                          stream: rebuildLikesButton,
+                          builder: (context, snapshot) {
+                            print("Building Stream Builder");
+                            if (snapshot.hasData) {
+                              print(
+                                  "New data in stream. Creating new Like Button");
+                              currLikeButton = createLikesFutureBuilder(
+                                  likesService, postData, uid);
+                              return currLikeButton;
+                            } else {
+                              print("Using old LikeButton");
+                              return currLikeButton;
+                            }
+                          }),
+                    ),
                     Expanded(
                         child: Align(
                       alignment: Alignment.centerLeft,
@@ -170,6 +157,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
     }
 
     print("View post controller");
+
     return Container(
         child: postData == null
             ? Scaffold(
@@ -188,121 +176,168 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                 body: Container(
                     child: Text(
                         "Error retrieving post: either the post does not exist, or your internet is not connected")))
-            : WillPopScope(
-                onWillPop: () async => false,
-                child: Scaffold(
-                    appBar: kIsWeb == true
-                        ? null
-                        : AppBar(
-                            centerTitle: true,
-                            title: Text(postData.status.inCaps),
-                            actions: <Widget>[
-                              new IconButton(
-                                  icon: new Icon(Icons.close),
-                                  onPressed: () {
-                                    print("Going back from ViewPost to Feed");
-                                    Navigator.of(context).pop();
-                                  })
-                            ],
-                            leading: new Container(),
-                          ),
-                    body: VisibilityDetector(
-                      key: UniqueKey(),
-                      onVisibilityChanged: (VisibilityInfo info) {
-                        debugPrint(
-                            "${info.visibleFraction} of my widget is visible");
-                        if (info.visibleFraction > 0 &&
-                            willNeedUpdate == true) {
-                          reloadPost();
-                        }
-                      },
-                      child: Column(children: [
-                        kIsWeb == true ? WebMenu(-1) : Container(),
-                        Expanded(
-                          child: ListView(
-                            children: <Widget>[
-                              Container(
-                                  color: Colors.white,
-                                  child: Container(
-                                      margin:
-                                          EdgeInsets.symmetric(vertical: 10.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          user != null
-                                              ? createPostUI(postData, user.uid,
-                                                  context, likesService)
-                                              : createPostUI(postData, '123',
-                                                  context, likesService),
-                                          PrimaryFundderButton(
-                                              text: 'Donate',
-                                              onPressed: () async {
-                                                willNeedUpdate = true;
-                                                //This is the old code for redirecting to a donation page within the app
-                                                //apple and google don't allow this without taking a 30% cut
+            : Scaffold(
+                appBar: kIsWeb == true
+                    ? null
+                    : AppBar(
+                        centerTitle: true,
+                        title: Text(postData.status.inCaps),
+                        actions: <Widget>[
+                          new IconButton(
+                              icon: new Icon(Icons.close),
+                              onPressed: () {
+                                print("Going back from ViewPost to Feed");
+                                Navigator.of(context).pop();
+                              })
+                        ],
+                        leading: new Container(),
+                      ),
+                body: VisibilityDetector(
+                  key: UniqueKey(),
+                  onVisibilityChanged: (VisibilityInfo info) {
+                    debugPrint(
+                        "${info.visibleFraction} of my widget is visible");
+                    if (info.visibleFraction > 0 && willNeedUpdate == true) {
+                      reloadPost();
+                    }
+                  },
+                  child: Column(children: [
+                    kIsWeb == true ? WebMenu(-1) : Container(),
+                    Expanded(
+                      child: ListView(
+                        children: <Widget>[
+                          Container(
+                              color: Colors.white,
+                              child: Container(
+                                  margin: EdgeInsets.symmetric(vertical: 10.0),
+                                  child: Column(
+                                    children: <Widget>[
+                                      user != null
+                                          ? createPostUI(postData, user.uid,
+                                              context, likesService)
+                                          : createPostUI(postData, '123',
+                                              context, likesService),
+                                      PrimaryFundderButton(
+                                          text: 'Donate',
+                                          onPressed: () async {
+                                            willNeedUpdate = true;
+                                            //This is the old code for redirecting to a donation page within the app
+                                            //apple and google don't allow this without taking a 30% cut
 
-                                                /*Navigator.of(context).push(_openDonate());*/
-                                                // Navigator.pushNamed(
-                                                //     context,
-                                                //     '/post/' +
-                                                //         postData.id +
-                                                //         '/donate');
-                                                String uid;
-                                                if (user != null) {
-                                                  uid = user.uid;
-                                                } else {
-                                                  uid = '123';
-                                                }
-                                                var donatePage =
-                                                    "https://donate.fundder.co/" +
-                                                        uid +
-                                                        '/' +
-                                                        postData.id;
+                                            /*Navigator.of(context).push(_openDonate());*/
+                                            // Navigator.pushNamed(
+                                            //     context,
+                                            //     '/post/' +
+                                            //         postData.id +
+                                            //         '/donate');
+                                            String uid;
+                                            if (user != null) {
+                                              uid = user.uid;
+                                            } else {
+                                              uid = '123';
+                                            }
+                                            var donatePage =
+                                                "https://donate.fundder.co/" +
+                                                    uid +
+                                                    '/' +
+                                                    postData.id;
 
-                                                // var url = "https://fundder.co/";
-                                                if (await canLaunch(
-                                                    donatePage)) {
-                                                  await launch(
-                                                    donatePage,
-                                                    forceSafariVC: false,
-                                                    forceWebView: false,
-                                                  );
-                                                } else {
-                                                  throw 'Could not launch $donatePage';
-                                                }
-                                              }),
-                                          user != null
-                                              ? user.uid != postData.author ||
-                                                      postData.status != 'fund'
-                                                  ? Container()
-                                                  : PrimaryFundderButton(
-                                                      text:
-                                                          'Complete Challenge',
-                                                      onPressed: () {
-                                                        willNeedUpdate = true;
-                                                        Navigator.pushNamed(
-                                                            context,
-                                                            '/post/' +
-                                                                postData.id +
-                                                                '/uploadProof');
-                                                      })
-                                              : Container(),
-                                        ],
-                                      )))
-                            ],
-                          ),
-                        ),
-                      ]),
-                    ))));
+                                            // var url = "https://fundder.co/";
+                                            if (await canLaunch(donatePage)) {
+                                              await launch(
+                                                donatePage,
+                                                forceSafariVC: false,
+                                                forceWebView: false,
+                                              );
+                                            } else {
+                                              throw 'Could not launch $donatePage';
+                                            }
+                                          }),
+                                      user != null
+                                          ? user.uid != postData.author ||
+                                                  postData.status != 'fund'
+                                              ? Container()
+                                              : PrimaryFundderButton(
+                                                  text: 'Complete Challenge',
+                                                  onPressed: () {
+                                                    willNeedUpdate = true;
+                                                    Navigator.pushNamed(
+                                                        context,
+                                                        '/post/' +
+                                                            postData.id +
+                                                            '/uploadProof');
+                                                  })
+                                          : Container(),
+                                    ],
+                                  )))
+                        ],
+                      ),
+                    ),
+                  ]),
+                )));
   }
 
   void reloadPost() async {
     print('reloading');
     postData = await DatabaseService(uid: "123").getPostById(this.postData.id);
     if (mounted) {
-      setState(() {
-        willNeedUpdate = false;
-      });
+      if (mounted)
+        setState(() {
+          willNeedUpdate = false;
+        });
     }
+  }
+
+  FutureBuilder createLikesFutureBuilder(likesService, postData, uid) {
+    bool initiallyHasLiked;
+    int initialLikesNo;
+    return FutureBuilder(
+        future: likesService.hasUserLikedPost(postData.id),
+        builder: (context, hasLiked) {
+          Widget child1 = Container(
+            width: 0,
+          );
+          if (hasLiked.connectionState == ConnectionState.done) {
+            initiallyHasLiked = hasLiked.data;
+            return FutureBuilder(
+              future: likesService.noOfLikes(postData.id),
+              builder: (context, noLikes) {
+                Widget child;
+                if (noLikes.connectionState == ConnectionState.done) {
+                  initialLikesNo = noLikes.data;
+
+                  child = NewLikeButton(
+                    initiallyHasLiked,
+                    initialLikesNo,
+                    uid: uid,
+                    postId: postData.id,
+                  );
+                } else {
+                  child =
+                      /*previousLikesNo != null && previousHasLiked != null
+                        ? NewLikeButton(previousHasLiked, previousLikesNo,
+                            uid: uid, postId: postData.id)
+                        :*/
+                      Container(
+                    width: 0,
+                  );
+                }
+                return AnimatedSwitcher(
+                  duration: Duration(milliseconds: 200),
+                  child: child,
+                );
+              },
+            );
+          } else {
+            child1 = Container(
+              width: 0,
+            );
+          }
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 200),
+            child: child1,
+          );
+        });
   }
 }
 

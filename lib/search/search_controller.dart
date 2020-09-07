@@ -108,7 +108,10 @@ class _SearchState extends State<SearchController>
                   if (_tabController.index == 0) {
                     return ListTile(
                       leading: ProfilePicFromUrl(doc.data['profilePic'], 40),
-                      title: Text(doc.data['username']),
+                      title: Text(
+                        doc.data['username'],
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       onTap: () {
                         Navigator.pushNamed(context, '/user/' + doc.documentID);
                       },
@@ -117,9 +120,11 @@ class _SearchState extends State<SearchController>
                   } else {
                     return ListTile(
                       //leading: ProfilePic(doc.data['author'], 40),
-                      title: Text("#" + doc.documentID.toString()),
-                      subtitle:
-                          Text(doc.data['count'].toString() + " challenges"),
+                      title: Text("#" + doc.documentID.toString(),
+                          style: TextStyle(color: Colors.blueGrey)),
+                      subtitle: Text(
+                        doc.data['count'].toString() + " challenges",
+                      ),
                       onTap: () {
                         Navigator.pushNamed(
                             context,

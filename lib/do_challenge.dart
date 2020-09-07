@@ -68,7 +68,7 @@ class _DoChallengeState extends State<DoChallenge> {
       if (mounted) setState(() {});
       _refreshController.loadComplete();
     } else {
-      setState(() {});
+      if (mounted) setState(() {});
       _refreshController.loadNoData();
     }
   }
@@ -164,7 +164,7 @@ class _DoChallengeState extends State<DoChallenge> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    height: 60,
+                    height: 65,
                     margin:
                         EdgeInsets.only(left: 0, right: 0, top: 20, bottom: 0),
                     child: Row(
@@ -212,7 +212,7 @@ class _DoChallengeState extends State<DoChallenge> {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontFamily: 'Founders Grotesk',
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                         ),
                                       )),
@@ -290,7 +290,7 @@ class _DoChallengeState extends State<DoChallenge> {
           style: TextStyle(
               color: Colors.black,
               fontFamily: 'Founders Grotesk',
-              fontSize: 15))
+              fontSize: 16))
     ];
     if (hashtags != null) {
       for (var i = 0; i < hashtags.length; i++) {
@@ -299,7 +299,7 @@ class _DoChallengeState extends State<DoChallenge> {
             style: TextStyle(
               color: Colors.blueGrey[700],
               fontFamily: 'Founders Grotesk' /*HexColor('ff6b6c')*/,
-              fontSize: 15,
+              fontSize: 16,
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {

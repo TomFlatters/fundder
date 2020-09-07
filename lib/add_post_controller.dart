@@ -72,9 +72,11 @@ class _AddPostState extends State<AddPost> {
                     onPressed: _current == 4
                         ? () {
                             try {
-                              setState(() {
-                                _submitting = true;
-                              });
+                              if (mounted) {
+                                setState(() {
+                                  _submitting = true;
+                                });
+                              }
 
                               // add image to firebase storage
                               if (imageFile != null) {
@@ -95,9 +97,11 @@ class _AddPostState extends State<AddPost> {
                                 _pushItem(null, user);
                               }
                             } catch (e) {
-                              setState(() {
-                                _submitting = false;
-                              });
+                              if (mounted) {
+                                setState(() {
+                                  _submitting = false;
+                                });
+                              }
                               _showErrorDialog(e.toString());
                             }
                           }
@@ -122,9 +126,11 @@ class _AddPostState extends State<AddPost> {
                     options: CarouselOptions(
                       onPageChanged: (index, reason) {
                         _changePage();
-                        setState(() {
-                          _current = index;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _current = index;
+                          });
+                        }
                       },
                       enableInfiniteScroll: false,
                       height: height,
@@ -157,14 +163,16 @@ class _AddPostState extends State<AddPost> {
         .document(firebaseUser.uid)
         .get()
         .then((value) {
-      setState(() {
-        user = User(
-            uid: firebaseUser.uid,
-            name: value.data["name"],
-            username: value.data['username'],
-            email: firebaseUser.email,
-            profilePic: value.data["profilePic"]);
-      });
+      if (mounted) {
+        setState(() {
+          user = User(
+              uid: firebaseUser.uid,
+              name: value.data["name"],
+              username: value.data['username'],
+              email: firebaseUser.email,
+              profilePic: value.data["profilePic"]);
+        });
+      }
     });
   }
 
@@ -175,86 +183,100 @@ class _AddPostState extends State<AddPost> {
         charity == -1 ||
         moneyController.text == "0.00" ||
         hashtags.length < 2) {
-      setState(() {
-        _submitting = false;
-      });
+      if (mounted) {
+        setState(() {
+          _submitting = false;
+        });
+      }
       _showErrorDialog('You have not filled all the required fields');
     } else {
-      if (whoDoes[selected] == "Myself") {
-        DatabaseService(uid: user.uid)
-            .uploadPost(new Post(
-                title: titleController.text.toString().trimRight(),
-                subtitle: subtitleController.text.toString().trimRight(),
-                author: user.uid,
-                authorUsername: user.username,
-                charity: charities[charity].id,
-                noLikes: 0,
-                noComments: 0,
-                timestamp: DateTime.now(),
-                moneyRaised: 0,
-                targetAmount: moneyController.text.toString(),
-                imageUrl: downloadUrl,
-                status: 'fund',
-                aspectRatio: aspectRatio,
-                hashtags: hashtags,
-                charityLogo: charities[charity].image))
-            .then((postId) => {
-                  if (postId == null)
-                    {
-                      setState(() {
-                        _submitting = false;
-                      })
-                    }
-                  else
-                    {
-                      print("The doc id is " +
-                          postId
-                              .toString()
-                              .substring(1, postId.toString().length - 1)),
-                      HashtagsService(uid: user.uid)
-                          .addHashtag(postId.toString(), hashtags),
+      if (double.parse(moneyController.text) < 2) {
+        if (mounted) {
+          setState(() {
+            _submitting = false;
+          });
+        }
+        _showErrorDialog('The minimum donation target amount is £2');
+      } else {
+        if (whoDoes[selected] == "Myself") {
+          DatabaseService(uid: user.uid)
+              .uploadPost(new Post(
+                  title: titleController.text.toString().trimRight(),
+                  subtitle: subtitleController.text.toString().trimRight(),
+                  author: user.uid,
+                  authorUsername: user.username,
+                  charity: charities[charity].id,
+                  noLikes: 0,
+                  noComments: 0,
+                  timestamp: DateTime.now(),
+                  moneyRaised: 0,
+                  targetAmount: moneyController.text.toString(),
+                  imageUrl: downloadUrl,
+                  status: 'fund',
+                  aspectRatio: aspectRatio,
+                  hashtags: hashtags,
+                  charityLogo: charities[charity].image))
+              .then((postId) => {
+                    if (postId == null)
+                      {
+                        if (mounted)
+                          {
+                            setState(() {
+                              _submitting = false;
+                            })
+                          }
+                      }
+                    else
+                      {
+                        print("The doc id is " +
+                            postId
+                                .toString()
+                                .substring(1, postId.toString().length - 1)),
+                        HashtagsService(uid: user.uid)
+                            .addHashtag(postId.toString(), hashtags),
 
-                      // if the post is successfully added, view the post
-                      /*DatabaseService(uid: user.uid).getPostById(postId.toString())
+                        // if the post is successfully added, view the post
+                        /*DatabaseService(uid: user.uid).getPostById(postId.toString())
                       .then((post) => {
                         Navigator.of(context)
                           .pushReplacement(_viewPost(post))
                       })*/
-                      Navigator.pushReplacementNamed(
-                          context,
-                          '/post/' +
-                              postId
-                                  .toString()
-                                  .substring(1, postId.toString().length - 1))
-                    } //the substring is very important as postId.toString() is in brackets
-                });
-      } else {
-        // Create a template
-        DatabaseService(uid: user.uid)
-            .uploadTemplate(new Template(
-                title: titleController.text.toString(),
-                subtitle: subtitleController.text.toString(),
-                author: user.uid,
-                authorUsername: user.username,
-                charity: charities[charity].id,
-                likes: [],
-                comments: {},
-                timestamp: DateTime.now(),
-                moneyRaised: 0,
-                targetAmount: moneyController.text.toString(),
-                imageUrl: downloadUrl,
-                whoDoes: whoDoes[selected].toString(),
-                acceptedBy: [],
-                completedBy: [],
-                aspectRatio: aspectRatio,
-                hashtags: hashtags,
-                active: true,
-                charityLogo: charities[charity].image))
-            .then((templateId) => {
-                  // if the post is successfully added, view the post
-                  Navigator.pushReplacementNamed(
-                      context, '/challenge/' + templateId.toString())
-                });
+                        Navigator.pushReplacementNamed(
+                            context,
+                            '/post/' +
+                                postId
+                                    .toString()
+                                    .substring(1, postId.toString().length - 1))
+                      } //the substring is very important as postId.toString() is in brackets
+                  });
+        } else {
+          // Create a template
+          DatabaseService(uid: user.uid)
+              .uploadTemplate(new Template(
+                  title: titleController.text.toString(),
+                  subtitle: subtitleController.text.toString(),
+                  author: user.uid,
+                  authorUsername: user.username,
+                  charity: charities[charity].id,
+                  likes: [],
+                  comments: {},
+                  timestamp: DateTime.now(),
+                  moneyRaised: 0,
+                  targetAmount: moneyController.text.toString(),
+                  imageUrl: downloadUrl,
+                  whoDoes: whoDoes[selected].toString(),
+                  acceptedBy: [],
+                  completedBy: [],
+                  aspectRatio: aspectRatio,
+                  hashtags: hashtags,
+                  active: true,
+                  charityLogo: charities[charity].image))
+              .then((templateId) => {
+                    // if the post is successfully added, view the post
+                    Navigator.pushReplacementNamed(
+                        context, '/challenge/' + templateId.toString())
+                  });
+        }
       }
     }
   }
@@ -275,7 +297,7 @@ class _AddPostState extends State<AddPost> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('OK'),
+              child: Text('OK', style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -305,22 +327,39 @@ class _AddPostState extends State<AddPost> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Title of Challenge',
-                    style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
+                  child: RichText(
+                      text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                            fontFamily: 'Founders Grotesk',
+                          ),
+                          children: [
+                        TextSpan(
+                            text: 'Title of Challenge ',
+                            style: TextStyle(
+                              fontFamily: 'Founders Grotesk',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            )),
+                        TextSpan(
+                            text: 'maximum 50 characters',
+                            style: TextStyle(
+                              fontFamily: 'Founders Grotesk',
+                              fontSize: 12,
+                            ))
+                      ])),
                 ),
                 TextField(
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(50),
+                    ],
                     controller: titleController,
                     decoration: InputDecoration(hintText: 'Write a title')),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
                   child: Text(
-                    'Subtitle',
+                    'Description',
                     style: TextStyle(
                       fontFamily: 'Founders Grotesk',
                       fontWeight: FontWeight.bold,
@@ -352,7 +391,8 @@ class _AddPostState extends State<AddPost> {
                                 fontSize: 18,
                               )),
                           TextSpan(
-                              text: 'minimum 2, maximum 5',
+                              text:
+                                  'minimum 2, maximum 5. These help categorise your post',
                               style: TextStyle(
                                 fontFamily: 'Founders Grotesk',
                                 fontSize: 12,
@@ -376,11 +416,13 @@ class _AddPostState extends State<AddPost> {
                             if (hashtags.contains(hashtagController.text) ==
                                     false &&
                                 hashtagController.text != "") {
-                              setState(() {
-                                hashtags
-                                    .add(hashtagController.text.toLowerCase());
-                                hashtagController.text = "";
-                              });
+                              if (mounted) {
+                                setState(() {
+                                  hashtags.add(
+                                      hashtagController.text.toLowerCase());
+                                  hashtagController.text = "";
+                                });
+                              }
                             }
                           },
                           child: Text('Add'))
@@ -402,9 +444,11 @@ class _AddPostState extends State<AddPost> {
                                 color: Colors.grey,
                               )),
                           onPressed: () {
-                            setState(() {
-                              hashtags.removeAt(index);
-                            });
+                            if (mounted) {
+                              setState(() {
+                                hashtags.removeAt(index);
+                              });
+                            }
                           },
                         ),
                       );
@@ -457,7 +501,9 @@ class _AddPostState extends State<AddPost> {
                     subtitle: Text('${subWho[index]}'),
                     onTap: () {
                       selected = index;
-                      setState(() {});
+                      if (mounted) {
+                        setState(() {});
+                      }
                     },
                   );
                 },
@@ -518,7 +564,9 @@ class _AddPostState extends State<AddPost> {
 
   void _loadCharityList() async {
     charities = await DatabaseService(uid: "123").getCharityNameList();
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Widget _chooseCharity() {
@@ -564,7 +612,9 @@ class _AddPostState extends State<AddPost> {
                       ),
                       onTap: () {
                         charity = index;
-                        setState(() {});
+                        if (mounted) {
+                          setState(() {});
+                        }
                       },
                     );
                   })
@@ -643,17 +693,23 @@ class _AddPostState extends State<AddPost> {
   // Helper functions for the image picker
   _openGallery() async {
     imageFile = await picker.getImage(source: ImageSource.gallery);
-    this.setState(() {});
+    if (mounted) {
+      this.setState(() {});
+    }
   }
 
   _openCamera() async {
     imageFile = await picker.getImage(source: ImageSource.camera);
-    this.setState(() {});
+    if (mounted) {
+      this.setState(() {});
+    }
   }
 
   _removePhoto() {
     imageFile = null;
-    this.setState(() {});
+    if (mounted) {
+      this.setState(() {});
+    }
   }
 
   Widget _decideImageView() {
@@ -684,11 +740,11 @@ class _AddPostState extends State<AddPost> {
             _removePhoto();
           },
         ),
-        ListTile(
+        /*ListTile(
           leading: Icon(FontAwesome5Brands.facebook_square),
           title: Text('Import from Facebook'),
           onTap: () {},
-        ),
+        ),*/
         ListTile(
           leading: Icon(FontAwesome.camera),
           title: Text('Take Photo'),

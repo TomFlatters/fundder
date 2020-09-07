@@ -27,15 +27,17 @@ class _FollowButtonState extends State<FollowButton> {
     if (isFollowed) {
       //already followed, so intention is to unfollow.
       widget.followersService.userUNfollowedSomeone(widget.profileOwnerId);
-      setState(() {
-        isFollowed = false;
-      });
+      if (mounted)
+        setState(() {
+          isFollowed = false;
+        });
     } else {
       //follow this user as they're not currently followed
       widget.followersService.userFollowedSomeone(widget.profileOwnerId);
-      setState(() {
-        isFollowed = true;
-      });
+      if (mounted)
+        (() {
+          isFollowed = true;
+        });
     }
   }
 

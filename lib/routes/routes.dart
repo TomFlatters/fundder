@@ -88,12 +88,14 @@ class FluroRouter {
           ViewFollowers(
             uid: params['id'][0],
             startIndex: 0,
+            username: params['username'][0],
           ));
   static Handler _followingHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ViewFollowers(
             uid: params['id'][0],
             startIndex: 1,
+            username: params['username'][0],
           ));
   static Handler _editProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
@@ -186,12 +188,12 @@ class FluroRouter {
       transitionType: TransitionType.fadeIn,
     );
     router.define(
-      '/user/:id/followers',
+      '/user/:id/:username/followers',
       handler: _followersHandler,
       transitionType: TransitionType.fadeIn,
     );
     router.define(
-      '/user/:id/following',
+      '/user/:id/:username/following',
       handler: _followingHandler,
       transitionType: TransitionType.fadeIn,
     );

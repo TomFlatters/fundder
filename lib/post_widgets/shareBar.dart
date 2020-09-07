@@ -42,7 +42,7 @@ class ShareBar extends StatelessWidget {
                 child: Text(
                   'Share',
                   textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: 15, color: Colors.grey[850]),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[850]),
                 )))
       ]),
       onPressed: () {

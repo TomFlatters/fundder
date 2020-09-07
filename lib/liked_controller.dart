@@ -9,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class LikedController extends StatefulWidget {
   @override
@@ -101,181 +102,226 @@ class _ActivityState extends State<LikedController> {
                           },
                           padding: const EdgeInsets.only(top: 10.0, bottom: 10),
                           shrinkWrap: true,
-                          itemCount: snapshot.data.length,
+                          itemCount: snapshot.data.length != 0
+                              ? snapshot.data.length
+                              : 1,
                           itemBuilder: (BuildContext context, int index) {
-                            DocumentSnapshot likedItem = snapshot.data[index];
-                            return GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(context,
-                                      '/user/' + likedItem['docLiker']);
-                                },
+                            if (snapshot.data.length == 0) {
+                              return Center(
                                 child: Container(
+                                    constraints: BoxConstraints(
+                                        minHeight:
+                                            MediaQuery.of(context).size.height -
+                                                80),
                                     decoration: new BoxDecoration(
-                                      color: likedItem['seen'] == false
-                                          ? Colors.grey[100]
-                                          : Colors.white,
-                                      borderRadius: index == 0
-                                          ? BorderRadius.only(
-                                              topLeft: Radius.circular(10.0),
-                                              topRight: Radius.circular(10.0),
-                                            )
-                                          : index == snapshot.data.length - 1
-                                              ? BorderRadius.only(
-                                                  bottomLeft:
-                                                      Radius.circular(10.0),
-                                                  bottomRight:
-                                                      Radius.circular(10.0),
-                                                )
-                                              : BorderRadius.only(
-                                                  bottomLeft:
-                                                      Radius.circular(0.0),
-                                                  bottomRight:
-                                                      Radius.circular(0.0),
-                                                ),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 0.0),
-                                    child: Container(
-                                        margin: EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Column(children: <Widget>[
-                                          Container(
-                                            height: 60,
-                                            child: Row(children: <Widget>[
-                                              Align(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: GestureDetector(
-                                                    child: AspectRatio(
-                                                        aspectRatio: 1 / 1,
-                                                        child: Container(
-                                                          child: ProfilePic(
-                                                              likedItem[
-                                                                  'docLiker'],
-                                                              40),
-                                                          margin:
-                                                              EdgeInsets.all(
-                                                                  10.0),
-                                                        )),
-                                                    onTap: () {
-                                                      Navigator.pushNamed(
-                                                          context,
-                                                          '/user/' +
-                                                              likedItem[
-                                                                  'docLiker']);
-                                                    },
-                                                  )),
-                                              Expanded(
-                                                  child: Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: RichText(
-                                                          text: TextSpan(
+                                        color: Colors.white,
+                                        borderRadius: new BorderRadius.all(
+                                          Radius.circular(10.0),
+                                        )),
+                                    padding: EdgeInsets.only(top: 150),
+                                    child: Column(children: [
+                                      Icon(
+                                        AntDesign.profile,
+                                        color: Colors.grey,
+                                        size:
+                                            MediaQuery.of(context).size.width /
+                                                8,
+                                      ),
+                                      Container(
+                                          margin: EdgeInsets.only(
+                                              top: 30,
+                                              left: 40,
+                                              right: 40,
+                                              bottom: 150),
+                                          child: Text(
+                                            'This is where you see your notifications. Create a Fundder challenge to raise for a cause or follow users to be alerted when they post.',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 16,
+                                                fontFamily: 'Founders Grotesk'),
+                                          )),
+                                    ])),
+                              );
+                            } else {
+                              DocumentSnapshot likedItem = snapshot.data[index];
+                              return GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(context,
+                                        '/user/' + likedItem['docLiker']);
+                                  },
+                                  child: Container(
+                                      decoration: new BoxDecoration(
+                                        color: likedItem['seen'] == false
+                                            ? Colors.grey[100]
+                                            : Colors.white,
+                                        borderRadius: index == 0
+                                            ? BorderRadius.only(
+                                                topLeft: Radius.circular(10.0),
+                                                topRight: Radius.circular(10.0),
+                                              )
+                                            : index == snapshot.data.length - 1
+                                                ? BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(10.0),
+                                                    bottomRight:
+                                                        Radius.circular(10.0),
+                                                  )
+                                                : BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(0.0),
+                                                    bottomRight:
+                                                        Radius.circular(0.0),
+                                                  ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 0.0),
+                                      child: Container(
+                                          margin: EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 3),
+                                          child: Column(children: <Widget>[
+                                            Container(
+                                              height: 60,
+                                              child: Row(children: <Widget>[
+                                                Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: GestureDetector(
+                                                      child: AspectRatio(
+                                                          aspectRatio: 1 / 1,
+                                                          child: Container(
+                                                            child: ProfilePic(
+                                                                likedItem[
+                                                                    'docLiker'],
+                                                                40),
+                                                            margin:
+                                                                EdgeInsets.all(
+                                                                    10.0),
+                                                          )),
+                                                      onTap: () {
+                                                        Navigator.pushNamed(
+                                                            context,
+                                                            '/user/' +
+                                                                likedItem[
+                                                                    'docLiker']);
+                                                      },
+                                                    )),
+                                                Expanded(
+                                                    child: Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: RichText(
+                                                            text: TextSpan(
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize:
+                                                                      16.0,
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontFamily:
+                                                                      'Founders Grotesk',
+                                                                ),
+                                                                children: [
+                                                              TextSpan(
+                                                                  text: likedItem[
+                                                                          'docLikerUsername'] +
+                                                                      " ",
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)),
+                                                              _itemText(
+                                                                  likedItem),
+                                                            ])))),
+                                                Container(
+                                                    width: 110,
+                                                    child: Align(
+                                                        alignment: Alignment
+                                                            .centerRight,
+                                                        child: GestureDetector(
+                                                          child: Container(
+                                                            width: 110,
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 7,
+                                                                    bottom: 3,
+                                                                    left: 5,
+                                                                    right: 5),
+                                                            margin:
+                                                                EdgeInsets.all(
+                                                                    10),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .grey,
+                                                                  width: 1),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(Radius
+                                                                          .circular(
+                                                                              5)),
+                                                            ),
+                                                            child: Text(
+                                                              likedItem['category'] ==
+                                                                      'new follower'
+                                                                  ? "View User"
+                                                                  : "View Post",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
                                                               style: TextStyle(
-                                                                fontSize: 14.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 14,
                                                                 color: Colors
                                                                     .black,
-                                                                fontFamily:
-                                                                    'Founders Grotesk',
                                                               ),
-                                                              children: [
-                                                            TextSpan(
-                                                                text: likedItem[
-                                                                        'docLikerUsername'] +
-                                                                    " ",
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold)),
-                                                            _itemText(
-                                                                likedItem),
-                                                          ])))),
-                                              Container(
-                                                  width: 110,
-                                                  child: Align(
-                                                      alignment:
-                                                          Alignment.centerRight,
-                                                      child: GestureDetector(
-                                                        child: Container(
-                                                          width: 110,
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 5,
-                                                                  horizontal:
-                                                                      5),
-                                                          margin:
-                                                              EdgeInsets.all(
-                                                                  10),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            border: Border.all(
-                                                                color:
-                                                                    Colors.grey,
-                                                                width: 1),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            5)),
-                                                          ),
-                                                          child: Text(
-                                                            likedItem['category'] ==
-                                                                    'new follower'
-                                                                ? "View User"
-                                                                : "View Post",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 12,
-                                                              color:
-                                                                  Colors.black,
                                                             ),
                                                           ),
-                                                        ),
-                                                        onTap: () {
-                                                          Firestore.instance
-                                                              .collection(
-                                                                  'users')
-                                                              .document(uid)
-                                                              .collection(
-                                                                  'activity')
-                                                              .where('postId',
-                                                                  isEqualTo:
+                                                          onTap: () {
+                                                            Firestore.instance
+                                                                .collection(
+                                                                    'users')
+                                                                .document(uid)
+                                                                .collection(
+                                                                    'activity')
+                                                                .where('postId',
+                                                                    isEqualTo:
+                                                                        likedItem[
+                                                                            'postId'])
+                                                                .getDocuments()
+                                                                .then(
+                                                                    (response) =>
+                                                                        {
+                                                                          if (response !=
+                                                                              null)
+                                                                            {
+                                                                              _batchUpdate(response)
+                                                                            }
+                                                                        });
+                                                            if (likedItem[
+                                                                    'category'] ==
+                                                                'new follower') {
+                                                              Navigator.pushNamed(
+                                                                  context,
+                                                                  '/user/' +
                                                                       likedItem[
-                                                                          'postId'])
-                                                              .getDocuments()
-                                                              .then(
-                                                                  (response) =>
-                                                                      {
-                                                                        if (response !=
-                                                                            null)
-                                                                          {
-                                                                            _batchUpdate(response)
-                                                                          }
-                                                                      });
-                                                          if (likedItem[
-                                                                  'category'] ==
-                                                              'new follower') {
-                                                            Navigator.pushNamed(
-                                                                context,
-                                                                '/user/' +
-                                                                    likedItem[
-                                                                        'postId']);
-                                                          } else {
-                                                            Navigator.pushNamed(
-                                                                context,
-                                                                '/post/' +
-                                                                    likedItem[
-                                                                        'postId']);
-                                                          }
-                                                        },
-                                                      ))),
-                                            ]),
-                                          )
-                                        ]))));
+                                                                          'postId']);
+                                                            } else {
+                                                              Navigator.pushNamed(
+                                                                  context,
+                                                                  '/post/' +
+                                                                      likedItem[
+                                                                          'postId']);
+                                                            }
+                                                          },
+                                                        ))),
+                                              ]),
+                                            )
+                                          ]))));
+                            }
                           }));
                 }
               }));
