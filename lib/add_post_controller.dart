@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +21,8 @@ import 'shared/loading.dart';
 import 'global_widgets/buttons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/hashtags.dart';
+import 'add_post_widgets/who_do_tiles.dart';
+import 'add_post_widgets/charity_tiles.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -31,6 +35,15 @@ class _AddPostState extends State<AddPost> {
   int _current = 0;
   CarouselController _carouselController = CarouselController();
   double aspectRatio;
+
+  // Person who does this - selects the screens which appear next
+
+  int selected = -1;
+  final List<String> whoDoes = <String>['Myself', 'Someone Else'];
+  final List<String> subWho = <String>[
+    'Raise money for your own challenge',
+    'Will be public and anyone will be able to accept the challenge. This appears in the "Do" tab in the Feed'
+  ];
 
   @override
   void initState() {
@@ -60,68 +73,95 @@ class _AddPostState extends State<AddPost> {
           ? Loading()
           : Scaffold(
               appBar: AppBar(
-                centerTitle: true,
-                title: Text("Create Fundder"),
-                actions: <Widget>[
-                  new FlatButton(
-                    child: _current == 4
-                        ? Text('Submit',
-                            style: TextStyle(fontWeight: FontWeight.bold))
-                        : Text('Next',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: _current == 4
-                        ? () {
-                            try {
-                              if (mounted) {
-                                setState(() {
-                                  _submitting = true;
-                                });
-                              }
+                  centerTitle: true,
+                  title: Text("Create Fundder"),
+                  actions: <Widget>[
+                    new FlatButton(
+                      child: (_current == 4 && selected == 0) ||
+                              (_current == 3 && selected == 1)
+                          ? Text('Preview',
+                              style: TextStyle(fontWeight: FontWeight.bold))
+                          : (_current == 5 && selected == 0) ||
+                                  (_current == 4 && selected == 1)
+                              ? Text('Submit',
+                                  style: TextStyle(fontWeight: FontWeight.bold))
+                              : selected != -1
+                                  ? Text('Next',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold))
+                                  : null,
+                      onPressed: (_current == 5 && selected == 0) ||
+                              (_current == 4 && selected == 1)
+                          ? () {
+                              try {
+                                if (mounted) {
+                                  setState(() {
+                                    _submitting = true;
+                                  });
+                                }
 
-                              // add image to firebase storage
-                              if (imageFile != null) {
-                                final String fileLocation = user.uid +
-                                    "/" +
-                                    DateTime.now()
-                                        .microsecondsSinceEpoch
-                                        .toString();
-                                DatabaseService(uid: user.uid)
-                                    .uploadImage(
-                                        File(imageFile.path), fileLocation)
-                                    .then((downloadUrl) => {
-                                          print("Successful image upload"),
-                                          print(downloadUrl),
-                                          _pushItem(downloadUrl, user)
-                                        });
-                              } else {
-                                _pushItem(null, user);
+                                // add image to firebase storage
+                                if (imageFile != null) {
+                                  final String fileLocation = user.uid +
+                                      "/" +
+                                      DateTime.now()
+                                          .microsecondsSinceEpoch
+                                          .toString();
+                                  DatabaseService(uid: user.uid)
+                                      .uploadImage(
+                                          File(imageFile.path), fileLocation)
+                                      .then((downloadUrl) => {
+                                            print("Successful image upload"),
+                                            print(downloadUrl),
+                                            _pushItem(downloadUrl, user)
+                                          });
+                                } else {
+                                  _pushItem(null, user);
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  setState(() {
+                                    _submitting = false;
+                                  });
+                                }
+                                _showErrorDialog(e.toString());
                               }
-                            } catch (e) {
-                              if (mounted) {
-                                setState(() {
-                                  _submitting = false;
-                                });
-                              }
-                              _showErrorDialog(e.toString());
                             }
-                          }
-                        : () {
-                            /*Navigator.of(context).pushReplacement(_viewPost());*/
-                            _carouselController.nextPage(
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.linear);
-                          },
-                  )
-                ],
-                leading: new IconButton(
-                  icon: new Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(null),
-                ),
-              ),
+                          : () {
+                              /*Navigator.of(context).pushReplacement(_viewPost());*/
+                              if (selected != -1) {
+                                _carouselController.nextPage(
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.linear);
+                              } else {
+                                _showErrorDialog(
+                                    "You need to choose who you'd like to do the challenge");
+                              }
+                            },
+                    )
+                  ],
+                  leading: Container(
+                      width: 100,
+                      child: IconButton(
+                          icon: _current == 0
+                              ? Icon(Icons.close)
+                              : Icon(Icons.arrow_back),
+                          onPressed: _current == 0
+                              ? () {
+                                  Navigator.of(context).pop(null);
+                                }
+                              : () {
+                                  _carouselController.previousPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.linear);
+                                }))),
               body: Builder(
                 builder: (context) {
                   final double height = MediaQuery.of(context).size.height;
-                  return CarouselSlider(
+                  return /*selected == -1
+                      ? _choosePerson()
+                      : */
+                      CarouselSlider(
                     carouselController: _carouselController,
                     options: CarouselOptions(
                       onPageChanged: (index, reason) {
@@ -138,13 +178,22 @@ class _AddPostState extends State<AddPost> {
                       enlargeCenterPage: false,
                       // autoPlay: false,
                     ),
-                    items: [
-                      _defineDescription(),
-                      _choosePerson(),
-                      _setMoney(),
-                      _chooseCharity(),
-                      _imageUpload()
-                    ],
+                    items: selected == 0
+                        ? [
+                            _choosePerson(),
+                            _defineDescription(),
+                            _setMoney(),
+                            _chooseCharity(),
+                            _imageUpload()
+                          ]
+                        : selected == 1
+                            ? [
+                                _choosePerson(),
+                                _defineDescription(),
+                                _chooseCharity(),
+                                _imageUpload()
+                              ]
+                            : [_choosePerson()],
                   );
                 },
               ),
@@ -309,6 +358,94 @@ class _AddPostState extends State<AddPost> {
   }
   // Define widgets for each of the form stages:
 
+  Widget _choosePerson() {
+    return Container(
+        color: Colors.white,
+        child: ListView(
+          //crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              color: Colors.grey[200],
+              child: Container(
+                height: 10,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10)),
+                  color: Colors.white,
+                ),
+                margin: EdgeInsets.only(top: 10),
+              ),
+            ),
+            Container(
+                padding:
+                    EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
+                child: Text(
+                  'Who do you want to do it',
+                  style: TextStyle(
+                    fontFamily: 'Founders Grotesk',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                )),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  selected = 0;
+                });
+              },
+              child: AnimatedContainer(
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.fastOutSlowIn,
+                  margin: EdgeInsets.only(left: 20, right: 20),
+                  height: 300,
+                  decoration: BoxDecoration(
+                      border: selected == 0
+                          ? Border.all(color: HexColor('ff6b6c'), width: 3)
+                          : Border.all(color: Colors.grey[200], width: 3),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: MyselfTile(selected == 0
+                      ? HexColor('ff6b6c') //Color.fromRGBO(237, 106, 110, .3)
+                      : Colors.grey[200])),
+            ),
+            SizedBox(height: 20),
+            Container(
+                padding: EdgeInsets.only(left: 20, right: 20),
+                child: Text(
+                  'Or',
+                  style: TextStyle(
+                    fontFamily: 'Founders Grotesk',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                )),
+            SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  selected = 1;
+                });
+              },
+              child: AnimatedContainer(
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.fastOutSlowIn,
+                  margin: EdgeInsets.only(left: 20, right: 20),
+                  decoration: BoxDecoration(
+                      border: selected == 1
+                          ? Border.all(color: HexColor('ff6b6c'), width: 3)
+                          : Border.all(color: Colors.grey[200], width: 3),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  child: OthersTile(selected == 1
+                      ? HexColor('ff6b6c') //Color.fromRGBO(237, 106, 110, .3)
+                      : Colors.grey[200])),
+            ),
+            SizedBox(height: 10),
+          ],
+        ));
+  }
+
   // _defineDescription state:
   final titleController = TextEditingController();
   final subtitleController = TextEditingController();
@@ -319,14 +456,24 @@ class _AddPostState extends State<AddPost> {
   Widget _defineDescription() {
     return ListView(shrinkWrap: true, children: <Widget>[
       Container(
+        color: Colors.grey[200],
+        child: Container(
+          height: 10,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            color: Colors.white,
+          ),
+          margin: EdgeInsets.only(top: 10),
+        ),
+      ),
+      Container(
           color: Colors.white,
-          margin: EdgeInsets.symmetric(vertical: 5),
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 10),
                   child: RichText(
                       text: TextSpan(
                           style: TextStyle(
@@ -351,11 +498,14 @@ class _AddPostState extends State<AddPost> {
                       ])),
                 ),
                 TextField(
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(50),
-                    ],
-                    controller: titleController,
-                    decoration: InputDecoration(hintText: 'Write a title')),
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(50),
+                  ],
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    hintText: 'Write a title',
+                  ),
+                ),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
                   child: Text(
@@ -458,60 +608,6 @@ class _AddPostState extends State<AddPost> {
   }
 
   // _choosePerson state:
-  int selected = -1;
-  final List<String> whoDoes = <String>['Myself', 'Someone Else'];
-  final List<String> subWho = <String>[
-    'Raise money for your own challenge',
-    'Will be public and anyone will be able to accept the challenge. This appears in the "Do" tab in the Feed'
-  ];
-
-  Widget _choosePerson() {
-    return ListView(children: <Widget>[
-      Container(
-          color: Colors.white,
-          margin: EdgeInsets.symmetric(vertical: 5),
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Who do you want to do it',
-                style: TextStyle(
-                  fontFamily: 'Founders Grotesk',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                shrinkWrap: true,
-                itemCount: whoDoes.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    dense: true,
-                    leading: Builder(builder: (context) {
-                      if (selected == index) {
-                        return Icon(Icons.check_circle);
-                      } else {
-                        return Icon(Icons.check_circle_outline);
-                      }
-                    }),
-                    title: Text('${whoDoes[index]}'),
-                    subtitle: Text('${subWho[index]}'),
-                    onTap: () {
-                      selected = index;
-                      if (mounted) {
-                        setState(() {});
-                      }
-                    },
-                  );
-                },
-              )
-            ],
-          )),
-    ]);
-  }
 
   // _setMoney state:
   final moneyController =
@@ -520,9 +616,20 @@ class _AddPostState extends State<AddPost> {
   Widget _setMoney() {
     return ListView(children: <Widget>[
       Container(
+        color: Colors.grey[200],
+        child: Container(
+          height: 10,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            color: Colors.white,
+          ),
+          margin: EdgeInsets.only(top: 10),
+        ),
+      ),
+      Container(
           color: Colors.white,
-          margin: EdgeInsets.symmetric(vertical: 5),
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
                   Widget>[
@@ -573,9 +680,20 @@ class _AddPostState extends State<AddPost> {
     _loadCharityList();
     return ListView(children: <Widget>[
       Container(
+        color: Colors.grey[200],
+        child: Container(
+          height: 10,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            color: Colors.white,
+          ),
+          margin: EdgeInsets.only(top: 10),
+        ),
+      ),
+      Container(
           color: Colors.white,
-          margin: EdgeInsets.symmetric(vertical: 5),
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -587,13 +705,26 @@ class _AddPostState extends State<AddPost> {
                   fontSize: 18,
                 ),
               ),
-              ListView.builder(
+              ListView.separated(
+                  separatorBuilder: (context, index) => SizedBox(
+                        height: 10,
+                      ),
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   shrinkWrap: true,
                   itemCount: charities.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
+                    return GestureDetector(
+                      child: CharityTile(
+                          charities[index], charity == index ? true : false),
+                      onTap: () {
+                        charity = index;
+                        if (mounted) {
+                          setState(() {});
+                        }
+                      },
+                    );
+                    /*ListTile(
                       dense: true,
                       leading: Builder(builder: (context) {
                         if (charity == index) {
@@ -608,7 +739,12 @@ class _AddPostState extends State<AddPost> {
                           Navigator.pushNamed(
                               context, '/charity/' + charities[index].id);
                         },
-                        child: Icon(Icons.info_outline),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            child: CachedNetworkImage(
+                                imageUrl: charities[index].image)),
                       ),
                       onTap: () {
                         charity = index;
@@ -616,7 +752,7 @@ class _AddPostState extends State<AddPost> {
                           setState(() {});
                         }
                       },
-                    );
+                    );*/
                   })
             ],
           )),
@@ -629,9 +765,20 @@ class _AddPostState extends State<AddPost> {
   Widget _imageUpload() {
     return ListView(children: <Widget>[
       Container(
+        color: Colors.grey[200],
+        child: Container(
+          height: 10,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            color: Colors.white,
+          ),
+          margin: EdgeInsets.only(top: 10),
+        ),
+      ),
+      Container(
           color: Colors.white,
-          margin: EdgeInsets.symmetric(vertical: 5),
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
           child: RichText(
               text: TextSpan(
                   style: TextStyle(
