@@ -23,6 +23,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'services/hashtags.dart';
 import 'add_post_widgets/who_do_tiles.dart';
 import 'add_post_widgets/charity_tiles.dart';
+import 'post_widgets/postHeader.dart';
+import 'post_widgets/postBody.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -48,6 +50,7 @@ class _AddPostState extends State<AddPost> {
   @override
   void initState() {
     _retrieveUser();
+    _loadCharityList();
     super.initState();
   }
 
@@ -102,21 +105,45 @@ class _AddPostState extends State<AddPost> {
 
                                 // add image to firebase storage
                                 if (imageFile != null) {
-                                  final String fileLocation = user.uid +
-                                      "/" +
-                                      DateTime.now()
-                                          .microsecondsSinceEpoch
-                                          .toString();
-                                  DatabaseService(uid: user.uid)
-                                      .uploadImage(
-                                          File(imageFile.path), fileLocation)
-                                      .then((downloadUrl) => {
-                                            print("Successful image upload"),
-                                            print(downloadUrl),
-                                            _pushItem(downloadUrl, user)
-                                          });
+                                  if (titleController.text == "" ||
+                                      subtitleController.text == "" ||
+                                      charity == -1 ||
+                                      (moneyController.text == "0.00" &&
+                                          whoDoes[selected] == "Myself") ||
+                                      hashtags.length < 2) {
+                                    if (mounted) {
+                                      setState(() {
+                                        _current = 0;
+                                        _submitting = false;
+                                      });
+                                    }
+                                    _showErrorDialog(
+                                        'You have not filled all the required fields');
+                                  } else {
+                                    final String fileLocation = user.uid +
+                                        "/" +
+                                        DateTime.now()
+                                            .microsecondsSinceEpoch
+                                            .toString();
+                                    DatabaseService(uid: user.uid)
+                                        .uploadImage(
+                                            File(imageFile.path), fileLocation)
+                                        .then((downloadUrl) => {
+                                              print("Successful image upload"),
+                                              print(downloadUrl),
+                                              _pushItem(downloadUrl, user)
+                                            });
+                                  }
                                 } else {
-                                  _pushItem(null, user);
+                                  if (selected == 0) {
+                                    _pushItem(null, user);
+                                  } else {
+                                    _showErrorDialog(
+                                        "'Do' feed challenges require an image");
+                                    setState(() {
+                                      _submitting = false;
+                                    });
+                                  }
                                 }
                               } catch (e) {
                                 if (mounted) {
@@ -182,16 +209,18 @@ class _AddPostState extends State<AddPost> {
                         ? [
                             _choosePerson(),
                             _defineDescription(),
-                            _setMoney(),
                             _chooseCharity(),
-                            _imageUpload()
+                            _setMoney(),
+                            _imageUpload(),
+                            _postPreview()
                           ]
                         : selected == 1
                             ? [
                                 _choosePerson(),
                                 _defineDescription(),
                                 _chooseCharity(),
-                                _imageUpload()
+                                _imageUpload(),
+                                _postPreview()
                               ]
                             : [_choosePerson()],
                   );
@@ -227,19 +256,21 @@ class _AddPostState extends State<AddPost> {
 
   void _pushItem(String downloadUrl, User user) {
     // Validate form
-    if (titleController.text == null ||
-        subtitleController.text == null ||
+    if (titleController.text == "" ||
+        subtitleController.text == "" ||
         charity == -1 ||
-        moneyController.text == "0.00" ||
+        (moneyController.text == "0.00" && whoDoes[selected] == "Myself") ||
         hashtags.length < 2) {
       if (mounted) {
         setState(() {
+          _current = 0;
           _submitting = false;
         });
       }
       _showErrorDialog('You have not filled all the required fields');
     } else {
-      if (double.parse(moneyController.text) < 2) {
+      if (double.parse(moneyController.text) < 2 &&
+          whoDoes[selected] == "Myself") {
         if (mounted) {
           setState(() {
             _submitting = false;
@@ -393,6 +424,7 @@ class _AddPostState extends State<AddPost> {
                 setState(() {
                   selected = 0;
                 });
+                _carouselController.nextPage();
               },
               child: AnimatedContainer(
                   duration: Duration(milliseconds: 500),
@@ -426,6 +458,7 @@ class _AddPostState extends State<AddPost> {
                 setState(() {
                   selected = 1;
                 });
+                _carouselController.nextPage();
               },
               child: AnimatedContainer(
                   duration: Duration(milliseconds: 500),
@@ -666,7 +699,7 @@ class _AddPostState extends State<AddPost> {
   }
 
   // _chooseCharity state:
-  List<Charity> charities = <Charity>[];
+  List<Charity> charities;
   int charity = -1;
 
   void _loadCharityList() async {
@@ -677,7 +710,6 @@ class _AddPostState extends State<AddPost> {
   }
 
   Widget _chooseCharity() {
-    _loadCharityList();
     return ListView(children: <Widget>[
       Container(
         color: Colors.grey[200],
@@ -712,7 +744,7 @@ class _AddPostState extends State<AddPost> {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   shrinkWrap: true,
-                  itemCount: charities.length,
+                  itemCount: charities != null ? charities.length : 0,
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                       child: CharityTile(
@@ -795,19 +827,29 @@ class _AddPostState extends State<AddPost> {
                       fontSize: 18,
                     )),
                 TextSpan(
-                    text: 'optional',
+                    text: selected == 0
+                        ? 'optional'
+                        : "required for 'do' feed challenges",
                     style: TextStyle(
                       fontFamily: 'Founders Grotesk',
                       fontSize: 12,
                     )),
               ]))),
-      Container(
-        child: _decideImageView(),
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.width * 9 / 16,
-        margin: EdgeInsets.only(bottom: 10),
+      SizedBox(
+        height: 30,
       ),
-      EditFundderButton(
+      Container(
+          child: _decideImageView(),
+          constraints: BoxConstraints(
+              minWidth: MediaQuery.of(context).size.width - 40,
+              minHeight: (MediaQuery.of(context).size.width - 40) * 9 / 16),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+          )),
+      SizedBox(
+        height: 40,
+      ),
+      PrimaryFundderButton(
         text: "Select an image",
         onPressed: () {
           _changePic();
@@ -861,7 +903,7 @@ class _AddPostState extends State<AddPost> {
 
   Widget _decideImageView() {
     if (imageFile == null) {
-      return Center(child: Text('No image selected'));
+      return Container();
     } else {
       File image =
           new File(imageFile.path); // Or any other way to get a File instance.
@@ -908,5 +950,64 @@ class _AddPostState extends State<AddPost> {
         ),
       ],
     );
+  }
+
+  Widget _postPreview() {
+    return ListView(children: <Widget>[
+      Container(
+        color: Colors.grey[200],
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            color: Colors.white,
+          ),
+          margin: EdgeInsets.only(top: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                child: Text(
+                  selected == 0
+                      ? 'This is what your post would look like:'
+                      : 'This is what your challenge, one somebody accepts it, would look like:',
+                  style: TextStyle(
+                    fontFamily: 'Founders Grotesk',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              PostHeader(
+                  postAuthorId: user.uid,
+                  postAuthorUserName: user.username,
+                  targetCharity: charities != null
+                      ? charity != -1 ? charities[charity].id : ""
+                      : "",
+                  charityLogo: charities != null
+                      ? charity != -1 ? charities[charity].image : ""
+                      : ""),
+              Container(
+                child: SizedBox(child: _decideImageView()),
+                margin: EdgeInsets.only(bottom: 10.0),
+              ),
+              PostBody(
+                likesManager: null,
+                maxLines: 99999999,
+                postData: Post(
+                    title: titleController.text,
+                    subtitle: subtitleController.text,
+                    hashtags: hashtags,
+                    moneyRaised: 0,
+                    targetAmount: moneyController.text),
+              )
+            ],
+          ),
+        ),
+      ),
+    ]);
   }
 }

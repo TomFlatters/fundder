@@ -64,26 +64,31 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                 Expanded(
                   child: ListView(
                     children: <Widget>[
-                      Container(
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.width /
-                              snapshot.data.aspectRatio,
-                          child: kIsWeb == true
-                              ? Image.network(snapshot.data.imageUrl)
-                              : CachedNetworkImage(
-                                  imageUrl: snapshot.data.imageUrl != null
-                                      ? snapshot.data.imageUrl
-                                      : "",
-                                  placeholder: (context, url) => Loading(),
-                                  errorWidget: (context, url, error) =>
-                                      Container(
-                                    color: Colors.grey[100],
-                                  ),
-                                ),
-                        ),
-                        margin: EdgeInsets.symmetric(vertical: 0.0),
-                      ),
+                      snapshot.data.aspectRatio != null
+                          ? Container(
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.width /
+                                    snapshot.data.aspectRatio,
+                                child: kIsWeb == true
+                                    ? Image.network(snapshot.data.imageUrl)
+                                    : CachedNetworkImage(
+                                        imageUrl: snapshot.data.imageUrl != null
+                                            ? snapshot.data.imageUrl
+                                            : "",
+                                        placeholder: (context, url) =>
+                                            Loading(),
+                                        errorWidget: (context, url, error) =>
+                                            Container(
+                                          color: Colors.grey[100],
+                                        ),
+                                      ),
+                              ),
+                              margin: EdgeInsets.symmetric(vertical: 0.0),
+                            )
+                          : Container(
+                              height: 0,
+                            ),
                       Container(
                           color: Colors.white,
                           child: Container(
