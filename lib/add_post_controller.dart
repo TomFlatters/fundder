@@ -110,10 +110,11 @@ class _AddPostState extends State<AddPost> {
                                       charity == -1 ||
                                       (moneyController.text == "0.00" &&
                                           whoDoes[selected] == "Myself") ||
-                                      hashtags.length < 2) {
+                                      hashtags.length < 2 ||
+                                      (double.parse(moneyController.text) < 2 &&
+                                          whoDoes[selected] == "Myself")) {
                                     if (mounted) {
                                       setState(() {
-                                        _current = 0;
                                         _submitting = false;
                                       });
                                     }
@@ -1002,7 +1003,7 @@ class _AddPostState extends State<AddPost> {
                     subtitle: subtitleController.text,
                     hashtags: hashtags,
                     moneyRaised: 0,
-                    targetAmount: moneyController.text),
+                    targetAmount: selected != 1 ? moneyController.text : '-1'),
               )
             ],
           ),
