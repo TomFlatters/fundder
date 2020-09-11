@@ -142,7 +142,7 @@ class _UploadProofState extends State<UploadProofScreen> {
                               }
                             }
                           : () {
-                              if (_imageFile != null) {
+                              if (_imageFile != null || _current == 0) {
                                 _carouselController.nextPage(
                                     duration: Duration(milliseconds: 300),
                                     curve: Curves.linear);
@@ -219,11 +219,13 @@ class _UploadProofState extends State<UploadProofScreen> {
                     enlargeCenterPage: false,
                     // autoPlay: false,
                   ),
-                  items: [
-                    _uploadImageVideo(),
-                    _completionComment(),
-                    _previewPost()
-                  ],
+                  items: _imageFile != null
+                      ? [
+                          _completionComment(),
+                          _uploadImageVideo(),
+                          _previewPost()
+                        ]
+                      : [_completionComment(), _uploadImageVideo()],
                 );
               },
             ),
@@ -370,7 +372,82 @@ class _UploadProofState extends State<UploadProofScreen> {
   }
 
   Widget _uploadImageVideo() {
-    return ListView(children: [
+    return ListView(children: <Widget>[
+      Container(
+        color: Colors.grey[200],
+        child: Container(
+          height: 10,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            color: Colors.white,
+          ),
+          margin: EdgeInsets.only(top: 10),
+        ),
+      ),
+      Container(
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+          child: RichText(
+              text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.black,
+                    fontFamily: 'Founders Grotesk',
+                  ),
+                  children: [
+                TextSpan(
+                    text:
+                        'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
+                    style: TextStyle(
+                      fontFamily: 'Founders Grotesk',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    )),
+                TextSpan(
+                    text: 'optional',
+                    style: TextStyle(
+                      fontFamily: 'Founders Grotesk',
+                      fontSize: 12,
+                    )),
+              ]))),
+      SizedBox(
+        height: 30,
+      ),
+      Container(
+          child: Platform.isAndroid
+              ? FutureBuilder<void>(
+                  future: retrieveLostData(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<void> snapshot) {
+                    return isVideo ? _previewVideo() : _previewImage();
+                  },
+                )
+              : (isVideo ? _previewVideo() : _previewImage()),
+          constraints: BoxConstraints(
+              minWidth: MediaQuery.of(context).size.width - 40,
+              minHeight: (MediaQuery.of(context).size.width - 40) * 9 / 16),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+          )),
+      SizedBox(
+        height: 40,
+      ),
+      PrimaryFundderButton(
+        text: "Select Video",
+        onPressed: () {
+          _changeVideo();
+        },
+      ),
+      PrimaryFundderButton(
+        text: "Select Image",
+        onPressed: () {
+          _changePic();
+        },
+      ),
+    ]);
+
+    /*ListView(children: [
       /*Container(
         decoration: new BoxDecoration(
             color: Colors.white,
@@ -436,7 +513,7 @@ class _UploadProofState extends State<UploadProofScreen> {
       SizedBox(
         height: 40,
       )
-    ]);
+    ]);*/
   }
 
   Future<void> _playVideo(PickedFile file) async {
@@ -518,13 +595,7 @@ class _UploadProofState extends State<UploadProofScreen> {
       return retrieveError;
     }
     if (_controller == null) {
-      return Container(
-          padding: EdgeInsets.all(20),
-          child: Text(
-            'Upload proof of completing the challenge - either a photo or video.',
-            style: TextStyle(fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ));
+      return Center(child: Text('No media selected'));
     } else {
       aspectRatio = _controller.value.aspectRatio;
       print(aspectRatio);
@@ -553,13 +624,7 @@ class _UploadProofState extends State<UploadProofScreen> {
         textAlign: TextAlign.center,
       );
     } else {
-      return Container(
-          padding: EdgeInsets.all(20),
-          child: Text(
-            'Upload proof of completing the challenge - either a photo or video.',
-            style: TextStyle(fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ));
+      return Center(child: Text('No media selected'));
     }
   }
 
