@@ -57,6 +57,29 @@ class PostBody extends StatelessWidget {
                 text: TextSpan(
                     children:
                         _returnHashtags(postData.hashtags, context, user)))),
+        (postData.completionComment == null ||
+                postData.completionComment == '' ||
+                this.maxLines == 2
+            ? Container()
+            : Container(
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.only(left: 10, right: 10),
+                child: Text('Completion comment:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500, /*fontSize: 18*/
+                    )))),
+        postData.completionComment == null ||
+                postData.completionComment == '' ||
+                this.maxLines == 2
+            ? Container()
+            : Container(
+                alignment: Alignment.centerLeft,
+                margin:
+                    EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
+                child: Text(postData.completionComment,
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal, /*fontSize: 18*/
+                    ))),
         Container(
           //alignment: Alignment.centerLeft,
           margin: EdgeInsets.only(top: 10, bottom: 10, left: 0, right: 0),
@@ -72,7 +95,9 @@ class PostBody extends StatelessWidget {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(bottom: 15, top: 0, left: 10, right: 10),
             child: Text(
-              '£${postData.moneyRaised == null ? 0.00.toStringAsFixed(2) : postData.moneyRaised.toStringAsFixed(2)} raised of £${postData.targetAmount} target',
+              postData.targetAmount != '-1'
+                  ? '£${postData.moneyRaised == null ? 0.00.toStringAsFixed(2) : postData.moneyRaised.toStringAsFixed(2)} raised of £${postData.targetAmount} target'
+                  : '£0.00 raised of user-selected target',
               style: TextStyle(fontWeight: FontWeight.w500),
             )),
       ],

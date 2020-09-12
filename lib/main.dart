@@ -53,6 +53,16 @@ class MyApp extends StatelessWidget {
                       ? Wrapper()
                       : Loading(),
                   theme: ThemeData(
+                      inputDecorationTheme: InputDecorationTheme(
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: HexColor('ff6b6c'))),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: HexColor('ff6b6c')),
+                        ),
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide(color: HexColor('ff6b6c')),
+                        ),
+                      ),
                       scaffoldBackgroundColor: Colors.white,
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
