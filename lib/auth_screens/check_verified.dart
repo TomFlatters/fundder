@@ -75,8 +75,8 @@ class _VerificationState extends State<CheckVerified> {
                             if (user.isEmailVerified == true) {
                               Navigator.pushReplacementNamed(
                                   context, '/' + user.uid + '/addProfilePic');
-                              Navigator.pushNamed(
-                                  context, '/' + user.uid + '/tutorial');
+                              /*Navigator.pushNamed(
+                                  context, '/' + user.uid + '/tutorial');*/
                             } else {
                               if (mounted)
                                 setState(() {
