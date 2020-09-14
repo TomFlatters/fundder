@@ -13,10 +13,38 @@ class Fund1 extends StatelessWidget {
       ),
       Text('The feed contains 3 tabs:',
           style: TextStyle(fontWeight: FontWeight.normal)),
-      Text('Do, Fund and Done',
-          style: TextStyle(fontWeight: FontWeight.normal)),
+      RichText(
+          text: TextSpan(
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Colors.black,
+                fontFamily: 'Founders Grotesk',
+              ),
+              children: [
+            TextSpan(
+                text: 'Do',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                )),
+            TextSpan(text: ', ', style: TextStyle()),
+            TextSpan(
+                text: 'Fund ',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                )),
+            TextSpan(text: 'and ', style: TextStyle()),
+            TextSpan(
+                text: 'Done',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                )),
+          ])),
       Expanded(
-        child: Image.asset('assets/images/tutorial_pics-01.png'),
+        child: Center(
+          child: Container(
+              margin: EdgeInsets.all(20),
+              child: Image.asset('assets/images/tutorial_pics-01.png')),
+        ),
       ),
     ]);
   }

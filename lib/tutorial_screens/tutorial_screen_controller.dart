@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'Fund/fund_1.dart';
-import 'Fund/fund_2.dart';
+import 'Do/do_1.dart';
+import 'Do/do_2.dart';
+import 'Done/done_1.dart';
+import 'Profile/profile_1.dart';
 import 'package:fundder/global_widgets/buttons.dart';
+import 'package:fundder/helper_classes.dart';
 
 class TutorialScreenController extends StatefulWidget {
+  final List<Widget> screens;
   @override
   _TutorialScreenControllerState createState() =>
       _TutorialScreenControllerState();
+  TutorialScreenController(this.screens);
 }
 
 class _TutorialScreenControllerState extends State<TutorialScreenController> {
   int _current = 0;
   CarouselController _carouselController = CarouselController();
-  List<Widget> _fundScreens = [Fund1(), Fund2()];
-  List<Widget> _doScreens = [Fund1()];
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,7 @@ class _TutorialScreenControllerState extends State<TutorialScreenController> {
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             //margin: EdgeInsets.symmetric(horizontal: 30, vertical: 50),
-            padding: EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
+            padding: EdgeInsets.only(top: 20, bottom: 10, left: 20, right: 20),
             child: Column(children: [
               SizedBox(height: 20),
               CarouselSlider(
@@ -50,17 +53,54 @@ class _TutorialScreenControllerState extends State<TutorialScreenController> {
                     enlargeCenterPage: false,
                     // autoPlay: false,
                   ),
-                  items: _fundScreens),
-              SecondaryFundderButton(
-                onPressed: () {
-                  if (_current == _fundScreens.length - 1) {
-                    Navigator.pop(context);
-                  } else {
-                    _carouselController.nextPage();
-                  }
-                },
-                text: 'Next',
-              ),
+                  items: widget.screens),
+              Row(
+                children: [
+                  Expanded(
+                    child: _current == 0
+                        ? Container()
+                        : Align(
+                            alignment: Alignment.centerLeft,
+                            child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  size: 28,
+                                  color: HexColor('ff6b6c'),
+                                ),
+                                onPressed: () {
+                                  _carouselController.previousPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.linear);
+                                }),
+                          ),
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FlatButton(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 4),
+                            child: Text(
+                                _current != widget.screens.length - 1
+                                    ? 'Next'
+                                    : 'Complete',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: HexColor('ff6b6c'))),
+                          ),
+                          onPressed: _current != widget.screens.length - 1
+                              ? () {
+                                  _carouselController.nextPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.linear);
+                                }
+                              : () {
+                                  Navigator.pop(context);
+                                }),
+                    ),
+                  )
+                ],
+              )
             ])));
   }
 

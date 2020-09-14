@@ -16,6 +16,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/database.dart';
 import 'connection_listener.dart';
+import 'tutorial_screens/profile_tutorial.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -28,6 +29,7 @@ class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool unreadNotifs = false;
+  bool checkedProfileTutorial = false;
 
   @override
   void initState() {
@@ -113,6 +115,35 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void checkProfileTutorial() async {
+    final FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(firebaseUser.uid)
+        .get()
+        .then((snapshot) {
+      if (snapshot != null) {
+        if (snapshot['doTutorialSeen'] != null) {
+          if (snapshot['doTutorialSeen'] != true) {
+            _showProfileTutorial(context);
+          }
+        } else {
+          _showProfileTutorial(context);
+        }
+      }
+    });
+  }
+
+  Future<void> _showProfileTutorial(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return ProfileTutorial();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
@@ -189,6 +220,10 @@ class _HomeState extends State<Home> {
   }
 
   void onTabTapped(int index) {
+    if (index == 4 && checkedProfileTutorial == false) {
+      checkProfileTutorial();
+      checkedProfileTutorial = true;
+    }
     if (index != 2) {
       if (mounted)
         setState(() {

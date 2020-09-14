@@ -12,7 +12,6 @@ import 'package:fundder/shared/helper_functions.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/template.dart';
 import 'shared/loading.dart';
-import 'tutorial_screens/tutorial_screen_controller.dart';
 import 'package:provider/provider.dart';
 
 class DoChallenge extends StatefulWidget {
@@ -82,39 +81,10 @@ class _DoChallengeState extends State<DoChallenge> {
     _getTemplates();
   }
 
-  void checkTutorial(User firebaseUser) async {
-    Firestore.instance
-        .collection("users")
-        .document(firebaseUser.uid)
-        .get()
-        .then((snapshot) {
-      if (snapshot != null) {
-        if (snapshot['fundTutorialSeen'] != null) {
-          if (snapshot['fundTutorialSeen'] != true) {
-            _showFundTutorial(context);
-          }
-        } else {
-          _showFundTutorial(context);
-        }
-      }
-    });
-  }
-
-  Future<void> _showFundTutorial(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return TutorialScreenController();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     if (checkedTutorial == false) {
-      checkTutorial(user);
       checkedTutorial = true;
     }
     if (templates == null) {
