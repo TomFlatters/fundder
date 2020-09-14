@@ -9,6 +9,9 @@ import 'Fund/fund_6.dart';
 import 'Fund/fund_7.dart';
 import 'Fund/fund_8.dart';
 import 'Fund/fund_9.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FundTutorial extends StatelessWidget {
   final List<Widget> fundScreens = [
@@ -22,8 +25,9 @@ class FundTutorial extends StatelessWidget {
     Fund8(),
     Fund9()
   ];
+
   @override
   Widget build(BuildContext context) {
-    return TutorialScreenController(this.fundScreens);
+    return TutorialScreenController(this.fundScreens, 'fundTutorialSeen');
   }
 }

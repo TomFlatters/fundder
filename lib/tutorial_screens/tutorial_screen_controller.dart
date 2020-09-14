@@ -6,13 +6,17 @@ import 'Done/done_1.dart';
 import 'Profile/profile_1.dart';
 import 'package:fundder/global_widgets/buttons.dart';
 import 'package:fundder/helper_classes.dart';
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TutorialScreenController extends StatefulWidget {
   final List<Widget> screens;
+  final String boolVariable;
   @override
   _TutorialScreenControllerState createState() =>
       _TutorialScreenControllerState();
-  TutorialScreenController(this.screens);
+  TutorialScreenController(this.screens, this.boolVariable);
 }
 
 class _TutorialScreenControllerState extends State<TutorialScreenController> {
@@ -94,7 +98,8 @@ class _TutorialScreenControllerState extends State<TutorialScreenController> {
                                       duration: Duration(milliseconds: 300),
                                       curve: Curves.linear);
                                 }
-                              : () {
+                              : () async {
+                                  _tutorialCompleted();
                                   Navigator.pop(context);
                                 }),
                     ),
@@ -106,5 +111,13 @@ class _TutorialScreenControllerState extends State<TutorialScreenController> {
 
   void _changePage() {
     FocusScope.of(context).unfocus();
+  }
+
+  Future _tutorialCompleted() async {
+    final FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(firebaseUser.uid)
+        .updateData({widget.boolVariable: true});
   }
 }

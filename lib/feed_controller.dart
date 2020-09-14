@@ -66,8 +66,8 @@ class _FeedControllerState extends State<FeedController>
         .get()
         .then((snapshot) {
       if (snapshot != null) {
-        if (snapshot['fundTutorialSeen'] != null) {
-          if (snapshot['fundTutorialSeen'] != true) {
+        if (snapshot['doneTutorialSeen'] != null) {
+          if (snapshot['doneTutorialSeen'] != true) {
             _showDoneTutorial(context);
           }
         } else {

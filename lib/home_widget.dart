@@ -123,8 +123,8 @@ class _HomeState extends State<Home> {
         .get()
         .then((snapshot) {
       if (snapshot != null) {
-        if (snapshot['doTutorialSeen'] != null) {
-          if (snapshot['doTutorialSeen'] != true) {
+        if (snapshot['profileTutorialSeen'] != null) {
+          if (snapshot['profileTutorialSeen'] != true) {
             _showProfileTutorial(context);
           }
         } else {
