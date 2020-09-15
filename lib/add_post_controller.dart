@@ -80,12 +80,10 @@ class _AddPostState extends State<AddPost> {
                   title: Text("Create Fundder"),
                   actions: <Widget>[
                     new FlatButton(
-                      child: (_current == 4 && selected == 0) ||
-                              (_current == 3 && selected == 1)
+                      child: _current == 4
                           ? Text('Preview',
                               style: TextStyle(fontWeight: FontWeight.bold))
-                          : (_current == 5 && selected == 0) ||
-                                  (_current == 4 && selected == 1)
+                          : _current == 5
                               ? Text('Submit',
                                   style: TextStyle(fontWeight: FontWeight.bold))
                               : selected != -1
@@ -93,8 +91,7 @@ class _AddPostState extends State<AddPost> {
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold))
                                   : null,
-                      onPressed: (_current == 5 && selected == 0) ||
-                              (_current == 4 && selected == 1)
+                      onPressed: _current == 5
                           ? () {
                               try {
                                 if (mounted) {
@@ -157,6 +154,7 @@ class _AddPostState extends State<AddPost> {
                             }
                           : () {
                               /*Navigator.of(context).pushReplacement(_viewPost());*/
+
                               if (selected != -1) {
                                 _carouselController.nextPage(
                                     duration: Duration(milliseconds: 300),
@@ -209,17 +207,18 @@ class _AddPostState extends State<AddPost> {
                     items: selected == 0
                         ? [
                             _choosePerson(),
-                            _defineDescription(),
+                            _defineDescriptionSelf(),
                             _chooseCharity(),
-                            _setMoney(),
+                            _setHashtags(),
                             _imageUpload(),
                             _postPreview()
                           ]
                         : selected == 1
                             ? [
                                 _choosePerson(),
-                                _defineDescription(),
+                                _defineDescriptionOthers(),
                                 _chooseCharity(),
+                                _setHashtags(),
                                 _imageUpload(),
                                 _postPreview()
                               ]
@@ -487,7 +486,7 @@ class _AddPostState extends State<AddPost> {
   final descriptionController = TextEditingController();
   List<String> hashtags = [];
 
-  Widget _defineDescription() {
+  Widget _defineDescriptionSelf() {
     return ListView(shrinkWrap: true, children: <Widget>[
       Container(
         color: Colors.grey[200],
@@ -537,11 +536,11 @@ class _AddPostState extends State<AddPost> {
                   ],
                   controller: titleController,
                   decoration: InputDecoration(
-                    hintText: 'Write a title',
+                    hintText: 'Eg. Hatford XV performs California Girls',
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 10),
+                  margin: EdgeInsets.only(top: 10),
                   child: Text(
                     'Description',
                     style: TextStyle(
@@ -556,7 +555,162 @@ class _AddPostState extends State<AddPost> {
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: InputDecoration(
-                        hintText: 'This will appear under the title')),
+                        hintText:
+                            'Eg. We will sing @Cornmarket St 12pm Sunday')),
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: Text(
+                    'If',
+                    style: TextStyle(
+                      fontFamily: 'Founders Grotesk',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                Row(children: [
+                  Text(
+                    '£',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w100,
+                        fontFamily: 'Founders Grotesk',
+                        fontSize: 45,
+                        color: HexColor('ff6b6c')),
+                  ),
+                  Expanded(
+                    child: TextField(
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w100,
+                          fontFamily: 'Founders Grotesk',
+                          fontSize: 45,
+                          color: Colors.black,
+                        ),
+                        controller: moneyController,
+                        decoration: InputDecoration(hintText: 'Amount in £')),
+                  )
+                ]),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 30),
+                  child: Text(
+                    'is donated to',
+                    style: TextStyle(
+                      fontFamily: 'Founders Grotesk',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                PrimaryFundderButton(
+                  onPressed: () {
+                    _carouselController.nextPage();
+                  },
+                  text: "Set Charity",
+                )
+              ])),
+    ]);
+  }
+
+  Widget _defineDescriptionOthers() {
+    return ListView(shrinkWrap: true, children: <Widget>[
+      Container(
+        color: Colors.grey[200],
+        child: Container(
+          height: 10,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            color: Colors.white,
+          ),
+          margin: EdgeInsets.only(top: 10),
+        ),
+      ),
+      Container(
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  child: RichText(
+                      text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                            fontFamily: 'Founders Grotesk',
+                          ),
+                          children: [
+                        TextSpan(
+                            text: "Title of Challenge ",
+                            style: TextStyle(
+                              fontFamily: 'Founders Grotesk',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            )),
+                        TextSpan(
+                            text: 'maximum 50 characters',
+                            style: TextStyle(
+                              fontFamily: 'Founders Grotesk',
+                              fontSize: 12,
+                            ))
+                      ])),
+                ),
+                TextField(
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(50),
+                  ],
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    hintText: 'Eg. Perform California Girls by Katy Perry',
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    'Description',
+                    style: TextStyle(
+                      fontFamily: 'Founders Grotesk',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                TextField(
+                    controller: subtitleController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                        hintText: 'Eg. Sing on a crowded street')),
+              ]))
+    ]);
+  }
+
+  // _choosePerson state:
+
+  // _setMoney state:
+  final moneyController =
+      MoneyMaskedTextController(decimalSeparator: '.', thousandSeparator: ',');
+
+  Widget _setHashtags() {
+    return ListView(children: <Widget>[
+      Container(
+        color: Colors.grey[200],
+        child: Container(
+          height: 10,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            color: Colors.white,
+          ),
+          margin: EdgeInsets.only(top: 10),
+        ),
+      ),
+      Container(
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
                 Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
                     child: RichText(
@@ -568,7 +722,8 @@ class _AddPostState extends State<AddPost> {
                             ),
                             children: [
                           TextSpan(
-                              text: 'Hashtags ',
+                              text:
+                                  'Add some hashtags to help categorise your post ',
                               style: TextStyle(
                                 fontFamily: 'Founders Grotesk',
                                 fontWeight: FontWeight.bold,
@@ -576,7 +731,7 @@ class _AddPostState extends State<AddPost> {
                               )),
                           TextSpan(
                               text:
-                                  'minimum 2, maximum 5. These help categorise your post',
+                                  "minimum 2, maximum 5. Press 'add' after every hashtag you would like to add.",
                               style: TextStyle(
                                 fontFamily: 'Founders Grotesk',
                                 fontSize: 12,
@@ -637,65 +792,7 @@ class _AddPostState extends State<AddPost> {
                         ),
                       );
                     })
-              ])),
-    ]);
-  }
-
-  // _choosePerson state:
-
-  // _setMoney state:
-  final moneyController =
-      MoneyMaskedTextController(decimalSeparator: '.', thousandSeparator: ',');
-
-  Widget _setMoney() {
-    return ListView(children: <Widget>[
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          height: 10,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            color: Colors.white,
-          ),
-          margin: EdgeInsets.only(top: 10),
-        ),
-      ),
-      Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                  Widget>[
-            Text(
-              'What is the target amount:',
-              style: TextStyle(
-                fontFamily: 'Founders Grotesk',
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            Row(children: [
-              Text(
-                '£',
-                style: TextStyle(
-                  fontWeight: FontWeight.w100,
-                  fontFamily: 'Founders Grotesk',
-                  fontSize: 45,
-                ),
-              ),
-              Expanded(
-                  child: TextField(
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w100,
-                        fontFamily: 'Founders Grotesk',
-                        fontSize: 45,
-                      ),
-                      controller: moneyController,
-                      decoration: InputDecoration(hintText: 'Amount in £'))),
-            ])
-          ])),
+              ]))
     ]);
   }
 
