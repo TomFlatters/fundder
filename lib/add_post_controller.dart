@@ -1119,7 +1119,7 @@ class _AddPostState extends State<AddPost> {
                 child: Text(
                   selected == 0
                       ? 'This is what your post would look like:'
-                      : 'This is what your challenge, one somebody accepts it, would look like:',
+                      : 'This is what your challenge, once somebody accepts it, would look like:',
                   style: TextStyle(
                     fontFamily: 'Founders Grotesk',
                     fontWeight: FontWeight.bold,
