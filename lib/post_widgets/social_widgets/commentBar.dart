@@ -6,17 +6,18 @@ class CommentButton extends StatelessWidget {
   CommentButton({this.pid});
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
+    return GestureDetector(
       child: Container(
-        width: 23,
-        height: 23,
-        padding: const EdgeInsets.all(0.0),
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        width: 43,
+        height: 43,
         child: Image.asset(
           'assets/images/comment.png',
           color: Colors.grey[850],
         ),
       ),
-      onPressed: () {
+      onTap: () {
         if (pid != null) {
           Navigator.pushNamed(context, '/post/' + pid + '/comments');
         }

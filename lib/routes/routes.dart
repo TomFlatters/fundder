@@ -26,6 +26,7 @@ import 'package:provider/provider.dart';
 import 'package:fundder/auth_screens/check_verified.dart';
 import 'package:fundder/search/hashtag_feed.dart';
 import 'package:fundder/charity_view_controller.dart';
+import 'package:fundder/post_widgets/view_likers_controller.dart';
 
 class FluroRouter {
   static Router.Router router = Router.Router();
@@ -97,6 +98,11 @@ class FluroRouter {
             startIndex: 1,
             username: params['username'][0],
           ));
+  static Handler _likersHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ViewLikers(
+            postId: params['id'][0],
+          ));
   static Handler _editProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           EditProfile());
@@ -156,6 +162,11 @@ class FluroRouter {
           CheckVerified());
 
   static void setupRouter() {
+    router.define(
+      '/post/:id/likers',
+      handler: _likersHandler,
+      transitionType: TransitionType.fadeIn,
+    );
     router.define(
       '/charity/:id',
       handler: _charityHandler,

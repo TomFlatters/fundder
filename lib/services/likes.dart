@@ -76,4 +76,34 @@ class LikesService {
     var postDoc = await postsCollection.document(postId).get();
     return postDoc.data['noLikes'];
   }
+
+  Future<List<String>> idsOfPostLikers(String postId) async {
+    //returns the user id of all users following user 'uid'
+    QuerySnapshot q = await postsCollection
+        .document(postId)
+        .collection('whoLiked')
+        .getDocuments();
+    //remember that the doc ids are the user ids of the followers]
+    return (q.documents.map((e) => e.documentID).toList());
+  }
+
+  Future<List<Map>> unamesOfPostLikers(String postId) async {
+    //return the usernames of all users following the user
+    List<String> uids = await idsOfPostLikers(postId);
+    List<Map> res = [];
+    if (uids != null) {
+      print("uids: " + uids.toString());
+      for (int i = 0; i < uids.length; i++) {
+        var uname = await mapIDtoName(uids[i]);
+        res.add(<String, String>{"username": uname, "uid": uids[i]});
+      }
+    }
+    return res;
+  }
+
+  Future<String> mapIDtoName(String uid) async {
+    //returns corresponding username to uid
+    var doc = await userCollection.document(uid).get();
+    return doc.data['username'];
+  }
 }

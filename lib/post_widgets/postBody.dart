@@ -93,7 +93,7 @@ class PostBody extends StatelessWidget {
         ),
         Container(
             alignment: Alignment.centerLeft,
-            margin: EdgeInsets.only(bottom: 15, top: 0, left: 10, right: 10),
+            margin: EdgeInsets.only(bottom: 10, top: 0, left: 10, right: 10),
             child: Text(
               postData.targetAmount != '-1'
                   ? '£${postData.moneyRaised == null ? 0.00.toStringAsFixed(2) : postData.moneyRaised.toStringAsFixed(2)} raised of £${postData.targetAmount} target'

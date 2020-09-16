@@ -4,11 +4,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
-import 'package:fundder/post_widgets/commentBar.dart';
-import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/post_widgets/social_widgets/commentBar.dart';
+import 'package:fundder/post_widgets/social_widgets/likeButton.dart';
 import 'package:fundder/post_widgets/postBody.dart';
 import 'package:fundder/post_widgets/postHeader.dart';
-import 'package:fundder/post_widgets/shareBar.dart';
+import 'package:fundder/post_widgets/social_widgets/shareBar.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'package:fundder/view_post_controller.dart';
@@ -18,6 +18,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'services/likes.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'routes/FadeTransition.dart';
+import 'post_widgets/socialBar.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -68,12 +69,9 @@ class _FeedViewState extends State<FeedView> {
           // print(postData)
 
           //arbitrarily chosen int
-          StreamController<void> likesManager = StreamController<int>();
+          StreamController<void> likesManager =
+              StreamController<int>.broadcast();
           Stream rebuildLikesButton = likesManager.stream;
-
-          //the previous state of like before it's changed
-          var currLikeButton =
-              createLikesFutureBuilder(likesService, postData, user.uid);
 
           return GestureDetector(
             child: Container(
@@ -98,44 +96,10 @@ class _FeedViewState extends State<FeedView> {
                     maxLines: 2,
                     likesManager: likesManager,
                   ),
-                  Container(
-                    //action bar
-                    key: GlobalKey(),
-                    height: 30,
-                    child: Row(children: <Widget>[
-                      //likeButton goes here
-                      Expanded(
-                        child: StreamBuilder(
-                            stream: rebuildLikesButton,
-                            builder: (context, snapshot) {
-                              print("Building Stream Builder");
-                              if (snapshot.hasData) {
-                                print(
-                                    "New data in stream. Creating new Like Button");
-                                currLikeButton = createLikesFutureBuilder(
-                                    likesService, postData, user.uid);
-                                return currLikeButton;
-                              } else {
-                                print("Using old LikeButton");
-                                return currLikeButton;
-                              }
-                            }),
-                      ),
-
-                      Expanded(
-                          child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: CommentButton(
-                          pid: postData.id,
-                        ),
-                      )),
-                      Expanded(
-                        child: ShareBar(
-                          postId: postData.id,
-                          postTitle: postData.title,
-                        ),
-                      ),
-                    ]),
+                  SocialBar(
+                    key: UniqueKey(),
+                    postData: postData,
+                    rebuildLikesButton: rebuildLikesButton,
                   ),
                   Row(children: [
                     Expanded(
@@ -170,16 +134,6 @@ class _FeedViewState extends State<FeedView> {
               ),
             ),
             onTap: () async {
-              //
-              //throw StateError('Uncaught error thrown by app.');
-              // var pid = postData.id;
-              // var noLikes = likesModel.noLikes;
-              // var isLiked = likesModel.isLiked;
-              // var uid = user.uid;
-              // //passing state into ViewPost screen
-              // LikesModel likeState = LikesModel(isLiked, noLikes,
-              //     uid: uid, postId: pid);
-
               print("a post clicked");
               await Navigator.push(
                   context, FadeRoute(page: ViewPost(postData)));

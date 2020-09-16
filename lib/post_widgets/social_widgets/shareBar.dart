@@ -27,15 +27,15 @@ class ShareBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      child: Row(children: [
-        Container(
-          width: 25,
-          height: 25,
-          padding: const EdgeInsets.all(0.0),
-          child: Image.asset('assets/images/share.png'),
-        ),
-        Expanded(
+    return GestureDetector(
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        width: 45,
+        height: 45,
+        child: Image.asset('assets/images/share.png'),
+      ),
+      /*Expanded(
             child: Container(
                 alignment: Alignment.centerLeft,
                 margin: EdgeInsets.only(left: 10, top: 5),
@@ -43,9 +43,8 @@ class ShareBar extends StatelessWidget {
                   'Share',
                   textAlign: TextAlign.left,
                   style: TextStyle(fontSize: 16, color: Colors.grey[850]),
-                )))
-      ]),
-      onPressed: () {
+                )))*/
+      onTap: () {
         _showShare(context);
       },
     );
