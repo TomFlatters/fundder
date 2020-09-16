@@ -12,6 +12,7 @@ import 'package:fundder/shared/helper_functions.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/template.dart';
 import 'shared/loading.dart';
+import 'package:provider/provider.dart';
 
 class DoChallenge extends StatefulWidget {
   @override
@@ -24,6 +25,7 @@ class DoChallenge extends StatefulWidget {
 class _DoChallengeState extends State<DoChallenge> {
   List<Template> templates;
 
+  bool checkedTutorial = false;
   int limit = 10;
   Timestamp loadingTimestamp;
   RefreshController _refreshController =
@@ -81,6 +83,10 @@ class _DoChallengeState extends State<DoChallenge> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+    if (checkedTutorial == false) {
+      checkedTutorial = true;
+    }
     if (templates == null) {
       return Loading();
     } else {

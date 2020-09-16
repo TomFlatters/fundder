@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fundder/post_widgets/likeBar.dart';
 import 'package:fundder/profileWidgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/followers.dart';
@@ -23,6 +22,9 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'tutorial_screens/profile_tutorial.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'tutorial_screens/all_tutorials.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -42,6 +44,8 @@ class _ProfileState extends State<ProfileController>
       RefreshController(initialRefresh: true);
 
   final AuthService _auth = AuthService();
+
+  bool checkedProfileTutorial = false;
 
   TabController _tabController;
   String _username = "Username";
@@ -74,38 +78,34 @@ class _ProfileState extends State<ProfileController>
     super.initState();
   }
 
-  /*void _retrieveUser() async {
+  void checkProfileTutorial() async {
+    FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
     Firestore.instance
         .collection("users")
-        .document(widget.uid)
+        .document(firebaseUser.uid)
         .get()
-        .then((value) {
-      setState(() {
-        _uid = widget.uid;
-        _name = value.data["name"];
-        _username = value.data['username'];
-        _email = value.data["email"];
-        _profilePic = value.data["profilePic"];
-        //followers bookkeeping
-        _noFollowing = (value.data.containsKey('noFollowing')
-            ? value.data['noFollowing']
-            : 0);
-        _noFollowers = (value.data.containsKey('noFollowers')
-            ? value.data['noFollowers']
-            : 0);
-
-        if (_profilePic == null) {
-          _profilePic =
-              'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-          DatabaseService(uid: _uid)
-              .updateUserData(_email, _username, _name, _profilePic);
+        .then((snapshot) {
+      if (snapshot != null) {
+        if (snapshot['fundTutorialSeen'] != null) {
+          if (snapshot['fundTutorialSeen'] != true) {
+            _showProfileTutorial(context);
+          }
+        } else {
+          _showProfileTutorial(context);
         }
-        if (value.data['amountDonated'] != null) {
-          _amountDonated = value.data['amountDonated'];
-        }
-      });
+      }
     });
-  }*/
+  }
+
+  Future<void> _showProfileTutorial(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return ProfileTutorial();
+      },
+    );
+  }
 
   _handleTabSelection() {
     if (_tabController.indexIsChanging) {
@@ -119,6 +119,10 @@ class _ProfileState extends State<ProfileController>
     if (user.uid != widget.uid) {
       emptyMessage = "Looks like they haven't yet created a Fundder challenge";
     }
+    /*if (checkedProfileTutorial == false) {
+      checkProfileTutorial();
+      checkedProfileTutorial = true;
+    }*/
     // print(user.uid);
     if (user == null && kIsWeb == true) {
       Future.microtask(() => Navigator.pushNamed(context, '/web/login'));

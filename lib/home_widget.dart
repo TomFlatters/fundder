@@ -16,6 +16,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/database.dart';
 import 'connection_listener.dart';
+import 'tutorial_screens/profile_tutorial.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -28,6 +29,7 @@ class _HomeState extends State<Home> {
   int _currentIndex = 0;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool unreadNotifs = false;
+  bool checkedProfileTutorial = false;
 
   @override
   void initState() {
@@ -99,18 +101,40 @@ class _HomeState extends State<Home> {
         } else {
           Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
         }
-        if (snapshot['seenTutorial'] != null) {
-          if (snapshot['seenTutorial'] != true) {
-            Navigator.pushNamed(context, '/' + user.uid + '/tutorial');
-          }
-        } else {
-          Navigator.pushNamed(context, '/' + user.uid + '/tutorial');
-        }
       }
       if (user.isEmailVerified == false) {
         Navigator.pushNamed(context, '/' + user.uid + '/verification');
       }
     });
+  }
+
+  void checkProfileTutorial() async {
+    final FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(firebaseUser.uid)
+        .get()
+        .then((snapshot) {
+      if (snapshot != null) {
+        if (snapshot['profileTutorialSeen'] != null) {
+          if (snapshot['profileTutorialSeen'] != true) {
+            _showProfileTutorial(context);
+          }
+        } else {
+          _showProfileTutorial(context);
+        }
+      }
+    });
+  }
+
+  Future<void> _showProfileTutorial(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return ProfileTutorial();
+      },
+    );
   }
 
   @override
@@ -189,6 +213,10 @@ class _HomeState extends State<Home> {
   }
 
   void onTabTapped(int index) {
+    if (index == 4 && checkedProfileTutorial == false) {
+      checkProfileTutorial();
+      checkedProfileTutorial = true;
+    }
     if (index != 2) {
       if (mounted)
         setState(() {

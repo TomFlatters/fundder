@@ -3,6 +3,9 @@ import 'package:fundder/services/auth.dart';
 import 'package:fundder/main.dart';
 import 'helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'tutorial_screens/all_tutorials.dart';
 
 class ProfileActions extends StatelessWidget {
   final AuthService _auth = AuthService();
@@ -36,6 +39,15 @@ class ProfileActions extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        ListTile(
+          leading:
+              Icon(MaterialCommunityIcons.picture_in_picture_top_right_outline),
+          title: Text('View Tutorial Again'),
+          onTap: () async {
+            await _showTutorial(context);
+            Navigator.pop(context);
+          },
+        ),
         /*ListTile(
           leading: Icon(FontAwesome.money),
           title: Text('Payments'),
@@ -52,6 +64,16 @@ class ProfileActions extends StatelessWidget {
           onTap: () {},
         ),*/
       ],
+    );
+  }
+
+  Future<void> _showTutorial(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AllTutorials();
+      },
     );
   }
 }
