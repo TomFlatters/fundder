@@ -1,6 +1,6 @@
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:fundder/messaging_Screens/findPeople.dart';
+import 'package:fundder/messaging/findPeople.dart';
 import 'package:fundder/routes/FadeTransition.dart';
 
 class ChatLobby extends StatelessWidget {
