@@ -77,14 +77,20 @@ class LikesService {
     return postDoc.data['noLikes'];
   }
 
-  Future<List<String>> idsOfPostLikers(String postId) async {
+  Future<List<dynamic>> idsOfPostLikers(String postId) async {
     //returns the user id of all users following user 'uid'
     QuerySnapshot q = await postsCollection
         .document(postId)
         .collection('whoLiked')
         .getDocuments();
     //remember that the doc ids are the user ids of the followers]
-    return (q.documents.map((e) => e.documentID).toList());
+    List<String> likers = [];
+    for (int i = 0; i < q.documents.length; i++) {
+      if (q.documents[i][q.documents[i].documentID] == true) {
+        likers.add(q.documents[i].documentID);
+      }
+    }
+    return likers;
   }
 
   Future<List<Map>> unamesOfPostLikers(String postId) async {
