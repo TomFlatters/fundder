@@ -4,8 +4,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'do_challenge.dart';
+import 'messaging_Screens/chat_room.dart';
 import 'models/user.dart';
 import 'feed_wrapper.dart';
+import 'routes/FadeTransition.dart';
 
 class FeedController extends StatefulWidget {
   @override
@@ -33,12 +35,19 @@ class _FeedControllerState extends State<FeedController>
         appBar: AppBar(
           centerTitle: true,
           title: Text('Feed'),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.chat_bubble_rounded),
+                onPressed: () {
+                  Navigator.push(context, FadeRoute(page: ChatRoom()));
+                })
+          ],
           bottom: TabBar(
             controller: _tabController,
             physics: NeverScrollableScrollPhysics(),
             //indicatorColor: HexColor(colors[_tabController.index]),
             tabs: [
-              Tab(text: 'Do'),
+              Tab(text: 'Ideas'),
               Tab(text: 'Fund'),
               Tab(text: 'Done'),
             ],
