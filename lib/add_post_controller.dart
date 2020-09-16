@@ -37,6 +37,7 @@ class _AddPostState extends State<AddPost> {
   int _current = 0;
   CarouselController _carouselController = CarouselController();
   double aspectRatio;
+  bool canMoveToPreview = false;
 
   // Person who does this - selects the screens which appear next
 
@@ -57,6 +58,18 @@ class _AddPostState extends State<AddPost> {
   @override
   Widget build(BuildContext context) {
     //final user = Provider.of<User>(context);
+    if ((imageFile == null && selected == 1) ||
+        titleController.text == "" ||
+        subtitleController.text == "" ||
+        charity == -1 ||
+        (moneyController.text == "0.00" && whoDoes[selected] == "Myself") ||
+        hashtags.length < 2 ||
+        (double.parse(moneyController.text) < 2 &&
+            whoDoes[selected] == "Myself")) {
+      canMoveToPreview = false;
+    } else {
+      canMoveToPreview = true;
+    }
     if (user == null && kIsWeb == true) {
       Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
       return Scaffold(
@@ -102,14 +115,7 @@ class _AddPostState extends State<AddPost> {
 
                                 // add image to firebase storage
                                 if (imageFile != null) {
-                                  if (titleController.text == "" ||
-                                      subtitleController.text == "" ||
-                                      charity == -1 ||
-                                      (moneyController.text == "0.00" &&
-                                          whoDoes[selected] == "Myself") ||
-                                      hashtags.length < 2 ||
-                                      (double.parse(moneyController.text) < 2 &&
-                                          whoDoes[selected] == "Myself")) {
+                                  if (canMoveToPreview == false) {
                                     if (mounted) {
                                       setState(() {
                                         _submitting = false;
@@ -156,9 +162,35 @@ class _AddPostState extends State<AddPost> {
                               /*Navigator.of(context).pushReplacement(_viewPost());*/
 
                               if (selected != -1) {
-                                _carouselController.nextPage(
-                                    duration: Duration(milliseconds: 300),
-                                    curve: Curves.linear);
+                                if (!(_current == 4 &&
+                                    canMoveToPreview == false)) {
+                                  _carouselController.nextPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.linear);
+                                } else if (titleController.text == "") {
+                                  _showErrorDialog(
+                                      'You have not chosen a title');
+                                } else if (subtitleController.text == "") {
+                                  _showErrorDialog(
+                                      'You have not written a description for the challenge');
+                                } else if (double.parse(moneyController.text) <
+                                        2 &&
+                                    whoDoes[selected] == "Myself") {
+                                  _showErrorDialog(
+                                      'Minimum target fundraising amount is £2.00');
+                                } else if (charity == -1) {
+                                  _showErrorDialog(
+                                      'You have not chosen a charity');
+                                } else if (hashtags.length < 2) {
+                                  _showErrorDialog(
+                                      'You need a minimum of 2 hashtags');
+                                } else if (selected == 1 && imageFile == null) {
+                                  _showErrorDialog(
+                                      "'Do' feed challenges require an image");
+                                } else {
+                                  _showErrorDialog(
+                                      'You have not filled all the required fields');
+                                }
                               } else {
                                 _showErrorDialog(
                                     "You need to choose who you'd like to do the challenge");
@@ -205,23 +237,39 @@ class _AddPostState extends State<AddPost> {
                       // autoPlay: false,
                     ),
                     items: selected == 0
-                        ? [
-                            _choosePerson(),
-                            _defineDescriptionSelf(),
-                            _chooseCharity(),
-                            _setHashtags(),
-                            _imageUpload(),
-                            _postPreview()
-                          ]
-                        : selected == 1
+                        ? canMoveToPreview == true
                             ? [
                                 _choosePerson(),
-                                _defineDescriptionOthers(),
+                                _defineDescriptionSelf(),
                                 _chooseCharity(),
                                 _setHashtags(),
                                 _imageUpload(),
                                 _postPreview()
                               ]
+                            : [
+                                _choosePerson(),
+                                _defineDescriptionSelf(),
+                                _chooseCharity(),
+                                _setHashtags(),
+                                _imageUpload()
+                              ]
+                        : selected == 1
+                            ? canMoveToPreview == true
+                                ? [
+                                    _choosePerson(),
+                                    _defineDescriptionOthers(),
+                                    _chooseCharity(),
+                                    _setHashtags(),
+                                    _imageUpload(),
+                                    _postPreview()
+                                  ]
+                                : [
+                                    _choosePerson(),
+                                    _defineDescriptionOthers(),
+                                    _chooseCharity(),
+                                    _setHashtags(),
+                                    _imageUpload()
+                                  ]
                             : [_choosePerson()],
                   );
                 },
