@@ -140,6 +140,7 @@ class _SocialBarState extends State<SocialBar> with TickerProviderStateMixin {
                     context, '/post/' + widget.postData.id + '/likers');
               },
               child: Container(
+                color: Colors.white,
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.only(left: 10, top: 5),
                 child: Text(
