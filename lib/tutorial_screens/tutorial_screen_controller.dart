@@ -99,8 +99,13 @@ class _TutorialScreenControllerState extends State<TutorialScreenController> {
                                       curve: Curves.linear);
                                 }
                               : () async {
-                                  _tutorialCompleted();
-                                  Navigator.pop(context);
+                                  if (widget.boolVariable ==
+                                      'allTutorialSeen') {
+                                    Navigator.pop(context);
+                                  } else {
+                                    _tutorialCompleted();
+                                    Navigator.pop(context);
+                                  }
                                 }),
                     ),
                   )

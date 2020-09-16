@@ -25,6 +25,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'tutorial_screens/profile_tutorial.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'tutorial_screens/all_tutorials.dart';
 
 class ProfileController extends StatefulWidget {
   @override
