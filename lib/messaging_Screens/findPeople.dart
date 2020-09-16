@@ -5,6 +5,8 @@ import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 
+import '../helper_classes.dart';
+
 class FindChatUsers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,16 @@ class FindChatUsers extends StatelessWidget {
           child: SearchBar(
             onSearch: search,
             onItemFound: (DocumentSnapshot doc, int index) {
-              return Text(doc.data.toString());
+              return ListTile(
+                leading: ProfilePicFromUrl(doc.data['profilePic'], 40),
+                title: Text(
+                  doc.data['username'],
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, '/user/' + doc.documentID);
+                },
+              );
             },
             minimumChars: 1,
           ),
