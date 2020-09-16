@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/messaging_Screens/chat_room.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/routes/FadeTransition.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -38,9 +40,8 @@ class FindChatUsers extends StatelessWidget {
                   doc.data['username'],
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                onTap: () {
-                  Navigator.pushNamed(context, '/user/' + doc.documentID);
-                },
+                onTap: () =>
+                    Navigator.push(context, FadeRoute(page: ChatRoom(doc))),
               );
             },
             minimumChars: 1,
