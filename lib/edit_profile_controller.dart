@@ -152,7 +152,9 @@ class _EditProfileState extends State<EditProfile> {
                   return Row(
                     children: <Widget>[
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        margin: index == 1
+                            ? EdgeInsets.only(left: 20, right: 20, top: 15)
+                            : EdgeInsets.symmetric(horizontal: 20),
                         width: 80,
                         child: Container(
                             child: Text(entries[index]),
@@ -166,7 +168,7 @@ class _EditProfileState extends State<EditProfile> {
                                     _uid == null ? "username" : _username,
                                     style: TextStyle(
                                         fontSize: 17, color: Colors.grey)),
-                                margin: EdgeInsets.only(bottom: 15),
+                                margin: EdgeInsets.symmetric(vertical: 15),
                               )
                             : index == 2
                                 ? Text(
