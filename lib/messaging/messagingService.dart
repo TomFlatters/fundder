@@ -40,7 +40,7 @@ class MessagingService {
     var messages = chatsCollection.document(chatId).collection('messages');
     messages.add({
       "from": this.uid,
-      "when": FieldValue.serverTimestamp(),
+      "when": Timestamp.fromDate(DateTime.now().toUtc()),
       "msg": txt,
     });
   }
