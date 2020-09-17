@@ -9,17 +9,17 @@ import 'package:provider/provider.dart';
 import '../helper_classes.dart';
 
 class ChatRoom extends StatelessWidget {
-  final DocumentSnapshot otherChatee;
+  final String otherChateeUid;
+  final String otherChateeUsername;
   final TextEditingController _messageController = TextEditingController();
-  ChatRoom(this.otherChatee);
+  ChatRoom(this.otherChateeUid, this.otherChateeUsername);
 
   @override
   Widget build(BuildContext context) {
     print("building chat page");
     var user = Provider.of<User>(context);
     MessagingService messagingService = MessagingService(user.uid);
-    String chatId =
-        MessagingService.getChatRoomId(user.uid, otherChatee.documentID);
+    String chatId = MessagingService.getChatRoomId(user.uid, otherChateeUid);
 
     return Scaffold(
       appBar: AppBar(
@@ -28,13 +28,13 @@ class ChatRoom extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop()),
           centerTitle: true,
           title: ListTile(
-            leading: ProfilePicFromUrl(otherChatee.data['profilePic'], 40),
+            leading: ProfilePic(otherChateeUid, 40),
             title: Text(
-              otherChatee.data['username'],
+              otherChateeUsername,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/user/' + otherChatee.documentID);
+              Navigator.pushNamed(context, '/user/' + otherChateeUid);
             },
           )),
       body: Column(

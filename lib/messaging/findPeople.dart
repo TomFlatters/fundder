@@ -41,8 +41,10 @@ class FindChatUsers extends StatelessWidget {
                   doc.data['username'],
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                onTap: () =>
-                    Navigator.push(context, FadeRoute(page: ChatRoom(doc))),
+                onTap: () => Navigator.push(
+                    context,
+                    FadeRoute(
+                        page: ChatRoom(doc.documentID, doc.data['username']))),
               );
             },
             minimumChars: 1,
