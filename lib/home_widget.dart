@@ -5,7 +5,7 @@ import 'feed_controller.dart';
 import 'search/search_controller.dart';
 import 'liked_controller.dart';
 import 'profile_controller.dart';
-import 'add_post_controller.dart';
+import 'post_creation_widgets/add_post_controller.dart';
 import 'helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:titled_navigation_bar/titled_navigation_bar.dart';

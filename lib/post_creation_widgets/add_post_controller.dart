@@ -6,8 +6,8 @@ import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
-import 'models/user.dart';
-import 'view_post_controller.dart';
+import '../models/user.dart';
+import '../view_post_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/models/post.dart';
@@ -15,16 +15,19 @@ import 'package:fundder/models/template.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'shared/loading.dart';
-import 'global_widgets/buttons.dart';
+import '../shared/loading.dart';
+import '../global_widgets/buttons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'services/hashtags.dart';
-import 'add_post_widgets/who_do_tiles.dart';
-import 'add_post_widgets/charity_tiles.dart';
-import 'post_widgets/postHeader.dart';
-import 'post_widgets/postBody.dart';
+import '../services/hashtags.dart';
+import 'creation_tiles/tile_widgets/who_do_tiles.dart';
+import 'creation_tiles/tile_widgets/charity_tiles.dart';
+import '../post_widgets/postHeader.dart';
+import '../post_widgets/postBody.dart';
+import 'creation_tiles/choose_person.dart';
+import 'creation_tiles/define_description_self.dart';
+import 'creation_tiles/define_description_others.dart';
+import 'creation_tiles/choose_charity.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -38,7 +41,6 @@ class _AddPostState extends State<AddPost> {
   CarouselController _carouselController = CarouselController();
   double aspectRatio;
   bool canMoveToPreview = false;
-
   // Person who does this - selects the screens which appear next
 
   int selected = -1;
@@ -57,15 +59,35 @@ class _AddPostState extends State<AddPost> {
 
   @override
   Widget build(BuildContext context) {
+    Widget _choosePerson =
+        ChoosePerson(selected: selected, chooseSelected: _haveSelectedPerson);
+    Widget _defineDescriptionSelf = DefineDescriptionSelf(
+      onTitleChange: _onTitleChange,
+      onSubtitleChange: _onSubtitleChange,
+      onMoneyChange: _onTargetAmountChange,
+      nextPage: _nextPage,
+      title: title,
+      subtitle: subtitle,
+      money: targetAmount,
+    );
+    Widget _defineDescriptionOthers = DefineDescriptionOthers(
+        onTitleChange: _onTitleChange,
+        onSubtitleChange: _onSubtitleChange,
+        title: title,
+        subtitle: subtitle);
+    Widget _chooseCharity = ChooseCharity(
+      charitySelected: _haveSelectedCharity,
+      charities: charities,
+      charity: charity,
+    );
     //final user = Provider.of<User>(context);
     if ((imageFile == null && selected == 1) ||
-        titleController.text == "" ||
-        subtitleController.text == "" ||
+        title == "" ||
+        subtitle == "" ||
         charity == -1 ||
-        (moneyController.text == "0.00" && whoDoes[selected] == "Myself") ||
+        (targetAmount == "0.00" && whoDoes[selected] == "Myself") ||
         hashtags.length < 2 ||
-        (double.parse(moneyController.text) < 2 &&
-            whoDoes[selected] == "Myself")) {
+        (double.parse(targetAmount) < 2 && whoDoes[selected] == "Myself")) {
       canMoveToPreview = false;
     } else {
       canMoveToPreview = true;
@@ -167,14 +189,13 @@ class _AddPostState extends State<AddPost> {
                                   _carouselController.nextPage(
                                       duration: Duration(milliseconds: 300),
                                       curve: Curves.linear);
-                                } else if (titleController.text == "") {
+                                } else if (title == "") {
                                   _showErrorDialog(
                                       'You have not chosen a title');
-                                } else if (subtitleController.text == "") {
+                                } else if (subtitle == "") {
                                   _showErrorDialog(
                                       'You have not written a description for the challenge');
-                                } else if (double.parse(moneyController.text) <
-                                        2 &&
+                                } else if (double.parse(targetAmount) < 2 &&
                                     whoDoes[selected] == "Myself") {
                                   _showErrorDialog(
                                       'Minimum target fundraising amount is £2.00');
@@ -216,10 +237,7 @@ class _AddPostState extends State<AddPost> {
               body: Builder(
                 builder: (context) {
                   final double height = MediaQuery.of(context).size.height;
-                  return /*selected == -1
-                      ? _choosePerson()
-                      : */
-                      CarouselSlider(
+                  return CarouselSlider(
                     carouselController: _carouselController,
                     options: CarouselOptions(
                       onPageChanged: (index, reason) {
@@ -239,38 +257,40 @@ class _AddPostState extends State<AddPost> {
                     items: selected == 0
                         ? canMoveToPreview == true
                             ? [
-                                _choosePerson(),
-                                _defineDescriptionSelf(),
-                                _chooseCharity(),
+                                _choosePerson,
+                                _defineDescriptionSelf,
+                                _chooseCharity,
                                 _setHashtags(),
                                 _imageUpload(),
                                 _postPreview()
                               ]
                             : [
-                                _choosePerson(),
-                                _defineDescriptionSelf(),
-                                _chooseCharity(),
+                                _choosePerson,
+                                _defineDescriptionSelf,
+                                _chooseCharity,
                                 _setHashtags(),
                                 _imageUpload()
                               ]
                         : selected == 1
                             ? canMoveToPreview == true
                                 ? [
-                                    _choosePerson(),
-                                    _defineDescriptionOthers(),
-                                    _chooseCharity(),
+                                    _choosePerson,
+                                    _defineDescriptionOthers,
+                                    _chooseCharity,
                                     _setHashtags(),
                                     _imageUpload(),
                                     _postPreview()
                                   ]
                                 : [
-                                    _choosePerson(),
-                                    _defineDescriptionOthers(),
-                                    _chooseCharity(),
+                                    _choosePerson,
+                                    _defineDescriptionOthers,
+                                    _chooseCharity,
                                     _setHashtags(),
                                     _imageUpload()
                                   ]
-                            : [_choosePerson()],
+                            : [
+                                _choosePerson,
+                              ],
                   );
                 },
               ),
@@ -279,6 +299,8 @@ class _AddPostState extends State<AddPost> {
   }
 
   void _changePage() {
+    // Set state to make sure that views instantiate with the latest values
+    setState(() {});
     FocusScope.of(context).unfocus();
   }
 
@@ -304,10 +326,10 @@ class _AddPostState extends State<AddPost> {
 
   void _pushItem(String downloadUrl, User user) {
     // Validate form
-    if (titleController.text == "" ||
-        subtitleController.text == "" ||
+    if (title == "" ||
+        subtitle == "" ||
         charity == -1 ||
-        (moneyController.text == "0.00" && whoDoes[selected] == "Myself") ||
+        (targetAmount == "0.00" && whoDoes[selected] == "Myself") ||
         hashtags.length < 2) {
       if (mounted) {
         setState(() {
@@ -317,8 +339,7 @@ class _AddPostState extends State<AddPost> {
       }
       _showErrorDialog('You have not filled all the required fields');
     } else {
-      if (double.parse(moneyController.text) < 2 &&
-          whoDoes[selected] == "Myself") {
+      if (double.parse(targetAmount) < 2 && whoDoes[selected] == "Myself") {
         if (mounted) {
           setState(() {
             _submitting = false;
@@ -329,8 +350,8 @@ class _AddPostState extends State<AddPost> {
         if (whoDoes[selected] == "Myself") {
           DatabaseService(uid: user.uid)
               .uploadPost(new Post(
-                  title: titleController.text.toString().trimRight(),
-                  subtitle: subtitleController.text.toString().trimRight(),
+                  title: title.toString().trimRight(),
+                  subtitle: subtitle.toString().trimRight(),
                   author: user.uid,
                   authorUsername: user.username,
                   charity: charities[charity].id,
@@ -338,7 +359,7 @@ class _AddPostState extends State<AddPost> {
                   noComments: 0,
                   timestamp: DateTime.now(),
                   moneyRaised: 0,
-                  targetAmount: moneyController.text.toString(),
+                  targetAmount: targetAmount.toString(),
                   imageUrl: downloadUrl,
                   status: 'fund',
                   aspectRatio: aspectRatio,
@@ -362,13 +383,6 @@ class _AddPostState extends State<AddPost> {
                                 .substring(1, postId.toString().length - 1)),
                         HashtagsService(uid: user.uid)
                             .addHashtag(postId.toString(), hashtags),
-
-                        // if the post is successfully added, view the post
-                        /*DatabaseService(uid: user.uid).getPostById(postId.toString())
-                      .then((post) => {
-                        Navigator.of(context)
-                          .pushReplacement(_viewPost(post))
-                      })*/
                         Navigator.pushReplacementNamed(
                             context,
                             '/post/' +
@@ -381,8 +395,8 @@ class _AddPostState extends State<AddPost> {
           // Create a template
           DatabaseService(uid: user.uid)
               .uploadTemplate(new Template(
-                  title: titleController.text.toString(),
-                  subtitle: subtitleController.text.toString(),
+                  title: title.toString(),
+                  subtitle: subtitle.toString(),
                   author: user.uid,
                   authorUsername: user.username,
                   charity: charities[charity].id,
@@ -390,7 +404,7 @@ class _AddPostState extends State<AddPost> {
                   comments: {},
                   timestamp: DateTime.now(),
                   moneyRaised: 0,
-                  targetAmount: moneyController.text.toString(),
+                  targetAmount: targetAmount.toString(),
                   imageUrl: downloadUrl,
                   whoDoes: whoDoes[selected].toString(),
                   acceptedBy: [],
@@ -437,307 +451,54 @@ class _AddPostState extends State<AddPost> {
   }
   // Define widgets for each of the form stages:
 
-  Widget _choosePerson() {
-    return Container(
-        color: Colors.white,
-        child: ListView(
-          //crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              color: Colors.grey[200],
-              child: Container(
-                height: 10,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10)),
-                  color: Colors.white,
-                ),
-                margin: EdgeInsets.only(top: 10),
-              ),
-            ),
-            Container(
-                padding:
-                    EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
-                child: Text(
-                  'Who do you want to do it',
-                  style: TextStyle(
-                    fontFamily: 'Founders Grotesk',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                )),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  selected = 0;
-                });
-                _carouselController.nextPage();
-              },
-              child: AnimatedContainer(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.fastOutSlowIn,
-                  margin: EdgeInsets.only(left: 20, right: 20),
-                  height: 300,
-                  decoration: BoxDecoration(
-                      border: selected == 0
-                          ? Border.all(color: HexColor('ff6b6c'), width: 3)
-                          : Border.all(color: Colors.grey[200], width: 3),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: MyselfTile(selected == 0
-                      ? HexColor('ff6b6c') //Color.fromRGBO(237, 106, 110, .3)
-                      : Colors.grey[200])),
-            ),
-            SizedBox(height: 20),
-            Container(
-                padding: EdgeInsets.only(left: 20, right: 20),
-                child: Text(
-                  'Or',
-                  style: TextStyle(
-                    fontFamily: 'Founders Grotesk',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                )),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  selected = 1;
-                });
-                _carouselController.nextPage();
-              },
-              child: AnimatedContainer(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.fastOutSlowIn,
-                  margin: EdgeInsets.only(left: 20, right: 20),
-                  decoration: BoxDecoration(
-                      border: selected == 1
-                          ? Border.all(color: HexColor('ff6b6c'), width: 3)
-                          : Border.all(color: Colors.grey[200], width: 3),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: OthersTile(selected == 1
-                      ? HexColor('ff6b6c') //Color.fromRGBO(237, 106, 110, .3)
-                      : Colors.grey[200])),
-            ),
-            SizedBox(height: 10),
-          ],
-        ));
+  void _haveSelectedPerson(int selectedPerson) {
+    setState(() {
+      selected = selectedPerson;
+    });
+    print('selected = ' + selected.toString());
+    _carouselController.nextPage();
   }
 
   // _defineDescription state:
-  final titleController = TextEditingController();
-  final subtitleController = TextEditingController();
+
+  String title;
+  String subtitle;
+  String targetAmount;
+
+  void _onTitleChange(String titleInput) {
+    setState(() {
+      title = titleInput;
+    });
+    print('title = ' + title);
+  }
+
+  void _onSubtitleChange(String subtitleInput) {
+    setState(() {
+      subtitle = subtitleInput;
+    });
+    print('subtitle = ' + subtitle);
+  }
+
+  void _onTargetAmountChange(String targetAmountInput) {
+    setState(() {
+      targetAmount = targetAmountInput;
+    });
+    print('targetAmount = ' + targetAmount);
+  }
+
+  void _nextPage() {
+    _carouselController.nextPage();
+  }
+
+  void _haveSelectedCharity(int selectedCharity) {
+    setState(() {
+      charity = selectedCharity;
+    });
+    print('charity = ' + charity.toString());
+  }
+
   final hashtagController = TextEditingController();
-  final descriptionController = TextEditingController();
   List<String> hashtags = [];
-
-  Widget _defineDescriptionSelf() {
-    return ListView(shrinkWrap: true, children: <Widget>[
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          height: 10,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            color: Colors.white,
-          ),
-          margin: EdgeInsets.only(top: 10),
-        ),
-      ),
-      Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  child: RichText(
-                      text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.black,
-                            fontFamily: 'Founders Grotesk',
-                          ),
-                          children: [
-                        TextSpan(
-                            text: 'Title of Challenge ',
-                            style: TextStyle(
-                              fontFamily: 'Founders Grotesk',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            )),
-                        TextSpan(
-                            text: 'maximum 50 characters',
-                            style: TextStyle(
-                              fontFamily: 'Founders Grotesk',
-                              fontSize: 12,
-                            ))
-                      ])),
-                ),
-                TextField(
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(50),
-                  ],
-                  controller: titleController,
-                  decoration: InputDecoration(
-                    hintText: 'Eg. Hatford XV performs California Girls',
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10),
-                  child: Text(
-                    'Description',
-                    style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                TextField(
-                    controller: subtitleController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                        hintText:
-                            'Eg. We will sing @Cornmarket St 12pm Sunday')),
-                Container(
-                  margin: EdgeInsets.only(top: 20),
-                  child: Text(
-                    'If',
-                    style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                Row(children: [
-                  Text(
-                    '£',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w100,
-                        fontFamily: 'Founders Grotesk',
-                        fontSize: 45,
-                        color: HexColor('ff6b6c')),
-                  ),
-                  Expanded(
-                    child: TextField(
-                        keyboardType: TextInputType.number,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w100,
-                          fontFamily: 'Founders Grotesk',
-                          fontSize: 45,
-                          color: Colors.black,
-                        ),
-                        controller: moneyController,
-                        decoration: InputDecoration(hintText: 'Amount in £')),
-                  )
-                ]),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 30),
-                  child: Text(
-                    'is donated to',
-                    style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                PrimaryFundderButton(
-                  onPressed: () {
-                    _carouselController.nextPage();
-                  },
-                  text: "Set Charity",
-                )
-              ])),
-    ]);
-  }
-
-  Widget _defineDescriptionOthers() {
-    return ListView(shrinkWrap: true, children: <Widget>[
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          height: 10,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            color: Colors.white,
-          ),
-          margin: EdgeInsets.only(top: 10),
-        ),
-      ),
-      Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  child: RichText(
-                      text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.black,
-                            fontFamily: 'Founders Grotesk',
-                          ),
-                          children: [
-                        TextSpan(
-                            text: "Title of Challenge ",
-                            style: TextStyle(
-                              fontFamily: 'Founders Grotesk',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            )),
-                        TextSpan(
-                            text: 'maximum 50 characters',
-                            style: TextStyle(
-                              fontFamily: 'Founders Grotesk',
-                              fontSize: 12,
-                            ))
-                      ])),
-                ),
-                TextField(
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(50),
-                  ],
-                  controller: titleController,
-                  decoration: InputDecoration(
-                    hintText: 'Eg. Perform California Girls by Katy Perry',
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10),
-                  child: Text(
-                    'Description',
-                    style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                TextField(
-                    controller: subtitleController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                        hintText: 'Eg. Sing on a crowded street')),
-              ]))
-    ]);
-  }
-
-  // _choosePerson state:
-
-  // _setMoney state:
-  final moneyController =
-      MoneyMaskedTextController(decimalSeparator: '.', thousandSeparator: ',');
 
   Widget _setHashtags() {
     return ListView(children: <Widget>[
@@ -853,88 +614,6 @@ class _AddPostState extends State<AddPost> {
     if (mounted) {
       setState(() {});
     }
-  }
-
-  Widget _chooseCharity() {
-    return ListView(children: <Widget>[
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          height: 10,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            color: Colors.white,
-          ),
-          margin: EdgeInsets.only(top: 10),
-        ),
-      ),
-      Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Which charity are you raising for?',
-                style: TextStyle(
-                  fontFamily: 'Founders Grotesk',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              ListView.separated(
-                  separatorBuilder: (context, index) => SizedBox(
-                        height: 10,
-                      ),
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  shrinkWrap: true,
-                  itemCount: charities != null ? charities.length : 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      child: CharityTile(
-                          charities[index], charity == index ? true : false),
-                      onTap: () {
-                        charity = index;
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
-                    );
-                    /*ListTile(
-                      dense: true,
-                      leading: Builder(builder: (context) {
-                        if (charity == index) {
-                          return Icon(Icons.check_circle);
-                        } else {
-                          return Icon(Icons.check_circle_outline);
-                        }
-                      }),
-                      title: Text('${charities[index].name}'),
-                      trailing: GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(
-                              context, '/charity/' + charities[index].id);
-                        },
-                        child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            child: CachedNetworkImage(
-                                imageUrl: charities[index].image)),
-                      ),
-                      onTap: () {
-                        charity = index;
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
-                    );*/
-                  })
-            ],
-          )),
-    ]);
   }
 
   // _imageUpload state
@@ -1144,11 +823,11 @@ class _AddPostState extends State<AddPost> {
                 likesManager: null,
                 maxLines: 99999999,
                 postData: Post(
-                    title: titleController.text,
-                    subtitle: subtitleController.text,
+                    title: title,
+                    subtitle: subtitle,
                     hashtags: hashtags,
                     moneyRaised: 0,
-                    targetAmount: selected != 1 ? moneyController.text : '-1'),
+                    targetAmount: selected != 1 ? targetAmount : '-1'),
               )
             ],
           ),
