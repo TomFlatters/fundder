@@ -200,8 +200,7 @@ class _ProfileState extends State<ProfileController>
                                   ]
                                 : <Widget>[
                                     IconButton(
-                                        icon: Icon(MaterialCommunityIcons
-                                            .comment_processing_outline),
+                                        icon: Icon(SimpleLineIcons.bubble),
                                         onPressed: () {
                                           Navigator.push(
                                               context,

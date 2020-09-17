@@ -38,7 +38,7 @@ class _FeedControllerState extends State<FeedController>
           title: Text('Feed'),
           actions: [
             IconButton(
-                icon: Icon(MaterialCommunityIcons.comment_multiple_outline),
+                icon: Icon(SimpleLineIcons.bubbles),
                 onPressed: () {
                   Navigator.push(context, FadeRoute(page: ChatLobby()));
                 })
