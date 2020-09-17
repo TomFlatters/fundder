@@ -2,9 +2,10 @@
 // feed.dart controls the actual feed content
 
 import 'package:flutter/material.dart';
+import 'package:fundder/messaging/chat_lobby.dart';
 import 'package:provider/provider.dart';
 import 'do_challenge.dart';
-import 'messaging_Screens/chat_lobby.dart';
+
 import 'models/user.dart';
 import 'feed_wrapper.dart';
 import 'routes/FadeTransition.dart';
