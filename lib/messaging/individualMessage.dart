@@ -11,6 +11,6 @@ class Message extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(child: Text(when.toString() + msg + fromMe.toString()));
   }
 }
