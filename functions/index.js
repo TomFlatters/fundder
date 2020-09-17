@@ -497,4 +497,17 @@ exports.postDone = functions.firestore
     });
 
 
+    ////////////////FUNCTIONS TO HANDLE MESSAGING///////////////////////////
+
+    exports.chatCreated = functions.firestore.document('chats/{chatId}').onCreate((snap, context)=>{
+
+      const chatId = context.params.chatId;
+      const chatMemberIds = chatId.split('_');
+      const data = {
+        chatMembers: chatMemberIds,
+      }
+      admin.firestore().collection('chats').doc(chatId).update(data);
+      
+
+    })
 
