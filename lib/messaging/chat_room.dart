@@ -1,15 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/messaging/messageList.dart';
+import 'package:fundder/messaging/messagingService.dart';
+import 'package:fundder/models/user.dart';
 import 'package:fundder/shared/loading.dart';
+import 'package:provider/provider.dart';
 
 import '../helper_classes.dart';
 
 class ChatRoom extends StatelessWidget {
   final DocumentSnapshot otherChatee;
-
+  final TextEditingController _messageController = TextEditingController();
   ChatRoom(this.otherChatee);
+
   @override
   Widget build(BuildContext context) {
+    print("building chat page");
+    var user = Provider.of<User>(context);
+    String chatId =
+        MessagingService.getChatRoomId(user.uid, otherChatee.documentID);
+
     return Scaffold(
       appBar: AppBar(
           leading: IconButton(
@@ -30,9 +40,9 @@ class ChatRoom extends StatelessWidget {
         children: [
           Expanded(
               child: StreamBuilder(
-                  stream: null, //getMessages(),
+                  stream: MessagingService.getMessages(chatId),
                   builder: (context, snapshot) => snapshot.hasData
-                      ? null //MessagesList(snapshot.data as QuerySnapshot),
+                      ? MessagesList(snapshot.data as QuerySnapshot)
                       : Center(
                           child: Loading(),
                         ))),
@@ -42,12 +52,12 @@ class ChatRoom extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
-                    controller: null /*_messageController*/,
+                    controller: _messageController,
                     keyboardType: TextInputType.text,
                     onSubmitted: (txt) {
                       //maybe this won't be necessary
                       //sendText(txt);
-                      //_messageController.clear();
+                      _messageController.clear();
                     },
                   ),
                 ),
@@ -55,8 +65,9 @@ class ChatRoom extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.send),
                 onPressed: () {
-                  //sendText(_messageController.text);
-                  //_messageController.clear();
+                  // sendText(_messageController.text);
+                  print("pressed send msg icon");
+                  _messageController.clear();
                 },
               )
             ],
