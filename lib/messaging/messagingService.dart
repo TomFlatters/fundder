@@ -47,4 +47,7 @@ class MessagingService {
         .document(chatId)
         .setData({'latestMessage': txt}, merge: true);
   }
+
+  Stream<QuerySnapshot> getChats() =>
+      chatsCollection.where("chatMembers", arrayContains: uid).snapshots();
 }
