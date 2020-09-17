@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/helper_classes.dart';
+import 'package:fundder/messaging/chat_room.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/routes/FadeTransition.dart';
 import 'package:provider/provider.dart';
 
 class ChatsList extends StatelessWidget {
@@ -25,7 +27,9 @@ class ChatsList extends StatelessWidget {
               return ListTile(
                   leading: ProfilePic(otherChateeId, 40),
                   title: Text(snapshot.data),
-                  subtitle: Text(latestMessage));
+                  subtitle: Text(latestMessage),
+                  onTap: () => Navigator.push(context,
+                      FadeRoute(page: ChatRoom(otherChateeId, snapshot.data))));
             } else {
               return Container(
                 height: 40,
