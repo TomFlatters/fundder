@@ -17,6 +17,7 @@ class ChatRoom extends StatelessWidget {
   Widget build(BuildContext context) {
     print("building chat page");
     var user = Provider.of<User>(context);
+    MessagingService messagingService = MessagingService(user.uid);
     String chatId =
         MessagingService.getChatRoomId(user.uid, otherChatee.documentID);
 
@@ -57,7 +58,6 @@ class ChatRoom extends StatelessWidget {
                     onSubmitted: (txt) {
                       //maybe this won't be necessary
                       //sendText(txt);
-                      _messageController.clear();
                     },
                   ),
                 ),
@@ -65,8 +65,8 @@ class ChatRoom extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.send),
                 onPressed: () {
-                  // sendText(_messageController.text);
                   print("pressed send msg icon");
+                  messagingService.sendText(_messageController.text, chatId);
                   _messageController.clear();
                 },
               )
