@@ -32,6 +32,7 @@ class FindChatUsers extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SearchBar(
+            hintText: 'find people...',
             onSearch: search,
             onItemFound: (DocumentSnapshot doc, int index) {
               return ListTile(
