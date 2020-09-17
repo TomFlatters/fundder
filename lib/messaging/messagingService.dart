@@ -43,5 +43,8 @@ class MessagingService {
       "when": Timestamp.fromDate(DateTime.now().toUtc()),
       "msg": txt,
     });
+    chatsCollection
+        .document(chatId)
+        .setData({'latestMessage': txt}, merge: true);
   }
 }
