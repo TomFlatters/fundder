@@ -5,21 +5,22 @@ import 'package:fundder/messaging/messagingService.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 import '../helper_classes.dart';
 
 class ChatRoom extends StatelessWidget {
-  final DocumentSnapshot otherChatee;
+  final String otherChateeUid;
+  final String otherChateeUsername;
   final TextEditingController _messageController = TextEditingController();
-  ChatRoom(this.otherChatee);
+  ChatRoom(this.otherChateeUid, this.otherChateeUsername);
 
   @override
   Widget build(BuildContext context) {
     print("building chat page");
     var user = Provider.of<User>(context);
     MessagingService messagingService = MessagingService(user.uid);
-    String chatId =
-        MessagingService.getChatRoomId(user.uid, otherChatee.documentID);
+    String chatId = MessagingService.getChatRoomId(user.uid, otherChateeUid);
 
     return Scaffold(
       appBar: AppBar(
@@ -28,51 +29,54 @@ class ChatRoom extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop()),
           centerTitle: true,
           title: ListTile(
-            leading: ProfilePicFromUrl(otherChatee.data['profilePic'], 40),
+            leading: ProfilePic(otherChateeUid, 40),
             title: Text(
-              otherChatee.data['username'],
+              otherChateeUsername,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/user/' + otherChatee.documentID);
+              Navigator.pushNamed(context, '/user/' + otherChateeUid);
             },
           )),
-      body: Column(
-        children: [
-          Expanded(
-              child: StreamBuilder(
-                  stream: MessagingService.getMessages(chatId),
-                  builder: (context, snapshot) => snapshot.hasData
-                      ? MessagesList(snapshot.data as QuerySnapshot)
-                      : Center(
-                          child: Loading(),
-                        ))),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: _messageController,
-                    keyboardType: TextInputType.text,
-                    onSubmitted: (txt) {
-                      //maybe this won't be necessary
-                      //sendText(txt);
-                    },
+      body: Container(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            Expanded(
+                child: StreamBuilder(
+                    stream: MessagingService.getMessages(chatId),
+                    builder: (context, snapshot) => snapshot.hasData
+                        ? MessagesList(snapshot.data as QuerySnapshot)
+                        : Center(
+                            child: Loading(),
+                          ))),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _messageController,
+                      keyboardType: TextInputType.text,
+                      onSubmitted: (txt) {
+                        //maybe this won't be necessary
+                        //sendText(txt);
+                      },
+                    ),
                   ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(Icons.send),
-                onPressed: () {
-                  print("pressed send msg icon");
-                  messagingService.sendText(_messageController.text, chatId);
-                  _messageController.clear();
-                },
-              )
-            ],
-          )
-        ],
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    print("pressed send msg icon");
+                    messagingService.sendText(_messageController.text, chatId);
+                    _messageController.clear();
+                  },
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

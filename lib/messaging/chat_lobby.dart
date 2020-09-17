@@ -2,6 +2,7 @@ import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/messaging/findPeople.dart';
 import 'package:fundder/routes/FadeTransition.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class ChatLobby extends StatelessWidget {
   @override
@@ -11,11 +12,11 @@ class ChatLobby extends StatelessWidget {
         title: Text('Chats'),
         centerTitle: true,
         leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: Icon(AntDesign.close),
             onPressed: () => Navigator.of(context).pop()),
         actions: [
           IconButton(
-              icon: Icon(Icons.border_color),
+              icon: Icon(AntDesign.edit),
               onPressed: () {
                 Navigator.push(context, FadeRoute(page: FindChatUsers()));
               })

@@ -23,6 +23,8 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'routes/FadeTransition.dart';
+import 'messaging/chat_room.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -189,18 +191,25 @@ class _ProfileState extends State<ProfileController>
                             title: Text(_username),
                             actions: _uid == user.uid
                                 ? <Widget>[
-                                    FlatButton(
-                                      onPressed:
-                                          () /*async {
-            await _auth.signOut();
-          }*/
-                                          {
+                                    IconButton(
+                                      onPressed: () {
                                         _showOptions();
                                       },
-                                      child: Icon(AntDesign.ellipsis1),
+                                      icon: Icon(AntDesign.ellipsis1),
                                     )
                                   ]
-                                : null),
+                                : <Widget>[
+                                    IconButton(
+                                        icon: Icon(MaterialCommunityIcons
+                                            .comment_processing_outline),
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              FadeRoute(
+                                                  page: ChatRoom(
+                                                      _uid, _username)));
+                                        })
+                                  ]),
                     body: Column(children: [
                       kIsWeb == true ? WebMenu(5) : Container(),
                       Expanded(
