@@ -72,16 +72,17 @@ class MessagingService {
     }
   }
 
+//not really used
   void chatNeedsAttention() {
     Firestore.instance
-        .collection('users')
+        .collection('userChatStatus')
         .document(uid)
         .setData({'chatNeedsAttention': true}, merge: true);
   }
 
   void chatSeen() {
     Firestore.instance
-        .collection('users')
+        .collection('userChatStatus')
         .document(uid)
         .setData({'chatNeedsAttention': false}, merge: true);
   }
