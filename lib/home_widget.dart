@@ -61,12 +61,15 @@ class _HomeState extends State<Home> {
       },
       onMessage: (Map<String, dynamic> message) {
         print('onMessage called');
-        if (mounted)
+        var data = message['data'];
+        if (data['type'] == 'Chat') {
+        } else if (mounted) {
           setState(() {
             if (_currentIndex != 3) {
               unreadNotifs = true;
             }
           });
+        }
       },
     );
   }
