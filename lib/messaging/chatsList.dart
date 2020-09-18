@@ -19,6 +19,9 @@ class ChatsList extends StatelessWidget {
         var latestMessage = chat.data["latestMessage"];
         var latestTxt =
             (latestMessage is String) ? latestMessage : latestMessage['txt'];
+        var latestMessageTimestamp = (latestMessage is String)
+            ? "-"
+            : "${latestMessage['timeStamp'].toDate().toLocal().hour}:${latestMessage['timeStamp'].toDate().toLocal().minute}";
         var chatMembers = chat.data["chatMembers"];
         var otherChateeId =
             (chatMembers[0] == user.uid) ? chatMembers[1] : chatMembers[0];
@@ -28,6 +31,7 @@ class ChatsList extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.done) {
               return ListTile(
                   leading: ProfilePic(otherChateeId, 40),
+                  trailing: Text(latestMessageTimestamp),
                   title: Text(snapshot.data),
                   subtitle: Text(latestTxt),
                   onTap: () => Navigator.push(context,
