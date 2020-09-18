@@ -1,7 +1,9 @@
 // Feed controller controls which feed is shown in the view and general layout of screen.
 // feed.dart controls the actual feed content
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/helper_classes.dart';
 import 'package:fundder/messaging/chat_lobby.dart';
 import 'package:provider/provider.dart';
 import 'do_challenge.dart';
@@ -37,11 +39,7 @@ class _FeedControllerState extends State<FeedController>
           centerTitle: true,
           title: Text('Feed'),
           actions: [
-            IconButton(
-                icon: Icon(SimpleLineIcons.bubbles),
-                onPressed: () {
-                  Navigator.push(context, FadeRoute(page: ChatLobby()));
-                })
+            MessagingIcon(user.uid),
           ],
           bottom: TabBar(
             controller: _tabController,
@@ -65,5 +63,61 @@ class _FeedControllerState extends State<FeedController>
             ]),
       ),
     );
+  }
+}
+
+_iconWithDot(context) {
+  return Stack(
+    children: [
+      IconButton(
+          icon: Icon(SimpleLineIcons.bubbles),
+          onPressed: () {
+            Navigator.push(context, FadeRoute(page: ChatLobby()));
+          }),
+      Positioned(
+          top: 10,
+          left: 30,
+          child: Icon(
+            Icons.brightness_1,
+            color: HexColor('ff6b6c'),
+            size: 9.0,
+          )),
+    ],
+  );
+}
+
+_iconWithoutDot(context) {
+  return IconButton(
+      icon: Icon(SimpleLineIcons.bubbles),
+      onPressed: () {
+        Navigator.push(context, FadeRoute(page: ChatLobby()));
+      });
+}
+
+class MessagingIcon extends StatelessWidget {
+  final String uid;
+  MessagingIcon(this.uid);
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: Firestore.instance
+            .collection('userChatStatus')
+            .document(uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return _iconWithoutDot(context);
+          } else if (snapshot.data.exists) {
+            if (snapshot.data["chatNeedsAttention"] != null) {
+              return (snapshot.data["chatNeedsAttention"] == true)
+                  ? _iconWithDot(context)
+                  : _iconWithoutDot(context);
+            } else {
+              return _iconWithoutDot(context);
+            }
+          } else {
+            return _iconWithoutDot(context);
+          }
+        });
   }
 }
