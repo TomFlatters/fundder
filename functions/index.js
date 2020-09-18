@@ -578,3 +578,23 @@ exports.postDone = functions.firestore
     }
 });
 
+
+exports.handleUnreadMessages = functions.firestore.document('chats/{chatId}').onUpdate((change, context)=>{
+  const newValue = change.after.data();
+
+  const uid1 = newValue.chatMembers[0];
+  const uid2 = newValue.chatMembers[1];
+  const latestMessageTimestamp = newValue.latestMessage.timeStamp.toDate();
+  const uid1LeftChatTime = (newValue.leftChat[uid1]===null)?null:newValue.leftChat[uid1].toDate();
+  const uid2LeftChatTime = (newValue.leftChat[uid2]===null)?null:newValue.leftChat[uid2].toDate();
+  if (uid1LeftChatTime<latestMessageTimestamp || uid1LeftChatTime === null){
+    let data = {chatNeedsAttention: true}
+    admin.firestore().collection('userChatStatus').doc(uid1).set(data, {merge: true})
+  }
+  if (uid2LeftChatTime<latestMessageTimestamp || uid2LeftChatTime === null){
+    let data = {chatNeedsAttention: true}
+    admin.firestore().collection('userChatStatus').doc(uid2).set(data, {merge: true})
+  }
+
+
+})

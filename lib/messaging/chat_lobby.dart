@@ -34,7 +34,10 @@ class ChatLobby extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
             icon: Icon(AntDesign.close),
-            onPressed: () => Navigator.of(context).pop()),
+            onPressed: () {
+              messagingService.chatSeen();
+              Navigator.of(context).pop();
+            }),
         actions: [
           IconButton(
               icon: Icon(AntDesign.edit),
