@@ -6,6 +6,7 @@ import 'package:fundder/models/user.dart';
 import 'package:fundder/routes/FadeTransition.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/services/followers.dart';
+import 'package:fundder/shared/loading.dart';
 import 'package:provider/provider.dart';
 
 import '../helper_classes.dart';
@@ -82,7 +83,7 @@ Widget _displyFollowers(uid) {
           },
         );
       } else {
-        return Container();
+        return Loading();
       }
     },
     future: GeneralFollowerServices.unamesFollowedByUser(uid),
