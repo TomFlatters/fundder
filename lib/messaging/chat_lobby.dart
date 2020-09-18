@@ -53,7 +53,7 @@ class ChatLobby extends StatelessWidget {
                 builder: (context, snapshot) => snapshot.hasData
                     ? ChatsList(snapshot.data as QuerySnapshot)
                     : Center(
-                        child: Loading(),
+                        child: Text('You have no active chats...'),
                       )),
             hintText: 'Search',
             onSearch: search,
