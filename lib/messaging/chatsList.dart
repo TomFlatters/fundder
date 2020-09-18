@@ -33,8 +33,12 @@ class ChatsList extends StatelessWidget {
         bool unread;
         if (leftChat != null) {
           var latestMessageTimestamp = latestMessage['timeStamp'].toDate();
-          var timeLeftChat = leftChat[user.uid].toDate();
-          unread = timeLeftChat.isBefore(latestMessageTimestamp);
+          if (leftChat[user.uid] != null) {
+            var timeLeftChat = leftChat[user.uid].toDate();
+            unread = timeLeftChat.isBefore(latestMessageTimestamp);
+          } else {
+            unread = true;
+          }
         }
 
         var chatMembers = chat.data["chatMembers"];
