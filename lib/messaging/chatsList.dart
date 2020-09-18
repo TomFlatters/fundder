@@ -16,6 +16,8 @@ class ChatsList extends StatelessWidget {
       itemCount: data.documents.length,
       itemBuilder: (context, i) {
         var chat = data.documents[i];
+        var leftChat = chat.data["leftChat"];
+
         var latestMessage = chat.data["latestMessage"];
         var latestTxt =
             (latestMessage is String) ? latestMessage : latestMessage['txt'];
@@ -27,6 +29,12 @@ class ChatsList extends StatelessWidget {
           var when = latestMessage['timeStamp'].toDate().toLocal();
           latestMessageTimestamp =
               (zeroFy(when.hour) + ":" + zeroFy(when.minute));
+        }
+        bool unread;
+        if (leftChat != null) {
+          var latestMessageTimestamp = latestMessage['timeStamp'].toDate();
+          var timeLeftChat = leftChat[user.uid].toDate();
+          unread = timeLeftChat.isBefore(latestMessageTimestamp);
         }
 
         var chatMembers = chat.data["chatMembers"];
@@ -40,7 +48,10 @@ class ChatsList extends StatelessWidget {
                   leading: ProfilePic(otherChateeId, 40),
                   trailing: Text(latestMessageTimestamp),
                   title: Text(snapshot.data),
-                  subtitle: Text(latestTxt),
+                  subtitle: Text(latestTxt,
+                      style: (unread)
+                          ? TextStyle(fontWeight: FontWeight.bold)
+                          : null),
                   onTap: () => Navigator.push(context,
                       FadeRoute(page: ChatRoom(otherChateeId, snapshot.data))));
             } else {
