@@ -11,6 +11,15 @@ class Message extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return Container(child: Text(when.toString() + msg + fromMe.toString()));
+    return Container(
+        alignment: fromMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          width: MediaQuery.of(context).size.width / 3 * 2,
+          child: Card(
+              shape: StadiumBorder(),
+              child: ListTile(
+                  title: Text(msg),
+                  trailing: Text("${when.hour}:${when.minute}"))),
+        ));
   }
 }
