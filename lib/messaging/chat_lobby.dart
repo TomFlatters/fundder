@@ -47,6 +47,7 @@ class ChatLobby extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SearchBar(
+            emptyWidget: Center(child: Text('No results for this search')),
             placeHolder: StreamBuilder(
                 stream: messagingService.getChats(),
                 builder: (context, snapshot) => snapshot.hasData
