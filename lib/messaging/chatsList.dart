@@ -17,6 +17,8 @@ class ChatsList extends StatelessWidget {
       itemBuilder: (context, i) {
         var chat = data.documents[i];
         var latestMessage = chat.data["latestMessage"];
+        var latestTxt =
+            (latestMessage is String) ? latestMessage : latestMessage['txt'];
         var chatMembers = chat.data["chatMembers"];
         var otherChateeId =
             (chatMembers[0] == user.uid) ? chatMembers[1] : chatMembers[0];
@@ -27,7 +29,7 @@ class ChatsList extends StatelessWidget {
               return ListTile(
                   leading: ProfilePic(otherChateeId, 40),
                   title: Text(snapshot.data),
-                  subtitle: Text(latestMessage),
+                  subtitle: Text(latestTxt),
                   onTap: () => Navigator.push(context,
                       FadeRoute(page: ChatRoom(otherChateeId, snapshot.data))));
             } else {

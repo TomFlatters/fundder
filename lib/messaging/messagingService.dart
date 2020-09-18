@@ -38,14 +38,15 @@ class MessagingService {
 
   void sendText(String txt, String chatId) {
     var messages = chatsCollection.document(chatId).collection('messages');
+    var timestamp = Timestamp.fromDate(DateTime.now().toUtc());
     messages.add({
       "from": this.uid,
-      "when": Timestamp.fromDate(DateTime.now().toUtc()),
+      "when": timestamp,
       "msg": txt,
     });
-    chatsCollection
-        .document(chatId)
-        .setData({'latestMessage': txt}, merge: true);
+    chatsCollection.document(chatId).setData({
+      'latestMessage': {'txt': txt, 'timeStamp': timestamp}
+    }, merge: true);
   }
 
   Stream<QuerySnapshot> getChats() =>
