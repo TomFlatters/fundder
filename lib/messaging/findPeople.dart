@@ -5,6 +5,7 @@ import 'package:fundder/messaging/chat_room.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/routes/FadeTransition.dart';
 import 'package:fundder/services/database.dart';
+import 'package:fundder/services/followers.dart';
 import 'package:provider/provider.dart';
 
 import '../helper_classes.dart';
@@ -32,6 +33,7 @@ class FindChatUsers extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SearchBar(
+            placeHolder: _displyFollowers(user.uid),
             hintText: 'Search',
             onSearch: search,
             onItemFound: (DocumentSnapshot doc, int index) {
@@ -53,4 +55,35 @@ class FindChatUsers extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _displyFollowers(uid) {
+  return FutureBuilder(
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        var users = snapshot.data;
+        return ListView.builder(
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            var uname = users[index]["username"];
+            var otherChateeId = users[index]["uid"];
+            return ListTile(
+              leading: ProfilePic(otherChateeId, 40),
+              title: Text(
+                uname,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                Navigator.push(context,
+                    FadeRoute(page: ChatRoom(otherChateeId, otherChateeId)));
+              },
+            );
+          },
+        );
+      } else {
+        return Container();
+      }
+    },
+    future: GeneralFollowerServices.unamesFollowedByUser(uid),
+  );
 }
