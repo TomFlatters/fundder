@@ -48,7 +48,7 @@ class _FeedControllerState extends State<FeedController>
             physics: NeverScrollableScrollPhysics(),
             //indicatorColor: HexColor(colors[_tabController.index]),
             tabs: [
-              Tab(text: 'Ideas'),
+              Tab(text: 'Do'),
               Tab(text: 'Fund'),
               Tab(text: 'Done'),
             ],
