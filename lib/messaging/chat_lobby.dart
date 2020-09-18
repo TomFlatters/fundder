@@ -7,11 +7,14 @@ import 'package:fundder/messaging/findPeople.dart';
 import 'package:fundder/messaging/messagingService.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/routes/FadeTransition.dart';
+
 import 'package:fundder/services/database.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:provider/provider.dart';
 
 import '../helper_classes.dart';
+
+import 'package:flutter_icons/flutter_icons.dart';
 
 class ChatLobby extends StatelessWidget {
   @override
@@ -30,11 +33,11 @@ class ChatLobby extends StatelessWidget {
         title: Text('Chats'),
         centerTitle: true,
         leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: Icon(AntDesign.close),
             onPressed: () => Navigator.of(context).pop()),
         actions: [
           IconButton(
-              icon: Icon(Icons.border_color),
+              icon: Icon(AntDesign.edit),
               onPressed: () {
                 Navigator.push(context, FadeRoute(page: FindChatUsers()));
               })

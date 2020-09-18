@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/messaging/chat_lobby.dart';
 import 'package:provider/provider.dart';
 import 'do_challenge.dart';
-
+import 'package:flutter_icons/flutter_icons.dart';
 import 'models/user.dart';
 import 'feed_wrapper.dart';
 import 'routes/FadeTransition.dart';
@@ -38,7 +38,7 @@ class _FeedControllerState extends State<FeedController>
           title: Text('Feed'),
           actions: [
             IconButton(
-                icon: Icon(Icons.chat_bubble_rounded),
+                icon: Icon(SimpleLineIcons.bubbles),
                 onPressed: () {
                   Navigator.push(context, FadeRoute(page: ChatLobby()));
                 })

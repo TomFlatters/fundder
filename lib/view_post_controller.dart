@@ -20,6 +20,8 @@ import 'global_widgets/buttons.dart';
 import 'services/database.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'dart:async';
+import 'package:fundder/routes/FadeTransition.dart';
+import 'messaging/chat_room.dart';
 
 class ViewPost extends StatefulWidget {
   @override
@@ -256,7 +258,21 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                       user != null
                                           ? user.uid != postData.author ||
                                                   postData.status != 'fund'
-                                              ? Container()
+                                              ? user.uid != postData.author
+                                                  ? EditFundderButton(
+                                                      text:
+                                                          'Message ${postData.authorUsername}',
+                                                      onPressed: () {
+                                                        Navigator.push(
+                                                            context,
+                                                            FadeRoute(
+                                                                page: ChatRoom(
+                                                                    postData
+                                                                        .author,
+                                                                    postData
+                                                                        .authorUsername)));
+                                                      })
+                                                  : Container()
                                               : PrimaryFundderButton(
                                                   text: 'Complete Challenge',
                                                   onPressed: () {
