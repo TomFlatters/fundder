@@ -511,3 +511,63 @@ exports.postDone = functions.firestore
 
     })
 
+    exports.messageSent = functions.firestore
+    .document('/chats/{chatId}/messages/{messageId}')
+    .onCreate(async (snapshot, context) =>
+    {
+    // Getting chat id from input
+    const chatId = context.params.chatId;
+    
+    // Getting sennder id from snapshot and using it to find sender doc for username
+    const senderId = snapshot.data()['from'];
+    const senderDoc = await admin.firestore().doc(`users/${senderId}`).get();
+
+    // Getting chat members to see who to send notification to
+    const chatRef = admin.firestore().doc(`chats/${chatId}`);
+    const chat = await chatRef.get();
+    const chatMembers = chat.data()['chatMembers'];
+
+    
+
+    // Create notification payload
+    const payload =
+    {
+        notification: { 
+            title: `Message from ${senderDoc.data()['username']}`,
+            body: `${snapshot.data()['msg']}`, 
+            click_action: "FLUTTER_NOTIFICATION_CLICK",
+            
+        },
+        data: {
+          
+          type: 'Chat',
+          senderUid: senderId,
+          senderUsername: senderDoc.data()['username']
+        }
+    };
+
+    // Remove chat member who sent message
+    var index2 = chatMembers.indexOf(senderId);
+    if (index2 > -1) {
+      chatMembers.splice(index2, 1);
+    }
+
+    // Find fcm tokens of all chat members apart from sender
+    var tokens = [];
+    for(var i=0; i<chatMembers.length; i++){
+        console.log(chatMembers[i]);
+        const doc = await admin.firestore().doc(`users/${chatMembers[i]}`).get();
+        console.log(doc.id);
+        if (doc.data()['fcm'] !== null) {
+          tokens = tokens.concat(doc.data()['fcm']);
+        }
+    }
+
+    // Send notification message to all tokens 
+    if (tokens.length > 0) {
+      const response = await admin.messaging().sendToDevice(tokens, payload);
+      await cleanupTokens(response, tokens, author);
+      console.log('Notifications have been sent and tokens cleaned up.');
+    }
+});
+

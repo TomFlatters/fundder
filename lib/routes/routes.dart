@@ -26,6 +26,7 @@ import 'package:provider/provider.dart';
 import 'package:fundder/auth_screens/check_verified.dart';
 import 'package:fundder/search/hashtag_feed.dart';
 import 'package:fundder/charity_view_controller.dart';
+import 'package:fundder/messaging/chat_room.dart';
 
 class FluroRouter {
   static Router.Router router = Router.Router();
@@ -67,6 +68,9 @@ class FluroRouter {
       },
     );
   });
+  static Handler _chatRoomHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ChatRoom(params['uid'][0], params['username'][0]));
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(pid: params['id'][0]));
@@ -156,6 +160,11 @@ class FluroRouter {
           CheckVerified());
 
   static void setupRouter() {
+    router.define(
+      '/chatroom/:uid/:username',
+      handler: _chatRoomHandler,
+      transitionType: TransitionType.fadeIn,
+    );
     router.define(
       '/charity/:id',
       handler: _charityHandler,

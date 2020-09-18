@@ -44,9 +44,19 @@ class _HomeState extends State<Home> {
     });
     _firebaseMessaging.configure(
       onLaunch: (Map<String, dynamic> message) {
+        var data = message['data'];
+        if (data['type'] == 'Chat') {
+          Navigator.pushNamed(context,
+              '/chatroom/' + data['senderUid'] + '/' + data['senderUsername']);
+        }
         print('onLaunch called');
       },
       onResume: (Map<String, dynamic> message) {
+        var data = message['data'];
+        if (data['type'] == 'Chat') {
+          Navigator.pushNamed(context,
+              '/chatroom/' + data['senderUid'] + '/' + data['senderUsername']);
+        }
         print('onResume called');
       },
       onMessage: (Map<String, dynamic> message) {
