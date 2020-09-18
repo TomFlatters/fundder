@@ -19,9 +19,16 @@ class ChatsList extends StatelessWidget {
         var latestMessage = chat.data["latestMessage"];
         var latestTxt =
             (latestMessage is String) ? latestMessage : latestMessage['txt'];
-        var latestMessageTimestamp = (latestMessage is String)
-            ? "-"
-            : "${latestMessage['timeStamp'].toDate().toLocal().hour}:${latestMessage['timeStamp'].toDate().toLocal().minute}";
+        String latestMessageTimestamp;
+        if (latestMessage is String) {
+          latestMessageTimestamp = "";
+        } else {
+          zeroFy(n) => (n < 10) ? ("0${n}") : n.toString();
+          var when = latestMessage['timeStamp'].toDate().toLocal();
+          latestMessageTimestamp =
+              (zeroFy(when.hour) + ":" + zeroFy(when.minute));
+        }
+
         var chatMembers = chat.data["chatMembers"];
         var otherChateeId =
             (chatMembers[0] == user.uid) ? chatMembers[1] : chatMembers[0];

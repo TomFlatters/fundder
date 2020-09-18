@@ -11,6 +11,12 @@ class Message extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
+    String latestMessageTimestamp;
+
+    zeroFy(n) => (n < 10) ? ("0${n}") : n.toString();
+
+    latestMessageTimestamp = (zeroFy(when.hour) + ":" + zeroFy(when.minute));
+
     return Container(
         alignment: fromMe ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
@@ -18,8 +24,7 @@ class Message extends StatelessWidget {
           child: Card(
               shape: StadiumBorder(),
               child: ListTile(
-                  title: Text(msg),
-                  trailing: Text("${when.hour}:${when.minute}"))),
+                  title: Text(msg), trailing: Text(latestMessageTimestamp))),
         ));
   }
 }
