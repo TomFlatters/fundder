@@ -52,7 +52,7 @@ class MessagingService {
   /**Get chats for the user for whom this messaging service was initialised */
   Stream<QuerySnapshot> getChats() => chatsCollection
       .where("chatMembers", arrayContains: uid)
-      .orderBy('latestMessage.timeStamp')
+      .orderBy('latestMessage.timeStamp', descending: true)
       .snapshots();
 
   /**register leaving a chatroom on the database. If no messages have been sent
