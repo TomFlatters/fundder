@@ -4,14 +4,23 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/tutorial_screens/fund_tutorial.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:fundder/helper_classes.dart';
+import 'package:fundder/messaging/chat_lobby.dart';
+
 import 'package:provider/provider.dart';
 import 'do_challenge.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'models/user.dart';
 import 'feed_wrapper.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'tutorial_screens/fund_tutorial.dart';
 import 'tutorial_screens/done_tutorial.dart';
 import 'tutorial_screens/do_tutorial.dart';
+
+import 'routes/FadeTransition.dart';
 
 class FeedController extends StatefulWidget {
   @override
@@ -142,6 +151,9 @@ class _FeedControllerState extends State<FeedController>
         appBar: AppBar(
           centerTitle: true,
           title: Text('Feed'),
+          actions: [
+            MessagingIcon(user.uid),
+          ],
           bottom: TabBar(
             onTap: _onItemTapped,
             controller: _tabController,
@@ -165,5 +177,61 @@ class _FeedControllerState extends State<FeedController>
             ]),
       ),
     );
+  }
+}
+
+_iconWithDot(context) {
+  return Stack(
+    children: [
+      IconButton(
+          icon: Icon(SimpleLineIcons.bubbles),
+          onPressed: () {
+            Navigator.push(context, FadeRoute(page: ChatLobby()));
+          }),
+      Positioned(
+          top: 10,
+          left: 30,
+          child: Icon(
+            Icons.brightness_1,
+            color: HexColor('ff6b6c'),
+            size: 9.0,
+          )),
+    ],
+  );
+}
+
+_iconWithoutDot(context) {
+  return IconButton(
+      icon: Icon(SimpleLineIcons.bubbles),
+      onPressed: () {
+        Navigator.push(context, FadeRoute(page: ChatLobby()));
+      });
+}
+
+class MessagingIcon extends StatelessWidget {
+  final String uid;
+  MessagingIcon(this.uid);
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: Firestore.instance
+            .collection('userChatStatus')
+            .document(uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return _iconWithoutDot(context);
+          } else if (snapshot.data.exists) {
+            if (snapshot.data["chatNeedsAttention"] != null) {
+              return (snapshot.data["chatNeedsAttention"] == true)
+                  ? _iconWithDot(context)
+                  : _iconWithoutDot(context);
+            } else {
+              return _iconWithoutDot(context);
+            }
+          } else {
+            return _iconWithoutDot(context);
+          }
+        });
   }
 }

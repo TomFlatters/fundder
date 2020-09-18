@@ -55,12 +55,12 @@ class MyApp extends StatelessWidget {
                   theme: ThemeData(
                       inputDecorationTheme: InputDecorationTheme(
                         focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: HexColor('ff6b6c'))),
+                            borderSide: BorderSide(color: Colors.grey)),
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: HexColor('ff6b6c')),
+                          borderSide: BorderSide(color: Colors.grey),
                         ),
                         border: UnderlineInputBorder(
-                          borderSide: BorderSide(color: HexColor('ff6b6c')),
+                          borderSide: BorderSide(color: Colors.grey),
                         ),
                       ),
                       scaffoldBackgroundColor: Colors.white,

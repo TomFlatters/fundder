@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:fundder/profileWidgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/followers.dart';
-import 'package:fundder/services/likes.dart';
-import 'package:fundder/view_post_controller.dart';
-import 'feed.dart';
 import 'profile_actions_view.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/models/user.dart';
@@ -22,9 +19,8 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'models/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 import 'tutorial_screens/profile_tutorial.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-import 'tutorial_screens/all_tutorials.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -193,18 +189,25 @@ class _ProfileState extends State<ProfileController>
                             title: Text(_username),
                             actions: _uid == user.uid
                                 ? <Widget>[
-                                    FlatButton(
-                                      onPressed:
-                                          () /*async {
-            await _auth.signOut();
-          }*/
-                                          {
+                                    IconButton(
+                                      onPressed: () {
                                         _showOptions();
                                       },
-                                      child: Icon(AntDesign.ellipsis1),
+                                      icon: Icon(AntDesign.ellipsis1),
                                     )
                                   ]
-                                : null),
+                                : <Widget>[
+                                    IconButton(
+                                        icon: Icon(SimpleLineIcons.bubble),
+                                        onPressed: () {
+                                          Navigator.pushNamed(
+                                              context,
+                                              '/chatroom/' +
+                                                  _uid +
+                                                  '/' +
+                                                  _username);
+                                        })
+                                  ]),
                     body: Column(children: [
                       kIsWeb == true ? WebMenu(5) : Container(),
                       Expanded(
