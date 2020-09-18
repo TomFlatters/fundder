@@ -33,6 +33,7 @@ class FindChatUsers extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SearchBar(
+            emptyWidget: Center(child: Text('No results for this search')),
             placeHolder: _displyFollowers(user.uid),
             hintText: 'Search',
             onSearch: search,
