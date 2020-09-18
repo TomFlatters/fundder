@@ -26,7 +26,10 @@ class ChatRoom extends StatelessWidget {
       appBar: AppBar(
           leading: IconButton(
               icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop()),
+              onPressed: () {
+                messagingService.leaveChat(chatId);
+                Navigator.of(context).pop();
+              }),
           centerTitle: true,
           title: ListTile(
             leading: ProfilePic(otherChateeUid, 40),

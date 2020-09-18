@@ -503,8 +503,15 @@ exports.postDone = functions.firestore
 
       const chatId = context.params.chatId;
       const chatMemberIds = chatId.split('_');
+      const uid1 = chatMemberIds[0];
+      const uid2 = chatMemberIds[1];
+      let leftChatData = {};
+      leftChatData[uid1] = null;
+      leftChatData[uid2] = null;
+      
       const data = {
-        chatMembers: chatMemberIds,
+        'chatMembers' : chatMemberIds,
+        leftChat: leftChatData
       }
       admin.firestore().collection('chats').doc(chatId).update(data);
       

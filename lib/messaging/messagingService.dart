@@ -49,6 +49,24 @@ class MessagingService {
     }, merge: true);
   }
 
+  /**Get chats for the user for whom this messaging service was initialised */
   Stream<QuerySnapshot> getChats() =>
       chatsCollection.where("chatMembers", arrayContains: uid).snapshots();
+
+  /**register leaving a chatroom on the database. If no messages have been sent
+   * on the chat, the database will not be modified.
+   */
+  void leaveChat(String chatId) async {
+    var chat = await chatsCollection.document(chatId).get();
+    if (chat.exists) {
+      //this chat exists and so register the user leaving the chat
+
+      var timestamp = Timestamp.fromDate(DateTime.now().toUtc());
+      chatsCollection.document(chatId).setData({
+        'leftChat': {uid: timestamp}
+      }, merge: true);
+    } else {
+      print("Chat doesn't exist");
+    }
+  }
 }
