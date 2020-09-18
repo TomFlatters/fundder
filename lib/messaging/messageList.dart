@@ -25,54 +25,63 @@ class MessagesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    return ListView.builder(
-        reverse: true,
-        itemCount: data.documents.length,
-        itemBuilder: (context, i) {
-          var months = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December'
-          ];
-          DateTime when = data.documents[i].data["when"].toDate().toLocal();
-          bool isMine = (data.documents[i].data["from"] as String) == user.uid;
-          List<Widget> widgetsToShow = [
-            Message(
-              fromMe: isMine,
-              msg: data.documents[i].data['msg'],
-              when: when,
-            )
-          ];
-          if (i == data.documents.length - 1) {
-            widgetsToShow.insert(
-                0,
-                Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
-                    child: Text(
-                        "${when.day} ${months[when.month - 1]} ${when.year}",
-                        style: Theme.of(context).textTheme.subtitle1)));
-          } else if (!areSameDay(data.documents[i + 1].data["when"],
-              data.documents[i].data["when"])) {
-            widgetsToShow.insert(
-                0,
-                Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
-                    child: Text(
-                        "${when.day} ${months[when.month - 1]} ${when.year}",
-                        style: Theme.of(context).textTheme.subtitle1)));
-          }
-          return Column(
-            children: widgetsToShow,
-          );
-        });
+    return (data.documents.length == 0)
+        ? Center(
+            child: Container(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  'You have no messages with this person. \nStart a conversation.',
+                  textAlign: TextAlign.center,
+                )))
+        : ListView.builder(
+            reverse: true,
+            itemCount: data.documents.length,
+            itemBuilder: (context, i) {
+              var months = [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December'
+              ];
+              DateTime when = data.documents[i].data["when"].toDate().toLocal();
+              bool isMine =
+                  (data.documents[i].data["from"] as String) == user.uid;
+              List<Widget> widgetsToShow = [
+                Message(
+                  fromMe: isMine,
+                  msg: data.documents[i].data['msg'],
+                  when: when,
+                )
+              ];
+              if (i == data.documents.length - 1) {
+                widgetsToShow.insert(
+                    0,
+                    Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: Text(
+                            "${when.day} ${months[when.month - 1]} ${when.year}",
+                            style: Theme.of(context).textTheme.subtitle1)));
+              } else if (!areSameDay(data.documents[i + 1].data["when"],
+                  data.documents[i].data["when"])) {
+                widgetsToShow.insert(
+                    0,
+                    Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: Text(
+                            "${when.day} ${months[when.month - 1]} ${when.year}",
+                            style: Theme.of(context).textTheme.subtitle1)));
+              }
+              return Column(
+                children: widgetsToShow,
+              );
+            });
   }
 }
