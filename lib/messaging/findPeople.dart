@@ -74,8 +74,8 @@ Widget _displyFollowers(uid) {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onTap: () {
-                Navigator.push(context,
-                    FadeRoute(page: ChatRoom(otherChateeId, otherChateeId)));
+                Navigator.push(
+                    context, FadeRoute(page: ChatRoom(otherChateeId, uname)));
               },
             );
           },
