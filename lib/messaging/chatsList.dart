@@ -51,7 +51,8 @@ class ChatsList extends StatelessWidget {
               return ListTile(
                   leading: ProfilePic(otherChateeId, 40),
                   trailing: Text(latestMessageTimestamp),
-                  title: Text(snapshot.data),
+                  title: Text(snapshot.data,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text(latestTxt,
                       style: (unread)
                           ? TextStyle(fontWeight: FontWeight.bold)
