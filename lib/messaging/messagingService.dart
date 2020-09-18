@@ -50,8 +50,10 @@ class MessagingService {
   }
 
   /**Get chats for the user for whom this messaging service was initialised */
-  Stream<QuerySnapshot> getChats() =>
-      chatsCollection.where("chatMembers", arrayContains: uid).snapshots();
+  Stream<QuerySnapshot> getChats() => chatsCollection
+      .where("chatMembers", arrayContains: uid)
+      .orderBy('latestMessage.timeStamp')
+      .snapshots();
 
   /**register leaving a chatroom on the database. If no messages have been sent
    * on the chat, the database will not be modified.
@@ -68,5 +70,19 @@ class MessagingService {
     } else {
       print("Chat doesn't exist");
     }
+  }
+
+  void chatNeedsAttention() {
+    Firestore.instance
+        .collection('users')
+        .document(uid)
+        .setData({'chatNeedsAttention': true}, merge: true);
+  }
+
+  void chatSeen() {
+    Firestore.instance
+        .collection('users')
+        .document(uid)
+        .setData({'chatNeedsAttention': false}, merge: true);
   }
 }
