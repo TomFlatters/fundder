@@ -202,11 +202,12 @@ class _ProfileState extends State<ProfileController>
                                     IconButton(
                                         icon: Icon(SimpleLineIcons.bubble),
                                         onPressed: () {
-                                          Navigator.push(
+                                          Navigator.pushNamed(
                                               context,
-                                              FadeRoute(
-                                                  page: ChatRoom(
-                                                      _uid, _username)));
+                                              '/chatroom/' +
+                                                  _uid +
+                                                  '/' +
+                                                  _username);
                                         })
                                   ]),
                     body: Column(children: [
