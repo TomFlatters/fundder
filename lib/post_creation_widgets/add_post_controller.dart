@@ -34,8 +34,23 @@ class _AddPostState extends State<AddPost> {
   CarouselController _carouselController = CarouselController();
   double aspectRatio;
   bool canMoveToPreview = false;
-  // Person who does this - selects the screens which appear next
 
+  // The image file
+  PickedFile imageFile;
+
+  // List of hashtags
+  List<String> hashtags = [];
+
+  // List of charities. If charity = -1 then no charity is selected
+  List<Charity> charities;
+  int charity = -1;
+
+  // Define description variables
+  String title = "";
+  String subtitle = "";
+  String targetAmount = '0.00';
+
+  // The type of challenge: 0 = for yourself, 1 = for someone else
   int selected = -1;
   final List<String> whoDoes = <String>['Myself', 'Someone Else'];
   final List<String> subWho = <String>[
@@ -52,51 +67,6 @@ class _AddPostState extends State<AddPost> {
 
   @override
   Widget build(BuildContext context) {
-    Widget _choosePerson =
-        ChoosePerson(selected: selected, chooseSelected: _haveSelectedPerson);
-    Widget _defineDescriptionSelf = DefineDescriptionSelf(
-      onTitleChange: _onTitleChange,
-      onSubtitleChange: _onSubtitleChange,
-      onMoneyChange: _onTargetAmountChange,
-      nextPage: _nextPage,
-      title: title,
-      subtitle: subtitle,
-      money: targetAmount,
-    );
-    Widget _defineDescriptionOthers = DefineDescriptionOthers(
-        onTitleChange: _onTitleChange,
-        onSubtitleChange: _onSubtitleChange,
-        title: title,
-        subtitle: subtitle);
-    Widget _chooseCharity = ChooseCharity(
-      charitySelected: _haveSelectedCharity,
-      charities: charities,
-      charity: charity,
-    );
-    Widget _setHashtags =
-        SetHashtags(hashtags: hashtags, onHasthagChange: _onHashtagsChanged);
-
-    Widget _postPreview = PostPreview(
-      charity: charity == -1 ? Charity(id: "", image: "") : charities[charity],
-      authorUid: user != null ? user.uid : '',
-      authorUsername: user != null ? user.username : '',
-      imageView: ImageView(
-        aspectRatioChange: _changedAspectRatio,
-        imageFile: imageFile,
-      ),
-      title: title,
-      subtitle: subtitle,
-      selected: selected,
-      targetAmount: targetAmount,
-      hashtags: hashtags,
-    );
-    Widget _imageUpload = ImageUpload(
-      selected: selected,
-      aspectRatio: aspectRatio,
-      aspectRatioChange: _changedAspectRatio,
-      imageFileChange: _changedImageFile,
-      imageFile: imageFile,
-    );
     //final user = Provider.of<User>(context);
     if ((imageFile == null && selected == 1) ||
         title == "" ||
@@ -257,45 +227,113 @@ class _AddPostState extends State<AddPost> {
                   ),
                   items: selected == 0
                       ? canMoveToPreview == true
+                          // If fund feed and all fields filled
                           ? [
-                              _choosePerson,
-                              _defineDescriptionSelf,
-                              _chooseCharity,
-                              _setHashtags,
-                              _imageUpload,
-                              _postPreview
+                              _choosePerson(),
+                              _defineDescriptionSelf(),
+                              _chooseCharity(),
+                              _setHashtags(),
+                              _imageUpload(),
+                              _postPreview()
                             ]
+                          // If fund feed and not all fields filled
                           : [
-                              _choosePerson,
-                              _defineDescriptionSelf,
-                              _chooseCharity,
-                              _setHashtags,
-                              _imageUpload
+                              _choosePerson(),
+                              _defineDescriptionSelf(),
+                              _chooseCharity(),
+                              _setHashtags(),
+                              _imageUpload()
                             ]
                       : selected == 1
                           ? canMoveToPreview == true
+                              // If do feed and all fields filled
                               ? [
-                                  _choosePerson,
-                                  _defineDescriptionOthers,
-                                  _chooseCharity,
-                                  _setHashtags,
-                                  _imageUpload,
-                                  _postPreview
+                                  _choosePerson(),
+                                  _defineDescriptionOthers(),
+                                  _chooseCharity(),
+                                  _setHashtags(),
+                                  _imageUpload(),
+                                  _postPreview()
                                 ]
+                              // If fund feed and not all fields filled
                               : [
-                                  _choosePerson,
-                                  _defineDescriptionOthers,
-                                  _chooseCharity,
-                                  _setHashtags,
-                                  _imageUpload
+                                  _choosePerson(),
+                                  _defineDescriptionOthers(),
+                                  _chooseCharity(),
+                                  _setHashtags(),
+                                  _imageUpload()
                                 ]
                           : [
-                              _choosePerson,
+                              _choosePerson(),
                             ],
                 );
               },
             ),
           );
+  }
+
+  Widget _choosePerson() {
+    return ChoosePerson(
+        selected: selected, chooseSelected: _haveSelectedPerson);
+  }
+
+  Widget _defineDescriptionSelf() {
+    return DefineDescriptionSelf(
+      onTitleChange: _onTitleChange,
+      onSubtitleChange: _onSubtitleChange,
+      onMoneyChange: _onTargetAmountChange,
+      nextPage: _nextPage,
+      title: title,
+      subtitle: subtitle,
+      money: targetAmount,
+    );
+  }
+
+  Widget _defineDescriptionOthers() {
+    return DefineDescriptionOthers(
+        onTitleChange: _onTitleChange,
+        onSubtitleChange: _onSubtitleChange,
+        title: title,
+        subtitle: subtitle);
+  }
+
+  Widget _chooseCharity() {
+    return ChooseCharity(
+      charitySelected: _haveSelectedCharity,
+      charities: charities,
+      charity: charity,
+    );
+  }
+
+  Widget _setHashtags() {
+    return SetHashtags(hashtags: hashtags, onHasthagChange: _onHashtagsChanged);
+  }
+
+  Widget _postPreview() {
+    return PostPreview(
+      charity: charity == -1 ? Charity(id: "", image: "") : charities[charity],
+      authorUid: user != null ? user.uid : '',
+      authorUsername: user != null ? user.username : '',
+      imageView: ImageView(
+        aspectRatioChange: _changedAspectRatio,
+        imageFile: imageFile,
+      ),
+      title: title,
+      subtitle: subtitle,
+      selected: selected,
+      targetAmount: targetAmount,
+      hashtags: hashtags,
+    );
+  }
+
+  Widget _imageUpload() {
+    return ImageUpload(
+      selected: selected,
+      aspectRatio: aspectRatio,
+      aspectRatioChange: _changedAspectRatio,
+      imageFileChange: _changedImageFile,
+      imageFile: imageFile,
+    );
   }
 
   void _changePage() {
@@ -461,10 +499,6 @@ class _AddPostState extends State<AddPost> {
 
   // _defineDescription state:
 
-  String title = "";
-  String subtitle = "";
-  String targetAmount = '0.00';
-
   void _onTitleChange(String titleInput) {
     setState(() {
       title = titleInput;
@@ -497,9 +531,6 @@ class _AddPostState extends State<AddPost> {
     print('charity = ' + charity.toString());
   }
 
-  final hashtagController = TextEditingController();
-  List<String> hashtags = [];
-
   void _onHashtagsChanged(List<String> newHashtags) {
     setState(() {
       hashtags = newHashtags;
@@ -508,8 +539,6 @@ class _AddPostState extends State<AddPost> {
   }
 
   // _chooseCharity state:
-  List<Charity> charities;
-  int charity = -1;
 
   void _loadCharityList() async {
     charities = await DatabaseService(uid: "123").getCharityNameList();
@@ -519,7 +548,6 @@ class _AddPostState extends State<AddPost> {
   }
 
   // _imageUpload state
-  PickedFile imageFile;
 
   void _changedImageFile(PickedFile newImageFile) {
     if (mounted) {
