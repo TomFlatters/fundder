@@ -24,7 +24,7 @@ class PostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    print('charity logo: ' + this.charityLogo);
+    //print('charity logo: ' + this.charityLogo);
     return Container(
       height: 60,
       child: Row(

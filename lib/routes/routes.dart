@@ -6,7 +6,7 @@ import 'package:fundder/services/database.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
 import 'package:fundder/donation/donate_page_controller.dart';
-import 'package:fundder/add_post_controller.dart';
+import 'package:fundder/post_creation_widgets/add_post_controller.dart';
 import 'package:fundder/do_challenge_detail.dart';
 import 'package:fundder/challenge_steps_view.dart';
 import 'package:fundder/view_followers_controller.dart';
