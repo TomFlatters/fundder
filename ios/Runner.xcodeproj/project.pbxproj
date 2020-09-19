@@ -407,6 +407,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.fundder;
 				PRODUCT_NAME = Fundder;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -550,6 +551,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.fundder;
 				PRODUCT_NAME = Fundder;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -587,6 +589,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.fundder;
 				PRODUCT_NAME = Fundder;
 				PROVISIONING_PROFILE_SPECIFIER = "";

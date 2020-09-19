@@ -1,33 +1,26 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/charity.dart';
+import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/services/database.dart';
-import 'package:provider/provider.dart';
 import '../models/user.dart';
-import '../view_post_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/models/template.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import '../shared/loading.dart';
 import '../global_widgets/buttons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/hashtags.dart';
-import 'creation_tiles/tile_widgets/who_do_tiles.dart';
-import 'creation_tiles/tile_widgets/charity_tiles.dart';
-import '../post_widgets/postHeader.dart';
-import '../post_widgets/postBody.dart';
 import 'creation_tiles/choose_person.dart';
 import 'creation_tiles/define_description_self.dart';
 import 'creation_tiles/define_description_others.dart';
 import 'creation_tiles/choose_charity.dart';
+import 'creation_tiles/set_hashtags.dart';
+import 'creation_tiles/post_preview.dart';
+import 'creation_tiles/tile_widgets/image_view.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -80,6 +73,30 @@ class _AddPostState extends State<AddPost> {
       charities: charities,
       charity: charity,
     );
+    Widget _setHashtags =
+        SetHashtags(hashtags: hashtags, onHasthagChange: _onHashtagsChanged);
+
+    Widget _postPreview = PostPreview(
+      charity: charity == -1 ? Charity(id: "", image: "") : charities[charity],
+      authorUid: user != null ? user.uid : '',
+      authorUsername: user != null ? user.username : '',
+      imageView: ImageView(
+        aspectRatioChange: _changedAspectRatio,
+        imageFile: imageFile,
+      ),
+      title: title,
+      subtitle: subtitle,
+      selected: selected,
+      targetAmount: targetAmount,
+      hashtags: hashtags,
+    );
+    Widget _imageUpload = ImageUpload(
+      selected: selected,
+      aspectRatio: aspectRatio,
+      aspectRatioChange: _changedAspectRatio,
+      imageFileChange: _changedImageFile,
+      imageFile: imageFile,
+    );
     //final user = Provider.of<User>(context);
     if ((imageFile == null && selected == 1) ||
         title == "" ||
@@ -92,210 +109,193 @@ class _AddPostState extends State<AddPost> {
     } else {
       canMoveToPreview = true;
     }
-    if (user == null && kIsWeb == true) {
-      Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
-      return Scaffold(
-        body: Text(
-          "Redirecting",
-          style: TextStyle(
-              fontFamily: 'Founders Grotesk',
-              fontSize: 20,
-              color: Colors.black,
-              decoration: null),
-        ),
-      );
-    } else
-    // This size provide us total height and width  of our screen
-    {
-      return _submitting == true
-          ? Loading()
-          : Scaffold(
-              appBar: AppBar(
-                  centerTitle: true,
-                  title: Text("Create Fundder"),
-                  actions: <Widget>[
-                    new FlatButton(
-                      child: _current == 4
-                          ? Text('Preview',
-                              style: TextStyle(fontWeight: FontWeight.bold))
-                          : _current == 5
-                              ? Text('Submit',
-                                  style: TextStyle(fontWeight: FontWeight.bold))
-                              : selected != -1
-                                  ? Text('Next',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold))
-                                  : null,
-                      onPressed: _current == 5
-                          ? () {
-                              try {
-                                if (mounted) {
-                                  setState(() {
-                                    _submitting = true;
-                                  });
-                                }
+    return _submitting == true
+        ? Loading()
+        : Scaffold(
+            appBar: AppBar(
+                centerTitle: true,
+                title: Text("Create Fundder"),
+                actions: <Widget>[
+                  new FlatButton(
+                    child: _current == 4
+                        ? Text('Preview',
+                            style: TextStyle(fontWeight: FontWeight.bold))
+                        : _current == 5
+                            ? Text('Submit',
+                                style: TextStyle(fontWeight: FontWeight.bold))
+                            : selected != -1
+                                ? Text('Next',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold))
+                                : null,
+                    onPressed: _current == 5
+                        ? () {
+                            try {
+                              if (mounted) {
+                                setState(() {
+                                  _submitting = true;
+                                });
+                              }
 
-                                // add image to firebase storage
-                                if (imageFile != null) {
-                                  if (canMoveToPreview == false) {
-                                    if (mounted) {
-                                      setState(() {
-                                        _submitting = false;
-                                      });
-                                    }
-                                    _showErrorDialog(
-                                        'You have not filled all the required fields');
-                                  } else {
-                                    final String fileLocation = user.uid +
-                                        "/" +
-                                        DateTime.now()
-                                            .microsecondsSinceEpoch
-                                            .toString();
-                                    DatabaseService(uid: user.uid)
-                                        .uploadImage(
-                                            File(imageFile.path), fileLocation)
-                                        .then((downloadUrl) => {
-                                              print("Successful image upload"),
-                                              print(downloadUrl),
-                                              _pushItem(downloadUrl, user)
-                                            });
-                                  }
-                                } else {
-                                  if (selected == 0) {
-                                    _pushItem(null, user);
-                                  } else {
-                                    _showErrorDialog(
-                                        "'Do' feed challenges require an image");
+                              // add image to firebase storage
+                              if (imageFile != null) {
+                                if (canMoveToPreview == false) {
+                                  if (mounted) {
                                     setState(() {
                                       _submitting = false;
                                     });
                                   }
+                                  _showErrorDialog(
+                                      'You have not filled all the required fields');
+                                } else {
+                                  final String fileLocation = user.uid +
+                                      "/" +
+                                      DateTime.now()
+                                          .microsecondsSinceEpoch
+                                          .toString();
+                                  DatabaseService(uid: user.uid)
+                                      .uploadImage(
+                                          File(imageFile.path), fileLocation)
+                                      .then((downloadUrl) => {
+                                            print("Successful image upload"),
+                                            print(downloadUrl),
+                                            _pushItem(downloadUrl, user)
+                                          });
                                 }
-                              } catch (e) {
-                                if (mounted) {
+                              } else {
+                                if (selected == 0) {
+                                  _pushItem(null, user);
+                                } else {
+                                  _showErrorDialog(
+                                      "'Do' feed challenges require an image");
                                   setState(() {
                                     _submitting = false;
                                   });
                                 }
-                                _showErrorDialog(e.toString());
                               }
+                            } catch (e) {
+                              if (mounted) {
+                                setState(() {
+                                  _submitting = false;
+                                });
+                              }
+                              _showErrorDialog(e.toString());
                             }
-                          : () {
-                              /*Navigator.of(context).pushReplacement(_viewPost());*/
+                          }
+                        : () {
+                            /*Navigator.of(context).pushReplacement(_viewPost());*/
 
-                              if (selected != -1) {
-                                if (!(_current == 4 &&
-                                    canMoveToPreview == false)) {
-                                  _carouselController.nextPage(
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.linear);
-                                } else if (title == "") {
-                                  _showErrorDialog(
-                                      'You have not chosen a title');
-                                } else if (subtitle == "") {
-                                  _showErrorDialog(
-                                      'You have not written a description for the challenge');
-                                } else if (double.parse(targetAmount) < 2 &&
-                                    whoDoes[selected] == "Myself") {
-                                  _showErrorDialog(
-                                      'Minimum target fundraising amount is £2.00');
-                                } else if (charity == -1) {
-                                  _showErrorDialog(
-                                      'You have not chosen a charity');
-                                } else if (hashtags.length < 2) {
-                                  _showErrorDialog(
-                                      'You need a minimum of 2 hashtags');
-                                } else if (selected == 1 && imageFile == null) {
-                                  _showErrorDialog(
-                                      "'Do' feed challenges require an image");
-                                } else {
-                                  _showErrorDialog(
-                                      'You have not filled all the required fields');
-                                }
+                            if (selected != -1) {
+                              if (!(_current == 4 &&
+                                  canMoveToPreview == false)) {
+                                _carouselController.nextPage(
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.linear);
+                              } else if (title == "") {
+                                _showErrorDialog('You have not chosen a title');
+                              } else if (subtitle == "") {
+                                _showErrorDialog(
+                                    'You have not written a description for the challenge');
+                              } else if (double.parse(targetAmount) < 2 &&
+                                  whoDoes[selected] == "Myself") {
+                                _showErrorDialog(
+                                    'Minimum target fundraising amount is £2.00');
+                              } else if (charity == -1) {
+                                _showErrorDialog(
+                                    'You have not chosen a charity');
+                              } else if (hashtags.length < 2) {
+                                _showErrorDialog(
+                                    'You need a minimum of 2 hashtags');
+                              } else if (selected == 1 && imageFile == null) {
+                                _showErrorDialog(
+                                    "'Do' feed challenges require an image");
                               } else {
                                 _showErrorDialog(
-                                    "You need to choose who you'd like to do the challenge");
+                                    'You have not filled all the required fields');
                               }
-                            },
-                    )
-                  ],
-                  leading: Container(
-                      width: 100,
-                      child: IconButton(
-                          icon: _current == 0
-                              ? Icon(Icons.close)
-                              : Icon(Icons.arrow_back),
-                          onPressed: _current == 0
-                              ? () {
-                                  Navigator.of(context).pop(null);
-                                }
-                              : () {
-                                  _carouselController.previousPage(
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.linear);
-                                }))),
-              body: Builder(
-                builder: (context) {
-                  final double height = MediaQuery.of(context).size.height;
-                  return CarouselSlider(
-                    carouselController: _carouselController,
-                    options: CarouselOptions(
-                      onPageChanged: (index, reason) {
-                        _changePage();
-                        if (mounted) {
-                          setState(() {
-                            _current = index;
-                          });
-                        }
-                      },
-                      enableInfiniteScroll: false,
-                      height: height,
-                      viewportFraction: 1.0,
-                      enlargeCenterPage: false,
-                      // autoPlay: false,
-                    ),
-                    items: selected == 0
-                        ? canMoveToPreview == true
-                            ? [
-                                _choosePerson,
-                                _defineDescriptionSelf,
-                                _chooseCharity,
-                                _setHashtags(),
-                                _imageUpload(),
-                                _postPreview()
-                              ]
-                            : [
-                                _choosePerson,
-                                _defineDescriptionSelf,
-                                _chooseCharity,
-                                _setHashtags(),
-                                _imageUpload()
-                              ]
-                        : selected == 1
-                            ? canMoveToPreview == true
-                                ? [
-                                    _choosePerson,
-                                    _defineDescriptionOthers,
-                                    _chooseCharity,
-                                    _setHashtags(),
-                                    _imageUpload(),
-                                    _postPreview()
-                                  ]
-                                : [
-                                    _choosePerson,
-                                    _defineDescriptionOthers,
-                                    _chooseCharity,
-                                    _setHashtags(),
-                                    _imageUpload()
-                                  ]
-                            : [
-                                _choosePerson,
-                              ],
-                  );
-                },
-              ),
-            );
-    }
+                            } else {
+                              _showErrorDialog(
+                                  "You need to choose who you'd like to do the challenge");
+                            }
+                          },
+                  )
+                ],
+                leading: Container(
+                    width: 100,
+                    child: IconButton(
+                        icon: _current == 0
+                            ? Icon(Icons.close)
+                            : Icon(Icons.arrow_back),
+                        onPressed: _current == 0
+                            ? () {
+                                Navigator.of(context).pop(null);
+                              }
+                            : () {
+                                _carouselController.previousPage(
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.linear);
+                              }))),
+            body: Builder(
+              builder: (context) {
+                final double height = MediaQuery.of(context).size.height;
+                return CarouselSlider(
+                  carouselController: _carouselController,
+                  options: CarouselOptions(
+                    onPageChanged: (index, reason) {
+                      _changePage();
+                      if (mounted) {
+                        setState(() {
+                          _current = index;
+                        });
+                      }
+                    },
+                    enableInfiniteScroll: false,
+                    height: height,
+                    viewportFraction: 1.0,
+                    enlargeCenterPage: false,
+                    // autoPlay: false,
+                  ),
+                  items: selected == 0
+                      ? canMoveToPreview == true
+                          ? [
+                              _choosePerson,
+                              _defineDescriptionSelf,
+                              _chooseCharity,
+                              _setHashtags,
+                              _imageUpload,
+                              _postPreview
+                            ]
+                          : [
+                              _choosePerson,
+                              _defineDescriptionSelf,
+                              _chooseCharity,
+                              _setHashtags,
+                              _imageUpload
+                            ]
+                      : selected == 1
+                          ? canMoveToPreview == true
+                              ? [
+                                  _choosePerson,
+                                  _defineDescriptionOthers,
+                                  _chooseCharity,
+                                  _setHashtags,
+                                  _imageUpload,
+                                  _postPreview
+                                ]
+                              : [
+                                  _choosePerson,
+                                  _defineDescriptionOthers,
+                                  _chooseCharity,
+                                  _setHashtags,
+                                  _imageUpload
+                                ]
+                          : [
+                              _choosePerson,
+                            ],
+                );
+              },
+            ),
+          );
   }
 
   void _changePage() {
@@ -461,9 +461,9 @@ class _AddPostState extends State<AddPost> {
 
   // _defineDescription state:
 
-  String title;
-  String subtitle;
-  String targetAmount;
+  String title = "";
+  String subtitle = "";
+  String targetAmount = '0.00';
 
   void _onTitleChange(String titleInput) {
     setState(() {
@@ -500,109 +500,11 @@ class _AddPostState extends State<AddPost> {
   final hashtagController = TextEditingController();
   List<String> hashtags = [];
 
-  Widget _setHashtags() {
-    return ListView(children: <Widget>[
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          height: 10,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            color: Colors.white,
-          ),
-          margin: EdgeInsets.only(top: 10),
-        ),
-      ),
-      Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: RichText(
-                        text: TextSpan(
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.black,
-                              fontFamily: 'Founders Grotesk',
-                            ),
-                            children: [
-                          TextSpan(
-                              text:
-                                  'Add some hashtags to help categorise your post ',
-                              style: TextStyle(
-                                fontFamily: 'Founders Grotesk',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              )),
-                          TextSpan(
-                              text:
-                                  "minimum 2, maximum 5. Press 'add' after every hashtag you would like to add.",
-                              style: TextStyle(
-                                fontFamily: 'Founders Grotesk',
-                                fontSize: 12,
-                              )),
-                        ]))),
-                Row(children: [
-                  Expanded(
-                      child: TextField(
-                          inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]"))
-                      ],
-                          controller: hashtagController,
-                          keyboardType: TextInputType.text,
-                          maxLines: null,
-                          decoration: InputDecoration(
-                              hintText:
-                                  'Only text allowed, press add for each hashtag'))),
-                  hashtags.length < 5
-                      ? FlatButton(
-                          onPressed: () {
-                            if (hashtags.contains(hashtagController.text) ==
-                                    false &&
-                                hashtagController.text != "") {
-                              if (mounted) {
-                                setState(() {
-                                  hashtags.add(
-                                      hashtagController.text.toLowerCase());
-                                  hashtagController.text = "";
-                                });
-                              }
-                            }
-                          },
-                          child: Text('Add'))
-                      : Container()
-                ]),
-                ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: hashtags.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        dense: true,
-                        title: Text("#" + hashtags[index]),
-                        trailing: FlatButton(
-                          child: Text('Delete',
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              )),
-                          onPressed: () {
-                            if (mounted) {
-                              setState(() {
-                                hashtags.removeAt(index);
-                              });
-                            }
-                          },
-                        ),
-                      );
-                    })
-              ]))
-    ]);
+  void _onHashtagsChanged(List<String> newHashtags) {
+    setState(() {
+      hashtags = newHashtags;
+    });
+    print('hashtags = ' + hashtags.toString());
   }
 
   // _chooseCharity state:
@@ -618,221 +520,16 @@ class _AddPostState extends State<AddPost> {
 
   // _imageUpload state
   PickedFile imageFile;
-  final picker = ImagePicker();
-  Widget _imageUpload() {
-    return ListView(children: <Widget>[
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          height: 10,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            color: Colors.white,
-          ),
-          margin: EdgeInsets.only(top: 10),
-        ),
-      ),
-      Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-          child: RichText(
-              text: TextSpan(
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.black,
-                    fontFamily: 'Founders Grotesk',
-                  ),
-                  children: [
-                TextSpan(
-                    text: 'Add a photo to make your Fundder more recognisable ',
-                    style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    )),
-                TextSpan(
-                    text: selected == 0
-                        ? 'optional'
-                        : "required for 'do' feed challenges",
-                    style: TextStyle(
-                      fontFamily: 'Founders Grotesk',
-                      fontSize: 12,
-                    )),
-              ]))),
-      SizedBox(
-        height: 30,
-      ),
-      Container(
-          child: _decideImageView(),
-          constraints: BoxConstraints(
-              minWidth: MediaQuery.of(context).size.width - 40,
-              minHeight: (MediaQuery.of(context).size.width - 40) * 9 / 16),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-          )),
-      SizedBox(
-        height: 40,
-      ),
-      PrimaryFundderButton(
-        text: "Select an image",
-        onPressed: () {
-          _changePic();
-        },
-      ),
-    ]);
-  }
 
-  void _changePic() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            color: Color(0xFF737373),
-            height: 350,
-            child: Container(
-              child: _buildBottomNavigationMenu(context),
-              decoration: BoxDecoration(
-                color: Theme.of(context).canvasColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(10),
-                  topRight: const Radius.circular(10),
-                ),
-              ),
-            ),
-          );
-        });
-  }
-
-  // Helper functions for the image picker
-  _openGallery() async {
-    imageFile = await picker.getImage(source: ImageSource.gallery);
+  void _changedImageFile(PickedFile newImageFile) {
     if (mounted) {
-      this.setState(() {});
+      setState(() {
+        imageFile = newImageFile;
+      });
     }
   }
 
-  _openCamera() async {
-    imageFile = await picker.getImage(source: ImageSource.camera);
-    if (mounted) {
-      this.setState(() {});
-    }
-  }
-
-  _removePhoto() {
-    imageFile = null;
-    if (mounted) {
-      this.setState(() {});
-    }
-  }
-
-  Widget _decideImageView() {
-    if (imageFile == null) {
-      return Container();
-    } else {
-      File image =
-          new File(imageFile.path); // Or any other way to get a File instance.
-      _findAspectRatio(image);
-      return Image.file(image);
-    }
-  }
-
-  void _findAspectRatio(File image) async {
-    var decodedImage = await decodeImageFromList(image.readAsBytesSync());
-    print(decodedImage.width);
-    print(decodedImage.height);
-    aspectRatio = decodedImage.width / decodedImage.height;
-  }
-
-  ListView _buildBottomNavigationMenu(context) {
-    return ListView(
-      children: <Widget>[
-        ListTile(
-          leading: Icon(FontAwesome.trash_o),
-          title: Text('Remove Current Photo'),
-          onTap: () async {
-            _removePhoto();
-          },
-        ),
-        /*ListTile(
-          leading: Icon(FontAwesome5Brands.facebook_square),
-          title: Text('Import from Facebook'),
-          onTap: () {},
-        ),*/
-        ListTile(
-          leading: Icon(FontAwesome.camera),
-          title: Text('Take Photo'),
-          onTap: () {
-            _openCamera();
-          },
-        ),
-        ListTile(
-          leading: Icon(FontAwesome.image),
-          title: Text('Choose From Library'),
-          onTap: () {
-            _openGallery();
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _postPreview() {
-    return ListView(children: <Widget>[
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            color: Colors.white,
-          ),
-          margin: EdgeInsets.only(top: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                color: Colors.white,
-                margin: EdgeInsets.only(bottom: 10),
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                child: Text(
-                  selected == 0
-                      ? 'This is what your post would look like:'
-                      : 'This is what your challenge, once somebody accepts it, would look like:',
-                  style: TextStyle(
-                    fontFamily: 'Founders Grotesk',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-              PostHeader(
-                  postAuthorId: user.uid,
-                  postAuthorUserName: user.username,
-                  targetCharity: charities != null
-                      ? charity != -1 ? charities[charity].id : ""
-                      : "",
-                  charityLogo: charities != null
-                      ? charity != -1 ? charities[charity].image : ""
-                      : ""),
-              Container(
-                child: SizedBox(child: _decideImageView()),
-                margin: EdgeInsets.only(bottom: 10.0),
-              ),
-              PostBody(
-                likesManager: null,
-                maxLines: 99999999,
-                postData: Post(
-                    title: title,
-                    subtitle: subtitle,
-                    hashtags: hashtags,
-                    moneyRaised: 0,
-                    targetAmount: selected != 1 ? targetAmount : '-1'),
-              )
-            ],
-          ),
-        ),
-      ),
-    ]);
+  void _changedAspectRatio(double newAspectRatio) {
+    aspectRatio = newAspectRatio;
   }
 }
