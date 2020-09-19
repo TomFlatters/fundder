@@ -46,19 +46,32 @@ class _HomeState extends State<Home> {
     });
     _firebaseMessaging.configure(
       onLaunch: (Map<String, dynamic> message) {
+        var data = message['data'];
+        if (data['type'] == 'Chat') {
+          Navigator.pushNamed(context,
+              '/chatroom/' + data['senderUid'] + '/' + data['senderUsername']);
+        }
         print('onLaunch called');
       },
       onResume: (Map<String, dynamic> message) {
+        var data = message['data'];
+        if (data['type'] == 'Chat') {
+          Navigator.pushNamed(context,
+              '/chatroom/' + data['senderUid'] + '/' + data['senderUsername']);
+        }
         print('onResume called');
       },
       onMessage: (Map<String, dynamic> message) {
         print('onMessage called');
-        if (mounted)
+        var data = message['data'];
+        if (data['type'] == 'Chat') {
+        } else if (mounted) {
           setState(() {
             if (_currentIndex != 3) {
               unreadNotifs = true;
             }
           });
+        }
       },
     );
   }

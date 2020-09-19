@@ -497,4 +497,104 @@ exports.postDone = functions.firestore
     });
 
 
+    ////////////////FUNCTIONS TO HANDLE MESSAGING///////////////////////////
 
+    exports.chatCreated = functions.firestore.document('chats/{chatId}').onCreate((snap, context)=>{
+
+      const chatId = context.params.chatId;
+      const chatMemberIds = chatId.split('_');
+      const uid1 = chatMemberIds[0];
+      const uid2 = chatMemberIds[1];
+      let leftChatData = {};
+      leftChatData[uid1] = null;
+      leftChatData[uid2] = null;
+      
+      const data = {
+        'chatMembers' : chatMemberIds,
+        leftChat: leftChatData
+      }
+      admin.firestore().collection('chats').doc(chatId).update(data);
+      
+
+    })
+
+    exports.messageSent = functions.firestore
+    .document('/chats/{chatId}/messages/{messageId}')
+    .onCreate(async (snapshot, context) =>
+    {
+    // Getting chat id from input
+    const chatId = context.params.chatId;
+    
+    // Getting sennder id from snapshot and using it to find sender doc for username
+    const senderId = snapshot.data()['from'];
+    const senderDoc = await admin.firestore().doc(`users/${senderId}`).get();
+
+    // Getting chat members to see who to send notification to
+    const chatRef = admin.firestore().doc(`chats/${chatId}`);
+    const chat = await chatRef.get();
+    const chatMembers = chat.data()['chatMembers'];
+
+    
+
+    // Create notification payload
+    const payload =
+    {
+        notification: { 
+            title: `Message from ${senderDoc.data()['username']}`,
+            body: `${snapshot.data()['msg']}`, 
+            click_action: "FLUTTER_NOTIFICATION_CLICK",
+            
+        },
+        data: {
+          
+          type: 'Chat',
+          senderUid: senderId,
+          senderUsername: senderDoc.data()['username']
+        }
+    };
+
+    // Remove chat member who sent message
+    var index2 = chatMembers.indexOf(senderId);
+    if (index2 > -1) {
+      chatMembers.splice(index2, 1);
+    }
+
+    // Find fcm tokens of all chat members apart from sender
+    var tokens = [];
+    for(var i=0; i<chatMembers.length; i++){
+        console.log(chatMembers[i]);
+        const doc = await admin.firestore().doc(`users/${chatMembers[i]}`).get();
+        console.log(doc.id);
+        if (doc.data()['fcm'] !== null) {
+          tokens = tokens.concat(doc.data()['fcm']);
+        }
+    }
+
+    // Send notification message to all tokens 
+    if (tokens.length > 0) {
+      const response = await admin.messaging().sendToDevice(tokens, payload);
+      await cleanupTokens(response, tokens, author);
+      console.log('Notifications have been sent and tokens cleaned up.');
+    }
+});
+
+
+exports.handleUnreadMessages = functions.firestore.document('chats/{chatId}').onUpdate((change, context)=>{
+  const newValue = change.after.data();
+
+  const uid1 = newValue.chatMembers[0];
+  const uid2 = newValue.chatMembers[1];
+  const latestMessageTimestamp = newValue.latestMessage.timeStamp.toDate();
+  const uid1LeftChatTime = (newValue.leftChat[uid1]===null)?null:newValue.leftChat[uid1].toDate();
+  const uid2LeftChatTime = (newValue.leftChat[uid2]===null)?null:newValue.leftChat[uid2].toDate();
+  if (uid1LeftChatTime<latestMessageTimestamp || uid1LeftChatTime === null){
+    let data = {chatNeedsAttention: true}
+    admin.firestore().collection('userChatStatus').doc(uid1).set(data, {merge: true})
+  }
+  if (uid2LeftChatTime<latestMessageTimestamp || uid2LeftChatTime === null){
+    let data = {chatNeedsAttention: true}
+    admin.firestore().collection('userChatStatus').doc(uid2).set(data, {merge: true})
+  }
+
+
+})
