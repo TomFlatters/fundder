@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class User {
   // add properties to the user model here
   final String uid;
@@ -12,6 +14,7 @@ class User {
   final bool seenTutorial;
   final bool dpSetterPrompted;
   final bool verified;
+  final bool isPrivate;
 
   // construct them into the object here
   User(
@@ -26,5 +29,6 @@ class User {
       this.profilePic,
       this.seenTutorial,
       this.dpSetterPrompted,
-      this.verified});
+      this.verified,
+      @required this.isPrivate});
 }
