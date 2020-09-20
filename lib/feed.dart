@@ -9,10 +9,12 @@ import 'package:fundder/post_widgets/social_widgets/likeButton.dart';
 import 'package:fundder/post_widgets/postBody.dart';
 import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/post_widgets/social_widgets/shareBar.dart';
+import 'package:fundder/privacyIcon.dart';
 import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:provider/provider.dart';
+import 'helper_classes.dart';
 import 'models/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'services/likes.dart';
@@ -117,17 +119,29 @@ class _FeedViewState extends State<FeedView> {
                     ),
                     postData.author != user.uid
                         ? Container()
-                        : FlatButton(
-                            onPressed: () {
-                              print('button pressed');
-                              _showDeleteDialog(postData);
-                            },
-                            child: Text('Delete',
-                                textAlign: TextAlign.right,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                )),
+                        : Row(
+                            children: [
+                              FlatButton(
+                                onPressed: () {
+                                  print('button pressed');
+                                  _showDeleteDialog(postData);
+                                },
+                                child: Text('Delete',
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    )),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.more_horiz,
+                                  color: HexColor("ff6b6c"),
+                                ),
+                                onPressed: () =>
+                                    {_postOptions(context, user.uid, postData)},
+                              )
+                            ],
                           ),
                   ])
                 ]),
@@ -148,6 +162,47 @@ class _FeedViewState extends State<FeedView> {
         },
       );
     }
+  }
+
+  _postOptions(context, uid, postData) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            color: Color(0xFF737373),
+            height: 175,
+            child: Container(
+              padding: EdgeInsets.only(top: 10),
+              child: ListView(
+                children: [
+                  PrivacyIcon(
+                    isPrivate: false,
+                    description:
+                        "Make this post viewable only to your followers",
+                    onPrivacySettingChanged: (bool newVal) => {},
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.delete_forever),
+                    title: Text('Delete'),
+                    subtitle: Text(
+                        "If this Fundder has not been completed, money raised will be refunded."),
+                    onTap: () {
+                      print('button pressed');
+                      _showDeleteDialog(postData);
+                    },
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(10),
+                  topRight: const Radius.circular(10),
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   Future<void> _showDeleteDialog(Post post) async {
