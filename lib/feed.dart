@@ -121,18 +121,6 @@ class _FeedViewState extends State<FeedView> {
                         ? Container()
                         : Row(
                             children: [
-                              FlatButton(
-                                onPressed: () {
-                                  print('button pressed');
-                                  _showDeleteDialog(postData);
-                                },
-                                child: Text('Delete',
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    )),
-                              ),
                               IconButton(
                                 icon: Icon(
                                   Icons.more_horiz,
