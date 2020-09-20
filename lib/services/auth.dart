@@ -9,8 +9,11 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create user obj based on (a subset of) FirebaseUser
+  //default mode for user is private
   User _userFromFirebaseUser(FirebaseUser user) {
-    return user != null ? User(uid: user.uid, email: user.email) : null;
+    return user != null
+        ? User(uid: user.uid, email: user.email, isPrivate: false)
+        : null;
   }
 
   // define methods to interact with firebase auth
