@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/privacyIcon.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/main.dart';
 import 'helper_classes.dart';
@@ -48,6 +49,13 @@ class ProfileActions extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        PrivacyIcon(
+          isPrivate: false,
+          description:
+              'Only your followers can view your profile and see the posts you make from this point on.',
+          onPrivacySettingChanged: (bool newVal) => {},
+        ),
+
         /*ListTile(
           leading: Icon(FontAwesome.money),
           title: Text('Payments'),
