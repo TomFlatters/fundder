@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fundder/models/user.dart';
 import 'package:fundder/post_widgets/postBody.dart';
 import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/models/charity.dart';
+import 'package:provider/provider.dart';
 
 class PostPreview extends StatelessWidget {
   final Charity charity;
@@ -27,6 +29,7 @@ class PostPreview extends StatelessWidget {
       this.hashtags});
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     return ListView(children: <Widget>[
       Container(
         color: Colors.grey[200],
@@ -68,6 +71,7 @@ class PostPreview extends StatelessWidget {
                 likesManager: null,
                 maxLines: 99999999,
                 postData: Post(
+                    isPrivate: user.isPrivate,
                     title: title,
                     subtitle: subtitle,
                     hashtags: hashtags,
