@@ -91,7 +91,12 @@ class DatabaseService {
 
   // Given a document return a User type object
   User _userDataFromSnapshot(DocumentSnapshot doc) {
+    var isPrivate =
+        (doc.data['isPrivate'] != null) ? doc.data['isPrivate'] : false;
+    print("this is the field value for isPrivate!!!!! : " +
+        doc.data['isPrivate']);
     return User(
+        isPrivate: isPrivate,
         uid: doc.data['uid'],
         name: doc.data['name'],
         username: doc.data['username'],
