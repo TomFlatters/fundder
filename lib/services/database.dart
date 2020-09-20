@@ -32,7 +32,7 @@ class DatabaseService {
   // Create: Users are created upon registration.
   // TBC by refactor
 
-  // Read: user information by the id used to instantiate the DatabaseService
+  /** Read: user information by the id used to instantiate the DatabaseService*/
   Future<User> readUserData() async {
     DocumentSnapshot userData = await userCollection.document(uid).get();
     User fetchedUser = _userDataFromSnapshot(userData);
@@ -91,8 +91,9 @@ class DatabaseService {
 
   // Given a document return a User type object
   User _userDataFromSnapshot(DocumentSnapshot doc) {
-    var isPrivate =
-        (doc.data['isPrivate'] != null) ? doc.data['isPrivate'] : false;
+    var isPrivate = (doc.data['isPrivate'] != null)
+        ? (true == doc.data['isPrivate'])
+        : false;
     print("this is the field value for isPrivate!!!!! : " +
         doc.data['isPrivate']);
     return User(
