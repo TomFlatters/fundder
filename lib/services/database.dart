@@ -115,9 +115,13 @@ class DatabaseService {
   // Given a document return a Post type object
   Post _makePost(DocumentSnapshot doc) {
     print("_makePost being run");
+    var isPrivate =
+        (doc.data["isPrivate"] == null) ? false : doc.data['isPrivate'];
+    print("private setting of this post is: " + isPrivate.toString());
 
     //print("printing noLikes:" + doc["noLikes"]);
     return Post(
+      isPrivate: isPrivate,
       noLikes: (doc.data["noLikes"] == null)
           ? (doc['likes'].length)
           : (doc["noLikes"]),
