@@ -35,6 +35,7 @@ class DatabaseService {
   /** Read: user information by the id used to instantiate the DatabaseService*/
   Future<User> readUserData() async {
     DocumentSnapshot userData = await userCollection.document(uid).get();
+    print("_readUserData invoked: \n" + userData.data.toString());
     User fetchedUser = _userDataFromSnapshot(userData);
     return fetchedUser;
   }
@@ -91,13 +92,15 @@ class DatabaseService {
 
   // Given a document return a User type object
   User _userDataFromSnapshot(DocumentSnapshot doc) {
-    var isPrivate = (doc.data['isPrivate'] != null)
-        ? (true == doc.data['isPrivate'])
-        : false;
-    print("this is the field value for isPrivate!!!!! : " +
-        doc.data['isPrivate']);
+    //print("_userDataFromSnapshot invoked. This is the username: " +
+    //   doc.data["username"]);
+
+    //print("this is the field value for isPrivate!!!!! : " +
+    //   doc.data['isPrivate']);
     return User(
-        isPrivate: isPrivate,
+        isPrivate: (doc.data['isPrivate'] != null)
+            ? (true == doc.data['isPrivate'])
+            : false, //isPrivate,
         uid: doc.data['uid'],
         name: doc.data['name'],
         username: doc.data['username'],
