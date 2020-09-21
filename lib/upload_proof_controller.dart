@@ -16,6 +16,7 @@ import 'post_widgets/postHeader.dart';
 import 'post_widgets/postBody.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -137,8 +138,10 @@ class _UploadProofState extends State<UploadProofScreen> {
                                     _submitting = false;
                                   });
                                 print('Error');
-                                _showErrorDialog(
-                                    'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.');
+                                DialogManager().createDialog(
+                                    'Error',
+                                    'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.',
+                                    context);
                               }
                             }
                           : () {
@@ -147,8 +150,10 @@ class _UploadProofState extends State<UploadProofScreen> {
                                     duration: Duration(milliseconds: 300),
                                     curve: Curves.linear);
                               } else {
-                                _showErrorDialog(
-                                    'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.');
+                                DialogManager().createDialog(
+                                    'Error',
+                                    'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.',
+                                    context);
                               }
                             })
                 ],
@@ -749,33 +754,6 @@ class _UploadProofState extends State<UploadProofScreen> {
           },
         ),
       ],
-    );
-  }
-
-  Future<void> _showErrorDialog(String string) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(string),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 

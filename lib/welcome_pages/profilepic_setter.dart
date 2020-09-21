@@ -10,6 +10,7 @@ import 'package:fundder/services/database.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:fundder/global_widgets/buttons.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class ProfilePicSetter extends StatefulWidget {
   @override
@@ -111,7 +112,8 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
                               _loading = false;
                             });
                           }
-                          _showErrorDialog('You have not set a name');
+                          DialogManager().createDialog(
+                              'Error', 'You have not set a name', context);
                         }
                       }
                     : () {
@@ -331,33 +333,6 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
           },
         ),
       ],
-    );
-  }
-
-  Future<void> _showErrorDialog(String string) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error Creating Profile'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(string),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }

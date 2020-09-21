@@ -21,6 +21,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'tutorial_screens/profile_tutorial.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -574,7 +575,8 @@ class _ProfileState extends State<ProfileController>
                             : FlatButton(
                                 onPressed: () {
                                   print('button pressed');
-                                  _showDeleteDialog(post);
+                                  DialogManager().showDeleteDialog(
+                                      post, context, _onRefresh);
                                 },
                                 child: Text('Delete',
                                     textAlign: TextAlign.right,
@@ -591,51 +593,6 @@ class _ProfileState extends State<ProfileController>
                     ));
               }
             }));
-  }
-
-  Future<void> _showDeleteDialog(Post post) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Delete Post?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                    'Once you delete this post, all the money donated will be refunded unless you have uploaded proof of challenge completion. This cannot be undone.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(
-                'Delete',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () {
-                Firestore.instance
-                    .collection('posts')
-                    .document(post.id)
-                    .delete()
-                    .then((value) {
-                  Navigator.of(context).pop();
-                  initial = true;
-                  _onRefresh();
-                });
-              },
-            ),
-            FlatButton(
-              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void _onRefresh() async {

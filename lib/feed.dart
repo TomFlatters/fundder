@@ -19,6 +19,7 @@ import 'services/likes.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'routes/FadeTransition.dart';
 import 'post_widgets/socialBar.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -120,7 +121,8 @@ class _FeedViewState extends State<FeedView> {
                         : FlatButton(
                             onPressed: () {
                               print('button pressed');
-                              _showDeleteDialog(postData);
+                              DialogManager().showDeleteDialog(
+                                  postData, context, widget.onDeletePressed);
                             },
                             child: Text('Delete',
                                 textAlign: TextAlign.right,
@@ -148,47 +150,6 @@ class _FeedViewState extends State<FeedView> {
         },
       );
     }
-  }
-
-  Future<void> _showDeleteDialog(Post post) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Delete Post?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                    'Once you delete this post, all the money donated will be refunded unless you have uploaded proof of challenge completion. This cannot be undone.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Delete', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Firestore.instance
-                    .collection('posts')
-                    .document(post.id)
-                    .delete()
-                    .then((value) {
-                  Navigator.of(context).pop();
-                  widget.onDeletePressed();
-                });
-              },
-            ),
-            FlatButton(
-              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   FutureBuilder createLikesFutureBuilder(likesService, postData, uid) {

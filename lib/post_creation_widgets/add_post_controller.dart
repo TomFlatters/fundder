@@ -21,6 +21,7 @@ import 'creation_tiles/choose_charity.dart';
 import 'creation_tiles/set_hashtags.dart';
 import 'creation_tiles/post_preview.dart';
 import 'creation_tiles/tile_widgets/image_view.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class AddPost extends StatefulWidget {
   @override
@@ -115,8 +116,11 @@ class _AddPostState extends State<AddPost> {
                                       _submitting = false;
                                     });
                                   }
-                                  _showErrorDialog(
-                                      'You have not filled all the required fields');
+                                  DialogManager().createDialog(
+                                    'Error',
+                                    'You have not filled all the required fields',
+                                    context,
+                                  );
                                 } else {
                                   final String fileLocation = user.uid +
                                       "/" +
@@ -136,8 +140,10 @@ class _AddPostState extends State<AddPost> {
                                 if (selected == 0) {
                                   _pushItem(null, user);
                                 } else {
-                                  _showErrorDialog(
-                                      "'Do' feed challenges require an image");
+                                  DialogManager().createDialog(
+                                      'Error',
+                                      "'Do' feed challenges require an image",
+                                      context);
                                   setState(() {
                                     _submitting = false;
                                   });
@@ -149,7 +155,11 @@ class _AddPostState extends State<AddPost> {
                                   _submitting = false;
                                 });
                               }
-                              _showErrorDialog(e.toString());
+                              DialogManager().createDialog(
+                                'Error',
+                                e.toString(),
+                                context,
+                              );
                             }
                           }
                         : () {
@@ -162,30 +172,55 @@ class _AddPostState extends State<AddPost> {
                                     duration: Duration(milliseconds: 300),
                                     curve: Curves.linear);
                               } else if (title == "") {
-                                _showErrorDialog('You have not chosen a title');
+                                DialogManager().createDialog(
+                                  'Error',
+                                  'You have not chosen a title',
+                                  context,
+                                );
                               } else if (subtitle == "") {
-                                _showErrorDialog(
-                                    'You have not written a description for the challenge');
+                                DialogManager().createDialog(
+                                  'Error',
+                                  'You have not written a description for the challenge',
+                                  context,
+                                );
                               } else if (double.parse(targetAmount) < 2 &&
                                   whoDoes[selected] == "Myself") {
-                                _showErrorDialog(
-                                    'Minimum target fundraising amount is £2.00');
+                                DialogManager().createDialog(
+                                  'Error',
+                                  'Minimum target fundraising amount is £2.00',
+                                  context,
+                                );
                               } else if (charity == -1) {
-                                _showErrorDialog(
-                                    'You have not chosen a charity');
+                                DialogManager().createDialog(
+                                  'Error',
+                                  'You have not chosen a charity',
+                                  context,
+                                );
                               } else if (hashtags.length < 2) {
-                                _showErrorDialog(
-                                    'You need a minimum of 2 hashtags');
+                                DialogManager().createDialog(
+                                  'Error',
+                                  'You need a minimum of 2 hashtags',
+                                  context,
+                                );
                               } else if (selected == 1 && imageFile == null) {
-                                _showErrorDialog(
-                                    "'Do' feed challenges require an image");
+                                DialogManager().createDialog(
+                                  'Error',
+                                  "'Do' feed challenges require an image",
+                                  context,
+                                );
                               } else {
-                                _showErrorDialog(
-                                    'You have not filled all the required fields');
+                                DialogManager().createDialog(
+                                  'Error',
+                                  'You have not filled all the required fields',
+                                  context,
+                                );
                               }
                             } else {
-                              _showErrorDialog(
-                                  "You need to choose who you'd like to do the challenge");
+                              DialogManager().createDialog(
+                                'Error',
+                                "You need to choose who you'd like to do the challenge",
+                                context,
+                              );
                             }
                           },
                   )
@@ -375,7 +410,11 @@ class _AddPostState extends State<AddPost> {
           _submitting = false;
         });
       }
-      _showErrorDialog('You have not filled all the required fields');
+      DialogManager().createDialog(
+        'Error',
+        'You have not filled all the required fields',
+        context,
+      );
     } else {
       if (double.parse(targetAmount) < 2 && whoDoes[selected] == "Myself") {
         if (mounted) {
@@ -383,7 +422,11 @@ class _AddPostState extends State<AddPost> {
             _submitting = false;
           });
         }
-        _showErrorDialog('The minimum donation target amount is £2');
+        DialogManager().createDialog(
+          'Error',
+          'The minimum donation target amount is £2',
+          context,
+        );
       } else {
         if (whoDoes[selected] == "Myself") {
           DatabaseService(uid: user.uid)
@@ -460,34 +503,6 @@ class _AddPostState extends State<AddPost> {
       }
     }
   }
-
-  Future<void> _showErrorDialog(String string) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error Creating Challenge'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(string),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-  // Define widgets for each of the form stages:
 
   void _haveSelectedPerson(int selectedPerson) {
     setState(() {

@@ -9,6 +9,7 @@ import 'dart:io';
 import 'services/database.dart';
 import 'shared/loading.dart';
 import 'global_widgets/buttons.dart';
+import 'global_widgets/dialogs.dart';
 
 class EditProfile extends StatefulWidget {
   @override
@@ -111,7 +112,8 @@ class _EditProfileState extends State<EditProfile> {
                     isLoading = false;
                   });
                 }
-                _showErrorDialog('Name cannot be empty');
+                DialogManager()
+                    .createDialog('Error', 'Name cannot be empty', context);
               }
             },
           )
@@ -276,33 +278,6 @@ class _EditProfileState extends State<EditProfile> {
           },
         ),
       ],
-    );
-  }
-
-  Future<void> _showErrorDialog(String string) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error Editing Profile'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(string),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
