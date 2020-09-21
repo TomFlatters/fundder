@@ -13,7 +13,12 @@ import 'package:image_picker/image_picker.dart';
 class DatabaseService {
   // initiate the class with the user id
   final String uid;
-  DatabaseService({this.uid});
+  final CollectionReference myFeed;
+  DatabaseService({this.uid})
+      : myFeed = Firestore.instance
+            .collection('users')
+            .document(uid)
+            .collection('myFeed');
 
   // Get Firestore collection reference
   final CollectionReference userCollection =
