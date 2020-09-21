@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
 import 'package:fundder/services/followers.dart';
-import 'helper_classes.dart';
-import 'shared/loading.dart';
+import '../helper_classes.dart';
+import '../shared/loading.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter/cupertino.dart';
 

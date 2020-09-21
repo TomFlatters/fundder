@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:fundder/profile_controller.dart';
+import 'package:fundder/profile_screens/profile_controller.dart';
 
 import 'models/template.dart';
 import 'package:fundder/services/database.dart';
@@ -11,6 +11,7 @@ import 'web_pages/web_menu.dart';
 import 'shared/loading.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'routes/FadeTransition.dart';
+import 'profile_screens/user_loader.dart';
 
 class ChallengeDetail extends StatefulWidget {
   final String challengeId;
@@ -200,8 +201,7 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                           Navigator.push(
                                               context,
                                               FadeRoute(
-                                                  page: ProfileController(
-                                                      uid: uid)));
+                                                  page: UserLoader(uid: uid)));
                                         } else {
                                           Navigator.pushNamed(
                                               context,

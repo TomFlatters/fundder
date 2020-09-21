@@ -205,9 +205,9 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
         color: Colors.white,
         margin: EdgeInsets.symmetric(vertical: 5),
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(physics: NeverScrollableScrollPhysics(),
+            //mainAxisAlignment: MainAxisAlignment.start,
+            //crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RichText(
                   text: TextSpan(

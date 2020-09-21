@@ -12,6 +12,12 @@ class User {
   final bool seenTutorial;
   final bool dpSetterPrompted;
   final bool verified;
+  final bool profileTutorialSeen;
+  final bool fundTutorialSeen;
+  final bool doTutorialSeen;
+  final bool doneTutorialSeen;
+  final double amountDonated;
+  final List<dynamic> likes;
 
   // construct them into the object here
   User(
@@ -26,5 +32,11 @@ class User {
       this.profilePic,
       this.seenTutorial,
       this.dpSetterPrompted,
-      this.verified});
+      this.verified,
+      this.profileTutorialSeen,
+      this.fundTutorialSeen,
+      this.doTutorialSeen,
+      this.doneTutorialSeen,
+      this.amountDonated,
+      this.likes});
 }

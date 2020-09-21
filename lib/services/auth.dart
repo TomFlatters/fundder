@@ -3,6 +3,7 @@ import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   String fcmToken;
@@ -163,5 +164,46 @@ class AuthService {
       print(e.toString());
       return null;
     }
+  }
+
+  // google sign in
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  Future signInWithGoogle() async {
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    final AuthResult result = await _auth.signInWithCredential(credential);
+    FirebaseUser user = result.user;
+    assert(user.email != null);
+    assert(user.displayName != null);
+    assert(!user.isAnonymous);
+    assert(await user.getIdToken() != null);
+
+    final FirebaseUser currentUser = await _auth.currentUser();
+    assert(user.uid == currentUser.uid);
+
+    String defaultPic =
+        'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+    // create a new (firestore) document for the user with corresponding uid
+
+    var docRef = Firestore.instance.collection('users').document(user.uid);
+
+    docRef.get().then((doc) async {
+      if (!doc.exists) {
+        print('Creating new doc');
+        // doc.data() will be undefined in this case
+        await DatabaseService(uid: user.uid)
+            .registerUserData(user.email, user.displayName, null, defaultPic);
+        _getFCMToken(user.uid);
+      }
+    });
+
+    return 'signInWithGoogle succeeded: $user';
   }
 }

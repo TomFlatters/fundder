@@ -107,6 +107,12 @@ class _AuthenticateState extends State<Authenticate>
             child: Form(
                 key: _signinKey,
                 child: Column(children: <Widget>[
+                  PrimaryFundderButton(
+                    onPressed: () {
+                      _auth.signInWithGoogle();
+                    },
+                    text: 'Sign in with Google',
+                  ),
                   SizedBox(height: 30.0),
                   TextFormField(
                     inputFormatters: [

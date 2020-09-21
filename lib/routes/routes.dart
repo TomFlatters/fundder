@@ -9,8 +9,8 @@ import 'package:fundder/donation/donate_page_controller.dart';
 import 'package:fundder/post_creation_widgets/add_post_controller.dart';
 import 'package:fundder/do_challenge_detail.dart';
 import 'package:fundder/challenge_steps_view.dart';
-import 'package:fundder/view_followers_controller.dart';
-import 'package:fundder/profile_controller.dart';
+import 'package:fundder/profile_screens/view_followers_controller.dart';
+import 'package:fundder/profile_screens/profile_controller.dart';
 import 'package:fundder/edit_profile_controller.dart';
 import 'package:fundder/feed_controller.dart';
 import 'package:fundder/web_pages/feed_web.dart';
@@ -30,6 +30,7 @@ import 'package:fundder/charity_view_controller.dart';
 import 'package:fundder/post_widgets/view_likers_controller.dart';
 
 import 'package:fundder/messaging/chat_room.dart';
+import 'package:fundder/profile_screens/user_loader.dart';
 
 class FluroRouter {
   static Router.Router router = Router.Router();
@@ -87,7 +88,7 @@ class FluroRouter {
           DonatePage(postId: params['id'][0]));
   static Handler _viewOtherProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ProfileController(
+          UserLoader(
             uid: params['id'][0],
           ));
   static Handler _followersHandler = Handler(
@@ -145,24 +146,6 @@ class FluroRouter {
   static Handler _aboutHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           AboutPage());
-  static Handler _webLoginHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          LoginWeb());
-  static Handler _loggingOutHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          LoginWeb());
-  static Handler _searchHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          SearchController());
-  static Handler _activityHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          LikedController());
-  static Handler _profileHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ProfileController());
-  static Handler _tempAddPostHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          TemporaryUpload());
   static Handler _checkVerifiedHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CheckVerified());
@@ -283,36 +266,6 @@ class FluroRouter {
     router.define(
       '/about',
       handler: _aboutHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/search',
-      handler: _searchHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/activity',
-      handler: _activityHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/profile',
-      handler: _profileHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/login',
-      handler: _webLoginHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/logging_out',
-      handler: _loggingOutHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/addpost',
-      handler: _tempAddPostHandler,
       transitionType: TransitionType.fadeIn,
     );
   }

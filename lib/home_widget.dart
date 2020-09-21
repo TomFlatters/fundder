@@ -4,7 +4,7 @@ import 'placeholder_widget.dart';
 import 'feed_controller.dart';
 import 'search/search_controller.dart';
 import 'liked_controller.dart';
-import 'profile_controller.dart';
+import 'profile_screens/profile_controller.dart';
 import 'post_creation_widgets/add_post_controller.dart';
 import 'helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -17,6 +17,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'services/database.dart';
 import 'connection_listener.dart';
 import 'tutorial_screens/profile_tutorial.dart';
+import 'models/user.dart';
+import 'shared/loading.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -152,68 +154,86 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
-    final List<Widget> screens = [
-      FeedController(), //i.e. the one from home button
-      SearchController(),
-      PlaceholderWidget(Colors.white),
-      LikedController(),
-      ProfileController(
-        uid: user.uid,
-      ),
-    ];
-    return Scaffold(
-      body: Column(children: [
-        Expanded(
-            child: IndexedStack(
-          index: _currentIndex,
-          children: screens,
-        )),
-        ConnectionListener()
-      ]), // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor:
-            Color.fromRGBO(0, 0, 0, 0.5), //hexcolor method is custom at bottom
-        iconSize: 26,
-        onTap: onTabTapped, // new
-        currentIndex: _currentIndex, // new
-        items: [
-          new BottomNavigationBarItem(
-            icon: Icon(
-              AntDesign.home,
-            ),
-            title: showIndicator(_currentIndex == 0),
-          ),
-          new BottomNavigationBarItem(
-            icon: Icon(
-              AntDesign.search1,
-            ),
-            title: showIndicator(_currentIndex == 1),
-          ),
-          new BottomNavigationBarItem(
-            icon: Icon(
-              AntDesign.plussquareo,
-            ),
-            title: showIndicator(_currentIndex == 2),
-          ),
-          new BottomNavigationBarItem(
-            icon: Icon(
-              unreadNotifs == false ? AntDesign.hearto : AntDesign.heart,
-              color: unreadNotifs == false ? null : HexColor('ff6b6c'),
-            ),
-            title: showIndicator(_currentIndex == 3),
-          ),
-          new BottomNavigationBarItem(
-            icon: Icon(
-              AntDesign.user,
-            ),
-            title: showIndicator(_currentIndex == 4),
-          )
-        ],
-      ),
-    );
+    final firebaseUser = Provider.of<User>(context);
+
+    return StreamBuilder(
+        stream:
+            DatabaseService(uid: firebaseUser.uid).userStream(firebaseUser.uid),
+        // widget.feedChoice == 'user'
+        //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
+        //   : Firestore.instance.collection("posts").snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            User user = DatabaseService(uid: firebaseUser.uid)
+                .userDataFromSnapshot(snapshot.data);
+            print(user.toString());
+            final List<Widget> screens = [
+              FeedController(currentUser: user), //i.e. the one from home button
+              SearchController(),
+              PlaceholderWidget(Colors.white),
+              LikedController(),
+              ProfileController(
+                user: user,
+              ),
+            ];
+            return Scaffold(
+              body: Column(children: [
+                Expanded(
+                    child: IndexedStack(
+                  index: _currentIndex,
+                  children: screens,
+                )),
+                ConnectionListener()
+              ]), // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
+              bottomNavigationBar: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                selectedItemColor: Colors.black,
+                unselectedItemColor: Color.fromRGBO(
+                    0, 0, 0, 0.5), //hexcolor method is custom at bottom
+                iconSize: 26,
+                onTap: onTabTapped, // new
+                currentIndex: _currentIndex, // new
+                items: [
+                  new BottomNavigationBarItem(
+                    icon: Icon(
+                      AntDesign.home,
+                    ),
+                    title: showIndicator(_currentIndex == 0),
+                  ),
+                  new BottomNavigationBarItem(
+                    icon: Icon(
+                      AntDesign.search1,
+                    ),
+                    title: showIndicator(_currentIndex == 1),
+                  ),
+                  new BottomNavigationBarItem(
+                    icon: Icon(
+                      AntDesign.plussquareo,
+                    ),
+                    title: showIndicator(_currentIndex == 2),
+                  ),
+                  new BottomNavigationBarItem(
+                    icon: Icon(
+                      unreadNotifs == false
+                          ? AntDesign.hearto
+                          : AntDesign.heart,
+                      color: unreadNotifs == false ? null : HexColor('ff6b6c'),
+                    ),
+                    title: showIndicator(_currentIndex == 3),
+                  ),
+                  new BottomNavigationBarItem(
+                    icon: Icon(
+                      AntDesign.user,
+                    ),
+                    title: showIndicator(_currentIndex == 4),
+                  )
+                ],
+              ),
+            );
+          } else {
+            return Loading();
+          }
+        });
   }
 
   Widget showIndicator(bool show) {

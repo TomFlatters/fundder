@@ -23,6 +23,9 @@ import 'tutorial_screens/do_tutorial.dart';
 import 'routes/FadeTransition.dart';
 
 class FeedController extends StatefulWidget {
+  final User currentUser;
+  FeedController({@required this.currentUser});
+
   @override
   _FeedControllerState createState() => _FeedControllerState();
 }
@@ -46,7 +49,7 @@ class _FeedControllerState extends State<FeedController>
         .document(firebaseUser.uid)
         .get()
         .then((snapshot) {
-      if (snapshot != null) {
+      if (snapshot.data != null) {
         if (snapshot['fundTutorialSeen'] != null) {
           if (snapshot['fundTutorialSeen'] != true) {
             _showFundTutorial(context);
@@ -74,7 +77,7 @@ class _FeedControllerState extends State<FeedController>
         .document(firebaseUser.uid)
         .get()
         .then((snapshot) {
-      if (snapshot != null) {
+      if (snapshot.data != null) {
         if (snapshot['doneTutorialSeen'] != null) {
           if (snapshot['doneTutorialSeen'] != true) {
             _showDoneTutorial(context);
@@ -102,7 +105,7 @@ class _FeedControllerState extends State<FeedController>
         .document(firebaseUser.uid)
         .get()
         .then((snapshot) {
-      if (snapshot != null) {
+      if (snapshot.data != null) {
         if (snapshot['doTutorialSeen'] != null) {
           if (snapshot['doTutorialSeen'] != true) {
             _showDoTutorial(context);
