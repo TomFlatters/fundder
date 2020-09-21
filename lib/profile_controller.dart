@@ -616,7 +616,7 @@ class _ProfileState extends State<ProfileController>
               ),
               onPressed: () {
                 Firestore.instance
-                    .collection('posts')
+                    .collection('postsV2')
                     .document(post.id)
                     .delete()
                     .then((value) {

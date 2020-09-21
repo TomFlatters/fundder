@@ -213,7 +213,7 @@ class _FeedViewState extends State<FeedView> {
               child: Text('Delete', style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Firestore.instance
-                    .collection('posts')
+                    .collection('postsV2')
                     .document(post.id)
                     .delete()
                     .then((value) {

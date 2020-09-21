@@ -35,7 +35,7 @@ class HashtagsService {
           Firestore.instance
               .collection('hashtags')
               .document(hashtags[i])
-              .collection('posts')
+              .collection('postsV2')
               .document(postId),
           {postId: true},
           merge: true);

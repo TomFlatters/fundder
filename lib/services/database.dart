@@ -259,6 +259,7 @@ class DatabaseService {
   Future uploadPost(Post post) async {
     return await postsCollection
         .add({
+          "isPrivate": post.isPrivate,
           "author": post.author,
           "authorUsername": post.authorUsername,
           "title": post.title,
