@@ -19,7 +19,7 @@ class HashtagsService {
   HashtagsService({this.uid});
 
   final CollectionReference postsCollection =
-      Firestore.instance.collection('posts');
+      Firestore.instance.collection('postsV2');
   final CollectionReference userCollection =
       Firestore.instance.collection('users');
 

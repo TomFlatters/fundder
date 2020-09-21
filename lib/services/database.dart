@@ -19,7 +19,7 @@ class DatabaseService {
   final CollectionReference userCollection =
       Firestore.instance.collection('users');
   final CollectionReference postsCollection =
-      Firestore.instance.collection('posts');
+      Firestore.instance.collection('postsV2');
   final CollectionReference templatesCollection =
       Firestore.instance.collection('templates');
   final CollectionReference charitiesCollection =
