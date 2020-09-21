@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/models/user.dart';
 import 'package:fundder/privacyIcon.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/main.dart';
+import 'package:fundder/services/privacyService.dart';
+import 'package:fundder/shared/loading.dart';
+import 'package:provider/provider.dart';
 import 'helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,6 +34,8 @@ class ProfileActions extends StatelessWidget {
   }
 
   ListView _buildBottomNavigationMenu(context) {
+    final User user = Provider.of<User>(context);
+    print("building bottom navigation bar");
     return ListView(
       children: <Widget>[
         ListTile(
@@ -49,12 +55,7 @@ class ProfileActions extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        PrivacyIcon(
-          isPrivate: false,
-          description:
-              'Only your followers can view your profile and see the posts you make from this point on.',
-          onPrivacySettingChanged: (bool newVal) => {},
-        ),
+        _initialiseTheIcon(user.uid)
 
         /*ListTile(
           leading: Icon(FontAwesome.money),
@@ -84,4 +85,29 @@ class ProfileActions extends StatelessWidget {
       },
     );
   }
+}
+
+FutureBuilder _initialiseTheIcon(uid) {
+  var privacyService = PrivacyService(uid);
+  Function privacyToggle =
+      (newVal) => privacyService.changePrivacySetting(newVal);
+  return FutureBuilder(
+      future: privacyService.isPrivate(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return PrivacyIcon(
+            isPrivate: snapshot.data,
+            onPrivacySettingChanged: privacyToggle,
+            description:
+                'Only your followers can view your profile and see the posts you make from this point on.',
+          );
+        } else {
+          return ListTile(
+            leading: Icon(Icons.lock_outline),
+            title: Text('Private Mode'),
+            subtitle: Text(
+                'Only your followers can view your profile and see the posts you make from this point on.'),
+          );
+        }
+      });
 }
