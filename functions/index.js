@@ -598,3 +598,39 @@ exports.handleUnreadMessages = functions.firestore.document('chats/{chatId}').on
 
 
 })
+
+
+/**Add ten dummy users to the database */
+
+exports.populateUsersCollection = functions.firestore.document('dummyCollectionForTriggers/gva6Vmg8J7yMbvQ6rdQ2').onUpdate((change, context)=>{
+
+  const newValue = change.after.data();
+  if (newValue.change  === true){
+    //populate the users collection 
+    let users = admin.firestore().collection('users');
+    let faker = require('faker');
+    
+    
+    var i;
+    for (i =0; i<10; i++){
+      const name = faker.name.findName();
+      const email = faker.internet.email()
+      const username = faker.internet.userName();
+
+      const data = {
+      noFollowers: 0,
+      noFollowing: 0, 
+      dpSetterPrompted: true,
+      profilePic: "https://image.shutterstock.com/image-vector/september-23-2016-vector-icon-260nw-487367941.jpg",
+      seenTutorial: true, 
+      amountDonated: 0, 
+      isPrivate: false, 
+      username: username,
+      name: name, 
+      email: email,
+      search_username: username.toLowerCase(),
+    }
+    users.add(data);
+    } 
+  }
+})
