@@ -1,13 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:fundder/profile_screens/profile_controller.dart';
 
 import 'models/template.dart';
 import 'package:fundder/services/database.dart';
 import 'global_widgets/buttons.dart';
-import 'web_pages/web_menu.dart';
 import 'shared/loading.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'routes/FadeTransition.dart';
@@ -47,21 +44,18 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
               hasAccepted = true;
             }
             return Scaffold(
-              appBar: kIsWeb == true
-                  ? null
-                  : AppBar(
-                      centerTitle: true,
-                      title: Text("Do a Challenge"),
-                      actions: <Widget>[
-                        new IconButton(
-                          icon: new Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop(null),
-                        )
-                      ],
-                      leading: new Container(),
-                    ),
+              appBar: AppBar(
+                centerTitle: true,
+                title: Text("Do a Challenge"),
+                actions: <Widget>[
+                  new IconButton(
+                    icon: new Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(null),
+                  )
+                ],
+                leading: new Container(),
+              ),
               body: Column(children: [
-                kIsWeb == true ? WebMenu(-1) : Container(),
                 Expanded(
                   child: ListView(
                     children: <Widget>[
@@ -71,19 +65,16 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                 width: MediaQuery.of(context).size.width,
                                 height: MediaQuery.of(context).size.width /
                                     snapshot.data.aspectRatio,
-                                child: kIsWeb == true
-                                    ? Image.network(snapshot.data.imageUrl)
-                                    : CachedNetworkImage(
-                                        imageUrl: snapshot.data.imageUrl != null
-                                            ? snapshot.data.imageUrl
-                                            : "",
-                                        placeholder: (context, url) =>
-                                            Loading(),
-                                        errorWidget: (context, url, error) =>
-                                            Container(
-                                          color: Colors.grey[100],
-                                        ),
-                                      ),
+                                child: CachedNetworkImage(
+                                  imageUrl: snapshot.data.imageUrl != null
+                                      ? snapshot.data.imageUrl
+                                      : "",
+                                  placeholder: (context, url) => Loading(),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                    color: Colors.grey[100],
+                                  ),
+                                ),
                               ),
                               margin: EdgeInsets.symmetric(vertical: 0.0),
                             )

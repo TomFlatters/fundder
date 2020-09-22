@@ -57,24 +57,6 @@ class _EmailSignInState extends State<EmailSignIn> {
                       ),
                     ),
                   ),
-                  /*Expanded(
-                      child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 50),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Image.asset(
-                                      'assets/images/pink_bear_with_text.png')),
-                              SizedBox(height: 20),
-                              Text(
-                                'Get hooked on giving',
-                                textAlign: TextAlign.right,
-                                style: TextStyle(fontSize: 20),
-                              )
-                            ],
-                          ))),*/
                   Container(
                       padding: EdgeInsets.symmetric(
                           vertical: 20.0, horizontal: 30.0),

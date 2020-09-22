@@ -57,35 +57,27 @@ class AuthService {
   }
 
   // register w/ email & password
-  Future registerWithEmailPasswordUsername(
-      String email, String password, String username) async {
-    if (await usernameUnique(username) == true) {
-      try {
-        AuthResult result = await _auth.createUserWithEmailAndPassword(
-            email: email, password: password);
-        Firestore.instance.collection('usernames').document(username).setData({
-          username: true,
-        });
-        FirebaseUser user = result.user;
-        user.sendEmailVerification();
-        String defaultPic =
-            'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-        // create a new (firestore) document for the user with corresponding uid
-        await DatabaseService(uid: user.uid)
-            .registerUserData(email, username, null, defaultPic);
-        _getFCMToken(user.uid);
-        // ADD: user sets username
-        return 'Success';
-      } catch (e) {
-        print(e.toString());
-        if (e.message != null) {
-          return e.message;
-        } else {
-          return e.toString();
-        }
+  Future registerWithEmailPassword(String email, String password) async {
+    try {
+      AuthResult result = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      FirebaseUser user = result.user;
+      user.sendEmailVerification();
+      String defaultPic =
+          'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+      // create a new (firestore) document for the user with corresponding uid
+      await DatabaseService(uid: user.uid)
+          .registerUserData(email, null, null, defaultPic);
+      _getFCMToken(user.uid);
+      // ADD: user sets username
+      return 'Success';
+    } catch (e) {
+      print(e.toString());
+      if (e.message != null) {
+        return e.message;
+      } else {
+        return e.toString();
       }
-    } else {
-      return 'Username is taken';
     }
   }
 

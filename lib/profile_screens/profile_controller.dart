@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/profileWidgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
@@ -10,8 +9,6 @@ import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import '../helper_classes.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import '../web_pages/web_menu.dart';
 import '../models/user.dart';
 import '../shared/loading.dart';
 import '../global_widgets/buttons.dart';
@@ -19,8 +16,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../models/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
-import '../tutorial_screens/profile_tutorial.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 
 class ProfileController extends StatefulWidget {
@@ -82,34 +77,31 @@ class _ProfileState extends State<ProfileController>
         ? Loading()
         : Scaffold(
             backgroundColor: Colors.grey[200],
-            appBar: kIsWeb == true
-                ? null
-                : AppBar(
-                    centerTitle: true,
-                    title: Text(widget.user.username),
-                    actions: widget.user.uid == firebaseUser.uid
-                        ? <Widget>[
-                            IconButton(
-                              onPressed: () {
-                                _showOptions();
-                              },
-                              icon: Icon(AntDesign.ellipsis1),
-                            )
-                          ]
-                        : <Widget>[
-                            IconButton(
-                                icon: Icon(SimpleLineIcons.bubble),
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                      context,
-                                      '/chatroom/' +
-                                          widget.user.uid +
-                                          '/' +
-                                          widget.user.username);
-                                })
-                          ]),
+            appBar: AppBar(
+                centerTitle: true,
+                title: Text(widget.user.username),
+                actions: widget.user.uid == firebaseUser.uid
+                    ? <Widget>[
+                        IconButton(
+                          onPressed: () {
+                            _showOptions();
+                          },
+                          icon: Icon(AntDesign.ellipsis1),
+                        )
+                      ]
+                    : <Widget>[
+                        IconButton(
+                            icon: Icon(SimpleLineIcons.bubble),
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context,
+                                  '/chatroom/' +
+                                      widget.user.uid +
+                                      '/' +
+                                      widget.user.username);
+                            })
+                      ]),
             body: Column(children: [
-              kIsWeb == true ? WebMenu(5) : Container(),
               Expanded(
                 child: SmartRefresher(
                   enablePullDown: true,
