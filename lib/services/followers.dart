@@ -146,6 +146,12 @@ class CloudInterfaceForFollowers {
   CloudInterfaceForFollowers(this.uid);
   final HttpsCallable userFollowedSomeone = CloudFunctions.instance
       .getHttpsCallable(functionName: 'userFollowedSomeone');
+
+  /**Interacts with cloud functions to request to follow a user.
+   * If the user is private, then a successful status result will be 'requested'.
+   * If the user is public, then a successful response is 'nowFollowing'
+   * Anything else is a failed response and should be handled.
+   */
   Future<String> followUser({@required String target}) async {
     HttpsCallableResult res = await userFollowedSomeone
         .call(<String, dynamic>{'follower': uid, 'followee': target});
