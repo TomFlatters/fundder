@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 
+@Deprecated("FollowersService")
 class FollowersService {
   final CollectionReference userCollection =
       Firestore.instance.collection('users');
@@ -64,9 +65,11 @@ class FollowersService {
   }
 }
 
+@Deprecated("GeneralFollowersServices")
 class GeneralFollowerServices {
   static CollectionReference userCollection =
       Firestore.instance.collection('users');
+
   static Future<int> howManyFollowers(String uid) async {
     Map<String, dynamic> doc;
     await userCollection.document(uid).get().then((value) => doc = value.data);
@@ -81,8 +84,8 @@ class GeneralFollowerServices {
     return (doc.containsKey('noFollowing') ? doc['noFollowing'] : 0);
   }
 
+/**returns corresponding username to uid*/
   static Future<String> mapIDtoName(String uid) async {
-    //returns corresponding username to uid
     var doc = await userCollection.document(uid).get();
     return doc.data['username'];
   }
