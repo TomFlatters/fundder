@@ -22,7 +22,7 @@ class User {
   // construct them into the object here
   User(
       {this.uid,
-      this.username,
+      this.username = '',
       this.email,
       this.bio,
       this.followers,
@@ -30,13 +30,13 @@ class User {
       this.gender,
       this.name,
       this.profilePic,
-      this.seenTutorial,
-      this.dpSetterPrompted,
+      this.seenTutorial = false,
+      this.dpSetterPrompted = false,
       this.verified,
-      this.profileTutorialSeen,
-      this.fundTutorialSeen,
-      this.doTutorialSeen,
-      this.doneTutorialSeen,
-      this.amountDonated,
+      this.profileTutorialSeen = false,
+      this.fundTutorialSeen = false,
+      this.doTutorialSeen = false,
+      this.doneTutorialSeen = false,
+      this.amountDonated = 1.0,
       this.likes});
 }

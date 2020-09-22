@@ -114,6 +114,20 @@ class _AuthenticateState extends State<Authenticate>
                     text: 'Sign in with Google',
                   ),
                   SizedBox(height: 30.0),
+                  PrimaryFundderButton(
+                    onPressed: () {
+                      _auth.loginWithFacebook(context);
+                    },
+                    text: 'Sign in with Facebook',
+                  ),
+                  SizedBox(height: 30.0),
+                  PrimaryFundderButton(
+                    onPressed: () {
+                      _auth.loginWithApple();
+                    },
+                    text: 'Sign in with Apple',
+                  ),
+                  SizedBox(height: 30.0),
                   TextFormField(
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(RegExp("[ ]"))

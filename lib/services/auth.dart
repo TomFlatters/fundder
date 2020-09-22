@@ -4,6 +4,9 @@ import 'package:fundder/services/database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter/material.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthService {
   String fcmToken;
@@ -205,5 +208,98 @@ class AuthService {
     });
 
     return 'signInWithGoogle succeeded: $user';
+  }
+
+  Future loginWithFacebook(BuildContext context) async {
+    final facebookLogin = FacebookLogin();
+    final result = await facebookLogin.logIn(['email']);
+
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        final AuthCredential credential = FacebookAuthProvider.getCredential(
+          accessToken: result.accessToken.token,
+        );
+
+        final AuthResult authResult =
+            await _auth.signInWithCredential(credential);
+        FirebaseUser user = authResult.user;
+        assert(user.email != null);
+        assert(user.displayName != null);
+        assert(!user.isAnonymous);
+        assert(await user.getIdToken() != null);
+
+        final FirebaseUser currentUser = await _auth.currentUser();
+        assert(user.uid == currentUser.uid);
+
+        String defaultPic =
+            'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+        // create a new (firestore) document for the user with corresponding uid
+
+        var docRef = Firestore.instance.collection('users').document(user.uid);
+
+        docRef.get().then((doc) async {
+          if (!doc.exists) {
+            print('Creating new doc');
+            // doc.data() will be undefined in this case
+            await DatabaseService(uid: user.uid).registerUserData(
+                user.email, user.displayName, null, defaultPic);
+            _getFCMToken(user.uid);
+          }
+        });
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        return 'Cancelled';
+        break;
+      case FacebookLoginStatus.error:
+        return 'result.errorMessage';
+        break;
+    }
+  }
+
+  Future loginWithApple() async {
+    final appleIdCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      webAuthenticationOptions: WebAuthenticationOptions(
+        // TODO: Set the `clientId` and `redirectUri` arguments to the values you entered in the Apple Developer portal during the setup
+        clientId: 'com.example.fundderAppleLogIn',
+        redirectUri: Uri.parse(
+          'https://fundder-c4a64.firebaseapp.com/__/auth/handler',
+        ),
+      ),
+    );
+
+    final oAuthProvider = OAuthProvider(providerId: 'apple.com');
+    final credential = oAuthProvider.getCredential(
+      idToken: appleIdCredential.identityToken,
+      accessToken: appleIdCredential.authorizationCode,
+    );
+    final authResult = await _auth.signInWithCredential(credential);
+    final user = authResult.user;
+    assert(user.email != null);
+    assert(user.displayName != null);
+    assert(!user.isAnonymous);
+    assert(await user.getIdToken() != null);
+
+    final FirebaseUser currentUser = await _auth.currentUser();
+    assert(user.uid == currentUser.uid);
+
+    String defaultPic =
+        'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+    // create a new (firestore) document for the user with corresponding uid
+
+    var docRef = Firestore.instance.collection('users').document(user.uid);
+
+    docRef.get().then((doc) async {
+      if (!doc.exists) {
+        print('Creating new doc');
+        // doc.data() will be undefined in this case
+        await DatabaseService(uid: user.uid)
+            .registerUserData(user.email, user.displayName, null, defaultPic);
+        _getFCMToken(user.uid);
+      }
+    });
   }
 }
