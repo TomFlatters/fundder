@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'services/database.dart';
-import 'models/user.dart';
+import '../services/database.dart';
+import '../models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_video_player/cached_video_player.dart';
-import 'shared/loading.dart';
-import 'global_widgets/buttons.dart';
+import '../shared/loading.dart';
+import '../global_widgets/buttons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'models/post.dart';
-import 'post_widgets/postHeader.dart';
-import 'post_widgets/postBody.dart';
+import '../models/post.dart';
+import '../post_widgets/postHeader.dart';
+import '../post_widgets/postBody.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
@@ -46,8 +45,6 @@ class _UploadProofState extends State<UploadProofScreen> {
   final TextEditingController qualityController = TextEditingController();
   final TextEditingController completionCommentController =
       TextEditingController();
-
-  final Key _key = UniqueKey();
 
   @override
   void initState() {
@@ -311,21 +308,6 @@ class _UploadProofState extends State<UploadProofScreen> {
 
   Widget _completionComment() {
     return ListView(children: [
-      /*Container(
-        decoration: new BoxDecoration(
-            color: Colors.white,
-            borderRadius: new BorderRadius.all(
-              Radius.circular(10.0),
-            )),
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-        child: Text(
-          'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
-          style: TextStyle(
-              fontFamily: 'Founders Grotesk',
-              fontWeight: FontWeight.w500,
-              fontSize: 18),
-        ),
-      ),*/
       Container(
           color: Colors.grey[200],
           child: Container(
@@ -451,91 +433,13 @@ class _UploadProofState extends State<UploadProofScreen> {
         },
       ),
     ]);
-
-    /*ListView(children: [
-      /*Container(
-        decoration: new BoxDecoration(
-            color: Colors.white,
-            borderRadius: new BorderRadius.all(
-              Radius.circular(10.0),
-            )),
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-        child: Text(
-          'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
-          style: TextStyle(
-              fontFamily: 'Founders Grotesk',
-              fontWeight: FontWeight.w500,
-              fontSize: 18),
-        ),
-      ),*/
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          margin: EdgeInsets.only(top: 10),
-          decoration: new BoxDecoration(
-              color: Colors.white,
-              borderRadius: new BorderRadius.all(
-                Radius.circular(10.0),
-              )),
-          child: Column(children: <Widget>[
-            PostHeader(
-                postAuthorId: postData.author,
-                postAuthorUserName: postData.authorUsername,
-                targetCharity: postData.charity,
-                charityLogo: postData.charityLogo),
-            Container(
-              constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.width * 9 / 16),
-              color: Colors.grey[200],
-              child: Center(
-                child: !kIsWeb && Platform.isAndroid
-                    ? FutureBuilder<void>(
-                        future: retrieveLostData(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<void> snapshot) {
-                          return isVideo ? _previewVideo() : _previewImage();
-                        },
-                      )
-                    : (isVideo ? _previewVideo() : _previewImage()),
-              ),
-            ),
-          ]),
-        ),
-      ),
-      SizedBox(height: 40),
-      PrimaryFundderButton(
-        text: "Select Video",
-        onPressed: () {
-          _changeVideo();
-        },
-      ),
-      PrimaryFundderButton(
-        text: "Select Image",
-        onPressed: () {
-          _changePic();
-        },
-      ),
-      SizedBox(
-        height: 40,
-      )
-    ]);*/
   }
 
   Future<void> _playVideo(PickedFile file) async {
     if (file != null && mounted) {
       await _disposeVideoController();
-      if (kIsWeb) {
-        _controller = CachedVideoPlayerController.network(file.path);
-        // In web, most browsers won't honor a programmatic call to .play
-        // if the video has a sound track (and is not muted).
-        // Mute the video so it auto-plays in web!
-        // This is not needed if the call to .play is the result of user
-        // interaction (clicking on a "play" button, for example).
-        await _controller.setVolume(0.0);
-      } else {
-        _controller = CachedVideoPlayerController.file(File(file.path));
-        await _controller.setVolume(1.0);
-      }
+      _controller = CachedVideoPlayerController.file(File(file.path));
+      await _controller.setVolume(1.0);
       await _controller.initialize();
       await _controller.setLooping(true);
       await _controller.play();
@@ -614,15 +518,9 @@ class _UploadProofState extends State<UploadProofScreen> {
       return retrieveError;
     }
     if (_imageFile != null) {
-      if (kIsWeb) {
-        // Why network?
-        // See https://pub.dev/packages/image_picker#getting-ready-for-the-web-platform
-        return Image.network(_imageFile.path);
-      } else {
-        File image = File(_imageFile.path);
-        _findAspectRatio(image);
-        return Image.file(image);
-      }
+      File image = File(_imageFile.path);
+      _findAspectRatio(image);
+      return Image.file(image);
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',

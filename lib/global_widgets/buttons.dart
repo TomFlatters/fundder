@@ -74,7 +74,7 @@ class FundderButton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: this.backgroundColor,
                 border: Border.all(color: this.borderColor, width: 1),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Text(
                 this.text,

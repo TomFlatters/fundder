@@ -19,7 +19,7 @@ import 'package:fundder/web_pages/login_web.dart';
 import 'package:fundder/search/search_controller.dart';
 import 'package:fundder/liked_controller.dart';
 import 'package:fundder/web_pages/temparary_upload_page.dart';
-import 'package:fundder/upload_proof_controller.dart';
+import 'package:fundder/post_creation_widgets/upload_proof_controller.dart';
 import 'package:fundder/welcome_pages/profilepic_setter.dart';
 import 'package:fundder/welcome_pages/tutorial.dart';
 import 'package:provider/provider.dart';

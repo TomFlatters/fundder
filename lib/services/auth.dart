@@ -7,6 +7,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AuthService {
   String fcmToken;
@@ -213,46 +215,76 @@ class AuthService {
   Future loginWithFacebook(BuildContext context) async {
     final facebookLogin = FacebookLogin();
     final result = await facebookLogin.logIn(['email']);
+    final AuthCredential credential = FacebookAuthProvider.getCredential(
+      accessToken: result.accessToken.token,
+    );
+    try {
+      final AuthResult authResult =
+          await _auth.signInWithCredential(credential);
+      FirebaseUser user = authResult.user;
+      assert(user.email != null);
+      assert(user.displayName != null);
+      assert(!user.isAnonymous);
+      assert(await user.getIdToken() != null);
 
-    switch (result.status) {
-      case FacebookLoginStatus.loggedIn:
-        final AuthCredential credential = FacebookAuthProvider.getCredential(
-          accessToken: result.accessToken.token,
-        );
+      final FirebaseUser currentUser = await _auth.currentUser();
+      assert(user.uid == currentUser.uid);
 
-        final AuthResult authResult =
-            await _auth.signInWithCredential(credential);
-        FirebaseUser user = authResult.user;
-        assert(user.email != null);
-        assert(user.displayName != null);
-        assert(!user.isAnonymous);
-        assert(await user.getIdToken() != null);
+      String defaultPic =
+          'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+      // create a new (firestore) document for the user with corresponding uid
 
-        final FirebaseUser currentUser = await _auth.currentUser();
-        assert(user.uid == currentUser.uid);
+      var docRef = Firestore.instance.collection('users').document(user.uid);
 
-        String defaultPic =
-            'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-        // create a new (firestore) document for the user with corresponding uid
+      docRef.get().then((doc) async {
+        if (!doc.exists) {
+          print('Creating new doc');
+          // doc.data() will be undefined in this case
+          await DatabaseService(uid: user.uid)
+              .registerUserData(user.email, user.displayName, null, defaultPic);
+          _getFCMToken(user.uid);
+        }
+      });
+    } catch (e) {
+      print(result.errorMessage);
+      print("handle facebook sign in: $e");
+      if (e.code == 'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL') {
+        // if exists get email of your simple get (i will write the code by this later)
+        final graphResponse = await Session.get(
+            'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token.toString()}');
 
-        var docRef = Firestore.instance.collection('users').document(user.uid);
+        final email = graphResponse["email"];
+        // unused
+        final signInMethods = await FirebaseAuth.instance
+            .fetchSignInMethodsForEmail(email: email);
+        FirebaseUser guser; // create a google user
+        //get credential google here
+        try {
+          final GoogleSignIn _googleSignIn = GoogleSignIn();
+          GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+          GoogleSignInAuthentication googleAuth =
+              await googleUser.authentication;
 
-        docRef.get().then((doc) async {
-          if (!doc.exists) {
-            print('Creating new doc');
-            // doc.data() will be undefined in this case
-            await DatabaseService(uid: user.uid).registerUserData(
-                user.email, user.displayName, null, defaultPic);
-            _getFCMToken(user.uid);
-          }
-        });
-        break;
-      case FacebookLoginStatus.cancelledByUser:
-        return 'Cancelled';
-        break;
-      case FacebookLoginStatus.error:
-        return 'result.errorMessage';
-        break;
+          final AuthCredential credential = GoogleAuthProvider.getCredential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          final AuthResult authResult =
+              await _auth.signInWithCredential(credential);
+          FirebaseUser firebaseUser = authResult.user;
+          guser = firebaseUser;
+          // get google user
+        } catch (e) {
+          print("handle google sign in: $e");
+        }
+        final authResult = guser;
+        if (authResult.email == email) {
+          // link facebook + google.
+          await authResult.linkWithCredential(credential);
+        }
+
+        //return usuario;
+      }
     }
   }
 
@@ -302,4 +334,15 @@ class AuthService {
       }
     });
   }
+}
+
+class Session {
+  static Map<String, String> headers = {'Content-Type': 'application/json'};
+
+  static Future<dynamic> get(String url) =>
+      http.get(url, headers: headers).then((response) {
+        print('GET ' + url);
+        return response.body;
+      }).then(json
+          .decode); // here is your map that return ['email'] on handleFacebookSignIn method
 }
