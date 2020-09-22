@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/widgets.dart';
 
 @Deprecated("FollowersService")
@@ -137,5 +138,18 @@ class GeneralFollowerServices {
       }
     }
     return res;
+  }
+}
+
+class CloudInterfaceForFollowers {
+  final uid;
+  CloudInterfaceForFollowers(this.uid);
+  final HttpsCallable userFollowedSomeone = CloudFunctions.instance
+      .getHttpsCallable(functionName: 'userFollowedSomeone');
+  Future<String> followUser({@required String target}) async {
+    HttpsCallableResult res = await userFollowedSomeone
+        .call(<String, dynamic>{'follower': uid, 'followee': target});
+    String status = res.data['status'];
+    return status;
   }
 }
