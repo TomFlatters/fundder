@@ -397,10 +397,11 @@ class _ProfileState extends State<ProfileController>
                                                     context, '/account/edit');
                                               })
                                           : FutureBuilder(
-                                              future: FollowersService(
-                                                      uid: user.uid)
-                                                  .doesXfollowY(
-                                                      x: user.uid, y: _uid),
+                                              future:
+                                                  CloudInterfaceForFollowers(
+                                                          user.uid)
+                                                      .doesXfollowY(
+                                                          x: user.uid, y: _uid),
                                               builder: (context, initialState) {
                                                 if (initialState
                                                             .connectionState ==

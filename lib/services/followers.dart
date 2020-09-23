@@ -174,4 +174,21 @@ class CloudInterfaceForFollowers {
     String status = res.data['status'];
     return status;
   }
+
+  /**Determines the follow relationship status of user x to user y. 
+ * returns : `\n`
+ * 
+ * if (x follows y) returns 'following' `\n`
+ * if (x requested to follow y) returns 'follow_requested' `\n`
+ * otherwise returns 'not_following' `\n`
+ * 
+ */
+
+  Future<String> doesXfollowY({@required String x, @required String y}) async {
+    HttpsCallable doesXfollowY =
+        cloudFunc.getHttpsCallable(functionName: 'doesXfollowY');
+    HttpsCallableResult res =
+        await doesXfollowY.call(<String, dynamic>{'x': x, 'y': y});
+    return res.data['status'];
+  }
 }
