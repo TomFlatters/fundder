@@ -601,14 +601,15 @@ exports.handleUnreadMessages = functions.firestore.document('chats/{chatId}').on
 })
 
 
-/**Add ten dummy users to the database
+/**Houses various triggers to perform various actions on db.
  * DO NOT DEPLOY
  */
 
-exports.populateUsersCollection = functions.firestore.document('dummyCollectionForTriggers/gva6Vmg8J7yMbvQ6rdQ2').onUpdate((change, context)=>{
-
+exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/gva6Vmg8J7yMbvQ6rdQ2').onUpdate(async (change, context)=>{
+  let res = {};
   const newValue = change.after.data();
-  if (newValue.change  === true){
+  if (newValue.moreUsers  === true){
+    res['moreUsersAcquired'] =  true
     //populate the users collection 
     let users = admin.firestore().collection('users');
     let faker = require('faker');
@@ -636,6 +637,26 @@ exports.populateUsersCollection = functions.firestore.document('dummyCollectionF
     users.add(data);
     } 
   }
+
+  
+  if (newValue.getMoreFollowers === true){
+    //set a follower and followee and make the follower follow the followee
+    res['moreFollowersAcquired'] = true;
+ 
+    
+      console.log("running userFollowedSomeone");
+      const FieldValue = require('firebase-admin').firestore.FieldValue;
+      const follower = newValue.dummyFollower; 
+      const followee = newValue.dummyFollowee;
+      const userCollection = admin.firestore().collection('users')
+      const userDoc = await userCollection.doc(followee).get();
+      const followeeIsPrivate = (userDoc.get('isPrivate')===null)?false:userDoc.get('isPrivate');
+      const status = await initiateFollow(followee, follower, followeeIsPrivate);
+    
+    
+  }
+
+  return res
 })
 
 
@@ -771,6 +792,9 @@ exports.doesXfollowY = functions.https.onCall(async (data, context)=>{
   const status =  await doesXfollowY(x, y);
   return {status: status};
 })
+
+
+
 
 
 
