@@ -29,7 +29,27 @@ class GeneralFollowerServices {
 ///////////////////////////// change after launch to give ten at time kind of thing////////
   static Future<List<String>> idsFollowingUser(String uid) async {
     //returns the user id of all users following user 'uid'
-    return [];
+    print("executing idsFollowingByUser");
+    CollectionReference followersCollection =
+        Firestore.instance.collection('followers');
+    DocumentSnapshot docSnap = await followersCollection.document(uid).get();
+    if (docSnap.exists) {
+      var followers = docSnap.data['followers'];
+      List<String> res = [];
+
+      if (followers != null) {
+        // return following as List<String>;
+        for (var i = 0; i < followers.length; i++) {
+          print(followers[i]);
+          res.add(followers[i].toString());
+        }
+        return res;
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
   }
 
   static Future<List<String>> idsFollowedByUser(String uid) async {
