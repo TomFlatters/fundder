@@ -2,13 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/widgets.dart';
 
-@Deprecated("FollowersService")
 class FollowersService {
   final CollectionReference userCollection =
       Firestore.instance.collection('users');
+  final CollectionReference followersCollection =
+      Firestore.instance.collection('followers');
   final String uid;
   FollowersService({@required this.uid});
 
+  @Deprecated("userFollowedSomeone")
   void userFollowedSomeone(String newlyFollowedId) {
     //register this new followee on followed's doc in database
     userCollection
@@ -31,6 +33,7 @@ class FollowersService {
         .updateData({'noFollowers': FieldValue.increment(1)});
   }
 
+  @Deprecated("userUNfollowedSomeone")
   void userUNfollowedSomeone(String recentlyUnfollowedId) {
     //remove the followee i.e. ourself from the followed's doc in database
     userCollection
@@ -56,13 +59,23 @@ class FollowersService {
         .updateData({'noFollowers': FieldValue.increment(-1)});
   }
 
+/**Returns true if uid x follows uid y, otherwise false */
   Future<bool> doesXfollowY({@required String x, @required String y}) async {
-    DocumentSnapshot docSnap = await userCollection
-        .document(x)
-        .collection('following')
-        .document(y)
-        .get();
-    return (docSnap.exists);
+    print("doesXfollowY called");
+    DocumentSnapshot docSnap = await followersCollection.document(x).get();
+    bool res;
+    if (docSnap.exists) {
+      var following = docSnap.data['following'];
+      if (following is Iterable) {
+        res = following.contains(y);
+      } else {
+        res = false;
+      }
+    } else {
+      res = false;
+    }
+    print("result of doesXfollowY:" + res.toString());
+    return res;
   }
 }
 
@@ -143,9 +156,10 @@ class GeneralFollowerServices {
 
 class CloudInterfaceForFollowers {
   final uid;
+  final cloudFunc = CloudFunctions.instance
+      .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+
   CloudInterfaceForFollowers(this.uid);
-  final HttpsCallable userFollowedSomeone = CloudFunctions.instance
-      .getHttpsCallable(functionName: 'userFollowedSomeone');
 
   /**Interacts with cloud functions to request to follow a user.
    * If the user is private, then a successful status result will be 'requested'.
@@ -153,6 +167,8 @@ class CloudInterfaceForFollowers {
    * Anything else is a failed response and should be handled.
    */
   Future<String> followUser({@required String target}) async {
+    HttpsCallable userFollowedSomeone =
+        cloudFunc.getHttpsCallable(functionName: 'userFollowedSomeone');
     HttpsCallableResult res = await userFollowedSomeone
         .call(<String, dynamic>{'follower': uid, 'followee': target});
     String status = res.data['status'];
