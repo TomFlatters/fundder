@@ -2,84 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/widgets.dart';
 
-class FollowersService {
-  final CollectionReference userCollection =
-      Firestore.instance.collection('users');
-  final CollectionReference followersCollection =
-      Firestore.instance.collection('followers');
-  final String uid;
-  FollowersService({@required this.uid});
-
-  @Deprecated("userFollowedSomeone")
-  void userFollowedSomeone(String newlyFollowedId) {
-    //register this new followee on followed's doc in database
-    userCollection
-        .document(newlyFollowedId)
-        .collection('myFollowers')
-        .document(uid)
-        .setData({'following': true, 'uid': uid}, merge: true);
-    //add the followed on the followees' doc in the database
-    userCollection
-        .document(uid)
-        .collection('following')
-        .document(newlyFollowedId)
-        .setData({'following': true, 'uid': newlyFollowedId}, merge: true);
-    //do the bookkeeping in the noFollowers and noFollowing fields
-    userCollection
-        .document(uid)
-        .updateData({'noFollowing': FieldValue.increment(1)});
-    userCollection
-        .document(newlyFollowedId)
-        .updateData({'noFollowers': FieldValue.increment(1)});
-  }
-
-  @Deprecated("userUNfollowedSomeone")
-  void userUNfollowedSomeone(String recentlyUnfollowedId) {
-    //remove the followee i.e. ourself from the followed's doc in database
-    userCollection
-        .document(recentlyUnfollowedId)
-        .collection('myFollowers')
-        .document(uid)
-        .delete();
-    //.setData({'following': false, 'uid': uid}, merge: true);
-    //remove this receently unfollowed scumbag from our followers list
-    userCollection
-        .document(uid)
-        .collection('following')
-        .document(recentlyUnfollowedId)
-        .delete();
-    //.setData({'following': false, 'uid': recentlyUnfollowedId},
-    //   merge: true);
-    //do the bookkeeping in the noFollowers and noFollowing fields
-    userCollection
-        .document(uid)
-        .updateData({'noFollowing': FieldValue.increment(-1)});
-    userCollection
-        .document(recentlyUnfollowedId)
-        .updateData({'noFollowers': FieldValue.increment(-1)});
-  }
-
-/**Returns true if uid x follows uid y, otherwise false */
-  Future<bool> doesXfollowY({@required String x, @required String y}) async {
-    print("doesXfollowY called");
-    DocumentSnapshot docSnap = await followersCollection.document(x).get();
-    bool res;
-    if (docSnap.exists) {
-      var following = docSnap.data['following'];
-      if (following is Iterable) {
-        res = following.contains(y);
-      } else {
-        res = false;
-      }
-    } else {
-      res = false;
-    }
-    print("result of doesXfollowY:" + res.toString());
-    return res;
-  }
-}
-
-@Deprecated("GeneralFollowersServices")
 class GeneralFollowerServices {
   static CollectionReference userCollection =
       Firestore.instance.collection('users');
@@ -107,12 +29,7 @@ class GeneralFollowerServices {
 ///////////////////////////// change after launch to give ten at time kind of thing////////
   static Future<List<String>> idsFollowingUser(String uid) async {
     //returns the user id of all users following user 'uid'
-    QuerySnapshot q = await userCollection
-        .document(uid)
-        .collection('myFollowers')
-        .getDocuments();
-    //remember that the doc ids are the user ids of the followers]
-    return (q.documents.map((e) => e.documentID).toList());
+    return [];
   }
 
   static Future<List<Map>> unamesFollowingUser(String uid) async {
@@ -127,16 +44,6 @@ class GeneralFollowerServices {
       }
     }
     return res;
-  }
-
-  static Future<List<String>> idsFollowedByUser(String uid) async {
-    //returns the user id of all users following user 'uid'
-    QuerySnapshot q = await userCollection
-        .document(uid)
-        .collection('following')
-        .getDocuments();
-    //remember that the doc ids are the user ids of the followers]
-    return (q.documents.map((e) => e.documentID).toList());
   }
 
   static Future<List<Map>> unamesFollowedByUser(String uid) async {
@@ -190,5 +97,15 @@ class CloudInterfaceForFollowers {
     HttpsCallableResult res =
         await doesXfollowY.call(<String, dynamic>{'x': x, 'y': y});
     return res.data['status'];
+  }
+
+/**Unfollow 'follower' from 'followee' */
+  Future<String> unfollowUser({@required String target}) async {
+    HttpsCallable userFollowedSomeone =
+        cloudFunc.getHttpsCallable(functionName: 'unfollowXfromY');
+    HttpsCallableResult res = await userFollowedSomeone
+        .call(<String, dynamic>{'x': uid, 'y': target});
+    String status = res.data['status'];
+    return status;
   }
 }
