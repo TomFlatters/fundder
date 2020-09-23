@@ -10,6 +10,7 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
+const { user } = require('firebase-functions/lib/providers/auth');
 admin.initializeApp();
 
 exports.onLike = functions.firestore
@@ -600,7 +601,9 @@ exports.handleUnreadMessages = functions.firestore.document('chats/{chatId}').on
 })
 
 
-/**Add ten dummy users to the database */
+/**Add ten dummy users to the database
+ * DO NOT DEPLOY
+ */
 
 exports.populateUsersCollection = functions.firestore.document('dummyCollectionForTriggers/gva6Vmg8J7yMbvQ6rdQ2').onUpdate((change, context)=>{
 
@@ -634,3 +637,47 @@ exports.populateUsersCollection = functions.firestore.document('dummyCollectionF
     } 
   }
 })
+
+exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
+  //chang to arrayUnion if possible in production 
+  //operation not working in emulation
+
+  console.log("running userFollowedSomeone");
+  const FieldValue = require('firebase-admin').firestore.FieldValue;
+  const follower = data.follower; 
+  const followee = data.followee;
+  
+  const userCollection = admin.firestore().collection('users')
+  const userDoc = await userCollection.doc(followee).get();
+  const followeeIsPrivate = (userDoc.get('isPrivate')===null)?false:userDoc.get('isPrivate');
+  const status = initiateFollow(followee, follower, followeeIsPrivate);
+  return status;
+}
+)
+
+
+/**takes the id of the prospective followee
+ * and id follower and the 'isPrivate' status of followee in that order.  */
+
+function initiateFollow (followee, follower, followeeIsPrivate){
+   const FieldValue = require('firebase-admin').firestore.FieldValue;
+   const followersCollection = admin.firestore().collection('followers');
+   const userCollection = admin.firestore().collection('users')
+   let status = "nothing";
+   if (followeeIsPrivate){
+     followersCollection.doc(followee).set({'requestedToFollowMe': FieldValue.arrayUnion(follower)}, {merge: true} )
+   status ="requested"
+   }    
+   else{
+     followersCollection.doc(followee).set({'followers': FieldValue.arrayUnion(follower)}, {merge: true});
+     followersCollection.doc(follower).set({'following': FieldValue.arrayUnion(followee) }, {merge: true});
+     //send notification to followee that this user is now following you 
+     userCollection.doc(follower).set({'noFollowing': FieldValue.increment(1)}, {merge: true} );
+     userCollection.doc(followee).set({'noFollowers': FieldValue.increment(1)}, {merge: true});
+     status = "nowFollowing"
+   }
+     return {'status': status};
+}
+
+
+
