@@ -652,7 +652,7 @@ exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
   const userCollection = admin.firestore().collection('users')
   const userDoc = await userCollection.doc(followee).get();
   const followeeIsPrivate = (userDoc.get('isPrivate')===null)?false:userDoc.get('isPrivate');
-  const status = initiateFollow(followee, follower, followeeIsPrivate);
+  const status = await initiateFollow(followee, follower, followeeIsPrivate);
   return {status: status};
 }
 )
@@ -734,14 +734,22 @@ exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
 /**takes the id of the prospective followee
  * and id follower and the 'isPrivate' status of followee in that order.  */
 
-function initiateFollow (followee, follower, followeeIsPrivate){
+async function initiateFollow (followee, follower, followeeIsPrivate){
    const FieldValue = require('firebase-admin').firestore.FieldValue;
    const followersCollection = admin.firestore().collection('followers');
    const userCollection = admin.firestore().collection('users')
    let status = "nothing";
    if (followeeIsPrivate){
      followersCollection.doc(followee).set({'requestedToFollowMe': FieldValue.arrayUnion(follower)}, {merge: true} )
-   status ="requested"
+     //if the user has nothing in the 'followers' field, initialise it to empty array
+     const followerDoc = await followersCollection.doc(follower).get()
+     if (!followerDoc.exists){
+       
+        followersCollection.doc(follower).set({'following': []}, {merge: true})
+       
+     }
+    status ="requested"
+   
    }    
    else{
      followersCollection.doc(followee).set({'followers': FieldValue.arrayUnion(follower)}, {merge: true});
