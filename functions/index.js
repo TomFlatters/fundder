@@ -748,8 +748,9 @@ async function initiateFollow (followee, follower, followeeIsPrivate){
         followersCollection.doc(follower).set({'following': []}, {merge: true})
        
      }
+     
     status ="requested"
-   
+    userCollection.doc(followee).set({'noFollowRequestsForMe': FieldValue.increment(1)}, {merge: true});
    }    
    else{
      followersCollection.doc(followee).set({'followers': FieldValue.arrayUnion(follower)}, {merge: true});
