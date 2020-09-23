@@ -6,52 +6,41 @@ import 'package:fundder/services/followers.dart';
 
 // need a new button for activity feed
 
-class FollowButton extends StatefulWidget {
-  /**
-   * States can be: 'following', 'follow_requested', 'not_following'
-   */
-  final String initialState;
+//NOTE: This button is integrated with a stream so no need for it to be a Stateful
+//widget!!
+
+//There are mechanisms coded to use the state better
+
+class FollowButton extends StatelessWidget {
+  final String isFollowed;
   final String profileOwnerId;
   final String myId;
   final CloudInterfaceForFollowers cloudFollowersService;
-  final FollowersService followersService;
+
   FollowButton(
-    this.initialState, {
+    this.isFollowed, {
     @required this.profileOwnerId,
     @required this.myId,
-  })  : followersService = FollowersService(uid: myId),
-        cloudFollowersService = CloudInterfaceForFollowers(myId);
-  @override
-  _FollowButtonState createState() => _FollowButtonState();
-}
-
-class _FollowButtonState extends State<FollowButton> {
-  String isFollowed;
-  @override
-  void initState() {
-    isFollowed = widget.initialState;
-    super.initState();
-  }
-
-  void followPressed() {
-    widget.cloudFollowersService.followUser(target: widget.profileOwnerId);
-  }
-
+  }) : cloudFollowersService = CloudInterfaceForFollowers(myId);
   @override
   Widget build(BuildContext context) {
-    return (isFollowed == 'following')
-        ? EditFundderButton(
-            onPressed: () => {},
-            text: 'Unfollow',
-          )
-        : (isFollowed == 'follow_requested')
-            ? EditFundderButton(
-                text: 'Follow Requested',
-                onPressed: () => {},
-              )
-            : EditFundderButton(
-                text: 'Follow',
-                onPressed: () => followPressed(),
-              );
+    if (isFollowed == 'following') {
+      return EditFundderButton(
+        onPressed: () =>
+            {cloudFollowersService.unfollowUser(target: profileOwnerId)},
+        text: 'Unfollow',
+      );
+    } else if (isFollowed == 'follow_requested') {
+      return EditFundderButton(
+        text: 'Follow Requested',
+        onPressed: () => {},
+      );
+    } else {
+      return EditFundderButton(
+        text: 'Follow',
+        onPressed: () =>
+            cloudFollowersService.followUser(target: profileOwnerId),
+      );
+    }
   }
 }
