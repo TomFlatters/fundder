@@ -81,7 +81,9 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
                           setState(() {
                             _loading = true;
                           });
-                        if (usernameEntry.text != "" /* == _oldUsername*/) {
+                        if (usernameEntry.text == _oldUsername ||
+                            await _auth.usernameUnique(usernameEntry.text) ==
+                                true) {
                           print('username is unique or new');
                           if (nameEntry.text != '' &&
                               usernameEntry.text != '') {

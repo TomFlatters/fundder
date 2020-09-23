@@ -69,6 +69,7 @@ class FundderButton extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         child: GestureDetector(
             child: Container(
+              height: 50,
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
               margin: EdgeInsets.only(left: 70, right: 70, bottom: 20),
               decoration: BoxDecoration(
@@ -76,13 +77,16 @@ class FundderButton extends StatelessWidget {
                 border: Border.all(color: this.borderColor, width: 1),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
-              child: Text(
-                this.text,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: this.textColor),
+              child: Container(
+                padding: EdgeInsets.only(top: 5),
+                child: Text(
+                  this.text,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                      color: this.textColor),
+                ),
               ),
             ),
             onTap: this.onPressed));

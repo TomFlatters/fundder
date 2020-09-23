@@ -32,11 +32,12 @@ class _HomeState extends State<Home> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool unreadNotifs = false;
   bool checkedProfileTutorial = false;
+  bool havePresentedWelcome = false;
+  bool loadingWelcome = false;
 
   @override
   void initState() {
     super.initState();
-    _checkIfIntroed();
     _checkNotifs();
     var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
     fcmTokenStream.listen((token) async {
@@ -108,11 +109,13 @@ class _HomeState extends State<Home> {
         .document(user.uid)
         .get()
         .then((snapshot) {
+      loadingWelcome = false;
       if (snapshot != null && (user.isEmailVerified == true)) {
         if (snapshot['name'] == null ||
             snapshot['username'] == null ||
             snapshot['name'] == '' ||
             snapshot['username'] == '') {
+          havePresentedWelcome = true;
           print('Pushing add profile pic');
           Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic').then(
               (value) => Firestore.instance
@@ -124,7 +127,16 @@ class _HomeState extends State<Home> {
         }
       }
       if (user.isEmailVerified == false) {
-        Navigator.pushNamed(context, '/' + user.uid + '/verification');
+        havePresentedWelcome = true;
+        Navigator.pushNamed(context, '/' + user.uid + '/verification').then(
+            (value) =>
+                Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic')
+                    .then((val) => Firestore.instance
+                            .collection('users')
+                            .document(user.uid)
+                            .updateData({
+                          'dpSetterPrompted': true,
+                        })));
       }
     });
   }
@@ -172,7 +184,13 @@ class _HomeState extends State<Home> {
               if (doc.data['dpSetterPrompted'] == null ||
                   doc.data['name'] == null ||
                   doc.data['username'] == null ||
-                  doc.data['dpSetterPrompted'] == false) {
+                  doc.data['dpSetterPrompted'] == false ||
+                  doc.data['name'] == '' ||
+                  doc.data['username'] == '') {
+                if (havePresentedWelcome == false && loadingWelcome == false) {
+                  loadingWelcome = true;
+                  _checkIfIntroed();
+                }
                 return Loading();
               } else {
                 User user = DatabaseService(uid: firebaseUser.uid)

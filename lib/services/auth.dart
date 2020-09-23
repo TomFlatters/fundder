@@ -83,8 +83,8 @@ class AuthService {
 
   Future<bool> usernameUnique(String username) async {
     final snapshot = await Firestore.instance
-        .collection('usernames')
-        .where(username, isEqualTo: true)
+        .collection('users')
+        .where('username', isEqualTo: username)
         .getDocuments();
     if (snapshot == null || snapshot.documents.isEmpty) {
       return true; //username is unique.
@@ -220,6 +220,7 @@ class AuthService {
       final FirebaseUser currentUser = await _auth.currentUser();
       print('user id: ' + currentUser.uid.toString());
       assert(user.uid == currentUser.uid);
+      currentUser.sendEmailVerification();
 
       String defaultPic =
           'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
@@ -303,7 +304,6 @@ class AuthService {
     final authResult = await _auth.signInWithCredential(credential);
     final user = authResult.user;
     assert(user.email != null);
-    assert(user.displayName != null);
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
 

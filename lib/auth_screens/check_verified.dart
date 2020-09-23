@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/shared/loading.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class CheckVerified extends StatefulWidget {
   @override
@@ -43,74 +44,82 @@ class _VerificationState extends State<CheckVerified> {
                   leading: new Container(),
                 ),
                 body: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Text('Congratulations! Your account is created.'),
-                        Text('Please verify your email to access the app.'),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Text('Verification email has been sent to:'),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(user != null ? user.email : "user email",
-                            style: TextStyle(
-                                fontFamily: "Founders Grotesk", fontSize: 17)),
-                        Expanded(
-                          child: Container(),
-                        ),
-                        Text(verificationText),
-                        PrimaryFundderButton(
-                          text: 'I have verified',
-                          onPressed: () async {
-                            FirebaseUser user =
-                                await FirebaseAuth.instance.currentUser();
-                            await user.reload();
-                            user = await FirebaseAuth.instance.currentUser();
-                            if (user.isEmailVerified == true) {
-                              Navigator.pushReplacementNamed(
-                                  context, '/' + user.uid + '/addProfilePic');
-                              /*Navigator.pushNamed(
+                  children: <Widget>[
+                    Container(
+                        margin: EdgeInsets.symmetric(horizontal: 30),
+                        child: Column(children: [
+                          SizedBox(
+                            height: 30,
+                          ),
+                          Text('Congratulations! Your account is created.'),
+                          Text('Please verify your email to access the app.'),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          Text('Verification email has been sent to:'),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(user != null ? user.email : "user email",
+                              style: TextStyle(
+                                  fontFamily: "Founders Grotesk",
+                                  fontSize: 17)),
+                        ])),
+                    Expanded(
+                      child: Container(),
+                    ),
+                    PrimaryFundderButton(
+                      text: 'I have verified',
+                      onPressed: () async {
+                        FirebaseUser user =
+                            await FirebaseAuth.instance.currentUser();
+                        await user.reload();
+                        user = await FirebaseAuth.instance.currentUser();
+                        if (user.isEmailVerified == true) {
+                          Navigator.pop(context);
+                          /*Navigator.pushReplacementNamed(
+                                  context, '/' + user.uid + '/addProfilePic');*/
+                          /*Navigator.pushNamed(
                                   context, '/' + user.uid + '/tutorial');*/
-                            } else {
-                              if (mounted)
-                                setState(() {
-                                  verificationText = 'Email not verified';
-                                });
-                            }
-                          },
-                        ),
-                        SecondaryFundderButton(
-                            text: 'Send email again',
-                            onPressed: () async {
-                              FirebaseUser user =
-                                  await FirebaseAuth.instance.currentUser();
-                              user.sendEmailVerification();
-                              if (mounted)
-                                setState(() {
-                                  verificationText = 'Verification email sent';
-                                });
-                            }),
-                        SecondaryFundderButton(
-                          text: 'Sign out',
-                          onPressed: () async {
-                            if (mounted)
-                              setState(() {
-                                loading = true;
-                              });
-                            await _auth.signOut();
-                            Navigator.pop(context);
-                          },
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                      ],
-                    ))));
+                        } else {
+                          if (mounted)
+                            setState(() {
+                              verificationText = 'Email is not yet verified';
+                            });
+                          DialogManager()
+                              .createDialog('Error', verificationText, context);
+                        }
+                      },
+                    ),
+                    SecondaryFundderButton(
+                        text: 'Send email again',
+                        onPressed: () async {
+                          FirebaseUser user =
+                              await FirebaseAuth.instance.currentUser();
+                          user.sendEmailVerification();
+                          if (mounted)
+                            setState(() {
+                              verificationText = 'Verification email sent';
+                            });
+                          DialogManager().createDialog(
+                              'Email sent', verificationText, context);
+                        }),
+                    SecondaryFundderButton(
+                      text: 'Sign out',
+                      onPressed: () async {
+                        if (mounted)
+                          setState(() {
+                            loading = true;
+                          });
+                        await _auth.signOut();
+                        Navigator.pop(context);
+                      },
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                  ],
+                ))));
   }
 }
