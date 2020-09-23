@@ -655,6 +655,36 @@ exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
 }
 )
 
+/**Determines the follow relationship status of user x to user y. 
+ * returns : `\n`
+ * 
+ * if (x follows y) returns 'following' `\n`
+ * if (x requested to follow y) returns 'follow_requested' `\n`
+ * otherwise returns 'not_following' `\n`
+ * 
+ */
+
+ async function doesXfollowY(x, y)  {
+  const followersCollection = admin.firestore().collection('followers');
+  const xDoc = await followersCollection.doc(x).get();
+  const xFollowing = xDoc.get('following');
+  if (xFollowing.includes(y)){
+    return 'following'
+  }
+  else {
+    //doesn't follow so either requested to follow or not yet following
+    //check if requested 
+
+    const yDoc = await followersCollection.doc(y).get()
+    const yRequested = (yDoc.exists)?yDoc.get('requestedToFollowMe'):[];
+    if (yRequested!== null && yRequested.includes(x) ){
+      return 'follow_requested'
+    }
+    else{
+      return 'not_following'
+    }
+  }
+ }
 
 /**takes the id of the prospective followee
  * and id follower and the 'isPrivate' status of followee in that order.  */
@@ -678,6 +708,8 @@ function initiateFollow (followee, follower, followeeIsPrivate){
    }
      return {'status': status};
 }
+
+
 
 
 
