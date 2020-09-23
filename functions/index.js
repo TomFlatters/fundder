@@ -651,7 +651,7 @@ exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
   const userDoc = await userCollection.doc(followee).get();
   const followeeIsPrivate = (userDoc.get('isPrivate')===null)?false:userDoc.get('isPrivate');
   const status = initiateFollow(followee, follower, followeeIsPrivate);
-  return status;
+  return {status: status};
 }
 )
 
@@ -710,6 +710,13 @@ function initiateFollow (followee, follower, followeeIsPrivate){
 }
 
 
+exports.doesXfollowY = functions.https.onCall(async (data, context)=>{
+  console.log("does x follow y???")
+  const x = data.x;
+  const y = data.y;
+  const status =  await doesXfollowY(x, y);
+  return {status: status};
+})
 
 
 
