@@ -638,6 +638,8 @@ exports.populateUsersCollection = functions.firestore.document('dummyCollectionF
   }
 })
 
+
+/**Register a follower if followee is public, otherwise sends a follow request. */
 exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
   //chang to arrayUnion if possible in production 
   //operation not working in emulation
@@ -655,6 +657,33 @@ exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
 }
 )
 
+/**
+ * If a user x follows user y, make x unfollow x from y. Otherwise do nothing.
+ */
+
+ exports.unfollowXfromY = functions.https.onCall(async (data, context)=>{
+  console.log("running unfollowXfromY");
+  const FieldValue = require('firebase-admin').firestore.FieldValue;
+  const follower = data.x; 
+  const followee = data.y;
+
+  /**
+   * Remove y from 'following' field of x
+   * Remove x from 'followers' field of y
+   * decrement noFollowers of y by one
+   * decrement noFollowing of x by one
+   */
+  const userCollection = admin.firestore().collection('users');
+  const followersCollection = admin.firestore().collection('followers');
+  followersCollection.doc(followee).set({'followers': FieldValue.arrayRemove(follower)}, {merge: true});
+  followersCollection.doc(follower).set({'following': FieldValue.arrayRemove(followee) }, {merge: true});
+  userCollection.doc(follower).set({'noFollowing': FieldValue.increment(-1)}, {merge: true} );
+  userCollection.doc(followee).set({'noFollowers': FieldValue.increment(-1)}, {merge: true});
+  return {'status': 'removed'};
+ })
+
+
+
 /**Determines the follow relationship status of user x to user y. 
  * returns : `\n`
  * 
@@ -667,22 +696,38 @@ exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
  async function doesXfollowY(x, y)  {
   const followersCollection = admin.firestore().collection('followers');
   const xDoc = await followersCollection.doc(x).get();
-  const xFollowing = xDoc.get('following');
+  //////////////////SANITY CHECKS///////////////////////////
+  if (!xDoc.exists){
+    return 'not_following';
+  }
+
+  if (!("following" in xDoc.data() )){
+    return 'not_following';
+  }
+
+  ////////////////////////////////////////////////////////////
+
+  let xFollowing = xDoc.data()['following'];
   if (xFollowing.includes(y)){
+    console.log("In if 2")
     return 'following'
   }
   else {
     //doesn't follow so either requested to follow or not yet following
     //check if requested 
+    const yDoc = await followersCollection.doc(y).get();
+    if (!yDoc.exists){return 'not_following'}
 
-    const yDoc = await followersCollection.doc(y).get()
-    const yRequested = (yDoc.exists)?yDoc.get('requestedToFollowMe'):[];
-    if (yRequested!== null && yRequested.includes(x) ){
-      return 'follow_requested'
+    if ("requestedToFollowMe" in yDoc.data())
+    {
+        const yRequested = yDoc.get('requestedToFollowMe')
+        if (yRequested.includes(x)){
+      
+          return 'follow_requested'
+        }
     }
-    else{
-      return 'not_following'
-    }
+    //the other two response have been ruled out at this point
+    return 'not_following'
   }
  }
 
