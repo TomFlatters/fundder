@@ -7,7 +7,7 @@ import 'terms_of_use.dart';
 import 'dart:io' show Platform;
 
 class AuthenticationHome extends StatelessWidget {
-  Function emailChosenMethod;
+  final Function emailChosenMethod;
   AuthenticationHome({this.emailChosenMethod});
   final AuthService _auth = AuthService();
   @override

@@ -10,6 +10,9 @@ import 'package:fundder/global_widgets/dialogs.dart';
 
 class EmailSignIn extends StatefulWidget {
   final AuthService auth = AuthService();
+  Function nextPage;
+  Function previousPage;
+  EmailSignIn({this.nextPage, this.previousPage});
   @override
   _EmailSignInState createState() => _EmailSignInState();
 }
@@ -36,13 +39,14 @@ class _EmailSignInState extends State<EmailSignIn> {
                         children: [
                           IconButton(
                             icon: Icon(Icons.arrow_back),
-                            onPressed: () {},
+                            onPressed: widget.previousPage,
                           ),
                           Expanded(
                               child: Align(
                             alignment: Alignment.centerRight,
                             child: FlatButton(
-                                onPressed: () {}, child: Text('Register')),
+                                onPressed: widget.nextPage,
+                                child: Text('Register')),
                           ))
                         ],
                       )),
@@ -167,7 +171,7 @@ class _EmailSignInState extends State<EmailSignIn> {
                   ),
                   SizedBox(height: 20.0),
                   GestureDetector(
-                      onTap: () {},
+                      onTap: widget.nextPage,
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

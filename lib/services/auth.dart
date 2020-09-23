@@ -196,7 +196,7 @@ class AuthService {
         print('Creating new doc');
         // doc.data() will be undefined in this case
         await DatabaseService(uid: user.uid)
-            .registerUserData(user.email, user.displayName, null, defaultPic);
+            .registerUserData(user.email, null, user.displayName, defaultPic);
         _getFCMToken(user.uid);
       }
     });
@@ -206,7 +206,8 @@ class AuthService {
 
   Future loginWithFacebook(BuildContext context) async {
     final facebookLogin = FacebookLogin();
-    final result = await facebookLogin.logIn(['email']);
+    final result =
+        await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
     final AuthCredential credential = FacebookAuthProvider.getCredential(
       accessToken: result.accessToken.token,
     );
@@ -215,25 +216,24 @@ class AuthService {
           await _auth.signInWithCredential(credential);
       FirebaseUser user = authResult.user;
       assert(user.email != null);
-      assert(user.displayName != null);
-      assert(!user.isAnonymous);
-      assert(await user.getIdToken() != null);
 
       final FirebaseUser currentUser = await _auth.currentUser();
+      print('user id: ' + currentUser.uid.toString());
       assert(user.uid == currentUser.uid);
 
       String defaultPic =
           'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
       // create a new (firestore) document for the user with corresponding uid
 
-      var docRef = Firestore.instance.collection('users').document(user.uid);
+      var docRef =
+          Firestore.instance.collection('users').document(currentUser.uid);
 
       docRef.get().then((doc) async {
         if (!doc.exists) {
           print('Creating new doc');
           // doc.data() will be undefined in this case
           await DatabaseService(uid: user.uid)
-              .registerUserData(user.email, user.displayName, null, defaultPic);
+              .registerUserData(user.email, null, null, defaultPic);
           _getFCMToken(user.uid);
         }
       });
@@ -321,7 +321,7 @@ class AuthService {
         print('Creating new doc');
         // doc.data() will be undefined in this case
         await DatabaseService(uid: user.uid)
-            .registerUserData(user.email, user.displayName, null, defaultPic);
+            .registerUserData(user.email, null, user.displayName, defaultPic);
         _getFCMToken(user.uid);
       }
     });

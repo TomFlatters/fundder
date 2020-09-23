@@ -109,12 +109,18 @@ class _HomeState extends State<Home> {
         .get()
         .then((snapshot) {
       if (snapshot != null && (user.isEmailVerified == true)) {
-        if (snapshot['dpSetterPrompted'] != null && snapshot['name'] != null) {
-          if (snapshot['dpSetterPrompted'] != true || snapshot['name'] == '') {
-            Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
-          }
-        } else {
-          Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
+        if (snapshot['name'] == null ||
+            snapshot['username'] == null ||
+            snapshot['name'] == '' ||
+            snapshot['username'] == '') {
+          print('Pushing add profile pic');
+          Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic').then(
+              (value) => Firestore.instance
+                      .collection('users')
+                      .document(user.uid)
+                      .updateData({
+                    'dpSetterPrompted': true,
+                  }));
         }
       }
       if (user.isEmailVerified == false) {
@@ -163,77 +169,84 @@ class _HomeState extends State<Home> {
           if (snapshot.hasData) {
             DocumentSnapshot doc = snapshot.data;
             if (doc.data != null) {
-              User user = DatabaseService(uid: firebaseUser.uid)
-                  .userDataFromSnapshot(doc);
-              print(user.toString());
-              final List<Widget> screens = [
-                FeedController(
-                    doTutorialSeen: user.doTutorialSeen,
-                    fundTutorialSeen: user.fundTutorialSeen,
-                    doneTutorialSeen:
-                        user.doneTutorialSeen), //i.e. the one from home button
-                SearchController(),
-                PlaceholderWidget(Colors.white),
-                LikedController(),
-                ProfileController(
-                  user: user,
-                ),
-              ];
-              return Scaffold(
-                body: Column(children: [
-                  Expanded(
-                      child: IndexedStack(
-                    index: _currentIndex,
-                    children: screens,
-                  )),
-                  ConnectionListener()
-                ]), // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
-                bottomNavigationBar: BottomNavigationBar(
-                  type: BottomNavigationBarType.fixed,
-                  selectedItemColor: Colors.black,
-                  unselectedItemColor: Color.fromRGBO(
-                      0, 0, 0, 0.5), //hexcolor method is custom at bottom
-                  iconSize: 26,
-                  onTap: onTabTapped, // new
-                  currentIndex: _currentIndex, // new
-                  items: [
-                    new BottomNavigationBarItem(
-                      icon: Icon(
-                        AntDesign.home,
+              if (doc.data['dpSetterPrompted'] == null ||
+                  doc.data['name'] == null ||
+                  doc.data['username'] == null ||
+                  doc.data['dpSetterPrompted'] == false) {
+                return Loading();
+              } else {
+                User user = DatabaseService(uid: firebaseUser.uid)
+                    .userDataFromSnapshot(doc);
+                print(user.toString());
+                final List<Widget> screens = [
+                  FeedController(
+                      doTutorialSeen: user.doTutorialSeen,
+                      fundTutorialSeen: user.fundTutorialSeen,
+                      doneTutorialSeen: user
+                          .doneTutorialSeen), //i.e. the one from home button
+                  SearchController(),
+                  PlaceholderWidget(Colors.white),
+                  LikedController(),
+                  ProfileController(
+                    user: user,
+                  ),
+                ];
+                return Scaffold(
+                  body: Column(children: [
+                    Expanded(
+                        child: IndexedStack(
+                      index: _currentIndex,
+                      children: screens,
+                    )),
+                    ConnectionListener()
+                  ]), // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
+                  bottomNavigationBar: BottomNavigationBar(
+                    type: BottomNavigationBarType.fixed,
+                    selectedItemColor: Colors.black,
+                    unselectedItemColor: Color.fromRGBO(
+                        0, 0, 0, 0.5), //hexcolor method is custom at bottom
+                    iconSize: 26,
+                    onTap: onTabTapped, // new
+                    currentIndex: _currentIndex, // new
+                    items: [
+                      new BottomNavigationBarItem(
+                        icon: Icon(
+                          AntDesign.home,
+                        ),
+                        title: showIndicator(_currentIndex == 0),
                       ),
-                      title: showIndicator(_currentIndex == 0),
-                    ),
-                    new BottomNavigationBarItem(
-                      icon: Icon(
-                        AntDesign.search1,
+                      new BottomNavigationBarItem(
+                        icon: Icon(
+                          AntDesign.search1,
+                        ),
+                        title: showIndicator(_currentIndex == 1),
                       ),
-                      title: showIndicator(_currentIndex == 1),
-                    ),
-                    new BottomNavigationBarItem(
-                      icon: Icon(
-                        AntDesign.plussquareo,
+                      new BottomNavigationBarItem(
+                        icon: Icon(
+                          AntDesign.plussquareo,
+                        ),
+                        title: showIndicator(_currentIndex == 2),
                       ),
-                      title: showIndicator(_currentIndex == 2),
-                    ),
-                    new BottomNavigationBarItem(
-                      icon: Icon(
-                        unreadNotifs == false
-                            ? AntDesign.hearto
-                            : AntDesign.heart,
-                        color:
-                            unreadNotifs == false ? null : HexColor('ff6b6c'),
+                      new BottomNavigationBarItem(
+                        icon: Icon(
+                          unreadNotifs == false
+                              ? AntDesign.hearto
+                              : AntDesign.heart,
+                          color:
+                              unreadNotifs == false ? null : HexColor('ff6b6c'),
+                        ),
+                        title: showIndicator(_currentIndex == 3),
                       ),
-                      title: showIndicator(_currentIndex == 3),
-                    ),
-                    new BottomNavigationBarItem(
-                      icon: Icon(
-                        AntDesign.user,
-                      ),
-                      title: showIndicator(_currentIndex == 4),
-                    )
-                  ],
-                ),
-              );
+                      new BottomNavigationBarItem(
+                        icon: Icon(
+                          AntDesign.user,
+                        ),
+                        title: showIndicator(_currentIndex == 4),
+                      )
+                    ],
+                  ),
+                );
+              }
             } else {
               return Loading();
             }

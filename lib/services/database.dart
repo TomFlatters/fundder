@@ -46,6 +46,7 @@ class DatabaseService {
     return await userCollection.document(uid).updateData({
       'email': email,
       'username': username,
+      'search_username': username != null ? username.toLowerCase() : null,
       'name': name,
       'profilePic': profilePic,
     });
@@ -58,7 +59,7 @@ class DatabaseService {
     return await userCollection.document(uid).setData({
       'email': email,
       'username': username,
-      'search_username': username.toLowerCase(),
+      'search_username': username != null ? username.toLowerCase() : null,
       'name': name,
       'profilePic': profilePic,
       'seenTutorial': false,

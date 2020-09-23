@@ -10,6 +10,8 @@ import 'package:fundder/global_widgets/dialogs.dart';
 
 class EmailRegistration extends StatefulWidget {
   final AuthService auth = AuthService();
+  final Function previousPage;
+  EmailRegistration({this.previousPage});
   @override
   _EmailRegistrationState createState() => _EmailRegistrationState();
 }
@@ -38,7 +40,7 @@ class _EmailRegistrationState extends State<EmailRegistration> {
                         children: [
                           IconButton(
                             icon: Icon(Icons.arrow_back),
-                            onPressed: () {},
+                            onPressed: widget.previousPage,
                           ),
                           Expanded(
                               child: Align(

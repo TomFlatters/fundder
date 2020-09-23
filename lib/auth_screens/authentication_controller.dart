@@ -45,8 +45,13 @@ class _AuthenticationControllerState extends State<AuthenticationController> {
                   AuthenticationHome(
                     emailChosenMethod: _emailChosen,
                   ),
-                  EmailSignIn(),
-                  EmailRegistration()
+                  EmailSignIn(
+                    nextPage: _carouselController.nextPage,
+                    previousPage: _carouselController.previousPage,
+                  ),
+                  EmailRegistration(
+                    previousPage: _carouselController.previousPage,
+                  )
                 ]),
     );
   }
