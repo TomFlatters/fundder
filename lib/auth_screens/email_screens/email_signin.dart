@@ -64,7 +64,7 @@ class _EmailSignInState extends State<EmailSignIn> {
                           key: _signinKey,
                           child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 TextFormField(
                                   inputFormatters: [

@@ -14,6 +14,7 @@ class AuthenticationController extends StatefulWidget {
 class _AuthenticationControllerState extends State<AuthenticationController> {
   CarouselController _carouselController = CarouselController();
   int _current = 0;
+  bool _email = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +35,19 @@ class _AuthenticationControllerState extends State<AuthenticationController> {
             enlargeCenterPage: false,
             // autoPlay: false,
           ),
-          items: [AuthenticationHome(), EmailSignIn(), EmailRegistration()]),
+          items: _email == false
+              ? [
+                  AuthenticationHome(
+                    emailChosenMethod: _emailChosen,
+                  )
+                ]
+              : [
+                  AuthenticationHome(
+                    emailChosenMethod: _emailChosen,
+                  ),
+                  EmailSignIn(),
+                  EmailRegistration()
+                ]),
     );
   }
 
@@ -42,5 +55,12 @@ class _AuthenticationControllerState extends State<AuthenticationController> {
     // Set state to make sure that views instantiate with the latest values
     setState(() {});
     FocusScope.of(context).unfocus();
+  }
+
+  void _emailChosen() {
+    setState(() {
+      _email = true;
+    });
+    _carouselController.nextPage();
   }
 }

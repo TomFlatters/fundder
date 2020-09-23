@@ -7,6 +7,8 @@ import 'terms_of_use.dart';
 import 'dart:io' show Platform;
 
 class AuthenticationHome extends StatelessWidget {
+  Function emailChosenMethod;
+  AuthenticationHome({this.emailChosenMethod});
   final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
@@ -68,7 +70,7 @@ class AuthenticationHome extends StatelessWidget {
                     )
                   : Container(height: 0),
               AuthFundderButton(
-                onPressed: () {},
+                onPressed: emailChosenMethod,
                 backgroundColor: HexColor('ff6b6c'),
                 textColor: Colors.white,
                 borderColor: HexColor('ff6b6c'),
@@ -84,7 +86,8 @@ class AuthenticationHome extends StatelessWidget {
                 },
                 child: Text(
                   'Terms of use',
-                  style: TextStyle(color: Colors.grey[800]),
+                  style: TextStyle(
+                      color: HexColor('ff6b6c'), fontWeight: FontWeight.w600),
                 ),
               ),
               SizedBox(height: 25.0),
