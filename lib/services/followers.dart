@@ -32,6 +32,31 @@ class GeneralFollowerServices {
     return [];
   }
 
+  static Future<List<String>> idsFollowedByUser(String uid) async {
+    //returns the user id of all users following user 'uid'
+    print("executing idsFollowedByUser");
+    CollectionReference followersCollection =
+        Firestore.instance.collection('followers');
+    DocumentSnapshot docSnap = await followersCollection.document(uid).get();
+    if (docSnap.exists) {
+      var following = docSnap.data['following'];
+      List<String> res = [];
+
+      if (following != null) {
+        // return following as List<String>;
+        for (var i = 0; i < following.length; i++) {
+          print(following[i]);
+          res.add(following[i].toString());
+        }
+        return res;
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
+  }
+
   static Future<List<Map>> unamesFollowingUser(String uid) async {
     //return the usernames of all users following the user
     List<String> uids = await GeneralFollowerServices.idsFollowingUser(uid);
