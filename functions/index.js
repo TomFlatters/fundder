@@ -804,13 +804,30 @@ exports.deployPostsToFollowerFeeds = functions.firestore.document('postsV2/{post
   const postAuthor =  postValue.author;
   const userCollection = admin.firestore().collection('users');
 
+
+  //we are only putting static values in this feed. The mutable fields like noLikes, status, isPrivate etc... will be held only in the central collection.
+  //post will be accessed from central collection anyway 
+  //this is just for housekeeping and any future features which may require the static but not dynamic info
   //first put it in the author's feed and then the author's followers' feed
-  const authorFeed = userCollection.doc(postAuthor).collection('myFeed').doc(postId).set(postValue);
+
+  //info regarding the nature of the post has been omitted if the author deletes the post later on. These posts in myFeed will persist but all sensitive data about them in the central collection will have 
+  //been removed
+  
+  const postForMyFeed = {
+    aspectRatio: postValue.aspectRatio,
+    author: postValue.author,
+    authorUsername: postValue.authorUsername,
+    charity: postValue.charity,
+    charityLogo: postValue.charityLogo, 
+    timestamp: postValue.timestamp, 
+  }
+  userCollection.doc(postAuthor).collection('myFeed').doc(postId).set(postForMyFeed);
   const authorFollowersDoc = await admin.firestore().collection('followers').doc(postAuthor).get();
   if (authorFollowersDoc.exists){
     if ("followers" in authorFollowersDoc.data()){
       const followers = authorFollowersDoc.get('followers');
-      followers.forEach((followerId)=> userCollection.doc(followerId).collection('myFeed').doc(postId).set(postValue))
+      followers.forEach((followerId)=> userCollection.doc(followerId).collection('myFeed').doc(postId).set(postForMyFeed));
     }
   }
+
 })
