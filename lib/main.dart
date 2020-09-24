@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/shared/loading.dart';
@@ -15,9 +16,10 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'dart:async';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Crashlytics.instance.enableInDevMode = false;
-
+  await Firestore.instance.settings(host: '10.0.2.2:8080', sslEnabled: false);
   // Pass all uncaught errors from the framework to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
   FluroRouter.setupRouter();
