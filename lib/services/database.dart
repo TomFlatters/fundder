@@ -45,7 +45,7 @@ class DatabaseService {
     return fetchedUser;
   }
 
-  // Update User
+  /** Update User */
   Future updateUserData(
       String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
@@ -57,7 +57,7 @@ class DatabaseService {
     });
   }
 
-  // only call this on registration, since it sets profile pic and tutorials viewed as false
+  /**  only call this on registration, since it sets profile pic and tutorials viewed as false */
   Future registerUserData(
       String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
@@ -95,7 +95,7 @@ class DatabaseService {
     return userCollection.snapshots();
   }
 
-  // Given a document return a User type object
+  /**Given a document return a User type object*/
   User _userDataFromSnapshot(DocumentSnapshot doc) {
     //print("_userDataFromSnapshot invoked. This is the username: " +
     //   doc.data["username"]);
@@ -121,7 +121,7 @@ class DatabaseService {
   // 2. Posts CRUD:
   // -------------
 
-  // Given a document return a Post type object
+  /**  Given a document return a Post type object */
   Post _makePost(DocumentSnapshot doc) {
     print("_makePost being run");
     var isPrivate =
@@ -160,32 +160,12 @@ class DatabaseService {
     );
   }
 
-  // Get posts list stream is mapped to the Post object
+  /**  Get posts list stream is mapped to the Post object */
   List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
     print('mapping the posts to Post model');
     return snapshot.documents.map((DocumentSnapshot doc) {
       return _makePost(doc);
     }).toList();
-  }
-
-  // Get list of posts ordered by time
-  Stream<List<Post>> get fundPosts {
-    return postsCollection
-        .orderBy("timestamp", descending: true)
-        .limit(10)
-        .where('status', isEqualTo: 'fund')
-        .snapshots()
-        .map(_postsDataFromSnapshot);
-  }
-
-  Stream<List<Post>> get donePosts {
-    print('returning done posts');
-    return postsCollection
-        .orderBy("timestamp", descending: true)
-        .limit(10)
-        .where('status', isEqualTo: 'done')
-        .snapshots()
-        .map(_postsDataFromSnapshot);
   }
 
   Future<List<Post>> refreshPosts(
@@ -203,6 +183,9 @@ class DatabaseService {
         });
   }
 
+  /**Get up to 'limit' number of post documents ordered by timestamp
+   * starting at 'startTimestamp' containing hashtag 'hashtag' 
+   */
   Future<List<Post>> refreshHashtag(
       String hashtag, int limit, Timestamp startTimestamp) {
     print('limit: ' + limit.toString());
@@ -218,7 +201,9 @@ class DatabaseService {
         });
   }
 
+  /**Get posts by author id */
   Future<List<Post>> authorPosts(String id) {
+    //TODO: only if you follow the author
     print('gettig posts by author: ' + id);
     return postsCollection
         .where("author", isEqualTo: id)
@@ -240,7 +225,9 @@ class DatabaseService {
   }
 
   // Get list of posts for given author
+  @Deprecated("postsByUser")
   Stream<List<Post>> postsByUser(id) {
+    //TODO: find a way to remove this function from the client side
     return postsCollection
         .where("author", isEqualTo: id)
         .orderBy("timestamp", descending: true)
@@ -260,7 +247,7 @@ class DatabaseService {
   }
 */
 
-  // Upload post and return the document id
+  /** Upload post and return the document id*/
   Future uploadPost(Post post) async {
     return await postsCollection
         .add({
