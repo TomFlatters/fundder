@@ -797,4 +797,20 @@ exports.doesXfollowY = functions.https.onCall(async (data, context)=>{
 
 
 
+exports.deployPostsToFollowerFeeds = functions.firestore.document('postsV2/{postId}').onCreate(async (snap, context)=>{
+  const postValue = snap.data();
+  const postId = context.params.postId;
+  //deploy to feed of all followers
+  const postAuthor =  postValue.author;
+  const userCollection = admin.firestore().collection('users');
 
+  //first put it in the author's feed and then the author's followers' feed
+  const authorFeed = userCollection.doc(postAuthor).collection('myFeed').doc(postId).set(postValue);
+  const authorFollowersDoc = await admin.firestore().collection('followers').doc(postAuthor).get();
+  if (authorFollowersDoc.exists){
+    if ("followers" in authorFollowersDoc.data()){
+      const followers = authorFollowersDoc.get('followers');
+      followers.forEach((followerId)=> userCollection.doc(followerId).collection('myFeed').doc(postId).set(postValue))
+    }
+  }
+})
