@@ -6,13 +6,15 @@ import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
+import 'dart:async';
 
 class CheckVerified extends StatefulWidget {
   @override
   _VerificationState createState() => _VerificationState();
 }
 
-class _VerificationState extends State<CheckVerified> {
+class _VerificationState extends State<CheckVerified>
+    with SingleTickerProviderStateMixin {
   // create auth service instance available for use here
   final AuthService _auth = AuthService();
   // key associated with form. Tracks state of form
@@ -28,6 +30,37 @@ class _VerificationState extends State<CheckVerified> {
 
   String error = '';
   String verificationText = '';
+
+  bool _isUserEmailVerified = false;
+  Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // ... any code here ...
+    Future(() async {
+      _timer = Timer.periodic(Duration(seconds: 5), (timer) async {
+        await FirebaseAuth.instance.currentUser()
+          ..reload();
+        var user = await FirebaseAuth.instance.currentUser();
+        if (user.isEmailVerified) {
+          setState(() {
+            _isUserEmailVerified = user.isEmailVerified;
+          });
+          Navigator.pop(context, true);
+          timer.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_timer != null) {
+      _timer.cancel();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

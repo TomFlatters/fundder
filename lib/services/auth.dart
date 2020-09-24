@@ -206,8 +206,8 @@ class AuthService {
 
   Future loginWithFacebook(BuildContext context) async {
     final facebookLogin = FacebookLogin();
-    final result =
-        await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
+    final result = await facebookLogin
+        .logIn(['default', 'email', 'user_friends', 'public_profile']);
     final AuthCredential credential = FacebookAuthProvider.getCredential(
       accessToken: result.accessToken.token,
     );

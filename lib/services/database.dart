@@ -64,7 +64,7 @@ class DatabaseService {
       'profilePic': profilePic,
       'seenTutorial': false,
       'dpSetterPrompted': false,
-    });
+    }, merge: true);
   }
 
   Future addFCMToken(String token) async {

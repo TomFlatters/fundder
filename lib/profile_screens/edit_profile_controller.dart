@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/main.dart';
-import 'helper_classes.dart';
+import '../helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'services/database.dart';
-import 'shared/loading.dart';
-import 'global_widgets/buttons.dart';
-import 'global_widgets/dialogs.dart';
+import '../services/database.dart';
+import '../shared/loading.dart';
+import '../global_widgets/buttons.dart';
+import '../global_widgets/dialogs.dart';
 
 class EditProfile extends StatefulWidget {
   @override

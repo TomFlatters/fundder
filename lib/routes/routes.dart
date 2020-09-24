@@ -10,7 +10,7 @@ import 'package:fundder/post_creation_widgets/add_post_controller.dart';
 import 'package:fundder/do_challenge_detail.dart';
 import 'package:fundder/challenge_steps_view.dart';
 import 'package:fundder/profile_screens/view_followers_controller.dart';
-import 'package:fundder/edit_profile_controller.dart';
+import 'package:fundder/profile_screens/edit_profile_controller.dart';
 import 'package:fundder/post_creation_widgets/upload_proof_controller.dart';
 import 'package:fundder/welcome_pages/profilepic_setter.dart';
 import 'package:fundder/welcome_pages/tutorial.dart';
