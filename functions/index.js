@@ -902,7 +902,9 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   let postJSONS = await Promise.all(queryData.map(async (postId)=>{
     const postDoc = await postsCollection.doc(postId).get();
     if (postDoc.exists){
-      return postDoc.data();
+      let postObj = postDoc.data();
+      postObj['postId'] = postId;
+      return postObj;
     }
     else {
       //INVOKE FUNCTION TO REMOVE POSTDOC FROM THIS FEED
