@@ -899,15 +899,18 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   const query = await myFeed.where("status", "==", postStatus).orderBy("timestamp", 'desc').startAfter(timeStamp).limit(limit).get();
   const queryDocSnap = query.docs
   const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data()['postId'])
-  const postJSONS = await Promise.all(queryData.map(async (postId)=>{
+  let postJSONS = await Promise.all(queryData.map(async (postId)=>{
     const postDoc = await postsCollection.doc(postId).get();
     if (postDoc.exists){
       return postDoc.data();
     }
-    else return null;
+    else {
+      //INVOKE FUNCTION TO REMOVE POSTDOC FROM THIS FEED
+      return null;}
   }));
-
   console.log(postJSONS);
-
+  console.log("printing filtered jsons")
+  postJSONS = postJSONS.filter((docSnap)=> docSnap!==null);
+  console.log(postJSONS);
   return {"listOfJsonDocs": queryData}
 })
