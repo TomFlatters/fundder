@@ -834,6 +834,7 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
     timestamp: postValue.timestamp, 
     status: postValue.status,
     postId: postId,
+    hashtags: postValue.hashtags,
   }
   userCollection.doc(postAuthor).collection('myFeed').doc(postId).set(postForMyFeed);
   const authorFollowersDoc = await admin.firestore().collection('followers').doc(postAuthor).get();
@@ -878,9 +879,6 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
 
 
 
-function stringToTimestamp(stringTimeStamp){
-  
-}
 /**Returns a list of json objects representing the latest 'limit' posts
  * of either a fund or done status from a specified timestamp for a given user.
  */
@@ -897,9 +895,19 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
 
   const uid = context.auth.uid;
   const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
+  const postsCollection = admin.firestore().collection('postsV2');
   const query = await myFeed.where("status", "==", postStatus).orderBy("timestamp", 'desc').startAfter(timeStamp).limit(limit).get();
   const queryDocSnap = query.docs
   const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data()['postId'])
-  queryData.forEach(console.log);
+  const postJSONS = await Promise.all(queryData.map(async (postId)=>{
+    const postDoc = await postsCollection.doc(postId).get();
+    if (postDoc.exists){
+      return postDoc.data();
+    }
+    else return null;
+  }));
+
+  console.log(postJSONS);
+
   return {"listOfJsonDocs": queryData}
 })
