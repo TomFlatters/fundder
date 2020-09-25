@@ -153,7 +153,7 @@ class _EmailRegistrationState extends State<EmailRegistration> {
                         DialogManager()
                             .createDialog('Error', registrationerror, context);
                       } else {
-                        if (mounted) {
+                        if (result != 'Success') {
                           if (mounted)
                             setState(() {
                               registrationerror = result;

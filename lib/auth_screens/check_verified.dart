@@ -110,7 +110,7 @@ class _VerificationState extends State<CheckVerified>
                         await user.reload();
                         user = await FirebaseAuth.instance.currentUser();
                         if (user.isEmailVerified == true) {
-                          Navigator.pop(context);
+                          Navigator.pop(context, true);
                           /*Navigator.pushReplacementNamed(
                                   context, '/' + user.uid + '/addProfilePic');*/
                           /*Navigator.pushNamed(
@@ -125,7 +125,7 @@ class _VerificationState extends State<CheckVerified>
                         }
                       },
                     ),
-                    SecondaryFundderButton(
+                    EditFundderButton(
                         text: 'Send email again',
                         onPressed: () async {
                           FirebaseUser user =
@@ -138,7 +138,7 @@ class _VerificationState extends State<CheckVerified>
                           DialogManager().createDialog(
                               'Email sent', verificationText, context);
                         }),
-                    SecondaryFundderButton(
+                    EditFundderButton(
                       text: 'Sign out',
                       onPressed: () async {
                         if (mounted)
@@ -146,7 +146,7 @@ class _VerificationState extends State<CheckVerified>
                             loading = true;
                           });
                         await _auth.signOut();
-                        Navigator.pop(context);
+                        Navigator.pop(context, false);
                       },
                     ),
                     SizedBox(

@@ -21,7 +21,14 @@ class UserLoader extends StatelessWidget {
                 .userDataFromSnapshot(snapshot.data);
             return ProfileController(user: user);
           } else {
-            return Loading();
+            if (snapshot.connectionState == ConnectionState.done) {
+              return Scaffold(
+                appBar: AppBar(),
+                body: Text('Cannot find user'),
+              );
+            } else {
+              return Loading();
+            }
           }
         });
   }

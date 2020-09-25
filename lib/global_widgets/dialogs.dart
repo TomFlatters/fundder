@@ -26,6 +26,18 @@ class DialogManager {
     );
   }
 
+  Future<void> showChoiceDialog(String title, String subtitle,
+      BuildContext context, List<Widget> actionsList) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return DialogWidget(
+            subtitle: subtitle, title: title, actionsList: actionsList);
+      },
+    );
+  }
+
   Future<void> showDeleteDialog(
       Post post, BuildContext context, VoidCallback onDeletePressed) async {
     return showDialog<void>(

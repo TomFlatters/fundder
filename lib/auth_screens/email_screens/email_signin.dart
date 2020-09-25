@@ -154,14 +154,16 @@ class _EmailSignInState extends State<EmailSignIn> {
                         DialogManager()
                             .createDialog('Error', signinerror, context);
                       } else {
-                        if (mounted) {
-                          if (mounted)
-                            setState(() {
-                              signinerror = result;
-                              loading = false;
-                            });
-                          DialogManager()
-                              .createDialog('Error', signinerror, context);
+                        if (result != 'Success') {
+                          if (mounted) {
+                            if (mounted)
+                              setState(() {
+                                signinerror = result;
+                                loading = false;
+                              });
+                            DialogManager()
+                                .createDialog('Error', signinerror, context);
+                          }
                         }
                       }
                     }

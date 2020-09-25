@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:fundder/auth_screens/terms_of_use.dart';
 
 class AuthService {
   String fcmToken;
@@ -206,11 +207,19 @@ class AuthService {
 
   Future loginWithFacebook(BuildContext context) async {
     final facebookLogin = FacebookLogin();
-    final result = await facebookLogin
-        .logIn(['default', 'email', 'user_friends', 'public_profile']);
+    final result =
+        await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
     final AuthCredential credential = FacebookAuthProvider.getCredential(
       accessToken: result.accessToken.token,
     );
+    final profileGraphResponse = await http.get(
+        'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token}');
+    final profile = json.decode(profileGraphResponse.body);
+    final friendsGraphResponse = await http.get(
+        'https://graph.facebook.com/v8.0/me/friends?access_token=${result.accessToken.token}');
+    final friends = json.decode(friendsGraphResponse.body);
+    print('profile: ' + profile.toString());
+    print('friends: ' + friends.toString());
     try {
       final AuthResult authResult =
           await _auth.signInWithCredential(credential);
@@ -232,9 +241,10 @@ class AuthService {
       docRef.get().then((doc) async {
         if (!doc.exists) {
           print('Creating new doc');
-          // doc.data() will be undefined in this case
+          // doc.data() will be undefined in this cas
           await DatabaseService(uid: user.uid)
               .registerUserData(user.email, null, null, defaultPic);
+          await DatabaseService(uid: user.uid).addFacebookId(profile['id']);
           _getFCMToken(user.uid);
         }
       });
@@ -275,6 +285,8 @@ class AuthService {
           // link facebook + google.
           await authResult.linkWithCredential(credential);
         }
+        await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);
+        _getFCMToken(guser.uid);
 
         //return usuario;
       }

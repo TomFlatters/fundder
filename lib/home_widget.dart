@@ -19,6 +19,9 @@ import 'connection_listener.dart';
 import 'tutorial_screens/profile_tutorial.dart';
 import 'models/user.dart';
 import 'shared/loading.dart';
+import 'auth_screens/terms_of_use.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'auth_screens/terms_of_use_prompted.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -82,6 +85,7 @@ class _HomeState extends State<Home> {
   // checks if user has any notifications and if they have set their profile pic yet
   void _checkNotifs() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    await user.reload();
     Firestore.instance
         .collection("users")
         .document(user.uid)
@@ -104,17 +108,39 @@ class _HomeState extends State<Home> {
   void _checkIfIntroed() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     await user.reload();
+    print('Checking if introed');
     Firestore.instance
         .collection("users")
         .document(user.uid)
         .get()
-        .then((snapshot) {
+        .then((snapshot) async {
       loadingWelcome = false;
-      if (snapshot != null && (user.isEmailVerified == true)) {
+      if (snapshot.data['termsAccepted'] == null ||
+          snapshot.data['termsAccepted'] == false) {
+        bool termsAccepted = await Navigator.push(context,
+            MaterialPageRoute(builder: (context) => TermsViewPrompter()));
+        if (termsAccepted == true) {
+          await Firestore.instance
+              .collection('users')
+              .document(user.uid)
+              .updateData({
+            'termsAccepted': true,
+          });
+        } else {
+          final FirebaseAuth _auth = FirebaseAuth.instance;
+          await _auth.signOut();
+          return;
+        }
+      }
+      if (snapshot != null &&
+          (user.isEmailVerified == true) &&
+          havePresentedWelcome == false) {
         if (snapshot['name'] == null ||
             snapshot['username'] == null ||
             snapshot['name'] == '' ||
-            snapshot['username'] == '') {
+            snapshot['username'] == '' ||
+            snapshot['dpSetterPrompted'] == null ||
+            snapshot['dpSetterPrompted'] == false) {
           havePresentedWelcome = true;
           print('Pushing add profile pic');
           Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic').then(
@@ -126,17 +152,20 @@ class _HomeState extends State<Home> {
                   }));
         }
       }
-      if (user.isEmailVerified == false) {
+      if (user.isEmailVerified == false && havePresentedWelcome == false) {
         havePresentedWelcome = true;
-        Navigator.pushNamed(context, '/' + user.uid + '/verification').then(
-            (value) =>
-                Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic')
-                    .then((val) => Firestore.instance
-                            .collection('users')
-                            .document(user.uid)
-                            .updateData({
-                          'dpSetterPrompted': true,
-                        })));
+        Navigator.pushNamed(context, '/' + user.uid + '/verification')
+            .then((value) {
+          if (value == true) {
+            Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic')
+                .then((val) => Firestore.instance
+                        .collection('users')
+                        .document(user.uid)
+                        .updateData({
+                      'dpSetterPrompted': true,
+                    }));
+          }
+        });
       }
     });
   }
@@ -181,7 +210,9 @@ class _HomeState extends State<Home> {
           if (snapshot.hasData) {
             DocumentSnapshot doc = snapshot.data;
             if (doc.data != null) {
-              if (doc.data['dpSetterPrompted'] == null ||
+              if (doc.data['termsAccepted'] == null ||
+                  doc.data['termsAccepted'] == false ||
+                  doc.data['dpSetterPrompted'] == null ||
                   doc.data['name'] == null ||
                   doc.data['username'] == null ||
                   doc.data['dpSetterPrompted'] == false ||
@@ -269,6 +300,8 @@ class _HomeState extends State<Home> {
               return Loading();
             }
           } else {
+            loadingWelcome = true;
+            _checkIfIntroed();
             return Loading();
           }
         });

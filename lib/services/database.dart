@@ -67,6 +67,12 @@ class DatabaseService {
     }, merge: true);
   }
 
+  Future addFacebookId(String facebookId) async {
+    return await userCollection
+        .document(uid)
+        .setData({'facebookId': facebookId}, merge: true);
+  }
+
   Future addFCMToken(String token) async {
     // create or update the document with this uid
     return await userCollection.document(uid).updateData({
