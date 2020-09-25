@@ -656,6 +656,14 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/gv
     
   }
 
+  if (newValue.assignUsersRandomNumbers===true){
+    //there are 45 users in the doc....so on average 9 docs will be assigned to each number from 0 to 4
+    const generateRandomNumber = (upperBound) => Math.ceil(Math.random() * upperBound); 
+    const userCollection =  admin.firestore().collection('users')
+    const userDocs = await userCollection.get();
+    userDocs.docs.forEach( (q)=> userCollection.doc(q.id).set({'randomNumber': generateRandomNumber(4)}, {merge: true}))
+
+  }
   return res
 })
 
@@ -797,13 +805,15 @@ exports.doesXfollowY = functions.https.onCall(async (data, context)=>{
 
 
 
-exports.deployPostsToFollowerFeeds = functions.firestore.document('postsV2/{postId}').onCreate(async (snap, context)=>{
+exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').onCreate(async (snap, context)=>{
   const postValue = snap.data();
   const postId = context.params.postId;
   //deploy to feed of all followers
   const postAuthor =  postValue.author;
+  const isPrivate = postValue.isPrivate;
   const userCollection = admin.firestore().collection('users');
   const FieldValue = require('firebase-admin').firestore.FieldValue;
+  var userHasFollowers = false;
 
   //we are only putting static values in this feed. The mutable fields like noLikes, isPrivate etc... will be held only in the central collection.
   //post will be accessed from central collection anyway 
@@ -826,7 +836,8 @@ exports.deployPostsToFollowerFeeds = functions.firestore.document('postsV2/{post
   const authorFollowersDoc = await admin.firestore().collection('followers').doc(postAuthor).get();
   if (authorFollowersDoc.exists){
     if ("followers" in authorFollowersDoc.data()){
-      const followers = authorFollowersDoc.get('followers');
+      userHasFollowers = true;
+      var followers = authorFollowersDoc.get('followers');
       followers.forEach(
         (followerId)=> {
           userCollection.doc(followerId).collection('myFeed').doc(postId).set(postForMyFeed);
@@ -836,5 +847,33 @@ exports.deployPostsToFollowerFeeds = functions.firestore.document('postsV2/{post
       );
     }
   }
+  
+  //if this post is public, it ought for now to be deployed to fifty feeds (including those of followers)
+  //get fifty users from the collection, check to see if they're not in followers.
+ 
+  if (!isPrivate){
+    //right now each doc has a random integer between 0 to 4
+    //in deployment generate a random number in the appropriate range but for now, we will use one
+    
+    const query = await userCollection.where('randomNumber', "==", 1).get();
+    query.forEach((q)=>{
+      const id = q.id;
+      if (id != postAuthor){
+        let canProceed = true;
+        if (userHasFollowers){
+            followers.includes(id)?canProceed=false:canProceed=true
+        }
+        if (canProceed){
+          userCollection.doc(id).collection('myFeed').doc(postId).set(postForMyFeed);
+          admin.firestore().collection('postsV2').doc(postId).collection('feedsDeployedTo').doc(id).set({'following': false, 'timestamp':FieldValue.serverTimestamp()});
+        }
+      }
+    })
+  }
+ 
+  
+
 
 })
+
+
