@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/charity.dart';
@@ -13,12 +14,10 @@ import 'package:image_picker/image_picker.dart';
 class DatabaseService {
   // initiate the class with the user id
   final String uid;
-  final CollectionReference myFeed;
-  DatabaseService({this.uid})
-      : myFeed = Firestore.instance
-            .collection('users')
-            .document(uid)
-            .collection('myFeed');
+  final cloudFunc = CloudFunctions.instance
+      .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+
+  DatabaseService({this.uid});
 
   // Get Firestore collection reference
   final CollectionReference userCollection =
@@ -169,8 +168,20 @@ class DatabaseService {
   }
 
   Future<List<Post>> refreshPosts(
-      String status, int limit, Timestamp startTimestamp) {
-    print('limit: ' + limit.toString());
+      String status, int limit, Timestamp startTimestamp) async {
+    print("in refresh posts");
+    HttpsCallable cloudRefreshPosts =
+        cloudFunc.getHttpsCallable(functionName: 'onRefreshPost');
+    HttpsCallableResult res = await cloudRefreshPosts.call(<String, dynamic>{
+      'status': status,
+      'limit': limit,
+      "timeStamp":
+          startTimestamp.toString(), //needs to be converted server side
+    });
+    print("printing timestamp in toString format ${startTimestamp.toString()}");
+    print("printing result of refresh feed: " +
+        res.data["listOfJsonDocs"].toString());
+
     return postsCollection
         .orderBy("timestamp", descending: true)
         .startAfter([startTimestamp])
