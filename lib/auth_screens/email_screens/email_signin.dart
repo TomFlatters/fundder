@@ -12,7 +12,8 @@ class EmailSignIn extends StatefulWidget {
   final AuthService auth = AuthService();
   Function nextPage;
   Function previousPage;
-  EmailSignIn({this.nextPage, this.previousPage});
+  final Function(bool) isLoadingChanged;
+  EmailSignIn({this.nextPage, this.previousPage, this.isLoadingChanged});
   @override
   _EmailSignInState createState() => _EmailSignInState();
 }

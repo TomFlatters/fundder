@@ -10,6 +10,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fundder/auth_screens/terms_of_use.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class AuthService {
   String fcmToken;
@@ -209,9 +210,15 @@ class AuthService {
     final facebookLogin = FacebookLogin();
     final result =
         await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
+    if (result == null || result.accessToken == null) {
+      return 'error';
+    }
     final AuthCredential credential = FacebookAuthProvider.getCredential(
       accessToken: result.accessToken.token,
     );
+    if (credential == null) {
+      return 'error';
+    }
     final profileGraphResponse = await http.get(
         'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token}');
     final profile = json.decode(profileGraphResponse.body);
@@ -248,6 +255,7 @@ class AuthService {
           _getFCMToken(user.uid);
         }
       });
+      return 'Success';
     } catch (e) {
       print(result.errorMessage);
       print("handle facebook sign in: $e");
@@ -260,36 +268,44 @@ class AuthService {
         // unused
         final signInMethods = await FirebaseAuth.instance
             .fetchSignInMethodsForEmail(email: email);
+        print('sign in methods: ' + signInMethods.toString());
         FirebaseUser guser; // create a google user
         //get credential google here
-        try {
-          final GoogleSignIn _googleSignIn = GoogleSignIn();
-          GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-          GoogleSignInAuthentication googleAuth =
-              await googleUser.authentication;
+        if (signInMethods.contains('google.com')) {
+          try {
+            final GoogleSignIn _googleSignIn = GoogleSignIn();
+            GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+            GoogleSignInAuthentication googleAuth =
+                await googleUser.authentication;
 
-          final AuthCredential credential = GoogleAuthProvider.getCredential(
-            accessToken: googleAuth.accessToken,
-            idToken: googleAuth.idToken,
-          );
-          final AuthResult authResult =
-              await _auth.signInWithCredential(credential);
-          FirebaseUser firebaseUser = authResult.user;
-          guser = firebaseUser;
-          // get google user
-        } catch (e) {
-          print("handle google sign in: $e");
+            final AuthCredential credential = GoogleAuthProvider.getCredential(
+              accessToken: googleAuth.accessToken,
+              idToken: googleAuth.idToken,
+            );
+            final AuthResult authResult =
+                await _auth.signInWithCredential(credential);
+            FirebaseUser firebaseUser = authResult.user;
+            guser = firebaseUser;
+            // get google user
+          } catch (e) {
+            print("handle google sign in: $e");
+          }
+          final authResult = guser;
+          if (authResult.email == email) {
+            // link facebook + google.
+            await authResult.linkWithCredential(credential);
+          }
+          await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);
+          _getFCMToken(guser.uid);
+        } else if (signInMethods.contains('password')) {
+          print("email account exists");
+          return "Email account exists";
         }
-        final authResult = guser;
-        if (authResult.email == email) {
-          // link facebook + google.
-          await authResult.linkWithCredential(credential);
-        }
-        await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);
-        _getFCMToken(guser.uid);
 
         //return usuario;
+        return 'linked with google';
       }
+      return 'error';
     }
   }
 

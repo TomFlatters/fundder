@@ -11,7 +11,8 @@ import 'package:fundder/global_widgets/dialogs.dart';
 class EmailRegistration extends StatefulWidget {
   final AuthService auth = AuthService();
   final Function previousPage;
-  EmailRegistration({this.previousPage});
+  final Function(bool) isLoadingChanged;
+  EmailRegistration({this.previousPage, this.isLoadingChanged});
   @override
   _EmailRegistrationState createState() => _EmailRegistrationState();
 }

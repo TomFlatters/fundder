@@ -5,10 +5,14 @@ import 'package:fundder/helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'terms_of_use.dart';
 import 'dart:io' show Platform;
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class AuthenticationHome extends StatelessWidget {
   final Function emailChosenMethod;
-  AuthenticationHome({this.emailChosenMethod});
+  final Function(bool) isLoadingChanged;
+  final Function(String) hasError;
+  AuthenticationHome(
+      {this.emailChosenMethod, this.isLoadingChanged, this.hasError});
   final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
@@ -35,8 +39,13 @@ class AuthenticationHome extends StatelessWidget {
                         ],
                       ))),
               AuthFundderButton(
-                onPressed: () {
-                  _auth.loginWithFacebook(context);
+                onPressed: () async {
+                  this.isLoadingChanged(true);
+                  String status = await _auth.loginWithFacebook(context);
+                  if (status == "Email account exists") {
+                    this.hasError("Email account exists");
+                  }
+                  this.isLoadingChanged(false);
                 },
                 backgroundColor: HexColor('4267B2'),
                 borderColor: HexColor('4267B2'),
@@ -46,8 +55,10 @@ class AuthenticationHome extends StatelessWidget {
                 iconColor: Colors.white,
               ),
               AuthFundderButton(
-                onPressed: () {
-                  _auth.signInWithGoogle();
+                onPressed: () async {
+                  this.isLoadingChanged(true);
+                  await _auth.signInWithGoogle();
+                  this.isLoadingChanged(false);
                 },
                 backgroundColor: HexColor('4285F4'),
                 textColor: Colors.white,
@@ -58,8 +69,10 @@ class AuthenticationHome extends StatelessWidget {
               ),
               Platform.isIOS
                   ? AuthFundderButton(
-                      onPressed: () {
-                        _auth.loginWithApple();
+                      onPressed: () async {
+                        this.isLoadingChanged(true);
+                        await _auth.loginWithApple();
+                        this.isLoadingChanged(false);
                       },
                       backgroundColor: Colors.black,
                       textColor: Colors.white,
