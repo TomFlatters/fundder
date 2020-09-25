@@ -804,7 +804,9 @@ exports.doesXfollowY = functions.https.onCall(async (data, context)=>{
 
 
 
-
+/**Deploy posts to the post's author's feed and their followers. `\n`
+ * Additionally, if the post is public then deploy to OTHER random users as well.
+ */
 exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').onCreate(async (snap, context)=>{
   const postValue = snap.data();
   const postId = context.params.postId;
@@ -831,6 +833,7 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
     charityLogo: postValue.charityLogo, 
     timestamp: postValue.timestamp, 
     status: postValue.status,
+    postId: postId,
   }
   userCollection.doc(postAuthor).collection('myFeed').doc(postId).set(postForMyFeed);
   const authorFollowersDoc = await admin.firestore().collection('followers').doc(postAuthor).get();
@@ -848,8 +851,9 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
     }
   }
   
-  //if this post is public, it ought for now to be deployed to fifty feeds (including those of followers)
-  //get fifty users from the collection, check to see if they're not in followers.
+  //if this post is public, deploy to random people to now....probability of random deployment can be adjusted
+  //All random deployment will be to non-followers, as followers already have the post in their feed and we do
+  // not want to override it with wrong info about follow relationship.
  
   if (!isPrivate){
     //right now each doc has a random integer between 0 to 4
@@ -870,10 +874,21 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
       }
     })
   }
- 
-  
-
-
 })
 
 
+exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
+  const postStatus = data.status;
+  console.log(postStatus);
+  const limit = data.limit;
+  console.log(limit);
+  //const startTimestamp = data.timeStamp;
+  const uid = context.auth.uid;
+  console.log(uid);
+  const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
+  const query = await myFeed.orderBy("timestamp", "desc").limit(limit).where("status", "==", postStatus).get();
+  const queryDocSnap = query.docs
+  const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data()['postId'])
+  queryData.forEach(console.log);
+  return {"listOfJsonDocs": queryData}
+})
