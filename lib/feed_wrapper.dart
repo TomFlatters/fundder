@@ -44,7 +44,8 @@ class _FeedWrapperState extends State<FeedWrapper> {
     loadingTimestamp = Timestamp.now();
     List<Post> futurePost;
     if (widget.status == 'hashtag') {
-      futurePost = await DatabaseService()
+      futurePost = null;
+      await DatabaseService()
           .refreshHashtag(widget.identifier, limit, loadingTimestamp);
     } else {
       futurePost = await DatabaseService()

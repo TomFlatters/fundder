@@ -168,12 +168,15 @@ class DatabaseService {
   }
 
 /**Make a post object from a JSON */
-  Post oneJSONtoPost(postJSON) {
-    print("_makePost being run");
+  Post aJSONtoPost(postJSON) {
+    print("aJSONtoPost being run");
     var isPrivate =
         (postJSON["isPrivate"] == null) ? false : postJSON['isPrivate'];
     print("private setting of this post is: " + isPrivate.toString());
-
+    print(
+        "in aJSONtoPost and the values of the seconds in the timestamp is ${postJSON['timestamp']['_seconds']}");
+    var timeStampSecs = postJSON['timestamp']['_seconds'];
+    var timeStampNanoSecs = postJSON['timestamp']['_nanoseconds'];
     //print("printing noLikes:" + doc["noLikes"]);
     return Post(
       //need to make a fromJSON initialisor in Post
@@ -194,7 +197,7 @@ class DatabaseService {
       likes: postJSON['likes'],
       noComments: postJSON['noComments'],
       subtitle: postJSON['subtitle'],
-      timestamp: postJSON['timestamp'],
+      timestamp: Timestamp(timeStampSecs, timeStampNanoSecs),
       imageUrl: postJSON['imageUrl'],
       id: postJSON['postId'],
       status: postJSON['status'],
@@ -208,10 +211,10 @@ class DatabaseService {
   }
 
 /**Make a list of Posts objects from a list of JSONS */
-  List<Post> jsonsToPosts(postJSONS) {
+  List<Post> jsonsToPosts(List<Object> postJSONS) {
     print('mapping the posts to Post model');
     return postJSONS.map((postJSON) {
-      return oneJSONtoPost(postJSON);
+      return aJSONtoPost(postJSON);
     }).toList();
   }
 
@@ -231,7 +234,7 @@ class DatabaseService {
     print("printing result of refresh feed: " +
         res.data["listOfJsonDocs"].toString());
 
-    var postList = jsonsToPosts(res.data);
+    var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
 
     return postList;
   }
