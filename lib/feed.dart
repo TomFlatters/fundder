@@ -124,7 +124,7 @@ class _FeedViewState extends State<FeedView> {
                               IconButton(
                                 icon: Icon(
                                   Icons.more_horiz,
-                                  color: HexColor("ff6b6c"),
+                                  color: Colors.grey,
                                 ),
                                 onPressed: () =>
                                     {_postOptions(context, user.uid, postData)},
