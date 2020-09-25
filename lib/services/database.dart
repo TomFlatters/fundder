@@ -159,7 +159,7 @@ class DatabaseService {
     );
   }
 
-  /**  Get posts list stream is mapped to the Post object */
+  /**  Get posts list from a query */
   List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
     print('mapping the posts to Post model');
     return snapshot.documents.map((DocumentSnapshot doc) {
@@ -167,6 +167,55 @@ class DatabaseService {
     }).toList();
   }
 
+/**Make a post object from a JSON */
+  Post oneJSONtoPost(postJSON) {
+    print("_makePost being run");
+    var isPrivate =
+        (postJSON["isPrivate"] == null) ? false : postJSON['isPrivate'];
+    print("private setting of this post is: " + isPrivate.toString());
+
+    //print("printing noLikes:" + doc["noLikes"]);
+    return Post(
+      //need to make a fromJSON initialisor in Post
+      isPrivate: isPrivate,
+      noLikes: (postJSON["noLikes"] == null)
+          ? (postJSON['likes'].length)
+          : (postJSON["noLikes"]),
+      peopleThatLikedThis: Set(),
+      author: postJSON['author'],
+      authorUsername: postJSON['authorUsername'],
+      title: postJSON['title'],
+      charity: postJSON['charity'],
+      amountRaised: postJSON['amountRaised'],
+      moneyRaised: (postJSON['moneyRaised'] != null)
+          ? postJSON['moneyRaised'].toDouble()
+          : postJSON['moneyRaised'],
+      targetAmount: postJSON['targetAmount'],
+      likes: postJSON['likes'],
+      noComments: postJSON['noComments'],
+      subtitle: postJSON['subtitle'],
+      timestamp: postJSON['timestamp'],
+      imageUrl: postJSON['imageUrl'],
+      id: postJSON['postId'],
+      status: postJSON['status'],
+      aspectRatio: postJSON['aspectRatio'],
+      hashtags: postJSON['hashtags'],
+      completionComment: postJSON['completionComment'],
+      charityLogo: postJSON['charityLogo'] != null
+          ? postJSON['charityLogo']
+          : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
+    );
+  }
+
+/**Make a list of Posts objects from a list of JSONS */
+  List<Post> jsonsToPosts(postJSONS) {
+    print('mapping the posts to Post model');
+    return postJSONS.map((postJSON) {
+      return oneJSONtoPost(postJSON);
+    }).toList();
+  }
+
+/**Get a list of up to three new posts of appropriate status (fund/done) */
   Future<List<Post>> refreshPosts(
       String status, int limit, Timestamp startTimestamp) async {
     print("in refresh posts");
@@ -182,16 +231,9 @@ class DatabaseService {
     print("printing result of refresh feed: " +
         res.data["listOfJsonDocs"].toString());
 
-    return postsCollection
-        .orderBy("timestamp", descending: true)
-        .startAfter([startTimestamp])
-        .limit(limit)
-        .where('status', isEqualTo: status)
-        .getDocuments()
-        .then((snapshot) {
-          print(_postsDataFromSnapshot(snapshot));
-          return _postsDataFromSnapshot(snapshot);
-        });
+    var postList = jsonsToPosts(res.data);
+
+    return postList;
   }
 
   /**Get up to 'limit' number of post documents ordered by timestamp
@@ -199,7 +241,9 @@ class DatabaseService {
    */
   Future<List<Post>> refreshHashtag(
       String hashtag, int limit, Timestamp startTimestamp) {
+    print("running refresh hashtag");
     print('limit: ' + limit.toString());
+    /*
     return postsCollection
         .orderBy("timestamp", descending: true)
         .startAfter([startTimestamp])
@@ -210,6 +254,7 @@ class DatabaseService {
           print(_postsDataFromSnapshot(snapshot));
           return _postsDataFromSnapshot(snapshot);
         });
+        */
   }
 
   /**Get posts by author id */
@@ -234,29 +279,6 @@ class DatabaseService {
       return _postsDataFromSnapshot(snapshot);
     });
   }
-
-  // Get list of posts for given author
-  @Deprecated("postsByUser")
-  Stream<List<Post>> postsByUser(id) {
-    //TODO: find a way to remove this function from the client side
-    return postsCollection
-        .where("author", isEqualTo: id)
-        .orderBy("timestamp", descending: true)
-        .limit(10)
-        .snapshots()
-        .map(_postsDataFromSnapshot);
-  }
-
-/*
-  Stream<List<Post>> postsLikedByUser(id) {
-    return postsCollection
-        .where("likes", arrayContains: id)
-        .orderBy("timestamp", descending: true)
-        .limit(10)
-        .snapshots()
-        .map(_postsDataFromSnapshot);
-  }
-*/
 
   /** Upload post and return the document id*/
   Future uploadPost(Post post) async {
