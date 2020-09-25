@@ -912,5 +912,5 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   console.log("printing filtered jsons")
   postJSONS = postJSONS.filter((docSnap)=> docSnap!==null);
   console.log(postJSONS);
-  return {"listOfJsonDocs": queryData}
+  return {"listOfJsonDocs": postJSONS}
 })
