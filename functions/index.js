@@ -877,16 +877,27 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
 })
 
 
+
+function stringToTimestamp(stringTimeStamp){
+  
+}
+/**Returns a list of json objects representing the latest 'limit' posts
+ * of either a fund or done status from a specified timestamp for a given user.
+ */
+
 exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   const postStatus = data.status;
-  console.log(postStatus);
   const limit = data.limit;
-  console.log(limit);
-  //const startTimestamp = data.timeStamp;
+  // the format of data.timeStamp is "Timestamp(seconds=1601043492, nanoseconds=743686000)"....i.e. a string
+  // this needs to be converted to a Timestamp dobject for querying purposes 
+  const regEx = /\d+/g;
+  const startTimestamp = data.timeStamp;
+  const [secs, nanoSecs] = startTimestamp.match(regEx); //returns an array in the formt [1601043492,743686000]
+  const timeStamp = new  admin.firestore.Timestamp( parseInt(secs),  parseInt(nanoSecs));
+
   const uid = context.auth.uid;
-  console.log(uid);
   const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
-  const query = await myFeed.orderBy("timestamp", "desc").limit(limit).where("status", "==", postStatus).get();
+  const query = await myFeed.where("status", "==", postStatus).orderBy("timestamp", 'desc').startAfter(timeStamp).limit(limit).get();
   const queryDocSnap = query.docs
   const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data()['postId'])
   queryData.forEach(console.log);
