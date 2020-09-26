@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/post_widgets/socialBar.dart';
-
-import 'package:fundder/post_widgets/social_widgets/commentBar.dart';
-import 'package:fundder/post_widgets/social_widgets/likeButton.dart';
 import 'package:fundder/post_widgets/postBody.dart';
 import 'package:fundder/post_widgets/postHeader.dart';
-import 'package:fundder/post_widgets/social_widgets/shareBar.dart';
-import 'package:fundder/services/likes.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'post_widgets/postHeader.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'models/post.dart';
-import 'shared/loading.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import 'models/user.dart';
 import 'global_widgets/buttons.dart';
@@ -122,21 +113,19 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                     child: Text(
                         "Error retrieving post: either the post does not exist, or your internet is not connected")))
             : Scaffold(
-                appBar: kIsWeb == true
-                    ? null
-                    : AppBar(
-                        centerTitle: true,
-                        title: Text(postData.status.inCaps),
-                        actions: <Widget>[
-                          new IconButton(
-                              icon: new Icon(Icons.close),
-                              onPressed: () {
-                                print("Going back from ViewPost to Feed");
-                                Navigator.of(context).pop();
-                              })
-                        ],
-                        leading: new Container(),
-                      ),
+                appBar: AppBar(
+                  centerTitle: true,
+                  title: Text(postData.status.inCaps),
+                  actions: <Widget>[
+                    new IconButton(
+                        icon: new Icon(Icons.close),
+                        onPressed: () {
+                          print("Going back from ViewPost to Feed");
+                          Navigator.of(context).pop();
+                        })
+                  ],
+                  leading: new Container(),
+                ),
                 body: VisibilityDetector(
                   key: UniqueKey(),
                   onVisibilityChanged: (VisibilityInfo info) {
@@ -147,7 +136,6 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                     }
                   },
                   child: Column(children: [
-                    kIsWeb == true ? WebMenu(-1) : Container(),
                     Expanded(
                       child: ListView(
                         children: <Widget>[

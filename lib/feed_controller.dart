@@ -1,7 +1,6 @@
 // Feed controller controls which feed is shown in the view and general layout of screen.
 // feed.dart controls the actual feed content
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/tutorial_screens/fund_tutorial.dart';
 
@@ -23,39 +22,41 @@ import 'tutorial_screens/do_tutorial.dart';
 import 'routes/FadeTransition.dart';
 
 class FeedController extends StatefulWidget {
+  final bool doTutorialSeen;
+  final bool fundTutorialSeen;
+  final bool doneTutorialSeen;
+  FeedController(
+      {@required this.doTutorialSeen,
+      @required this.fundTutorialSeen,
+      @required this.doneTutorialSeen});
+
   @override
   _FeedControllerState createState() => _FeedControllerState();
 }
 
 class _FeedControllerState extends State<FeedController>
     with SingleTickerProviderStateMixin {
-  bool checkedDoTutorial = false;
-  bool checkedFundTutorial = false;
-  bool checkedDoneTutorial = false;
   User user;
   TabController _tabController;
   @override
   void initState() {
     _tabController = new TabController(length: 3, vsync: this, initialIndex: 1);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _checkTutorials();
+    });
     super.initState();
   }
 
-  void checkFundTutorial(User firebaseUser) async {
-    Firestore.instance
-        .collection("users")
-        .document(firebaseUser.uid)
-        .get()
-        .then((snapshot) {
-      if (snapshot != null) {
-        if (snapshot['fundTutorialSeen'] != null) {
-          if (snapshot['fundTutorialSeen'] != true) {
-            _showFundTutorial(context);
-          }
-        } else {
-          _showFundTutorial(context);
-        }
-      }
-    });
+  void _checkTutorials() async {
+    if (widget.doTutorialSeen != true && _tabController.index == 0) {
+      _showDoTutorial(context);
+    }
+    if (widget.fundTutorialSeen != true && _tabController.index == 1) {
+      _showFundTutorial(context);
+    }
+    if (widget.doneTutorialSeen != true && _tabController.index == 2) {
+      _showDoneTutorial(context);
+    }
   }
 
   Future<void> _showFundTutorial(BuildContext context) {
@@ -68,24 +69,6 @@ class _FeedControllerState extends State<FeedController>
     );
   }
 
-  void checkDoneTutorial(User firebaseUser) async {
-    Firestore.instance
-        .collection("users")
-        .document(firebaseUser.uid)
-        .get()
-        .then((snapshot) {
-      if (snapshot != null) {
-        if (snapshot['doneTutorialSeen'] != null) {
-          if (snapshot['doneTutorialSeen'] != true) {
-            _showDoneTutorial(context);
-          }
-        } else {
-          _showDoneTutorial(context);
-        }
-      }
-    });
-  }
-
   Future<void> _showDoneTutorial(BuildContext context) {
     return showDialog<void>(
       context: context,
@@ -94,24 +77,6 @@ class _FeedControllerState extends State<FeedController>
         return DoneTutorial();
       },
     );
-  }
-
-  void checkDoTutorial(User firebaseUser) async {
-    Firestore.instance
-        .collection("users")
-        .document(firebaseUser.uid)
-        .get()
-        .then((snapshot) {
-      if (snapshot != null) {
-        if (snapshot['doTutorialSeen'] != null) {
-          if (snapshot['doTutorialSeen'] != true) {
-            _showDoTutorial(context);
-          }
-        } else {
-          _showDoTutorial(context);
-        }
-      }
-    });
   }
 
   Future<void> _showDoTutorial(BuildContext context) {
@@ -126,31 +91,24 @@ class _FeedControllerState extends State<FeedController>
 
   void _onItemTapped(int index) {
     setState(() {});
+    _checkTutorials();
   }
 
   @override
   Widget build(BuildContext context) {
     print('feed controller instantiated');
     final user = Provider.of<User>(context);
-    if (checkedDoTutorial == false && _tabController.index == 0) {
-      checkDoTutorial(user);
-      checkedDoTutorial = true;
-    }
-    if (checkedFundTutorial == false && _tabController.index == 1) {
-      checkFundTutorial(user);
-      checkedFundTutorial = true;
-    }
-    if (checkedDoneTutorial == false && _tabController.index == 2) {
-      checkDoneTutorial(user);
-      checkedDoneTutorial = true;
-    }
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
           centerTitle: true,
-          title: Text('Feed'),
+          title: Text(
+            'Fundder',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
           actions: [
             MessagingIcon(user.uid),
           ],

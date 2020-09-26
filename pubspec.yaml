@@ -48,7 +48,7 @@ dependencies:
   google_fonts: ^1.1.0
   flutter_icons: ^1.1.0
   cached_network_image: ^2.2.0+1
-  pull_to_refresh: ^1.6.0
+  pull_to_refresh: ^1.6.2
 
   # Loading icons
   flutter_spinkit: "^4.0.0"
@@ -68,6 +68,12 @@ dependencies:
   connectivity: ^0.4.9
   connectivity_for_web: ^0.3.0
   firebase_dynamic_links: ^0.5.3
+  google_sign_in: ^4.5.3
+  flutter_facebook_login: ^3.0.0
+  flutter_webview_plugin: ^0.3.10+1
+  sign_in_with_apple: ^2.5.2
+  apple_sign_in: ^0.1.0
+
   
 
 dev_dependencies:

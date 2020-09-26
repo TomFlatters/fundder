@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/main.dart';
-import 'helper_classes.dart';
+import '../helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'tutorial_screens/all_tutorials.dart';
+import '../tutorial_screens/all_tutorials.dart';
+import 'package:fundder/services/auth.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class ProfileActions extends StatelessWidget {
   final AuthService _auth = AuthService();
@@ -46,6 +48,15 @@ class ProfileActions extends StatelessWidget {
           onTap: () async {
             await _showTutorial(context);
             Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          leading: Icon(MaterialCommunityIcons.facebook),
+          title: Text('Link With Facebook'),
+          onTap: () async {
+            String result = await AuthService().linkAccountToFacebook();
+            print(result);
+            DialogManager().createDialog("Link to Facebook", result, context);
           },
         ),
         /*ListTile(

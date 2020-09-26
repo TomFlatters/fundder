@@ -13,7 +13,7 @@ class EditFundderButton extends StatelessWidget {
         onPressed: this.onPressed,
         backgroundColor: Colors.white,
         borderColor: Colors.grey,
-        textColor: Colors.black,
+        textColor: Colors.grey[800],
         text: this.text);
   }
 }
@@ -43,9 +43,9 @@ class SecondaryFundderButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FundderButton(
         onPressed: this.onPressed,
-        backgroundColor: Colors.white,
-        borderColor: HexColor('ff6b6c'),
-        textColor: HexColor('ff6b6c'),
+        backgroundColor: Colors.grey,
+        borderColor: Colors.grey,
+        textColor: Colors.white,
         text: this.text);
   }
 }
@@ -69,20 +69,24 @@ class FundderButton extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         child: GestureDetector(
             child: Container(
+              height: 50,
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
               margin: EdgeInsets.only(left: 70, right: 70, bottom: 20),
               decoration: BoxDecoration(
                 color: this.backgroundColor,
-                border: Border.all(color: this.borderColor, width: 1),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                border: Border.all(color: this.borderColor, width: 2),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
-              child: Text(
-                this.text,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: this.textColor),
+              child: Container(
+                padding: EdgeInsets.only(top: 3),
+                child: Text(
+                  this.text,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                      color: this.textColor),
+                ),
               ),
             ),
             onTap: this.onPressed));

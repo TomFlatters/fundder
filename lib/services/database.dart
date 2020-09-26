@@ -35,7 +35,7 @@ class DatabaseService {
   // Read: user information by the id used to instantiate the DatabaseService
   Future<User> readUserData() async {
     DocumentSnapshot userData = await userCollection.document(uid).get();
-    User fetchedUser = _userDataFromSnapshot(userData);
+    User fetchedUser = userDataFromSnapshot(userData);
     return fetchedUser;
   }
 
@@ -46,6 +46,7 @@ class DatabaseService {
     return await userCollection.document(uid).updateData({
       'email': email,
       'username': username,
+      'search_username': username != null ? username.toLowerCase() : null,
       'name': name,
       'profilePic': profilePic,
     });
@@ -58,12 +59,24 @@ class DatabaseService {
     return await userCollection.document(uid).setData({
       'email': email,
       'username': username,
-      'search_username': username.toLowerCase(),
+      'search_username': username != null ? username.toLowerCase() : null,
       'name': name,
       'profilePic': profilePic,
       'seenTutorial': false,
       'dpSetterPrompted': false,
-    });
+    }, merge: true);
+  }
+
+  Future addFacebookId(String facebookId) async {
+    return await userCollection
+        .document(uid)
+        .setData({'facebookId': facebookId}, merge: true);
+  }
+
+  Future addProfilePic(String location) async {
+    return await userCollection
+        .document(uid)
+        .setData({'profilePic': location}, merge: true);
   }
 
   Future addFCMToken(String token) async {
@@ -89,18 +102,34 @@ class DatabaseService {
     return userCollection.snapshots();
   }
 
+  Stream<DocumentSnapshot> userStream(String uid) {
+    return Firestore.instance.collection('users').document(uid).snapshots();
+  }
+
   // Given a document return a User type object
-  User _userDataFromSnapshot(DocumentSnapshot doc) {
+
+  User userDataFromSnapshot(DocumentSnapshot snapshot) {
     return User(
-        uid: doc.data['uid'],
-        name: doc.data['name'],
-        username: doc.data['username'],
-        email: doc.data['email'],
-        bio: doc.data['bio'],
-        followers: doc.data['followers'],
-        following: doc.data['following'],
-        gender: doc.data['gender'],
-        profilePic: doc.data['profilePic']);
+        uid: snapshot.documentID,
+        username: snapshot.data['username'],
+        email: snapshot.data['email'],
+        bio: snapshot.data['bio'],
+        followers: snapshot.data['noFollowers'],
+        following: snapshot.data['noFollowing'],
+        gender: snapshot.data['gender'],
+        name: snapshot.data['name'],
+        profilePic: snapshot.data['profilePic'],
+        seenTutorial: snapshot.data['seenTutorial'],
+        dpSetterPrompted: snapshot.data['dpSetterPrompted'],
+        verified: snapshot.data['verified'],
+        profileTutorialSeen: snapshot.data['profileTutorialSeen'],
+        fundTutorialSeen: snapshot.data['fundTutorialSeen'],
+        doTutorialSeen: snapshot.data['doTutorialSeen'],
+        doneTutorialSeen: snapshot.data['doneTutorialSeen'],
+        likes: snapshot.data['likes'],
+        amountDonated: snapshot.data['amountDonated'] != null
+            ? snapshot.data['amountDonated'].toDouble()
+            : 0.0);
   }
 
   // -------------
