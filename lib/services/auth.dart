@@ -173,6 +173,11 @@ class AuthService {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
+    if (googleAuth == null ||
+        googleAuth.idToken == null ||
+        googleAuth.accessToken == null) {
+      return 'error';
+    }
     final AuthCredential credential = GoogleAuthProvider.getCredential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
@@ -325,6 +330,11 @@ class AuthService {
     );
 
     final oAuthProvider = OAuthProvider(providerId: 'apple.com');
+    if (appleIdCredential == null ||
+        appleIdCredential.identityToken == null ||
+        appleIdCredential.authorizationCode == null) {
+      return 'error';
+    }
     final credential = oAuthProvider.getCredential(
       idToken: appleIdCredential.identityToken,
       accessToken: appleIdCredential.authorizationCode,
@@ -353,6 +363,46 @@ class AuthService {
         _getFCMToken(user.uid);
       }
     });
+  }
+
+  Future<List> checkProvider({String email}) async {
+    List signInMethods =
+        await FirebaseAuth.instance.fetchSignInMethodsForEmail(email: email);
+    return signInMethods;
+  }
+
+  Future linkAccountToFacebook() async {
+    final facebookLogin = FacebookLogin();
+    final result =
+        await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
+    if (result == null || result.accessToken == null) {
+      return 'No Facebook result';
+    }
+    final AuthCredential credential = FacebookAuthProvider.getCredential(
+      accessToken: result.accessToken.token,
+    );
+    if (credential == null) {
+      return 'No Auth Credentials';
+    }
+    final profileGraphResponse = await http.get(
+        'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token}');
+    final profile = json.decode(profileGraphResponse.body);
+    final friendsGraphResponse = await http.get(
+        'https://graph.facebook.com/v8.0/me/friends?access_token=${result.accessToken.token}');
+    final friends = json.decode(friendsGraphResponse.body);
+    FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
+    try {
+      await currentUser.linkWithCredential(credential);
+      print('went past credential');
+      await DatabaseService(uid: currentUser.uid).addFacebookId(profile['id']);
+      return ('Account successfully linked to facebook');
+    } catch (e) {
+      if (e.message != null) {
+        return e.message;
+      } else {
+        return e.toString();
+      }
+    }
   }
 }
 

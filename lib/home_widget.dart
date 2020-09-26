@@ -44,6 +44,7 @@ class _HomeState extends State<Home> {
     _checkNotifs();
     var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
     fcmTokenStream.listen((token) async {
+      print("FCM TOKEN UPDATED");
       final FirebaseUser user = await FirebaseAuth.instance.currentUser();
       // this will get called on logging out otherwise and throw errors
       if (user != null) {
@@ -117,6 +118,7 @@ class _HomeState extends State<Home> {
       loadingWelcome = false;
       if (snapshot.data['termsAccepted'] == null ||
           snapshot.data['termsAccepted'] == false) {
+        havePresentedWelcome = true;
         bool termsAccepted = await Navigator.push(context,
             MaterialPageRoute(builder: (context) => TermsViewPrompter()));
         if (termsAccepted == true) {
@@ -132,9 +134,7 @@ class _HomeState extends State<Home> {
           return;
         }
       }
-      if (snapshot != null &&
-          (user.isEmailVerified == true) &&
-          havePresentedWelcome == false) {
+      if (snapshot != null && (user.isEmailVerified == true)) {
         if (snapshot['name'] == null ||
             snapshot['username'] == null ||
             snapshot['name'] == '' ||
@@ -152,7 +152,7 @@ class _HomeState extends State<Home> {
                   }));
         }
       }
-      if (user.isEmailVerified == false && havePresentedWelcome == false) {
+      if (user.isEmailVerified == false) {
         havePresentedWelcome = true;
         Navigator.pushNamed(context, '/' + user.uid + '/verification')
             .then((value) {
@@ -300,8 +300,8 @@ class _HomeState extends State<Home> {
               return Loading();
             }
           } else {
-            loadingWelcome = true;
-            _checkIfIntroed();
+            /*loadingWelcome = true;
+            _checkIfIntroed();*/
             return Loading();
           }
         });
