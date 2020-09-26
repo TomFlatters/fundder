@@ -48,7 +48,7 @@ dependencies:
   google_fonts: ^1.1.0
   flutter_icons: ^1.1.0
   cached_network_image: ^2.2.0+1
-  pull_to_refresh: ^1.6.0
+  pull_to_refresh: ^1.6.2
 
   # Loading icons
   flutter_spinkit: "^4.0.0"

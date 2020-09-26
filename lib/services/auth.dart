@@ -223,122 +223,127 @@ class AuthService {
   }
 
   Future loginWithFacebook(BuildContext context) async {
-    final facebookLogin = FacebookLogin();
-    final result =
-        await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
-    if (result == null || result.accessToken == null) {
-      return 'error';
-    }
-    final AuthCredential credential = FacebookAuthProvider.getCredential(
-      accessToken: result.accessToken.token,
-    );
-    if (credential == null) {
-      return 'error';
-    }
-    final profileGraphResponse = await http.get(
-        'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token}');
-    final profile = json.decode(profileGraphResponse.body);
-    final friendsGraphResponse = await http.get(
-        'https://graph.facebook.com/v8.0/me/friends?access_token=${result.accessToken.token}');
-    final friends = json.decode(friendsGraphResponse.body);
-    print('profile: ' + profile.toString());
-    print('friends: ' + friends.toString());
     try {
-      final AuthResult authResult =
-          await _auth.signInWithCredential(credential);
-      FirebaseUser user = authResult.user;
-      assert(user.email != null);
-
-      final FirebaseUser currentUser = await _auth.currentUser();
-      print('user id: ' + currentUser.uid.toString());
-      assert(user.uid == currentUser.uid);
-      currentUser.sendEmailVerification();
-      // create a new (firestore) document for the user with corresponding uid
-
-      var docRef =
-          Firestore.instance.collection('users').document(currentUser.uid);
-
-      docRef.get().then((doc) async {
-        if (!doc.exists) {
-          print('Creating new doc');
-          // doc.data() will be undefined in this cas
-          //final picGraphResponse = await http.get(
-          //   'https://graph.facebook.com/v8.0/me/picture?redirect=treu&width=100&height=100&access_token=${result.accessToken.token}');
-          //final pic = json.decode(picGraphResponse.body);
-          String profilePic = await _picFromUrlToFirebase(
-              'https://graph.facebook.com/v8.0/me/picture?redirect=true&width=200&height=200&access_token=${result.accessToken.token}',
-              user.uid);
-          //print('pic response: ' + pic.toString());
-          print('url sent to method: ' +
-              'https://graph.facebook.com/v8.0/me/picture?redirect=true&width=200&height=200&access_token=${result.accessToken.token}');
-          print('profilePic: ' + profilePic.toString());
-          if (profilePic.contains('error') ||
-              profilePic.contains('Error') ||
-              profilePic.contains('ERROR')) {
-            profilePic =
-                'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-          }
-          String name = '';
-          if (profile['name'] != null) {
-            name = profile['name'];
-          }
-          await DatabaseService(uid: user.uid)
-              .registerUserData(user.email, null, name, profilePic);
-          await DatabaseService(uid: user.uid).addFacebookId(profile['id']);
-          _getFCMToken(user.uid);
-        }
-      });
-      return 'Success';
-    } catch (e) {
-      print(result.errorMessage);
-      print("handle facebook sign in: $e");
-      if (e.code == 'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL') {
-        // if exists get email of your simple get (i will write the code by this later)
-        final graphResponse = await Session.get(
-            'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token.toString()}');
-
-        final email = graphResponse["email"];
-        // unused
-        final signInMethods = await FirebaseAuth.instance
-            .fetchSignInMethodsForEmail(email: email);
-        print('sign in methods: ' + signInMethods.toString());
-        FirebaseUser guser; // create a google user
-        //get credential google here
-        if (signInMethods.contains('google.com')) {
-          try {
-            final GoogleSignIn _googleSignIn = GoogleSignIn();
-            GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-            GoogleSignInAuthentication googleAuth =
-                await googleUser.authentication;
-
-            final AuthCredential credential = GoogleAuthProvider.getCredential(
-              accessToken: googleAuth.accessToken,
-              idToken: googleAuth.idToken,
-            );
-            final AuthResult authResult =
-                await _auth.signInWithCredential(credential);
-            FirebaseUser firebaseUser = authResult.user;
-            guser = firebaseUser;
-            // get google user
-          } catch (e) {
-            print("handle google sign in: $e");
-          }
-          final authResult = guser;
-          if (authResult.email == email) {
-            // link facebook + google.
-            await authResult.linkWithCredential(credential);
-          }
-          await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);
-          _getFCMToken(guser.uid);
-        } else if (signInMethods.contains('password')) {
-          print("email account exists");
-          return "Email account exists";
-        }
-
-        //return usuario;
-        return 'linked with google';
+      final facebookLogin = FacebookLogin();
+      final result = await facebookLogin
+          .logIn(['email', 'user_friends', 'public_profile']);
+      if (result == null || result.accessToken == null) {
+        return 'error';
       }
-      return 'error';
+      final AuthCredential credential = FacebookAuthProvider.getCredential(
+        accessToken: result.accessToken.token,
+      );
+      if (credential == null) {
+        return 'error';
+      }
+      final profileGraphResponse = await http.get(
+          'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token}');
+      final profile = json.decode(profileGraphResponse.body);
+      final friendsGraphResponse = await http.get(
+          'https://graph.facebook.com/v8.0/me/friends?access_token=${result.accessToken.token}');
+      final friends = json.decode(friendsGraphResponse.body);
+      print('profile: ' + profile.toString());
+      print('friends: ' + friends.toString());
+      try {
+        final AuthResult authResult =
+            await _auth.signInWithCredential(credential);
+        FirebaseUser user = authResult.user;
+        assert(user.email != null);
+
+        final FirebaseUser currentUser = await _auth.currentUser();
+        print('user id: ' + currentUser.uid.toString());
+        assert(user.uid == currentUser.uid);
+        currentUser.sendEmailVerification();
+        // create a new (firestore) document for the user with corresponding uid
+
+        var docRef =
+            Firestore.instance.collection('users').document(currentUser.uid);
+
+        docRef.get().then((doc) async {
+          if (!doc.exists) {
+            print('Creating new doc');
+            // doc.data() will be undefined in this cas
+            //final picGraphResponse = await http.get(
+            //   'https://graph.facebook.com/v8.0/me/picture?redirect=treu&width=100&height=100&access_token=${result.accessToken.token}');
+            //final pic = json.decode(picGraphResponse.body);
+            String profilePic = await _picFromUrlToFirebase(
+                'https://graph.facebook.com/v8.0/me/picture?redirect=true&width=200&height=200&access_token=${result.accessToken.token}',
+                user.uid);
+            //print('pic response: ' + pic.toString());
+            print('url sent to method: ' +
+                'https://graph.facebook.com/v8.0/me/picture?redirect=true&width=200&height=200&access_token=${result.accessToken.token}');
+            print('profilePic: ' + profilePic.toString());
+            if (profilePic.contains('error') ||
+                profilePic.contains('Error') ||
+                profilePic.contains('ERROR')) {
+              profilePic =
+                  'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+            }
+            String name = '';
+            if (profile['name'] != null) {
+              name = profile['name'];
+            }
+            await DatabaseService(uid: user.uid)
+                .registerUserData(user.email, null, name, profilePic);
+            await DatabaseService(uid: user.uid).addFacebookId(profile['id']);
+            _getFCMToken(user.uid);
+          }
+        });
+        return 'Success';
+      } catch (e) {
+        print(result.errorMessage);
+        print("handle facebook sign in: $e");
+        if (e.code == 'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL') {
+          // if exists get email of your simple get (i will write the code by this later)
+          final graphResponse = await Session.get(
+              'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token.toString()}');
+
+          final email = graphResponse["email"];
+          // unused
+          final signInMethods = await FirebaseAuth.instance
+              .fetchSignInMethodsForEmail(email: email);
+          print('sign in methods: ' + signInMethods.toString());
+          FirebaseUser guser; // create a google user
+          //get credential google here
+          if (signInMethods.contains('google.com')) {
+            try {
+              final GoogleSignIn _googleSignIn = GoogleSignIn();
+              GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+              GoogleSignInAuthentication googleAuth =
+                  await googleUser.authentication;
+
+              final AuthCredential credential =
+                  GoogleAuthProvider.getCredential(
+                accessToken: googleAuth.accessToken,
+                idToken: googleAuth.idToken,
+              );
+              final AuthResult authResult =
+                  await _auth.signInWithCredential(credential);
+              FirebaseUser firebaseUser = authResult.user;
+              guser = firebaseUser;
+              // get google user
+            } catch (e) {
+              print("handle google sign in: $e");
+            }
+            final authResult = guser;
+            if (authResult.email == email) {
+              // link facebook + google.
+              await authResult.linkWithCredential(credential);
+            }
+            await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);
+            _getFCMToken(guser.uid);
+          } else if (signInMethods.contains('password')) {
+            print("email account exists");
+            return "Email account exists";
+          }
+
+          //return usuario;
+          return 'linked with google';
+        }
+        return 'error';
+      }
+    } catch (generalError) {
+      return generalError.toString();
     }
   }
 

@@ -148,6 +148,7 @@ class PostBody extends StatelessWidget {
       return kIsWeb == true
           ? Image.network(postData.imageUrl)
           : CachedNetworkImage(
+              fit: BoxFit.cover,
               imageUrl: (postData.imageUrl != null) ? postData.imageUrl : '',
               placeholder: (context, url) => Loading(),
               errorWidget: (context, url, error) => Icon(Icons.error),
