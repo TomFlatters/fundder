@@ -105,7 +105,10 @@ class _FeedControllerState extends State<FeedController>
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
           centerTitle: true,
-          title: Text('Feed'),
+          title: Text(
+            'Fundder',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
           actions: [
             MessagingIcon(user.uid),
           ],

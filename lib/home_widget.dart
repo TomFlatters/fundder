@@ -39,6 +39,7 @@ class _HomeState extends State<Home> {
   bool havePresentedWelcome = false;
   bool loadingWelcome = false;
   bool userDocumentExists = false;
+  final AuthService _auth = AuthService();
 
   @override
   void initState() {
@@ -131,7 +132,6 @@ class _HomeState extends State<Home> {
             'termsAccepted': true,
           });
         } else {
-          final AuthService _auth = AuthService();
           await _auth.signOut();
           return;
         }
@@ -210,9 +210,12 @@ class _HomeState extends State<Home> {
             DatabaseService(uid: firebaseUser.uid).userStream(firebaseUser.uid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            print('Snapshot has data');
             // bool to tell that account exists and you can update user doc with fcm tokens
             userDocumentExists = true;
             DocumentSnapshot doc = snapshot.data;
+            print('Data: ' + doc.documentID.toString());
+            print('Connection state: ' + snapshot.connectionState.toString());
             if (doc.data != null) {
               if (doc.data['termsAccepted'] == null ||
                   doc.data['termsAccepted'] == false ||
@@ -304,8 +307,6 @@ class _HomeState extends State<Home> {
               return Loading();
             }
           } else {
-            /*loadingWelcome = true;
-            _checkIfIntroed();*/
             return Loading();
           }
         });
