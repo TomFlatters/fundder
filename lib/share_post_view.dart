@@ -66,7 +66,7 @@ class SharePost extends StatelessWidget {
               iosParameters: IosParameters(
                 bundleId: 'com.example.fundder',
                 minimumVersion: '1.0.0',
-                appStoreId: '123456789',
+                appStoreId: '1529120882',
               ),
               googleAnalyticsParameters: GoogleAnalyticsParameters(
                 campaign: 'example-promo',

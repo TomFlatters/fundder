@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/services/auth.dart';
 //import 'package:fundder/feed_controller.dart';
 import 'placeholder_widget.dart';
 import 'feed_controller.dart';
@@ -37,6 +38,7 @@ class _HomeState extends State<Home> {
   bool checkedProfileTutorial = false;
   bool havePresentedWelcome = false;
   bool loadingWelcome = false;
+  bool userDocumentExists = false;
 
   @override
   void initState() {
@@ -47,7 +49,7 @@ class _HomeState extends State<Home> {
       print("FCM TOKEN UPDATED");
       final FirebaseUser user = await FirebaseAuth.instance.currentUser();
       // this will get called on logging out otherwise and throw errors
-      if (user != null) {
+      if (user != null && userDocumentExists == true) {
         DatabaseService(uid: user.uid).addFCMToken(token);
       }
     });
@@ -129,7 +131,7 @@ class _HomeState extends State<Home> {
             'termsAccepted': true,
           });
         } else {
-          final FirebaseAuth _auth = FirebaseAuth.instance;
+          final AuthService _auth = AuthService();
           await _auth.signOut();
           return;
         }
@@ -208,6 +210,8 @@ class _HomeState extends State<Home> {
             DatabaseService(uid: firebaseUser.uid).userStream(firebaseUser.uid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            // bool to tell that account exists and you can update user doc with fcm tokens
+            userDocumentExists = true;
             DocumentSnapshot doc = snapshot.data;
             if (doc.data != null) {
               if (doc.data['termsAccepted'] == null ||

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
@@ -11,6 +13,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fundder/auth_screens/terms_of_use.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart';
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
+import 'package:path/path.dart';
 
 class AuthService {
   String fcmToken;
@@ -171,6 +179,9 @@ class AuthService {
 
   Future signInWithGoogle() async {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) {
+      return 'error';
+    }
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
     if (googleAuth == null ||
@@ -242,9 +253,6 @@ class AuthService {
       print('user id: ' + currentUser.uid.toString());
       assert(user.uid == currentUser.uid);
       currentUser.sendEmailVerification();
-
-      String defaultPic =
-          'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
       // create a new (firestore) document for the user with corresponding uid
 
       var docRef =
@@ -254,8 +262,28 @@ class AuthService {
         if (!doc.exists) {
           print('Creating new doc');
           // doc.data() will be undefined in this cas
+          //final picGraphResponse = await http.get(
+          //   'https://graph.facebook.com/v8.0/me/picture?redirect=treu&width=100&height=100&access_token=${result.accessToken.token}');
+          //final pic = json.decode(picGraphResponse.body);
+          String profilePic = await _picFromUrlToFirebase(
+              'https://graph.facebook.com/v8.0/me/picture?redirect=true&width=200&height=200&access_token=${result.accessToken.token}',
+              user.uid);
+          //print('pic response: ' + pic.toString());
+          print('url sent to method: ' +
+              'https://graph.facebook.com/v8.0/me/picture?redirect=true&width=200&height=200&access_token=${result.accessToken.token}');
+          print('profilePic: ' + profilePic.toString());
+          if (profilePic.contains('error') ||
+              profilePic.contains('Error') ||
+              profilePic.contains('ERROR')) {
+            profilePic =
+                'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+          }
+          String name = '';
+          if (profile['name'] != null) {
+            name = profile['name'];
+          }
           await DatabaseService(uid: user.uid)
-              .registerUserData(user.email, null, null, defaultPic);
+              .registerUserData(user.email, null, name, profilePic);
           await DatabaseService(uid: user.uid).addFacebookId(profile['id']);
           _getFCMToken(user.uid);
         }
@@ -314,55 +342,78 @@ class AuthService {
     }
   }
 
-  Future loginWithApple() async {
-    final appleIdCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      webAuthenticationOptions: WebAuthenticationOptions(
-        // TODO: Set the `clientId` and `redirectUri` arguments to the values you entered in the Apple Developer portal during the setup
-        clientId: 'com.example.fundderAppleLogIn',
-        redirectUri: Uri.parse(
-          'https://fundder-c4a64.firebaseapp.com/__/auth/handler',
-        ),
-      ),
-    );
+  Future<String> _picFromUrlToFirebase(String url, String uid) async {
+    try {
+      var response = await http.get(url);
+      final documentDirectory = await getApplicationDocumentsDirectory();
 
-    final oAuthProvider = OAuthProvider(providerId: 'apple.com');
-    if (appleIdCredential == null ||
-        appleIdCredential.identityToken == null ||
-        appleIdCredential.authorizationCode == null) {
-      return 'error';
+      File file = File(join(documentDirectory.path, 'imagetest.png'));
+
+      file.writeAsBytesSync(response.bodyBytes);
+      final String fileLocation =
+          uid + "/" + DateTime.now().microsecondsSinceEpoch.toString();
+      String downloadUrl =
+          await DatabaseService(uid: uid).uploadImage(file, fileLocation);
+      return downloadUrl;
+    } catch (e) {
+      print(e);
+      return 'Error';
     }
-    final credential = oAuthProvider.getCredential(
-      idToken: appleIdCredential.identityToken,
-      accessToken: appleIdCredential.authorizationCode,
-    );
-    final authResult = await _auth.signInWithCredential(credential);
-    final user = authResult.user;
-    assert(user.email != null);
-    assert(!user.isAnonymous);
-    assert(await user.getIdToken() != null);
+  }
 
-    final FirebaseUser currentUser = await _auth.currentUser();
-    assert(user.uid == currentUser.uid);
+  Future loginWithApple() async {
+    try {
+      final appleIdCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        webAuthenticationOptions: WebAuthenticationOptions(
+          // TODO: Set the `clientId` and `redirectUri` arguments to the values you entered in the Apple Developer portal during the setup
+          clientId: 'com.example.fundderAppleLogIn',
+          redirectUri: Uri.parse(
+            'https://fundder-c4a64.firebaseapp.com/__/auth/handler',
+          ),
+        ),
+      );
 
-    String defaultPic =
-        'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-    // create a new (firestore) document for the user with corresponding uid
-
-    var docRef = Firestore.instance.collection('users').document(user.uid);
-
-    docRef.get().then((doc) async {
-      if (!doc.exists) {
-        print('Creating new doc');
-        // doc.data() will be undefined in this case
-        await DatabaseService(uid: user.uid)
-            .registerUserData(user.email, null, user.displayName, defaultPic);
-        _getFCMToken(user.uid);
+      final oAuthProvider = OAuthProvider(providerId: 'apple.com');
+      if (appleIdCredential == null ||
+          appleIdCredential.identityToken == null ||
+          appleIdCredential.authorizationCode == null) {
+        return 'error';
       }
-    });
+      final credential = oAuthProvider.getCredential(
+        idToken: appleIdCredential.identityToken,
+        accessToken: appleIdCredential.authorizationCode,
+      );
+      final authResult = await _auth.signInWithCredential(credential);
+      final user = authResult.user;
+      assert(user.email != null);
+      assert(!user.isAnonymous);
+      assert(await user.getIdToken() != null);
+
+      final FirebaseUser currentUser = await _auth.currentUser();
+      assert(user.uid == currentUser.uid);
+
+      String defaultPic =
+          'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+      // create a new (firestore) document for the user with corresponding uid
+
+      var docRef = Firestore.instance.collection('users').document(user.uid);
+
+      docRef.get().then((doc) async {
+        if (!doc.exists) {
+          print('Creating new doc');
+          // doc.data() will be undefined in this case
+          await DatabaseService(uid: user.uid)
+              .registerUserData(user.email, null, user.displayName, defaultPic);
+          _getFCMToken(user.uid);
+        }
+      });
+    } catch (e) {
+      return e.toString();
+    }
   }
 
   Future<List> checkProvider({String email}) async {

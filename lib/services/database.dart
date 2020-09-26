@@ -73,6 +73,12 @@ class DatabaseService {
         .setData({'facebookId': facebookId}, merge: true);
   }
 
+  Future addProfilePic(String location) async {
+    return await userCollection
+        .document(uid)
+        .setData({'profilePic': location}, merge: true);
+  }
+
   Future addFCMToken(String token) async {
     // create or update the document with this uid
     return await userCollection.document(uid).updateData({
