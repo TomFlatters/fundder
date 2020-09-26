@@ -39,3 +39,27 @@ class _PrivacyIconState extends State<PrivacyIcon> {
     );
   }
 }
+
+class SelectedFollowersOnlyPrivacyToggle extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(Icons.lock_outline),
+      title: Text('Private Mode'),
+      subtitle: Text(
+          "Choose specific people from your followers that you'd like to see this post"),
+      onTap: () {
+        Navigator.of(context).pop();
+        print("SelectedFollowersOnlyPrivacyToggle selected");
+        showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              var height = MediaQuery.of(context).size.height;
+              return Container(
+                height: 0.75 * height,
+              );
+            });
+      },
+    );
+  }
+}
