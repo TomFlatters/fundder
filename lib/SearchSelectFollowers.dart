@@ -1,5 +1,6 @@
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/followers.dart';
 import 'package:provider/provider.dart';
@@ -76,7 +77,7 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
   @override
   void dispose() {
     _textController.dispose();
-    super.dispose;
+    super.dispose();
   }
 
   onTextChanged(String searchTxt) {
@@ -102,7 +103,17 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
           child: TextField(
             controller: _textController,
             decoration: InputDecoration(
-                prefixIcon: new Icon(Icons.search),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  gapPadding: 4.0,
+                  borderSide: BorderSide(color: HexColor("ff6b6c"), width: 1.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  gapPadding: 4.0,
+                  borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                ),
+                prefixIcon: Icon(Icons.search),
                 hintText: 'Search followers...'),
           ),
         ),
