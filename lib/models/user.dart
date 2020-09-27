@@ -18,6 +18,8 @@ class User {
   final bool doneTutorialSeen;
   final double amountDonated;
   final List<dynamic> likes;
+  final String facebookId;
+  final String facebookToken;
 
   // construct them into the object here
   User(
@@ -38,5 +40,7 @@ class User {
       this.doTutorialSeen = false,
       this.doneTutorialSeen = false,
       this.amountDonated = 1.0,
-      this.likes});
+      this.likes,
+      this.facebookId,
+      this.facebookToken});
 }

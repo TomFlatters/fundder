@@ -23,6 +23,7 @@ import 'shared/loading.dart';
 import 'auth_screens/terms_of_use.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_screens/terms_of_use_prompted.dart';
+import 'welcome_pages/find_friends.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -112,6 +113,8 @@ class _HomeState extends State<Home> {
   void _checkIfIntroed() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     await user.reload();
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => FindFriends()));
     print('Checking if introed');
     Firestore.instance
         .collection("users")

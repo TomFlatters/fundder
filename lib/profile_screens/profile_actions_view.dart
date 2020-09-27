@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../tutorial_screens/all_tutorials.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
+import 'package:fundder/welcome_pages/find_friends.dart';
 
 class ProfileActions extends StatelessWidget {
   final AuthService _auth = AuthService();
@@ -59,11 +60,15 @@ class ProfileActions extends StatelessWidget {
             DialogManager().createDialog("Link to Facebook", result, context);
           },
         ),
-        /*ListTile(
-          leading: Icon(FontAwesome.money),
-          title: Text('Payments'),
-          onTap: () {},
+        ListTile(
+          leading: Icon(MaterialCommunityIcons.account_multiple_plus),
+          title: Text('Find friends'),
+          onTap: () async {
+            await Navigator.push(context,
+                MaterialPageRoute(builder: (context) => FindFriends()));
+          },
         ),
+        /*
         ListTile(
           leading: Icon(Feather.activity),
           title: Text('Your Activity'),

@@ -466,6 +466,19 @@ class AuthService {
       }
     }
   }
+
+  Future getNewFacebookToken(String uid) async {
+    try {
+      final facebookLogin = FacebookLogin();
+      final result = await facebookLogin
+          .logIn(['email', 'user_friends', 'public_profile']);
+      DatabaseService(uid: uid)
+          .addFacebookToken(result.accessToken.token.toString());
+      return result.accessToken.token.toString();
+    } catch (e) {
+      return 'Error: ' + e.toString();
+    }
+  }
 }
 
 class Session {

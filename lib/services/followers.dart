@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
+import 'dart:async';
 
 class FollowersService {
   final CollectionReference userCollection =
@@ -134,5 +135,16 @@ class GeneralFollowerServices {
       }
     }
     return res;
+  }
+
+  Future<List> facebookFriendsUnames(
+      List<String> facebookIdList, String uid) async {
+    QuerySnapshot q = await userCollection
+        .where('facebookId', whereIn: facebookIdList)
+        .getDocuments();
+    List l = q.documents
+        .map((e) => {'uid': e.documentID, 'username': e.data['username']})
+        .toList();
+    return l;
   }
 }
