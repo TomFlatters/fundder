@@ -1,5 +1,6 @@
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/followers.dart';
@@ -35,17 +36,6 @@ class _SearchSelectFollowersState extends State<SearchSelectFollowers> {
                 );
               }
             }));
-  }
-}
-
-class SelectedProfileRow extends StatelessWidget {
-  final List<String> followersSelected;
-  SelectedProfileRow(this.followersSelected);
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [],
-    );
   }
 }
 
@@ -100,6 +90,33 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
+        Container(
+          //this is the title container
+          child: Row(
+            children: [
+              IconButton(
+                icon: Icon(AntDesign.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              Expanded(
+                child: Text(
+                  "Choose People",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                width: 40,
+                child: (selectedFollowers.length > 0)
+                    ? IconButton(
+                        icon: Icon(AntDesign.check),
+                        onPressed: () {},
+                      )
+                    : Container(),
+              )
+            ],
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: TextField(
