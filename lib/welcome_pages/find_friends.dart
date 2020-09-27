@@ -38,7 +38,7 @@ class _FindFriendsState extends State<FindFriends> {
           actions: [
             FlatButton(
               child:
-                  Text('Skip', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Done', style: TextStyle(fontWeight: FontWeight.bold)),
               onPressed: () {
                 Navigator.pop(context);
               },

@@ -69,6 +69,12 @@ class _FriendsListState extends State<FriendsList> {
   @override
   Widget build(BuildContext context) {
     if (haveRetrievedFriends == true) {
+      if (facebookFriends == null || facebookFriends.length == 0) {
+        return Center(
+            child: Container(
+                padding: EdgeInsets.all(30),
+                child: Text('No facebook friends found')));
+      }
       return ListView.builder(
         itemCount: facebookFriends.length,
         itemBuilder: (BuildContext context, int index) {

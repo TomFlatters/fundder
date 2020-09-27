@@ -113,8 +113,6 @@ class _HomeState extends State<Home> {
   void _checkIfIntroed() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     await user.reload();
-    await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => FindFriends()));
     print('Checking if introed');
     Firestore.instance
         .collection("users")
@@ -128,10 +126,7 @@ class _HomeState extends State<Home> {
         bool termsAccepted = await Navigator.push(context,
             MaterialPageRoute(builder: (context) => TermsViewPrompter()));
         if (termsAccepted == true) {
-          await Firestore.instance
-              .collection('users')
-              .document(user.uid)
-              .updateData({
+          Firestore.instance.collection('users').document(user.uid).updateData({
             'termsAccepted': true,
           });
         } else {
@@ -139,37 +134,33 @@ class _HomeState extends State<Home> {
           return;
         }
       }
-      if (snapshot != null && (user.isEmailVerified == true)) {
-        if (snapshot['name'] == null ||
-            snapshot['username'] == null ||
-            snapshot['name'] == '' ||
-            snapshot['username'] == '' ||
-            snapshot['dpSetterPrompted'] == null ||
-            snapshot['dpSetterPrompted'] == false) {
-          havePresentedWelcome = true;
-          print('Pushing add profile pic');
-          Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic').then(
-              (value) => Firestore.instance
-                      .collection('users')
-                      .document(user.uid)
-                      .updateData({
-                    'dpSetterPrompted': true,
-                  }));
-        }
-      }
       if (user.isEmailVerified == false) {
         havePresentedWelcome = true;
-        Navigator.pushNamed(context, '/' + user.uid + '/verification')
-            .then((value) {
-          if (value == true) {
-            Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic')
-                .then((val) => Firestore.instance
-                        .collection('users')
-                        .document(user.uid)
-                        .updateData({
-                      'dpSetterPrompted': true,
-                    }));
-          }
+        final value = await Navigator.pushNamed(
+            context, '/' + user.uid + '/verification');
+        if (value == false) {
+          return;
+        }
+      }
+      if (snapshot['name'] == null ||
+          snapshot['username'] == null ||
+          snapshot['name'] == '' ||
+          snapshot['username'] == '' ||
+          snapshot['dpSetterPrompted'] == null ||
+          snapshot['dpSetterPrompted'] == false) {
+        havePresentedWelcome = true;
+        print('Pushing add profile pic');
+        await Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
+        Firestore.instance.collection('users').document(user.uid).updateData({
+          'dpSetterPrompted': true,
+        });
+      }
+      if (snapshot['friendFinderPrompted'] == null ||
+          snapshot['friendFinderPrompted'] == false) {
+        await Navigator.push(
+            context, MaterialPageRoute(builder: (context) => FindFriends()));
+        Firestore.instance.collection('users').document(user.uid).updateData({
+          'friendFinderPrompted': true,
         });
       }
     });
@@ -227,7 +218,9 @@ class _HomeState extends State<Home> {
                   doc.data['username'] == null ||
                   doc.data['dpSetterPrompted'] == false ||
                   doc.data['name'] == '' ||
-                  doc.data['username'] == '') {
+                  doc.data['username'] == '' ||
+                  doc.data['friendFinderPrompted'] == null ||
+                  doc.data['friendFinderPrompted'] == false) {
                 if (havePresentedWelcome == false && loadingWelcome == false) {
                   loadingWelcome = true;
                   _checkIfIntroed();
