@@ -119,10 +119,14 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
                 hintText: 'Search followers...'),
           ),
         ),
-        Container(
-          child: SelectedFollowersRow(selectedFollowers),
-          height: 50,
-        ),
+        (selectedFollowers.length > 0)
+            ? Container(
+                child: SelectedFollowersRow(selectedFollowers),
+                height: 50,
+              )
+            : Container(
+                height: 0,
+              ),
         Expanded(
           child: ListView.builder(
               itemCount: searchedFollowers.length,
