@@ -164,46 +164,6 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
   }
 }
 
-class FollowerListTile extends StatefulWidget {
-  final bool currentlySelected;
-  final Map follower;
-  final Function selectProfilePic;
-  FollowerListTile(this.follower, this.selectProfilePic,
-      {@required this.currentlySelected, Key key})
-      : super(key: key);
-  @override
-  _FollowerListTileState createState() => _FollowerListTileState();
-}
-
-class _FollowerListTileState extends State<FollowerListTile> {
-  bool isSelected = false;
-  void initState() {
-    isSelected = widget.currentlySelected;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    String followerId = widget.follower["uid"];
-    String followerUserName = widget.follower["username"];
-    return CheckboxListTile(
-      secondary: ProfilePic(followerId, 40),
-      value: isSelected,
-      title: Text(
-        followerUserName,
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      activeColor: HexColor("ff6b6c"),
-      onChanged: (val) {
-        setState(() {
-          widget.selectProfilePic(val);
-          isSelected = val;
-        });
-      },
-    );
-  }
-}
-
 class SelectedFollowersRow extends StatelessWidget {
   final List selectedFollowersIds;
   SelectedFollowersRow(this.selectedFollowersIds);
@@ -214,6 +174,33 @@ class SelectedFollowersRow extends StatelessWidget {
         children: selectedFollowersIds.map((id) => ProfilePic(id, 40)).toList(),
         scrollDirection: Axis.horizontal,
       ),
+    );
+  }
+}
+
+class FollowerListTile extends StatelessWidget {
+  final bool currentlySelected;
+  final Map follower;
+  final Function selectProfilePic;
+  FollowerListTile(this.follower, this.selectProfilePic,
+      {@required this.currentlySelected, Key key})
+      : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    String followerId = follower["uid"];
+    String followerUserName = follower["username"];
+    return CheckboxListTile(
+      secondary: ProfilePic(followerId, 40),
+      value: currentlySelected,
+      title: Text(
+        followerUserName,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      activeColor: HexColor("ff6b6c"),
+      onChanged: (val) {
+        selectProfilePic(val);
+        // isSelected = val;
+      },
     );
   }
 }
