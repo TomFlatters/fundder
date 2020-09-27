@@ -286,6 +286,8 @@ class AuthService {
             await DatabaseService(uid: user.uid)
                 .registerUserData(user.email, null, name, profilePic);
             await DatabaseService(uid: user.uid).addFacebookId(profile['id']);
+            await DatabaseService(uid: user.uid)
+                .addFacebookToken(result.accessToken.token);
             _getFCMToken(user.uid);
           }
         });
@@ -331,6 +333,8 @@ class AuthService {
               await authResult.linkWithCredential(credential);
             }
             await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);
+            await DatabaseService(uid: guser.uid)
+                .addFacebookToken(result.accessToken.token);
             _getFCMToken(guser.uid);
           } else if (signInMethods.contains('password')) {
             print("email account exists");
@@ -451,6 +455,8 @@ class AuthService {
       await currentUser.linkWithCredential(credential);
       print('went past credential');
       await DatabaseService(uid: currentUser.uid).addFacebookId(profile['id']);
+      await DatabaseService(uid: currentUser.uid)
+          .addFacebookToken(result.accessToken.token);
       return ('Account successfully linked to facebook');
     } catch (e) {
       if (e.message != null) {
