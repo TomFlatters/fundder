@@ -57,11 +57,13 @@ class FollowersSearchSelect extends StatefulWidget {
 }
 
 class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
+  List selectedFollowers;
   List<Map> searchedFollowers;
   TextEditingController _textController = TextEditingController();
   @override
   void initState() {
     searchedFollowers = widget.myFollowers;
+    selectedFollowers = [];
     _textController.addListener(() {
       if (_textController.text.isEmpty) {
         setState(() {
@@ -123,13 +125,73 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
               padding: EdgeInsets.all(12.0),
               itemBuilder: (context, index) {
                 var data = searchedFollowers[index];
-                return ListTile(
-                  title: Text(data.toString()),
-                  onTap: () => print(data),
+                var followerId = data["uid"] as String;
+                followerSelected(bool newVal) {
+                  if (newVal) {
+                    //i.e. this follower has been selected
+                    setState(() {
+                      selectedFollowers.add(followerId);
+                      print(
+                          "The followers selected so far are: ${selectedFollowers.toString()}");
+                    });
+                  } else {
+                    setState(() {
+                      selectedFollowers.remove(data["uid"]);
+                      print(
+                          "The followers selected so far are: ${selectedFollowers.toString()}");
+                    });
+                  }
+                }
+
+                return FollowerListTile(
+                  data,
+                  followerSelected,
+                  currentlySelected: selectedFollowers.contains(data['uid']),
+                  key: UniqueKey(),
                 );
               }),
         )
       ],
+    );
+  }
+}
+
+class FollowerListTile extends StatefulWidget {
+  final bool currentlySelected;
+  final Map follower;
+  final Function selectProfilePic;
+  FollowerListTile(this.follower, this.selectProfilePic,
+      {@required this.currentlySelected, Key key})
+      : super(key: key);
+  @override
+  _FollowerListTileState createState() => _FollowerListTileState();
+}
+
+class _FollowerListTileState extends State<FollowerListTile> {
+  bool isSelected = false;
+  void initState() {
+    isSelected = widget.currentlySelected;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String followerId = widget.follower["uid"];
+    String followerUserName = widget.follower["username"];
+    return CheckboxListTile(
+      secondary: ProfilePic(followerId, 40),
+      value: isSelected,
+      title: Text(
+        followerUserName,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      activeColor: HexColor("ff6b6c"),
+      onChanged: (val) {
+        setState(() {
+          widget.selectProfilePic(val);
+          isSelected = val;
+        });
+      },
     );
   }
 }
