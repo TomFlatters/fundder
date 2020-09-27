@@ -119,6 +119,10 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
                 hintText: 'Search followers...'),
           ),
         ),
+        Container(
+          child: SelectedFollowersRow(selectedFollowers),
+          height: 50,
+        ),
         Expanded(
           child: ListView.builder(
               itemCount: searchedFollowers.length,
@@ -192,6 +196,20 @@ class _FollowerListTileState extends State<FollowerListTile> {
           isSelected = val;
         });
       },
+    );
+  }
+}
+
+class SelectedFollowersRow extends StatelessWidget {
+  final List selectedFollowersIds;
+  SelectedFollowersRow(this.selectedFollowersIds);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: ListView(
+        children: selectedFollowersIds.map((id) => ProfilePic(id, 40)).toList(),
+        scrollDirection: Axis.horizontal,
+      ),
     );
   }
 }
