@@ -158,11 +158,12 @@ class _FeedViewState extends State<FeedView> {
         builder: (context) {
           return Container(
             color: Color(0xFF737373),
-            height: 175,
+            height: 235,
             child: Container(
               padding: EdgeInsets.only(top: 10),
               child: ListView(
                 children: [
+                  SelectedFollowersOnlyPrivacyToggle(),
                   PrivacyIcon(
                     isPrivate: false,
                     description:
@@ -174,9 +175,10 @@ class _FeedViewState extends State<FeedView> {
                     title: Text('Delete'),
                     subtitle: Text(
                         "If this Fundder has not been completed, money raised will be refunded."),
-                    onTap: () {
-                      print('button pressed');
-                      _showDeleteDialog(postData);
+                    onTap: () async {
+                      print('elipses button pressed');
+                      await _showDeleteDialog(postData);
+                      Navigator.of(context).pop();
                     },
                   ),
                 ],
