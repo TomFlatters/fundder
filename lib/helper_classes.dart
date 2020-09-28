@@ -60,7 +60,7 @@ class _ProfilePicState extends State<ProfilePic> {
       if (mounted) {
         if (mounted)
           setState(() {
-            if (value.data != null) {
+            if (value.data != null && value.data['profilePic'] != null) {
               url = value.data["profilePic"];
             }
           });
