@@ -901,6 +901,7 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data()['postId'])
   let postJSONS = await Promise.all(queryData.map(async (postId)=>{
     const postDoc = await postsCollection.doc(postId).get();
+    //if post is private, check the private status of the post. If it's private, check to see if follower.
     if (postDoc.exists){
       let postObj = postDoc.data();
       postObj['postId'] = postId;
