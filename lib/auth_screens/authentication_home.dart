@@ -42,6 +42,7 @@ class AuthenticationHome extends StatelessWidget {
                 onPressed: () async {
                   this.isLoadingChanged(true);
                   String status = await _auth.loginWithFacebook(context);
+                  print('facebook log in status: ' + status);
                   if (status == "Email account exists") {
                     this.hasError("Email account exists");
                   }

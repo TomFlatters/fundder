@@ -178,6 +178,7 @@ class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future signInWithGoogle() async {
+    _googleSignIn.signOut();
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     if (googleUser == null) {
       return 'error';
@@ -224,17 +225,24 @@ class AuthService {
 
   Future loginWithFacebook(BuildContext context) async {
     try {
+      print('is logged in?: ' + (await FacebookLogin().isLoggedIn).toString());
+      await FacebookLogin().logOut();
       final facebookLogin = FacebookLogin();
       final result = await facebookLogin
           .logIn(['email', 'user_friends', 'public_profile']);
       if (result == null || result.accessToken == null) {
-        return 'error';
+        return 'result: ' +
+            result.toString() +
+            ' result token: ' +
+            result.accessToken.toString() +
+            ' result error: ' +
+            result.errorMessage.toString();
       }
       final AuthCredential credential = FacebookAuthProvider.getCredential(
         accessToken: result.accessToken.token,
       );
       if (credential == null) {
-        return 'error';
+        return 'credential is null';
       }
       final profileGraphResponse = await http.get(
           'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token}');
@@ -344,7 +352,7 @@ class AuthService {
           //return usuario;
           return 'linked with google';
         }
-        return 'error';
+        return e.toString();
       }
     } catch (generalError) {
       return generalError.toString();
@@ -432,6 +440,7 @@ class AuthService {
   }
 
   Future linkAccountToFacebook() async {
+    await FacebookLogin().logOut();
     final facebookLogin = FacebookLogin();
     final result =
         await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
@@ -469,6 +478,7 @@ class AuthService {
 
   Future getNewFacebookToken(String uid) async {
     try {
+      await FacebookLogin().logOut();
       final facebookLogin = FacebookLogin();
       final result = await facebookLogin
           .logIn(['email', 'user_friends', 'public_profile']);

@@ -134,7 +134,10 @@ class _HomeState extends State<Home> {
           return;
         }
       }
-      if (user.isEmailVerified == false) {
+      List providers = await FirebaseAuth.instance
+          .fetchSignInMethodsForEmail(email: user.email);
+      if (user.isEmailVerified == false &&
+          providers.contains('facebook.com') == false) {
         havePresentedWelcome = true;
         final value = await Navigator.pushNamed(
             context, '/' + user.uid + '/verification');
@@ -157,6 +160,7 @@ class _HomeState extends State<Home> {
       }
       if (snapshot['friendFinderPrompted'] == null ||
           snapshot['friendFinderPrompted'] == false) {
+        havePresentedWelcome = true;
         await Navigator.push(
             context, MaterialPageRoute(builder: (context) => FindFriends()));
         Firestore.instance.collection('users').document(user.uid).updateData({

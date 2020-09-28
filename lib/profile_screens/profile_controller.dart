@@ -69,7 +69,7 @@ class _ProfileState extends State<ProfileController>
   @override
   Widget build(BuildContext context) {
     final firebaseUser = Provider.of<User>(context);
-    if (widget.user.uid != widget.user.uid) {
+    if (widget.user.uid != firebaseUser.uid) {
       emptyMessage = "Looks like they haven't yet created a Fundder challenge";
     }
     // print(user.uid);

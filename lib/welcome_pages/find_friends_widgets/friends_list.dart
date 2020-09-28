@@ -79,13 +79,15 @@ class _FriendsListState extends State<FriendsList> {
         itemCount: facebookFriends.length,
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
-              onTap: () {
+              onTap: () async {
                 print('/user/' + facebookFriends[index]['uid']);
-                Navigator.pushNamed(
+                await Navigator.pushNamed(
                     context, '/user/' + facebookFriends[index]['uid']);
+                setState(() {});
               },
               child: Container(
-                  margin: EdgeInsets.only(left: 10, top: 0, bottom: 0),
+                  padding: EdgeInsets.only(left: 10, top: 0, bottom: 0),
+                  color: Colors.white,
                   child: Row(children: <Widget>[
                     Align(
                       alignment: Alignment.centerLeft,
