@@ -123,8 +123,8 @@ class CloudInterfaceForFollowers {
         cloudFunc.getHttpsCallable(functionName: 'userFollowedSomeone');
     HttpsCallableResult res = await userFollowedSomeone
         .call(<String, dynamic>{'follower': uid, 'followee': target});
-    String status = res.data['status'];
-    return status;
+    var status = res.data['status'];
+    return status.toString();
   }
 
   /**Determines the follow relationship status of user x to user y. 
