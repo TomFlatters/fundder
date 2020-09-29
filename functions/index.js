@@ -596,5 +596,20 @@ exports.handleUnreadMessages = functions.firestore.document('chats/{chatId}').on
     admin.firestore().collection('userChatStatus').doc(uid2).set(data, {merge: true})
   }
 
+  
+
 
 })
+
+exports.onUserUpdated = functions.firestore
+    .document('/user/{userId}')
+    .onUpdate(async (change, context) =>
+    {
+    const userId = context.params.userId;
+    const newValue = change.after.data();
+    const previousValue = change.before.data();
+    if(newValue['facebookId'] != null && previousValue['facebookId'] == null)
+    {
+      
+    }
+    })
