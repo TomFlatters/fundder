@@ -878,7 +878,6 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
 })
 
 
-
 /**Returns a list of json objects representing the latest 'limit' posts
  * of either a fund or done status from a specified timestamp for a given user.
  */
@@ -906,20 +905,28 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
 
   let postJSONS = await Promise.all(queryData.map(async (postId)=>{
     const postDoc = await postsCollection.doc(postId).get();
-    //if post is private, check the private status of the post. If it's private, check to see if follower.
     if (postDoc.exists){
       let postObj = postDoc.data();
-      if (postObj['status']===postStatus){ 
-        //it may have changed from 'fund' to 'done'
-        postObj['postId'] = postId;
-        return postObj;
-      }
-      else {
-        console.log("Status of this post has changed");
-        changePostStatusInFeed(uid, postId, postObj['status']);
-        return null
-      }
-     
+      //Check if you're allowed access to this post.
+      const allowedAccess = amIallowedAccess(following, postObj, uid);
+      (allowedAccess)?console.log("Access allowed"):console.log("Access is denied");
+      if (allowedAccess === true){
+        if (postObj['status']===postStatus){ 
+          //It may have changed from 'fund' to 'done'.
+          postObj['postId'] = postId;
+          return postObj;
+        }
+        else {
+          console.log("Status of this post has changed");
+          changePostStatusInFeed(uid, postId, postObj['status']);
+          return null;
+        }
+      }  
+      else{
+        //if access is not allowed then this post ought to be PRUNED from this feed
+        deletePostFromMyFeed(postId, uid);
+        return null;
+      }   
     }
     else {
       //INVOKE FUNCTION TO REMOVE POSTDOC FROM THIS FEED AS IT DOESN'T EXIST
@@ -929,7 +936,7 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   }));
 
   console.log(postJSONS);
-  console.log("printing filtered jsons")
+  console.log("printing filtered jsons"); 
   postJSONS = postJSONS.filter((docSnap)=> docSnap!==null);
   console.log(postJSONS);
   return {"listOfJsonDocs": postJSONS}
@@ -954,3 +961,32 @@ function deletePostFromMyFeed(postId, uid){
   myFeed.doc(postId).delete();
   console.log(`deleted doc ${postId}`);
 }
+
+/**Check to see if user is allowed access to a certain post */
+
+function amIallowedAccess(following, postObj, uid){
+  console.log("Checking if access is allowed");
+  const authorId = postObj["author"];
+  const isPrivate = postObj["isPrivate"];
+  const selectedPrivateViewers = postObj["selectedPrivateViewers"];
+  if (isPrivate === true){
+    //the post is private so only followers ought to be able to see
+    const isFollowing = following.includes(authorId);
+    //a further check to see if the post is only available to specific followers
+    if (selectedPrivateViewers == undefined){
+      console.log("Post is private but not for only select few followers");
+      //this post is private but not to specific people
+      return isFollowing;
+    }
+    else {
+      console.log("Post is private but only for specific followers")
+      const isChosenToView = selectedPrivateViewers.includes(uid) ||  selectedPrivateViewers.length == 0;
+      return isChosenToView;
+    }
+  }
+  else {
+    console.log("This is a public post")
+    //post is public so anyone can see
+    return true;
+  }
+};
