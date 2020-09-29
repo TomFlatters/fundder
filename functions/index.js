@@ -918,7 +918,9 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
     }
     else {
       //INVOKE FUNCTION TO REMOVE POSTDOC FROM THIS FEED AS IT DOESN'T EXIST
-      return null;}
+      deletePostFromMyFeed(postId, uid);
+      return null;
+    }
   }));
   console.log(postJSONS);
   console.log("printing filtered jsons")
@@ -928,7 +930,21 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
 })
 
 
+/**
+ * Sets the 'status' of a post in myFeed to newStatus 
+ * Invoked when loading up posts from myFeed to display to the user. Status discrepancies that may 
+ * be caused when the user migrates a post from fund to done will be fixed here, on the fly.
+*/
+
 function changePostStatusInFeed(feedUid, postId, newStatus){
   const myFeed = admin.firestore().collection('users').doc(feedUid).collection('myFeed');
   myFeed.doc(postId).set({'status': newStatus}, {merge: true});
+}
+
+/**Removes a post with postId from myFeed of user uid */
+
+function deletePostFromMyFeed(postId, uid){
+  const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
+  myFeed.doc(postId).delete();
+  console.log(`deleted doc ${postId}`);
 }
