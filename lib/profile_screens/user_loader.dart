@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
@@ -16,10 +17,18 @@ class UserLoader extends StatelessWidget {
         //   ? Firestore.instance.collection("posts").where("author", isEqualTo: widget.identifier).snapshots()
         //   : Firestore.instance.collection("posts").snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            User user = DatabaseService(uid: this.uid)
-                .userDataFromSnapshot(snapshot.data);
-            return ProfileController(user: user);
+          if (snapshot.hasData && snapshot.data != null) {
+            DocumentSnapshot doc = snapshot.data;
+            if (doc.data != null) {
+              User user =
+                  DatabaseService(uid: this.uid).userDataFromSnapshot(doc);
+              return ProfileController(user: user);
+            } else {
+              return Scaffold(
+                appBar: AppBar(),
+                body: Text('User not fully created'),
+              );
+            }
           } else {
             if (snapshot.connectionState == ConnectionState.done) {
               return Scaffold(

@@ -137,8 +137,8 @@ class _FeedViewState extends State<FeedView> {
             ),
             onTap: () async {
               print("a post clicked");
-              await Navigator.push(
-                  context, FadeRoute(page: ViewPost(postData)));
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ViewPost(postData)));
               likesManager.add(1);
             },
           );

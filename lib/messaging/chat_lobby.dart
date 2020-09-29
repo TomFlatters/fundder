@@ -42,7 +42,8 @@ class ChatLobby extends StatelessWidget {
           IconButton(
               icon: Icon(AntDesign.edit),
               onPressed: () {
-                Navigator.push(context, FadeRoute(page: FindChatUsers()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => FindChatUsers()));
               })
         ],
       ),
@@ -69,8 +70,9 @@ class ChatLobby extends StatelessWidget {
                 ),
                 onTap: () => Navigator.push(
                     context,
-                    FadeRoute(
-                        page: ChatRoom(doc.documentID, doc.data['username']))),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ChatRoom(doc.documentID, doc.data['username']))),
               );
             },
             minimumChars: 1,

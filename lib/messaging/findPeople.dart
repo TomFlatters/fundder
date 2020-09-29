@@ -47,8 +47,9 @@ class FindChatUsers extends StatelessWidget {
                 ),
                 onTap: () => Navigator.push(
                     context,
-                    FadeRoute(
-                        page: ChatRoom(doc.documentID, doc.data['username']))),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ChatRoom(doc.documentID, doc.data['username']))),
               );
             },
             minimumChars: 1,
@@ -77,7 +78,9 @@ Widget _displyFollowers(uid) {
               ),
               onTap: () {
                 Navigator.push(
-                    context, FadeRoute(page: ChatRoom(otherChateeId, uname)));
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatRoom(otherChateeId, uname)));
               },
             );
           },

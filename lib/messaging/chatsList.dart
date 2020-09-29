@@ -62,8 +62,9 @@ class ChatsList extends StatelessWidget {
                             : null),
                     onTap: () => Navigator.push(
                         context,
-                        FadeRoute(
-                            page: ChatRoom(otherChateeId, snapshot.data))));
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ChatRoom(otherChateeId, snapshot.data))));
               } else {
                 return Container(
                   height: 40,
