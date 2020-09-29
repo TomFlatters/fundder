@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fundder/global_widgets/buttons.dart';
 import 'package:fundder/services/followers.dart';
@@ -32,8 +33,17 @@ class FollowButton extends StatelessWidget {
       );
     } else if (isFollowed == 'follow_requested') {
       return EditFundderButton(
-        text: 'Follow Requested',
-        onPressed: () => {},
+        text: 'Cancel Follow Request',
+        onPressed: () {
+          var followersCollection = Firestore.instance.collection('followers');
+          var userCollection = Firestore.instance.collection('users');
+          followersCollection.document(profileOwnerId).updateData({
+            'requestedToFollowMe': FieldValue.arrayRemove([myId])
+          });
+          userCollection.document(profileOwnerId).setData(
+              {'noFollowRequestsForMe': FieldValue.increment(-1)},
+              merge: true);
+        },
       );
     } else {
       return EditFundderButton(
