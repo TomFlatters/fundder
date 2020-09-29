@@ -892,23 +892,32 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   const startTimestamp = data.timeStamp;
   const [secs, nanoSecs] = startTimestamp.match(regEx); //returns an array in the formt [1601043492,743686000]
   const timeStamp = new  admin.firestore.Timestamp( parseInt(secs),  parseInt(nanoSecs));
-
   const uid = context.auth.uid;
   const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
   const postsCollection = admin.firestore().collection('postsV2');
   const query = await myFeed.where("status", "==", postStatus).orderBy("timestamp", 'desc').startAfter(timeStamp).limit(limit).get();
   const queryDocSnap = query.docs
   const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data()['postId'])
+
   let postJSONS = await Promise.all(queryData.map(async (postId)=>{
     const postDoc = await postsCollection.doc(postId).get();
     //if post is private, check the private status of the post. If it's private, check to see if follower.
     if (postDoc.exists){
       let postObj = postDoc.data();
-      postObj['postId'] = postId;
-      return postObj;
+      if (postObj['status']===postStatus){ 
+        //it may have changed from 'fund' to 'done'
+        postObj['postId'] = postId;
+        return postObj;
+      }
+      else {
+        console.log("Status of this post has changed");
+        changePostStatusInFeed(uid, postId, postObj['status']);
+        return null
+      }
+     
     }
     else {
-      //INVOKE FUNCTION TO REMOVE POSTDOC FROM THIS FEED
+      //INVOKE FUNCTION TO REMOVE POSTDOC FROM THIS FEED AS IT DOESN'T EXIST
       return null;}
   }));
   console.log(postJSONS);
@@ -917,3 +926,9 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   console.log(postJSONS);
   return {"listOfJsonDocs": postJSONS}
 })
+
+
+function changePostStatusInFeed(feedUid, postId, newStatus){
+  const myFeed = admin.firestore().collection('users').doc(feedUid).collection('myFeed');
+  myFeed.doc(postId).set({'status': newStatus}, {merge: true});
+}
