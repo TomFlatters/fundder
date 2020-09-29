@@ -59,6 +59,9 @@ class _ProfileState extends State<ProfileController>
   String emptyMessage =
       "Looks like you haven't yet created a Fundder challenge. Press the plus icon in the bottom bar to create a new challenge.";
 
+  //this is only set if this is not the user's profile controller
+  bool isFollower;
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -407,6 +410,12 @@ class _ProfileState extends State<ProfileController>
                                                             .connectionState ==
                                                         ConnectionState.done &&
                                                     initialState.data != null) {
+                                                  isFollower =
+                                                      (initialState.data ==
+                                                          "following");
+                                                  print(
+                                                      "this person is a follower: ${isFollower.toString()}");
+
                                                   return FollowButton(
                                                       initialState.data,
                                                       profileOwnerId: _uid,
