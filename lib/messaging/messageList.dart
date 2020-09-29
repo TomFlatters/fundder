@@ -65,7 +65,7 @@ class MessagesList extends StatelessWidget {
                 widgetsToShow.insert(
                     0,
                     Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        padding: EdgeInsets.only(top: 20.0, bottom: 5),
                         child: Text(
                             "${when.day} ${months[when.month - 1]} ${when.year}",
                             style: Theme.of(context).textTheme.subtitle1)));
@@ -74,7 +74,7 @@ class MessagesList extends StatelessWidget {
                 widgetsToShow.insert(
                     0,
                     Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        padding: EdgeInsets.only(top: 20.0, bottom: 5),
                         child: Text(
                             "${when.day} ${months[when.month - 1]} ${when.year}",
                             style: Theme.of(context).textTheme.subtitle1)));
