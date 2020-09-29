@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/profileWidgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/followers.dart';
+import 'package:fundder/services/privacyService.dart';
 import 'profile_actions_view.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/models/user.dart';
@@ -60,7 +61,7 @@ class _ProfileState extends State<ProfileController>
       "Looks like you haven't yet created a Fundder challenge. Press the plus icon in the bottom bar to create a new challenge.";
 
   //this is only set if this is not the user's profile controller
-  bool isFollower;
+  bool isFollower = false;
 
   @override
   void dispose() {
@@ -427,41 +428,101 @@ class _ProfileState extends State<ProfileController>
                                                 }
                                               },
                                             ),
-                                      _uid != user.uid
-                                          ? DefaultTabController(
-                                              length: 1,
-                                              initialIndex: 0,
-                                              child: Column(
-                                                children: [
-                                                  TabBar(
-                                                    onTap: (index) {},
-                                                    tabs: [
-                                                      Tab(text: 'Posts'),
-                                                    ],
-                                                  ),
-                                                  _profileView(user.uid, 0),
-                                                ],
-                                              ),
-                                            )
-                                          : DefaultTabController(
-                                              length: 2,
-                                              initialIndex: 0,
-                                              child: Column(
-                                                children: [
-                                                  TabBar(
-                                                    tabs: [
-                                                      Tab(text: 'Posts'),
-                                                      Tab(text: 'Liked')
-                                                    ],
-                                                    controller: _tabController,
-                                                  ),
-                                                  [
-                                                    _profileView(user.uid, 0),
-                                                    _profileView(user.uid, 1)
-                                                  ][_tabController.index]
-                                                ],
-                                              ),
-                                            )
+                                      FutureBuilder(
+                                          future: PrivacyService(widget.uid)
+                                              .isPrivate(),
+                                          builder: (context, isPrivate) {
+                                            if (isPrivate.hasData) {
+                                              if (isPrivate.data &&
+                                                  !isFollower) {
+                                                return Container(
+                                                    padding: EdgeInsets.only(
+                                                        top: 40),
+                                                    child: Column(children: [
+                                                      Icon(
+                                                        AntDesign.lock,
+                                                        color: Colors.grey,
+                                                        size: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width /
+                                                            8,
+                                                      ),
+                                                      Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  top: 30,
+                                                                  left: 40,
+                                                                  right: 40,
+                                                                  bottom: 20),
+                                                          child: Text(
+                                                            "You are not following this account",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontSize: 16,
+                                                                fontFamily:
+                                                                    'Founders Grotesk'),
+                                                          )),
+                                                    ]));
+                                              } else {
+                                                return _uid != user.uid
+                                                    ? DefaultTabController(
+                                                        length: 1,
+                                                        initialIndex: 0,
+                                                        child: Column(
+                                                          children: [
+                                                            TabBar(
+                                                              onTap: (index) {},
+                                                              tabs: [
+                                                                Tab(
+                                                                    text:
+                                                                        'Posts'),
+                                                              ],
+                                                            ),
+                                                            _profileView(
+                                                                user.uid, 0),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    : DefaultTabController(
+                                                        length: 2,
+                                                        initialIndex: 0,
+                                                        child: Column(
+                                                          children: [
+                                                            TabBar(
+                                                              tabs: [
+                                                                Tab(
+                                                                    text:
+                                                                        'Posts'),
+                                                                Tab(
+                                                                    text:
+                                                                        'Liked')
+                                                              ],
+                                                              controller:
+                                                                  _tabController,
+                                                            ),
+                                                            [
+                                                              _profileView(
+                                                                  user.uid, 0),
+                                                              _profileView(
+                                                                  user.uid, 1)
+                                                            ][_tabController
+                                                                .index]
+                                                          ],
+                                                        ),
+                                                      );
+                                              }
+                                            } else {
+                                              return Container(
+                                                child: Center(
+                                                  child: Text("Loading"),
+                                                ),
+                                              );
+                                            }
+                                          })
                                     ]))
                               ]),
                         ),
