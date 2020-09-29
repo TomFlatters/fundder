@@ -13,6 +13,9 @@ import 'package:fundder/global_widgets/buttons.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 import 'package:fundder/services/auth.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ProfilePicSetter extends StatefulWidget {
   @override
@@ -35,6 +38,8 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
   CarouselController _carouselController = CarouselController();
   int _current = 0;
   String _oldUsername;
+  String _facebookId;
+  String _facebookToken;
 
   var nameEntry = TextEditingController();
   var usernameEntry = TextEditingController();
@@ -59,6 +64,8 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
           nameEntry.text = value.data['name'];
           usernameEntry.text = value.data['username'];
           _oldUsername = value.data['username'];
+          _facebookId = value.data['facebookId'];
+          _facebookToken = value.data['facebookToken'];
         });
     });
   }
@@ -131,6 +138,18 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
                                     print('username is unique or new');
                                     if (nameEntry.text != '' &&
                                         usernameEntry.text != '') {
+                                      if (_facebookToken != null) {
+                                        final friendsGraphResponse = await http.get(
+                                            'https://graph.facebook.com/v8.0/me/friends?access_token=$_facebookToken');
+
+                                        final friends = json
+                                            .decode(friendsGraphResponse.body);
+                                        print('friends: ' + friends.toString());
+                                        CloudFunctions()
+                                            .getHttpsCallable(
+                                                functionName: 'facebookUser')
+                                            .call([_uid, friends]);
+                                      }
                                       if (imageFile != null) {
                                         final String fileLocation = _uid +
                                             "/" +

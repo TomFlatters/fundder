@@ -1,4 +1,5 @@
 const functions = require('firebase-functions');
+const https = require('https');
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -600,3 +601,79 @@ exports.handleUnreadMessages = functions.firestore.document('chats/{chatId}').on
 
 
 })
+
+exports.facebookUser = functions.https.onCall(async ([userId, friendsList], context) =>
+    {
+    console.log('uid: ' + userId);
+    // Retrieve user file of Fundder user to provide right data for notification
+    const receiver = await admin.firestore().doc(`users/${userId}`).get();
+    const newValue = receiver.data();
+
+    // For now we pass the friend data, as retrieving on node js is a headache, but in future can refactor.
+    const friends = friendsList;
+    // If error return 'wrong token' message
+    if ('error' in friends) {
+          console.log('wrong token');
+    } else {
+      // If no error, then add the facebook ids of all friends to array
+      console.log('friend maps: ' + friends['data'].toString());
+      var friendsFacebookIds = [];
+
+      for(var j in friends['data']){
+        var fid = friends['data'][j]['id'];
+        friendsFacebookIds.push(fid.toString());
+      }
+
+      console.log('facebook friends: ' + friendsFacebookIds);
+      
+      // Retrieve users with the facebook ids in the array
+      const userFriendsSnapshot = await admin.firestore().collection('users').where('facebookId', 'in', friendsFacebookIds).get();
+      const userFriends = userFriendsSnapshot.docs.map(doc => doc);
+      var tokens = [];
+      // For every friend add to their activity feed to say that facebook friend has joined
+      for(var i=0; i<userFriends.length; i++){
+        console.log('user friend: ' + userFriends[i].toString());
+        const doc = userFriends[i];
+        console.log('user friend id: ' + doc.id);
+        // Data to add to activity feed
+        const data = {
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          category: 'new facebook friend',
+          docLiker: userId,
+          docLikerUsername: newValue['name'],
+          postId: userId,
+          seen: false};
+
+        console.log('data: ' + doc.id);
+        
+        const res = await admin.firestore().collection(`users/${doc.id}/activity`).add(data);
+        
+        // Retrieve each receiver to find out their fcm token to send notification to
+        const receiver = await admin.firestore().doc(`users/${doc.id}`).get();
+        
+        console.log('Added document with ID: ', res.id);
+        if (receiver.data()['fcm'] !== null) {
+          tokens = tokens.concat(receiver.data()['fcm']);
+        }
+      }
+
+      // Log all tokens we are sending notification to
+      console.log('tokens: ' + tokens);
+
+      // Craft the notification
+      const payload =
+        {
+            notification: { 
+                title: 'Friends on Fundder',
+                body: `Your facebook friend ${newValue['username']} is on Fundder`, 
+            },
+        };
+
+      if (tokens.length > 0) {
+          // Send notifications to all tokens.
+          const response = await admin.messaging().sendToDevice(tokens, payload);
+          console.log('Notifications have been sent and tokens cleaned up.');
+          }
+      }
+
+    });
