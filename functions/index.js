@@ -895,9 +895,14 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   const uid = context.auth.uid;
   const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
   const postsCollection = admin.firestore().collection('postsV2');
+
   const query = await myFeed.where("status", "==", postStatus).orderBy("timestamp", 'desc').startAfter(timeStamp).limit(limit).get();
   const queryDocSnap = query.docs
   const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data()['postId'])
+
+  const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
+  const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] == undefined)?[]:myFollowersDoc.data()['following']):[];
+  console.log(`this is the list of users I'm following ${following}`);
 
   let postJSONS = await Promise.all(queryData.map(async (postId)=>{
     const postDoc = await postsCollection.doc(postId).get();
@@ -922,6 +927,7 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
       return null;
     }
   }));
+
   console.log(postJSONS);
   console.log("printing filtered jsons")
   postJSONS = postJSONS.filter((docSnap)=> docSnap!==null);
