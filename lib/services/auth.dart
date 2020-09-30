@@ -468,6 +468,7 @@ class AuthService {
     final friends = json.decode(friendsGraphResponse.body);
     FirebaseUser currentUser = await FirebaseAuth.instance.currentUser();
     try {
+      await currentUser.unlinkFromProvider('facebook.com');
       await currentUser.linkWithCredential(credential);
       print('went past credential');
       await DatabaseService(uid: currentUser.uid)
