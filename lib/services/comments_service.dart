@@ -6,7 +6,7 @@ class CommentsService {
   CommentsService({this.uid, this.postId});
 
   final CollectionReference postsCollection =
-      Firestore.instance.collection('posts');
+      Firestore.instance.collection('postsV2');
 
   final CollectionReference userCollection =
       Firestore.instance.collection('users');

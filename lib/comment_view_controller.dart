@@ -143,6 +143,10 @@ class _CommentPageState extends State<CommentPage> {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         String username = snapshot.data.username;
+                        print(
+                            "in FutureBuilder of the comment view controller rn.....\n the is private status is " +
+                                snapshot.data.isPrivate.toString());
+                        //snapshot.data.search_username;
                         return GestureDetector(
                           child: Container(
                             child: GestureDetector(

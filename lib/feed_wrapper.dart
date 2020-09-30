@@ -27,7 +27,7 @@ class FeedWrapper extends StatefulWidget {
 }
 
 class _FeedWrapperState extends State<FeedWrapper> {
-  int limit = 3;
+  int limit = 10;
   Timestamp loadingTimestamp;
   List<FeedView> postList;
   RefreshController _refreshController =

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class User {
   // add properties to the user model here
   final String uid;
@@ -20,6 +22,7 @@ class User {
   final List<dynamic> likes;
   final String facebookId;
   final String facebookToken;
+  final bool isPrivate;
 
   // construct them into the object here
   User(
@@ -42,5 +45,6 @@ class User {
       this.amountDonated = 1.0,
       this.likes,
       this.facebookId,
-      this.facebookToken});
+      this.facebookToken,
+      @required this.isPrivate});
 }

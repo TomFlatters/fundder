@@ -387,6 +387,9 @@ class _AddPostState extends State<AddPost> {
       if (mounted) {
         setState(() {
           user = User(
+              isPrivate: (value.data["isPrivate"] == null)
+                  ? false
+                  : value.data["isPrivate"],
               uid: firebaseUser.uid,
               name: value.data["name"],
               username: value.data['username'],
@@ -431,6 +434,7 @@ class _AddPostState extends State<AddPost> {
         if (whoDoes[selected] == "Myself") {
           DatabaseService(uid: user.uid)
               .uploadPost(new Post(
+                  isPrivate: user.isPrivate,
                   title: title.toString().trimRight(),
                   subtitle: subtitle.toString().trimRight(),
                   author: user.uid,
