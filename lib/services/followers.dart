@@ -118,25 +118,80 @@ class GeneralFollowerServices {
   }
 }
 
+/**Note that this service no longer interfaces with the cloud */
 class CloudInterfaceForFollowers {
   final uid;
   final cloudFunc = CloudFunctions.instance;
   // .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+  final CollectionReference _followersCollection =
+      Firestore.instance.collection('followers');
+  final CollectionReference _usersCollection =
+      Firestore.instance.collection('users');
 
   CloudInterfaceForFollowers(this.uid);
+
+/**takes the id of the prospective followee
+ * and id follower and the 'isPrivate' status of followee in that order and follows or requests follow.
+ * Returns the status of the outcome.  */
+
+  Future<String> _initiateFollow(followee, follower, followeeIsPrivate) async {
+    if (followeeIsPrivate) {
+      _followersCollection.document(followee).setData({
+        'requestedToFollowMe': FieldValue.arrayUnion([follower])
+      }, merge: true);
+      var followerDoc = await _followersCollection.document(follower).get();
+      if (!followerDoc.exists) {
+        _followersCollection
+            .document(follower)
+            .setData({'following': []}, merge: true);
+      }
+
+      _usersCollection.document(followee).setData(
+          {'noFollowRequestsForMe': FieldValue.increment(1)},
+          merge: true);
+      return "requested";
+    } else {
+      _followersCollection.document(followee).setData({
+        'followers': FieldValue.arrayUnion([follower])
+      }, merge: true);
+      _followersCollection.document(follower).setData({
+        'following': FieldValue.arrayUnion([followee])
+      }, merge: true);
+      _usersCollection
+          .document(follower)
+          .setData({'noFollowing': FieldValue.increment(1)}, merge: true);
+      _usersCollection
+          .document(followee)
+          .setData({'noFollowers': FieldValue.increment(1)}, merge: true);
+      return "nowFollowing";
+    }
+  }
 
   /**Interacts with cloud functions to request to follow a user.
    * If the user is private, then a successful status result will be 'requested'.
    * If the user is public, then a successful response is 'nowFollowing'
    * Anything else is a failed response and should be handled.
+   * 
+   * NOTE: no longer interacts with cloud function massive rip 
+   * The things we do for....nothing really THE END
    */
   Future<String> followUser({@required String target}) async {
+    var userDoc =
+        await Firestore.instance.collection('users').document(target).get();
+    var followeeIsPrivate = (userDoc.data['isPrivate'] == null)
+        ? false
+        : userDoc.data['isPrivate'] == true;
+    var status = await _initiateFollow(target, uid, followeeIsPrivate);
+    return status;
+
+    /*
     HttpsCallable userFollowedSomeone =
         cloudFunc.getHttpsCallable(functionName: 'userFollowedSomeone');
     HttpsCallableResult res = await userFollowedSomeone
         .call(<String, dynamic>{'follower': uid, 'followee': target});
     var status = res.data['status'];
     return status.toString();
+    */
   }
 
   /**Determines the follow relationship status of user x to user y. 
