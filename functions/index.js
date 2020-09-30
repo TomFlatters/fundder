@@ -878,6 +878,42 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
 })
 
 
+exports.onRefreshHashtag = functions.https.onCall(async (data, context)=>{
+  const hashtag = data.hashtag;
+  const limit = data.limit;
+    // the format of data.timeStamp is "Timestamp(seconds=1601043492, nanoseconds=743686000)"....i.e. a string
+  // this needs to be converted to a Timestamp dobject for querying purposes 
+  const regEx = /\d+/g;
+  const startTimestamp = data.timeStamp;
+  const [secs, nanoSecs] = startTimestamp.match(regEx); //returns an array in the formt [1601043492,743686000]
+  const timeStamp = new  admin.firestore.Timestamp( parseInt(secs),  parseInt(nanoSecs));
+  const uid = context.auth.uid;
+  
+  const postsCollection = admin.firestore().collection('postsV2');
+  
+  const query = await postsCollection.where("hashtags", "array-contains", hashtag).orderBy("timestamp", 'desc').startAfter(timeStamp).limit(limit).get();
+  const queryDocSnap = query.docs
+  const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data())
+
+
+  const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
+  const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] == undefined)?[]:myFollowersDoc.data()['following']):[];
+  
+
+  let postJSONS = queryData.filter( (postObj)=>{
+      //Check if you're allowed access to this post.
+       allowedAccess = amIallowedAccess(following, postObj, uid);
+       return allowedAccess;
+  });
+
+  console.log(postJSONS);
+  console.log("printing filtered jsons of posts with this hashtag"); 
+  postJSONS = postJSONS.filter((docSnap)=> docSnap!==null);
+  console.log(postJSONS);
+  return {"listOfJsonDocs": postJSONS}
+
+  
+});
 /**Returns a list of json objects representing the latest 'limit' posts
  * of either a fund or done status from a specified timestamp for a given user.
  */
@@ -929,7 +965,6 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
       }   
     }
     else {
-      //INVOKE FUNCTION TO REMOVE POSTDOC FROM THIS FEED AS IT DOESN'T EXIST
       deletePostFromMyFeed(postId, uid);
       return null;
     }

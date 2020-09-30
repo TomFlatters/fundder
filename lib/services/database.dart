@@ -243,21 +243,24 @@ class DatabaseService {
    * starting at 'startTimestamp' containing hashtag 'hashtag' 
    */
   Future<List<Post>> refreshHashtag(
-      String hashtag, int limit, Timestamp startTimestamp) {
+      String hashtag, int limit, Timestamp startTimestamp) async {
     print("running refresh hashtag");
     print('limit: ' + limit.toString());
-    /*
-    return postsCollection
-        .orderBy("timestamp", descending: true)
-        .startAfter([startTimestamp])
-        .limit(limit)
-        .where('hashtags', arrayContains: hashtag)
-        .getDocuments()
-        .then((snapshot) {
-          print(_postsDataFromSnapshot(snapshot));
-          return _postsDataFromSnapshot(snapshot);
-        });
-        */
+
+    HttpsCallable cloudRefreshHashtag =
+        cloudFunc.getHttpsCallable(functionName: 'onRefreshHashtag');
+    HttpsCallableResult res = await cloudRefreshHashtag.call(<String, dynamic>{
+      'hashtag': hashtag,
+      'limit': limit,
+      "timeStamp": startTimestamp.toString(), //this is converted server side
+    });
+
+    print("printing result of refresh hashtag: " +
+        res.data["listOfJsonDocs"].toString());
+
+    var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
+
+    return postList;
   }
 
   /**Get posts by author id */
