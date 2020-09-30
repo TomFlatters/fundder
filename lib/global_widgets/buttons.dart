@@ -71,7 +71,7 @@ class FundderButton extends StatelessWidget {
             child: Container(
               height: 50,
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-              margin: EdgeInsets.only(left: 70, right: 70, bottom: 20),
+              margin: EdgeInsets.only(left: 70, right: 70),
               decoration: BoxDecoration(
                 color: this.backgroundColor,
                 border: Border.all(color: this.borderColor, width: 2),

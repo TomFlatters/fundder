@@ -56,12 +56,15 @@ class _ViewFollowersState extends State<ViewFollowers>
   }
 
   _handleTabSelection() {
-    if (mounted) setState(() {});
-    print("called");
+    if (_tabController.indexIsChanging) {
+      if (mounted) setState(() {});
+      print("called");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print('rebuilding followers');
     var user = Provider.of<User>(context);
     List usedList = [];
     if (_tabController.index == 0) {

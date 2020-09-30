@@ -15,6 +15,7 @@ class UserListTile extends StatefulWidget {
 class _UserListTileState extends State<UserListTile> {
   @override
   Widget build(BuildContext context) {
+    print('building user tiles');
     return FundderListTile(
       onTap: () async {
         print('/user/' + widget.displayUserUid);
@@ -23,8 +24,12 @@ class _UserListTileState extends State<UserListTile> {
       },
       profilePicUid: widget.displayUserUid,
       title: widget.displayUserUsername,
-      trailing:
-          ListFollowButtonBuilder(widget.currentUserUid, widget.displayUserUid),
+      trailing: widget.currentUserUid != widget.displayUserUid
+          ? ListFollowButtonBuilder(
+              widget.currentUserUid, widget.displayUserUid)
+          : Container(
+              width: 0,
+            ),
     );
   }
 }

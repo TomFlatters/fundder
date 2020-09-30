@@ -19,7 +19,7 @@ class UserLoader extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             DocumentSnapshot doc = snapshot.data;
-            if (doc.data != null) {
+            if (doc.data != null && doc.data['name'] != null) {
               User user =
                   DatabaseService(uid: this.uid).userDataFromSnapshot(doc);
               return ProfileController(user: user);
