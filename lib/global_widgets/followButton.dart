@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fundder/global_widgets/buttons.dart';
@@ -8,86 +9,91 @@ import 'package:fundder/helper_classes.dart';
 
 // need a new button for activity feed
 
-class FollowButton extends StatefulWidget {
-  final bool initialState;
+class FollowButton extends StatelessWidget {
+  final String isFollowed;
   final String profileOwnerId;
   final String myId;
-  final FollowersService followersService;
+  final CloudInterfaceForFollowers cloudFollowersService;
+
   FollowButton(
-    this.initialState, {
+    this.isFollowed, {
     @required this.profileOwnerId,
     @required this.myId,
-  }) : followersService = FollowersService(uid: myId);
-  @override
-  _FollowButtonState createState() => _FollowButtonState(initialState);
-}
-
-class _FollowButtonState extends State<FollowButton> {
-  bool isFollowed = false;
-  _FollowButtonState(this.isFollowed);
-  void followPressed() {
-    if (isFollowed) {
-      //already followed, so intention is to unfollow.
-      widget.followersService.userUNfollowedSomeone(widget.profileOwnerId);
-      if (mounted)
-        setState(() {
-          isFollowed = false;
-        });
-    } else {
-      //follow this user as they're not currently followed
-      widget.followersService.userFollowedSomeone(widget.profileOwnerId);
-      if (mounted)
-        (() {
-          isFollowed = true;
-        });
-    }
-  }
-
+  }) : cloudFollowersService = CloudInterfaceForFollowers(myId);
   @override
   Widget build(BuildContext context) {
-    return (isFollowed)
-        ? EditFundderButton(
-            onPressed: () => followPressed(),
-            text: 'Unfollow',
-          )
-        : EditFundderButton(
-            text: 'Follow',
-            onPressed: () => followPressed(),
-          );
+    if (isFollowed == 'following') {
+      return EditFundderButton(
+        onPressed: () =>
+            {cloudFollowersService.unfollowUser(target: profileOwnerId)},
+        text: 'Unfollow',
+      );
+    } else if (isFollowed == 'follow_requested') {
+      return EditFundderButton(
+        text: 'Cancel Follow Request',
+        onPressed: () async {
+          var followersCollection = Firestore.instance.collection('followers');
+          var userCollection = Firestore.instance.collection('users');
+          await followersCollection.document(profileOwnerId).updateData({
+            'requestedToFollowMe': FieldValue.arrayRemove([myId])
+          });
+          await userCollection.document(profileOwnerId).setData(
+              {'noFollowRequestsForMe': FieldValue.increment(-1)},
+              merge: true);
+        },
+      );
+    } else {
+      return EditFundderButton(
+        text: 'Follow',
+        onPressed: () =>
+            cloudFollowersService.followUser(target: profileOwnerId),
+      );
+    }
   }
 }
 
+/*
 class MiniFollowButton extends StatefulWidget {
-  final bool initialState;
+  final String initialState;
   final String profileOwnerId;
   final String myId;
-  final FollowersService followersService;
+  final CloudInterfaceForFollowers followersService;
   MiniFollowButton(
     this.initialState, {
     @required this.profileOwnerId,
     @required this.myId,
-  }) : followersService = FollowersService(uid: myId);
+  }) : followersService = CloudInterfaceForFollowers(myId);
   @override
-  _MiniFollowButtonState createState() => _MiniFollowButtonState(initialState);
+  _MiniFollowButtonState createState() => _MiniFollowButtonState();
 }
 
+
 class _MiniFollowButtonState extends State<MiniFollowButton> {
-  bool isFollowed = false;
-  _MiniFollowButtonState(this.isFollowed);
+  String followStatus;
+  @override
+  void initState() {
+    followStatus = widget.initialState;
+    super.initState();
+  }
+
+
   void followPressed() {
-    if (isFollowed) {
+    if (followStatus == 'following') {
       //already followed, so intention is to unfollow.
-      widget.followersService.userUNfollowedSomeone(widget.profileOwnerId);
+      widget.followersService.unfollowUser(target: widget.profileOwnerId);
       if (mounted)
         setState(() {
-          isFollowed = false;
+          followStatus = 'not_following';
         });
-    } else {
-      //follow this user as they're not currently followed
-      widget.followersService.userFollowedSomeone(widget.profileOwnerId);
+    } else if (followStatus == 'follow_requested') {
+      //do nothing
+    
+    }
+    else {
+       widget.followersService.followUser(target: widget.profileOwnerId);
       if (mounted)
         setState(() {
-          isFollowed = true;
+          followStatus = 'following';
         });
     }
   }
@@ -129,4 +135,4 @@ class _MiniFollowButtonState extends State<MiniFollowButton> {
             onPressed: () => followPressed(),
           );
   }
-}
+}*/

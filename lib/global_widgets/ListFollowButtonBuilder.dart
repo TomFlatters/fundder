@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/services/followers.dart';
 import 'package:fundder/global_widgets/followButton.dart';
 
+/*
 class ListFollowButtonBuilder extends StatelessWidget {
   final String uid;
   final String friendUid;
@@ -12,8 +13,8 @@ class ListFollowButtonBuilder extends StatelessWidget {
         child: Align(
             alignment: Alignment.centerRight,
             child: FutureBuilder(
-                future: FollowersService(uid: this.uid)
-                    .doesXfollowY(x: this.uid, y: this.friendUid),
+                future: CloudInterfaceForFollowers(uid)
+                    .doesXfollowY(x: uid, y: friendUid),
                 builder: (context, initialState) {
                   if (initialState.connectionState == ConnectionState.done &&
                       initialState.data != null) {
@@ -27,3 +28,5 @@ class ListFollowButtonBuilder extends StatelessWidget {
                 })));
   }
 }
+
+*/

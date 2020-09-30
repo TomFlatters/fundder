@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/global_widgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/followers.dart';
+import 'package:fundder/services/privacyService.dart';
 import 'profile_actions_view.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/models/user.dart';
@@ -46,6 +47,8 @@ class _ProfileState extends State<ProfileController>
   String emptyMessage =
       "Looks like you haven't yet created a Fundder challenge. Press the plus icon in the bottom bar to create a new challenge.";
 
+  //this is only set if this is not the user's profile controller
+  bool isFollower = false;
   @override
   void dispose() {
     _tabController.dispose();
@@ -285,8 +288,8 @@ class _ProfileState extends State<ProfileController>
                                             context, '/account/edit');
                                       })
                                   : FutureBuilder(
-                                      future: FollowersService(
-                                              uid: firebaseUser.uid)
+                                      future: CloudInterfaceForFollowers(
+                                              firebaseUser.uid)
                                           .doesXfollowY(
                                               x: firebaseUser.uid,
                                               y: widget.user.uid),
@@ -294,6 +297,11 @@ class _ProfileState extends State<ProfileController>
                                         if (initialState.connectionState ==
                                                 ConnectionState.done &&
                                             initialState.data != null) {
+                                          isFollower = (initialState.data ==
+                                              "following");
+                                          print(
+                                              "this person is a follower: ${isFollower.toString()}");
+
                                           return FollowButton(initialState.data,
                                               profileOwnerId: widget.user.uid,
                                               myId: firebaseUser.uid);
@@ -303,41 +311,91 @@ class _ProfileState extends State<ProfileController>
                                         }
                                       },
                                     ),
-                              widget.user.uid != firebaseUser.uid
-                                  ? DefaultTabController(
-                                      length: 1,
-                                      initialIndex: 0,
-                                      child: Column(
-                                        children: [
-                                          TabBar(
-                                            onTap: (index) {},
-                                            tabs: [
-                                              Tab(text: 'Posts'),
-                                            ],
-                                          ),
-                                          _profileView(firebaseUser.uid, 0),
-                                        ],
-                                      ),
-                                    )
-                                  : DefaultTabController(
-                                      length: 2,
-                                      initialIndex: 0,
-                                      child: Column(
-                                        children: [
-                                          TabBar(
-                                            tabs: [
-                                              Tab(text: 'Posts'),
-                                              Tab(text: 'Liked')
-                                            ],
-                                            controller: _tabController,
-                                          ),
-                                          [
-                                            _profileView(firebaseUser.uid, 0),
-                                            _profileView(firebaseUser.uid, 1)
-                                          ][_tabController.index]
-                                        ],
-                                      ),
-                                    )
+                              FutureBuilder(
+                                  future: PrivacyService(widget.user.uid)
+                                      .isPrivate(),
+                                  builder: (context, isPrivate) {
+                                    if (isPrivate.hasData) {
+                                      if (isPrivate.data &&
+                                          !isFollower &&
+                                          widget.user.uid != firebaseUser.uid) {
+                                        return Container(
+                                            padding: EdgeInsets.only(top: 40),
+                                            child: Column(children: [
+                                              Icon(
+                                                AntDesign.lock,
+                                                color: Colors.grey,
+                                                size: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    8,
+                                              ),
+                                              Container(
+                                                  margin: EdgeInsets.only(
+                                                      top: 30,
+                                                      left: 40,
+                                                      right: 40,
+                                                      bottom: 20),
+                                                  child: Text(
+                                                    "You are not following this private account",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 16,
+                                                        fontFamily:
+                                                            'Founders Grotesk'),
+                                                  )),
+                                            ]));
+                                      } else {
+                                        return widget.user.uid !=
+                                                firebaseUser.uid
+                                            ? DefaultTabController(
+                                                length: 1,
+                                                initialIndex: 0,
+                                                child: Column(
+                                                  children: [
+                                                    TabBar(
+                                                      onTap: (index) {},
+                                                      tabs: [
+                                                        Tab(text: 'Posts'),
+                                                      ],
+                                                    ),
+                                                    _profileView(
+                                                        firebaseUser.uid, 0),
+                                                  ],
+                                                ),
+                                              )
+                                            : DefaultTabController(
+                                                length: 2,
+                                                initialIndex: 0,
+                                                child: Column(
+                                                  children: [
+                                                    TabBar(
+                                                      tabs: [
+                                                        Tab(text: 'Posts'),
+                                                        Tab(text: 'Liked')
+                                                      ],
+                                                      controller:
+                                                          _tabController,
+                                                    ),
+                                                    [
+                                                      _profileView(
+                                                          firebaseUser.uid, 0),
+                                                      _profileView(
+                                                          firebaseUser.uid, 1)
+                                                    ][_tabController.index]
+                                                  ],
+                                                ),
+                                              );
+                                      }
+                                    } else {
+                                      return Container(
+                                        child: Center(
+                                          child: Text("Loading"),
+                                        ),
+                                      );
+                                    }
+                                  })
                             ]))
                       ]),
                 ),
