@@ -456,7 +456,7 @@ class _ProfileState extends State<ProfileController>
                                                                   right: 40,
                                                                   bottom: 20),
                                                           child: Text(
-                                                            "You are not following this account",
+                                                            "You are not following this private account",
                                                             textAlign: TextAlign
                                                                 .center,
                                                             style: TextStyle(
