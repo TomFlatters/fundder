@@ -120,8 +120,8 @@ class GeneralFollowerServices {
 
 class CloudInterfaceForFollowers {
   final uid;
-  final cloudFunc = CloudFunctions.instance
-      .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+  final cloudFunc = CloudFunctions.instance;
+  // .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
 
   CloudInterfaceForFollowers(this.uid);
 

@@ -683,6 +683,7 @@ exports.facebookUser = functions.https.onCall(async ([userId, friendsList], cont
  * DO NOT DEPLOY
  */
 
+ /*
 exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/gva6Vmg8J7yMbvQ6rdQ2').onUpdate(async (change, context)=>{
   let res = {};
   const newValue = change.after.data();
@@ -744,6 +745,7 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/gv
   }
   return res
 })
+*/
 
 
 /**Register a follower if followee is public, otherwise sends a follow request. */
@@ -941,7 +943,7 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
     const query = await userCollection.where('randomNumber', "==", 1).get();
     query.forEach((q)=>{
       const id = q.id;
-      if (id != postAuthor){
+      if (id !== postAuthor){
         let canProceed = true;
         if (userHasFollowers){
             followers.includes(id)?canProceed=false:canProceed=true
@@ -975,7 +977,7 @@ exports.onRefreshHashtag = functions.https.onCall(async (data, context)=>{
 
 
   const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
-  const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] == undefined)?[]:myFollowersDoc.data()['following']):[];
+  const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] === undefined)?[]:myFollowersDoc.data()['following']):[];
   
 
   let postJSONS = queryData.filter( (postObj)=>{
@@ -1014,7 +1016,7 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data()['postId'])
 
   const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
-  const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] == undefined)?[]:myFollowersDoc.data()['following']):[];
+  const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] === undefined)?[]:myFollowersDoc.data()['following']):[];
   console.log(`this is the list of users I'm following ${following}`);
 
   let postJSONS = await Promise.all(queryData.map(async (postId)=>{
@@ -1086,14 +1088,14 @@ function amIallowedAccess(following, postObj, uid){
     //the post is private so only followers ought to be able to see
     const isFollowing = following.includes(authorId);
     //a further check to see if the post is only available to specific followers
-    if (selectedPrivateViewers == undefined){
+    if (selectedPrivateViewers === undefined){
       console.log("Post is private but not for only select few followers");
       //this post is private but not to specific people
       return isFollowing;
     }
     else {
       console.log("Post is private but only for specific followers")
-      const isChosenToView = selectedPrivateViewers.includes(uid) ||  selectedPrivateViewers.length == 0;
+      const isChosenToView = selectedPrivateViewers.includes(uid) ||  selectedPrivateViewers.length === 0;
       return isChosenToView;
     }
   }
@@ -1102,4 +1104,4 @@ function amIallowedAccess(following, postObj, uid){
     //post is public so anyone can see
     return true;
   }
-};
+}
