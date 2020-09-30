@@ -64,7 +64,7 @@ class SelectedFollowersOnlyPrivacyToggle extends StatelessWidget {
                 height: 0.75 * height,
                 color: Color(0xFF737373),
                 child: Container(
-                  child: SearchSelectFollowers(),
+                  child: SearchSelectFollowers(postId),
                   decoration: BoxDecoration(
                     color: Theme.of(context).canvasColor,
                     borderRadius: BorderRadius.only(
@@ -76,16 +76,21 @@ class SelectedFollowersOnlyPrivacyToggle extends StatelessWidget {
               );
             });
       } else {
-        //code to make post not private
+        postPrivacyToggle.makePostPublic();
       }
     };
     return FutureBuilder(
       future: postPrivacyToggle.isPrivate(),
       builder: (context, isPrivate) {
         if (isPrivate.hasData) {
+          var map = isPrivate.data;
+          var selectedFollowers = map["selectedViewers"];
+          var hasSelectedFollowers = (selectedFollowers != null)
+              ? (selectedFollowers.length > 0)
+              : false;
           return PrivacyIcon(
             description: description,
-            isPrivate: isPrivate.data,
+            isPrivate: (map['isPrivate'] && hasSelectedFollowers),
             onPrivacySettingChanged: onPrivacySettingChanged,
           );
         } else {
