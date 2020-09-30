@@ -122,6 +122,7 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
                         onPressed: () async {
                           await postPrivacyToggle
                               .makeAvailableToSpecificPeople(selectedFollowers);
+                          Navigator.of(context).pop();
                         },
                       )
                     : Container(),
