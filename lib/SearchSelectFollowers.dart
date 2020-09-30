@@ -97,6 +97,7 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
 
   @override
   Widget build(BuildContext context) {
+    var user = Provider.of<User>(context);
     return Column(
       children: <Widget>[
         Container(
@@ -120,8 +121,10 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
                     ? IconButton(
                         icon: Icon(AntDesign.check),
                         onPressed: () async {
+                          var uidPlusMe = selectedFollowers;
+                          uidPlusMe.add(user.uid);
                           await postPrivacyToggle
-                              .makeAvailableToSpecificPeople(selectedFollowers);
+                              .makeAvailableToSpecificPeople(uidPlusMe);
                           Navigator.of(context).pop();
                         },
                       )
