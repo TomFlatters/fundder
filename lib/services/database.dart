@@ -129,15 +129,28 @@ class DatabaseService {
         isPrivate: (doc.data['isPrivate'] != null)
             ? (true == doc.data['isPrivate'])
             : false, //isPrivate,
-        uid: doc.data['uid'],
-        name: doc.data['name'],
+        uid: doc.documentID,
         username: doc.data['username'],
         email: doc.data['email'],
         bio: doc.data['bio'],
-        followers: doc.data['followers'],
-        following: doc.data['following'],
+        followers: doc.data['noFollowers'],
+        following: doc.data['noFollowing'],
         gender: doc.data['gender'],
-        profilePic: doc.data['profilePic']);
+        name: doc.data['name'],
+        profilePic: doc.data['profilePic'],
+        seenTutorial: doc.data['seenTutorial'],
+        dpSetterPrompted: doc.data['dpSetterPrompted'],
+        verified: doc.data['verified'],
+        profileTutorialSeen: doc.data['profileTutorialSeen'],
+        fundTutorialSeen: doc.data['fundTutorialSeen'],
+        doTutorialSeen: doc.data['doTutorialSeen'],
+        doneTutorialSeen: doc.data['doneTutorialSeen'],
+        likes: doc.data['likes'],
+        facebookId: doc.data['facebookId'],
+        facebookToken: doc.data['facebookToken'],
+        amountDonated: doc.data['amountDonated'] != null
+            ? doc.data['amountDonated'].toDouble()
+            : 0.0);
   }
 
   // -------------
