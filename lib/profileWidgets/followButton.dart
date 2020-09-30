@@ -34,13 +34,13 @@ class FollowButton extends StatelessWidget {
     } else if (isFollowed == 'follow_requested') {
       return EditFundderButton(
         text: 'Cancel Follow Request',
-        onPressed: () {
+        onPressed: () async {
           var followersCollection = Firestore.instance.collection('followers');
           var userCollection = Firestore.instance.collection('users');
-          followersCollection.document(profileOwnerId).updateData({
+          await followersCollection.document(profileOwnerId).updateData({
             'requestedToFollowMe': FieldValue.arrayRemove([myId])
           });
-          userCollection.document(profileOwnerId).setData(
+          await userCollection.document(profileOwnerId).setData(
               {'noFollowRequestsForMe': FieldValue.increment(-1)},
               merge: true);
         },
