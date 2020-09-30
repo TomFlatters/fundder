@@ -434,7 +434,8 @@ class _ProfileState extends State<ProfileController>
                                           builder: (context, isPrivate) {
                                             if (isPrivate.hasData) {
                                               if (isPrivate.data &&
-                                                  !isFollower) {
+                                                  !isFollower &&
+                                                  widget.uid != user.uid) {
                                                 return Container(
                                                     padding: EdgeInsets.only(
                                                         top: 40),
