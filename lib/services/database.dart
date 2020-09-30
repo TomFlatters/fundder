@@ -134,6 +134,8 @@ class DatabaseService {
         doTutorialSeen: snapshot.data['doTutorialSeen'],
         doneTutorialSeen: snapshot.data['doneTutorialSeen'],
         likes: snapshot.data['likes'],
+        facebookId: snapshot.data['facebookId'],
+        facebookToken: snapshot.data['facebookToken'],
         amountDonated: snapshot.data['amountDonated'] != null
             ? snapshot.data['amountDonated'].toDouble()
             : 0.0);

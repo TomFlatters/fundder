@@ -23,6 +23,7 @@ import 'shared/loading.dart';
 import 'auth_screens/terms_of_use.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_screens/terms_of_use_prompted.dart';
+import 'welcome_pages/find_friends.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -125,10 +126,7 @@ class _HomeState extends State<Home> {
         bool termsAccepted = await Navigator.push(context,
             MaterialPageRoute(builder: (context) => TermsViewPrompter()));
         if (termsAccepted == true) {
-          await Firestore.instance
-              .collection('users')
-              .document(user.uid)
-              .updateData({
+          Firestore.instance.collection('users').document(user.uid).updateData({
             'termsAccepted': true,
           });
         } else {
@@ -136,37 +134,37 @@ class _HomeState extends State<Home> {
           return;
         }
       }
-      if (snapshot != null && (user.isEmailVerified == true)) {
-        if (snapshot['name'] == null ||
-            snapshot['username'] == null ||
-            snapshot['name'] == '' ||
-            snapshot['username'] == '' ||
-            snapshot['dpSetterPrompted'] == null ||
-            snapshot['dpSetterPrompted'] == false) {
-          havePresentedWelcome = true;
-          print('Pushing add profile pic');
-          Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic').then(
-              (value) => Firestore.instance
-                      .collection('users')
-                      .document(user.uid)
-                      .updateData({
-                    'dpSetterPrompted': true,
-                  }));
+      List providers = await FirebaseAuth.instance
+          .fetchSignInMethodsForEmail(email: user.email);
+      if (user.isEmailVerified == false &&
+          providers.contains('facebook.com') == false) {
+        havePresentedWelcome = true;
+        final value = await Navigator.pushNamed(
+            context, '/' + user.uid + '/verification');
+        if (value == false) {
+          return;
         }
       }
-      if (user.isEmailVerified == false) {
+      if (snapshot['name'] == null ||
+          snapshot['username'] == null ||
+          snapshot['name'] == '' ||
+          snapshot['username'] == '' ||
+          snapshot['dpSetterPrompted'] == null ||
+          snapshot['dpSetterPrompted'] == false) {
         havePresentedWelcome = true;
-        Navigator.pushNamed(context, '/' + user.uid + '/verification')
-            .then((value) {
-          if (value == true) {
-            Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic')
-                .then((val) => Firestore.instance
-                        .collection('users')
-                        .document(user.uid)
-                        .updateData({
-                      'dpSetterPrompted': true,
-                    }));
-          }
+        print('Pushing add profile pic');
+        await Navigator.pushNamed(context, '/' + user.uid + '/addProfilePic');
+        Firestore.instance.collection('users').document(user.uid).updateData({
+          'dpSetterPrompted': true,
+        });
+      }
+      if (snapshot['friendFinderPrompted'] == null ||
+          snapshot['friendFinderPrompted'] == false) {
+        havePresentedWelcome = true;
+        await Navigator.push(
+            context, MaterialPageRoute(builder: (context) => FindFriends()));
+        Firestore.instance.collection('users').document(user.uid).updateData({
+          'friendFinderPrompted': true,
         });
       }
     });
@@ -224,7 +222,9 @@ class _HomeState extends State<Home> {
                   doc.data['username'] == null ||
                   doc.data['dpSetterPrompted'] == false ||
                   doc.data['name'] == '' ||
-                  doc.data['username'] == '') {
+                  doc.data['username'] == '' ||
+                  doc.data['friendFinderPrompted'] == null ||
+                  doc.data['friendFinderPrompted'] == false) {
                 if (havePresentedWelcome == false && loadingWelcome == false) {
                   loadingWelcome = true;
                   _checkIfIntroed();

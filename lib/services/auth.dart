@@ -19,6 +19,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class AuthService {
   String fcmToken;
@@ -178,6 +179,7 @@ class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future signInWithGoogle() async {
+    _googleSignIn.signOut();
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     if (googleUser == null) {
       return 'error';
@@ -209,41 +211,43 @@ class AuthService {
 
     var docRef = Firestore.instance.collection('users').document(user.uid);
 
-    docRef.get().then((doc) async {
+    await docRef.get().then((doc) async {
       if (!doc.exists) {
         print('Creating new doc');
         // doc.data() will be undefined in this case
         await DatabaseService(uid: user.uid)
             .registerUserData(user.email, null, user.displayName, defaultPic);
-        _getFCMToken(user.uid);
       }
     });
+    _getFCMToken(user.uid);
 
     return 'signInWithGoogle succeeded: $user';
   }
 
   Future loginWithFacebook(BuildContext context) async {
     try {
+      print('is logged in?: ' + (await FacebookLogin().isLoggedIn).toString());
+      await FacebookLogin().logOut();
       final facebookLogin = FacebookLogin();
       final result = await facebookLogin
           .logIn(['email', 'user_friends', 'public_profile']);
       if (result == null || result.accessToken == null) {
-        return 'error';
+        return 'result: ' +
+            result.toString() +
+            ' result token: ' +
+            result.accessToken.toString() +
+            ' result error: ' +
+            result.errorMessage.toString();
       }
       final AuthCredential credential = FacebookAuthProvider.getCredential(
         accessToken: result.accessToken.token,
       );
       if (credential == null) {
-        return 'error';
+        return 'credential is null';
       }
       final profileGraphResponse = await http.get(
           'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${result.accessToken.token}');
       final profile = json.decode(profileGraphResponse.body);
-      final friendsGraphResponse = await http.get(
-          'https://graph.facebook.com/v8.0/me/friends?access_token=${result.accessToken.token}');
-      final friends = json.decode(friendsGraphResponse.body);
-      print('profile: ' + profile.toString());
-      print('friends: ' + friends.toString());
       try {
         final AuthResult authResult =
             await _auth.signInWithCredential(credential);
@@ -259,7 +263,7 @@ class AuthService {
         var docRef =
             Firestore.instance.collection('users').document(currentUser.uid);
 
-        docRef.get().then((doc) async {
+        await docRef.get().then((doc) async {
           if (!doc.exists) {
             print('Creating new doc');
             // doc.data() will be undefined in this cas
@@ -285,12 +289,12 @@ class AuthService {
             }
             await DatabaseService(uid: user.uid)
                 .registerUserData(user.email, null, name, profilePic);
-            await DatabaseService(uid: user.uid).addFacebookId(profile['id']);
             await DatabaseService(uid: user.uid)
                 .addFacebookToken(result.accessToken.token);
-            _getFCMToken(user.uid);
+            await DatabaseService(uid: user.uid).addFacebookId(profile['id']);
           }
         });
+        _getFCMToken(user.uid);
         return 'Success';
       } catch (e) {
         print(result.errorMessage);
@@ -323,6 +327,7 @@ class AuthService {
                   await _auth.signInWithCredential(credential);
               FirebaseUser firebaseUser = authResult.user;
               guser = firebaseUser;
+              _getFCMToken(guser.uid);
               // get google user
             } catch (e) {
               print("handle google sign in: $e");
@@ -332,10 +337,17 @@ class AuthService {
               // link facebook + google.
               await authResult.linkWithCredential(credential);
             }
-            await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);
             await DatabaseService(uid: guser.uid)
                 .addFacebookToken(result.accessToken.token);
-            _getFCMToken(guser.uid);
+            await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);
+            final friendsGraphResponse = await http.get(
+                'https://graph.facebook.com/v8.0/me/friends?access_token=${result.accessToken.token}');
+            final friends = json.decode(friendsGraphResponse.body);
+            print('profile: ' + profile.toString());
+            print('friends: ' + friends.toString());
+            CloudFunctions()
+                .getHttpsCallable(functionName: 'facebookUser')
+                .call([guser.uid, friends]);
           } else if (signInMethods.contains('password')) {
             print("email account exists");
             return "Email account exists";
@@ -344,7 +356,7 @@ class AuthService {
           //return usuario;
           return 'linked with google';
         }
-        return 'error';
+        return e.toString();
       }
     } catch (generalError) {
       return generalError.toString();
@@ -411,15 +423,15 @@ class AuthService {
 
       var docRef = Firestore.instance.collection('users').document(user.uid);
 
-      docRef.get().then((doc) async {
+      await docRef.get().then((doc) async {
         if (!doc.exists) {
           print('Creating new doc');
           // doc.data() will be undefined in this case
           await DatabaseService(uid: user.uid)
               .registerUserData(user.email, null, user.displayName, defaultPic);
-          _getFCMToken(user.uid);
         }
       });
+      _getFCMToken(user.uid);
     } catch (e) {
       return e.toString();
     }
@@ -432,6 +444,7 @@ class AuthService {
   }
 
   Future linkAccountToFacebook() async {
+    await FacebookLogin().logOut();
     final facebookLogin = FacebookLogin();
     final result =
         await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
@@ -454,9 +467,18 @@ class AuthService {
     try {
       await currentUser.linkWithCredential(credential);
       print('went past credential');
-      await DatabaseService(uid: currentUser.uid).addFacebookId(profile['id']);
       await DatabaseService(uid: currentUser.uid)
           .addFacebookToken(result.accessToken.token);
+      await DatabaseService(uid: currentUser.uid).addFacebookId(profile['id']);
+      final friendsGraphResponse = await http.get(
+          'https://graph.facebook.com/v8.0/me/friends?access_token=${result.accessToken.token}');
+      final friends = json.decode(friendsGraphResponse.body);
+      print('profile: ' + profile.toString());
+      print('friends: ' + friends.toString());
+      CloudFunctions()
+          .getHttpsCallable(functionName: 'facebookUser')
+          .call([currentUser.uid, friends]);
+
       return ('Account successfully linked to facebook');
     } catch (e) {
       if (e.message != null) {
@@ -464,6 +486,20 @@ class AuthService {
       } else {
         return e.toString();
       }
+    }
+  }
+
+  Future getNewFacebookToken(String uid) async {
+    try {
+      await FacebookLogin().logOut();
+      final facebookLogin = FacebookLogin();
+      final result = await facebookLogin
+          .logIn(['email', 'user_friends', 'public_profile']);
+      DatabaseService(uid: uid)
+          .addFacebookToken(result.accessToken.token.toString());
+      return result.accessToken.token.toString();
+    } catch (e) {
+      return 'Error: ' + e.toString();
     }
   }
 }

@@ -141,53 +141,53 @@ class FluroRouter {
     router.define(
       '/chatroom/:uid/:username',
       handler: _chatRoomHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/charity/:id',
       handler: _charityHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/post/:id',
       handler: _postHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/?post=:id',
       handler: _postHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/post/:id/comments',
       handler: _commentHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/post/:id/donate',
       handler: _donateHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/user/:id',
       handler: _viewOtherProfileHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/user/:id/:username/followers',
       handler: _followersHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/user/:id/:username/following',
       handler: _followingHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/account/edit',
       handler: _editProfileHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/addpost',
@@ -196,48 +196,48 @@ class FluroRouter {
     router.define(
       '/challenge/:id',
       handler: _challengeDetailHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/challenge/:id/steps',
       handler: _challengeStepsHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/post/:id/uploadProof',
       handler: _uploadProofHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/:id/addProfilePic',
       handler: _profilePicHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/:id/tutorial',
       handler: _tutorialHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/:id/verification',
       handler: _checkVerifiedHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       'hashtag/:id/:id2',
       handler: _hashtagHandler1,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       'hashtag/:id',
       handler: _hashtagHandler2,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
   }
 }

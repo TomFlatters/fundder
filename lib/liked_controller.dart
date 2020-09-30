@@ -159,23 +159,20 @@ class _ActivityState extends State<LikedController> {
                                             horizontal: 10, vertical: 3),
                                         child: Column(children: <Widget>[
                                           Container(
-                                            height: 60,
+                                            constraints:
+                                                BoxConstraints(minHeight: 60),
                                             child: Row(children: <Widget>[
                                               Align(
                                                   alignment:
                                                       Alignment.centerLeft,
                                                   child: GestureDetector(
-                                                    child: AspectRatio(
-                                                        aspectRatio: 1 / 1,
-                                                        child: Container(
-                                                          child: ProfilePic(
-                                                              likedItem[
-                                                                  'docLiker'],
-                                                              40),
-                                                          margin:
-                                                              EdgeInsets.all(
-                                                                  10.0),
-                                                        )),
+                                                    child: Container(
+                                                      child: ProfilePic(
+                                                          likedItem['docLiker'],
+                                                          40),
+                                                      margin:
+                                                          EdgeInsets.all(10.0),
+                                                    ),
                                                     onTap: () {
                                                       Navigator.pushNamed(
                                                           context,
@@ -200,8 +197,12 @@ class _ActivityState extends State<LikedController> {
                                                               children: [
                                                             TextSpan(
                                                                 text: likedItem[
-                                                                        'docLikerUsername'] +
-                                                                    " ",
+                                                                            'docLikerUsername'] !=
+                                                                        null
+                                                                    ? likedItem[
+                                                                            'docLikerUsername'] +
+                                                                        " "
+                                                                    : "",
                                                                 style: TextStyle(
                                                                     fontWeight:
                                                                         FontWeight
@@ -240,7 +241,10 @@ class _ActivityState extends State<LikedController> {
                                                           ),
                                                           child: Text(
                                                             likedItem['category'] ==
-                                                                    'new follower'
+                                                                        'new follower' ||
+                                                                    likedItem[
+                                                                            'category'] ==
+                                                                        'new facebook friend'
                                                                 ? "View User"
                                                                 : "View Post",
                                                             textAlign: TextAlign
@@ -277,8 +281,11 @@ class _ActivityState extends State<LikedController> {
                                                                           }
                                                                       });
                                                           if (likedItem[
-                                                                  'category'] ==
-                                                              'new follower') {
+                                                                      'category'] ==
+                                                                  'new follower' ||
+                                                              likedItem[
+                                                                      'category'] ==
+                                                                  'new facebook friend') {
                                                             Navigator.pushNamed(
                                                                 context,
                                                                 '/user/' +
@@ -324,6 +331,9 @@ class _ActivityState extends State<LikedController> {
 
       case 'new follower':
         return TextSpan(text: 'has started following you');
+
+      case 'new facebook friend':
+        return TextSpan(text: 'who is your facebook friend, is on Fundder');
 
       default:
         return TextSpan(text: 'has done an action');

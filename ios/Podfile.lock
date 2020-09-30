@@ -612,8 +612,8 @@ SPEC CHECKSUMS:
   cloud_functions: 20ba5a917ef4e8f5e60648c7398c272b38a66051
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
-  Crashlytics: 540b7e5f5da5a042647227a5e3ac51d85eed06df
-  Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
+  Crashlytics: 9220f5bc89e7a618df411b4f639389dbfb0e03d2
+  Fabric: ea977e3cd9c20425516d3dafd3bf8c941c51223f
   FBSDKCoreKit: 1d5acf7c9d7a2f92bb1a242dc60cae5b7adb91df
   FBSDKLoginKit: f1ea8026a58b52d30c9f2e6a58ca7d813619fb83
   Firebase: 5719b4f965f76643241a1bb8244483ff6117db39

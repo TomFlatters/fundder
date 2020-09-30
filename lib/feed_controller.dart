@@ -144,7 +144,8 @@ _iconWithDot(context) {
       IconButton(
           icon: Icon(SimpleLineIcons.bubbles),
           onPressed: () {
-            Navigator.push(context, FadeRoute(page: ChatLobby()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ChatLobby()));
           }),
       Positioned(
           top: 10,
@@ -162,7 +163,8 @@ _iconWithoutDot(context) {
   return IconButton(
       icon: Icon(SimpleLineIcons.bubbles),
       onPressed: () {
-        Navigator.push(context, FadeRoute(page: ChatLobby()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ChatLobby()));
       });
 }
 

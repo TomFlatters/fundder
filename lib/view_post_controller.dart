@@ -196,12 +196,13 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                                       onPressed: () {
                                                         Navigator.push(
                                                             context,
-                                                            FadeRoute(
-                                                                page: ChatRoom(
-                                                                    postData
-                                                                        .author,
-                                                                    postData
-                                                                        .authorUsername)));
+                                                            MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    ChatRoom(
+                                                                        postData
+                                                                            .author,
+                                                                        postData
+                                                                            .authorUsername)));
                                                       })
                                                   : Container()
                                               : PrimaryFundderButton(

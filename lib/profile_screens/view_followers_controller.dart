@@ -5,6 +5,9 @@ import '../helper_classes.dart';
 import '../shared/loading.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:fundder/global_widgets/user_list_tile.dart';
+import 'package:provider/provider.dart';
+import 'package:fundder/models/user.dart';
 
 class ViewFollowers extends StatefulWidget {
   @override
@@ -53,12 +56,16 @@ class _ViewFollowersState extends State<ViewFollowers>
   }
 
   _handleTabSelection() {
-    if (mounted) setState(() {});
-    print("called");
+    if (_tabController.indexIsChanging) {
+      if (mounted) setState(() {});
+      print("called");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print('rebuilding followers');
+    var user = Provider.of<User>(context);
     List usedList = [];
     if (_tabController.index == 0) {
       usedList = followersList;
@@ -116,14 +123,10 @@ class _ViewFollowersState extends State<ViewFollowers>
                         child: ListView.builder(
                           itemCount: usedList.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
-                              leading: ProfilePic(usedList[index]['uid'], 40),
-                              title: Text(usedList[index]['username']),
-                              onTap: () {
-                                print('/user/' + usedList[index]['uid']);
-                                Navigator.pushNamed(
-                                    context, '/user/' + usedList[index]['uid']);
-                              },
+                            return UserListTile(
+                              currentUserUid: user.uid,
+                              displayUserUid: usedList[index]['uid'],
+                              displayUserUsername: usedList[index]['username'],
                             );
                           },
                         ))),

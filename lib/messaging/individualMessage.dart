@@ -22,10 +22,14 @@ class Message extends StatelessWidget {
         alignment: fromMe ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
           width: MediaQuery.of(context).size.width / 3 * 2,
-          child: Card(
-              elevation: 0,
-              shape: StadiumBorder(),
-              color: fromMe ? HexColor('ff6b6c') : Colors.grey[200],
+          child: Container(
+              decoration: new BoxDecoration(
+                  color: fromMe ? HexColor('ff6b6c') : Colors.grey[200],
+                  borderRadius: new BorderRadius.all(
+                    Radius.circular(10.0),
+                  )),
+              margin: EdgeInsets.all(4),
+              padding: EdgeInsets.only(top: 4),
               child: ListTile(
                   title: Text(
                     msg,

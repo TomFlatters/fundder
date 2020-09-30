@@ -191,8 +191,9 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                         if (hasAccepted) {
                                           Navigator.push(
                                               context,
-                                              FadeRoute(
-                                                  page: UserLoader(uid: uid)));
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      UserLoader(uid: uid)));
                                         } else {
                                           Navigator.pushNamed(
                                               context,

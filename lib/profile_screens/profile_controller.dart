@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fundder/profileWidgets/followButton.dart';
+import 'package:fundder/global_widgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/followers.dart';
 import 'profile_actions_view.dart';
@@ -69,7 +69,7 @@ class _ProfileState extends State<ProfileController>
   @override
   Widget build(BuildContext context) {
     final firebaseUser = Provider.of<User>(context);
-    if (widget.user.uid != widget.user.uid) {
+    if (widget.user.uid != firebaseUser.uid) {
       emptyMessage = "Looks like they haven't yet created a Fundder challenge";
     }
     // print(user.uid);
