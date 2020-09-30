@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/post_creation_widgets/creation_tiles/post_preview.dart';
 import 'package:fundder/services/followers.dart';
+import 'package:fundder/services/privacyService.dart';
 import 'package:provider/provider.dart';
 
+/**Scaffold to hold search bar for followers, with the list of followers preloaded */
 class SearchSelectFollowers extends StatefulWidget {
+  final postId;
+  SearchSelectFollowers(this.postId);
   @override
   _SearchSelectFollowersState createState() => _SearchSelectFollowersState();
 }
@@ -27,7 +32,7 @@ class _SearchSelectFollowersState extends State<SearchSelectFollowers> {
                     "Building Search Bar. Have loaded the usernames follwing the user. \n");
                 print("They are " + snapshot.data.toString());
                 List<Map> myFollowers = snapshot.data;
-                return FollowersSearchSelect(myFollowers);
+                return FollowersSearchSelect(myFollowers, widget.postId);
               } else {
                 return Container(
                   child: Center(
@@ -39,9 +44,11 @@ class _SearchSelectFollowersState extends State<SearchSelectFollowers> {
   }
 }
 
+/**Custom search bar for followers. */
 class FollowersSearchSelect extends StatefulWidget {
   final List<Map> myFollowers;
-  FollowersSearchSelect(this.myFollowers);
+  final String postId;
+  FollowersSearchSelect(this.myFollowers, this.postId);
   @override
   _FollowersSearchSelectState createState() => _FollowersSearchSelectState();
 }
@@ -50,8 +57,10 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
   List selectedFollowers;
   List<Map> searchedFollowers;
   TextEditingController _textController = TextEditingController();
+  PostPrivacyToggle postPrivacyToggle;
   @override
   void initState() {
+    postPrivacyToggle = PostPrivacyToggle(widget.postId);
     searchedFollowers = widget.myFollowers;
     selectedFollowers = [];
     _textController.addListener(() {
@@ -110,7 +119,10 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
                 child: (selectedFollowers.length > 0)
                     ? IconButton(
                         icon: Icon(AntDesign.check),
-                        onPressed: () {},
+                        onPressed: () async {
+                          await postPrivacyToggle
+                              .makeAvailableToSpecificPeople(selectedFollowers);
+                        },
                       )
                     : Container(),
               )
