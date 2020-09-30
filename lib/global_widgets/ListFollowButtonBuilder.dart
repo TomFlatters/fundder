@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/services/followers.dart';
-import 'package:fundder/profileWidgets/followButton.dart';
+import 'package:fundder/global_widgets/followButton.dart';
 
-class FbFollowButton extends StatelessWidget {
+class ListFollowButtonBuilder extends StatelessWidget {
   final String uid;
   final String friendUid;
-  FbFollowButton(this.uid, this.friendUid);
+  ListFollowButtonBuilder(this.uid, this.friendUid);
   @override
   Widget build(BuildContext context) {
     return Container(

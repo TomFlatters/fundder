@@ -5,12 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/followers.dart';
 import 'package:fundder/helper_classes.dart';
-import 'package:fundder/profileWidgets/followButton.dart';
+import 'package:fundder/global_widgets/followButton.dart';
 import 'package:fundder/global_widgets/auth_button.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 import 'package:fundder/shared/loading.dart';
-import 'facebook_friends_follow_button.dart';
+import 'package:fundder/global_widgets/user_list_tile.dart';
 
 class FriendsList extends StatefulWidget {
   final String uid;
@@ -78,33 +78,11 @@ class _FriendsListState extends State<FriendsList> {
       return ListView.builder(
         itemCount: facebookFriends.length,
         itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
-              onTap: () async {
-                print('/user/' + facebookFriends[index]['uid']);
-                await Navigator.pushNamed(
-                    context, '/user/' + facebookFriends[index]['uid']);
-                setState(() {});
-              },
-              child: Container(
-                  padding: EdgeInsets.only(left: 10, top: 0, bottom: 0),
-                  color: Colors.white,
-                  child: Row(children: <Widget>[
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        child: ProfilePic(facebookFriends[index]['uid'], 40),
-                        margin: EdgeInsets.all(10.0),
-                      ),
-                    ),
-                    Expanded(
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                facebookFriends[index]['username'].toString(),
-                                style:
-                                    TextStyle(fontWeight: FontWeight.bold)))),
-                    FbFollowButton(widget.uid, facebookFriends[index]['uid'])
-                  ])));
+          return UserListTile(
+            currentUserUid: widget.uid,
+            displayUserUid: facebookFriends[index]['uid'],
+            displayUserUsername: facebookFriends[index]['username'],
+          );
         },
       );
     } else {
