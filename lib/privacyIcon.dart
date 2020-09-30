@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/SearchSelectFollowers.dart';
 import 'package:fundder/helper_classes.dart';
+import 'package:fundder/services/privacyService.dart';
 
 class PrivacyIcon extends StatefulWidget {
   final bool isPrivate;
@@ -42,14 +43,16 @@ class _PrivacyIconState extends State<PrivacyIcon> {
 }
 
 class SelectedFollowersOnlyPrivacyToggle extends StatelessWidget {
+  final description =
+      "Choose specific people from your followers that you'd like to allow to see this post";
+  final String postId;
+
+  SelectedFollowersOnlyPrivacyToggle(this.postId);
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(Icons.lock_outline),
-      title: Text('Private Mode'),
-      subtitle: Text(
-          "Choose specific people from your followers that you'd like to allow to see this post"),
-      onTap: () {
+    var postPrivacyToggle = PostPrivacyToggle(postId);
+    Function onPrivacySettingChanged = (newVal) {
+      if (newVal) {
         Navigator.of(context).pop();
         print("SelectedFollowersOnlyPrivacyToggle selected");
         showModalBottomSheet(
@@ -72,6 +75,26 @@ class SelectedFollowersOnlyPrivacyToggle extends StatelessWidget {
                 ),
               );
             });
+      } else {
+        //code to make post not private
+      }
+    };
+    return FutureBuilder(
+      future: postPrivacyToggle.isPrivate(),
+      builder: (context, isPrivate) {
+        if (isPrivate.hasData) {
+          return PrivacyIcon(
+            description: description,
+            isPrivate: isPrivate.data,
+            onPrivacySettingChanged: onPrivacySettingChanged,
+          );
+        } else {
+          return ListTile(
+            title: Text('Private Mode'),
+            subtitle: Text(description),
+            leading: Icon(Icons.lock_outline),
+          );
+        }
       },
     );
   }
