@@ -11,6 +11,7 @@ import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/post_widgets/social_widgets/shareBar.dart';
 import 'package:fundder/privacyIcon.dart';
 import 'package:fundder/services/likes.dart';
+import 'package:fundder/services/privacyService.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:provider/provider.dart';
@@ -163,13 +164,8 @@ class _FeedViewState extends State<FeedView> {
               padding: EdgeInsets.only(top: 10),
               child: ListView(
                 children: [
-                  SelectedFollowersOnlyPrivacyToggle(),
-                  PrivacyIcon(
-                    isPrivate: false,
-                    description:
-                        "Make this post viewable only to your followers",
-                    onPrivacySettingChanged: (bool newVal) => {},
-                  ),
+                  SelectedFollowersOnlyPrivacyToggle(postData.id),
+                  _createPrivacyIcon(postData.id),
                   ListTile(
                     leading: Icon(Icons.delete_forever),
                     title: Text('Delete'),
@@ -289,4 +285,33 @@ class _FeedViewState extends State<FeedView> {
           );
         });
   }
+}
+
+_createPrivacyIcon(postId) {
+  var postPrivacyToggle = PostPrivacyToggle(postId);
+  return FutureBuilder(
+    future: postPrivacyToggle.isPrivate(),
+    builder: (context, isPrivate) {
+      if (isPrivate.hasData) {
+        var map = isPrivate.data;
+
+        return PrivacyIcon(
+            description: "Make this post viewable only to your followers",
+            isPrivate: map['isPrivate'],
+            onPrivacySettingChanged: (bool newVal) async {
+              if (newVal) {
+                await postPrivacyToggle.makePrivate();
+              } else {
+                await postPrivacyToggle.makePostPublic();
+              }
+            });
+      } else {
+        return ListTile(
+          title: Text('Private Mode'),
+          subtitle: Text("Make this post viewable only to your followers"),
+          leading: Icon(Icons.lock_outline),
+        );
+      }
+    },
+  );
 }
