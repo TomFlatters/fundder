@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
+import 'package:flappy_search_bar/search_bar_style.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/messaging/chat_room.dart';
 import 'package:fundder/messaging/chatsList.dart';
@@ -51,6 +52,9 @@ class ChatLobby extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SearchBar(
+            searchBarStyle: SearchBarStyle(
+                backgroundColor: Colors.grey[200],
+                borderRadius: BorderRadius.all(Radius.circular(10))),
             emptyWidget: Center(child: Text('No results for this search')),
             placeHolder: StreamBuilder(
                 stream: messagingService.getChats(),

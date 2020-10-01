@@ -8,6 +8,7 @@ import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'global_widgets/buttons.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
+import 'package:fundder/shared/constants.dart';
 
 class StepsPage extends StatefulWidget {
   final Template template;
@@ -120,16 +121,16 @@ class _StepsPageState extends State<StepsPage> {
                                       ),
                                       Expanded(
                                           child: TextField(
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w100,
-                                                fontFamily: 'Founders Grotesk',
-                                                fontSize: 45,
-                                              ),
-                                              controller: moneyController,
-                                              decoration: InputDecoration(
-                                                  hintText: 'Amount in £'))),
+                                        keyboardType: TextInputType.number,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w100,
+                                          fontFamily: 'Founders Grotesk',
+                                          fontSize: 45,
+                                        ),
+                                        controller: moneyController,
+                                        decoration: textInputDecoration
+                                            .copyWith(hintText: 'Amount in £'),
+                                      ))
                                     ])
                                   ])),
                           PrimaryFundderButton(

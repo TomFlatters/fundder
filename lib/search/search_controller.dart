@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flappy_search_bar/search_bar_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:provider/provider.dart';
@@ -64,6 +65,9 @@ class _SearchState extends State<SearchController>
           Expanded(
             child: SearchBar<DocumentSnapshot>(
               searchBarPadding: EdgeInsets.symmetric(horizontal: 20),
+              searchBarStyle: SearchBarStyle(
+                  backgroundColor: Colors.grey[200],
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
               searchBarController: _searchBarController,
               header: DefaultTabController(
                 length: 2,

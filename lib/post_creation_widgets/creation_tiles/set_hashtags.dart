@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fundder/shared/constants.dart';
 
 class SetHashtags extends StatefulWidget {
   final List<String> hashtags;
@@ -68,7 +69,7 @@ class _SetHashtagsState extends State<SetHashtags> {
                           controller: hashtagController,
                           keyboardType: TextInputType.text,
                           maxLines: null,
-                          decoration: InputDecoration(
+                          decoration: textInputDecoration.copyWith(
                               hintText:
                                   'Only text allowed, press add for each hashtag'))),
                   widget.hashtags.length < 5

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:fundder/shared/constants.dart';
 
 Widget moneyInputWidget(MoneyMaskedTextController moneyController) {
   return Row(children: [
@@ -20,6 +21,6 @@ Widget moneyInputWidget(MoneyMaskedTextController moneyController) {
               fontSize: 45,
             ),
             controller: moneyController,
-            decoration: InputDecoration(hintText: 'Amount in £'))),
+            decoration: textInputDecoration.copyWith(hintText: 'Amount in £'))),
   ]);
 }

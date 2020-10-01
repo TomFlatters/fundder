@@ -55,16 +55,6 @@ class MyApp extends StatelessWidget {
                       ? Wrapper()
                       : Loading(),
                   theme: ThemeData(
-                      inputDecorationTheme: InputDecorationTheme(
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey)),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        border: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                      ),
                       scaffoldBackgroundColor: Colors.white,
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,

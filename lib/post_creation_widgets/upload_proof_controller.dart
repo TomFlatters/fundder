@@ -16,6 +16,7 @@ import '../post_widgets/postBody.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
+import 'package:fundder/shared/constants.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -349,7 +350,7 @@ class _UploadProofState extends State<UploadProofScreen> {
                             ])),
                         TextField(
                           controller: completionCommentController,
-                          decoration: InputDecoration(
+                          decoration: textInputDecoration.copyWith(
                             //border: InputBorder.none,
                             hintText: 'Name',
                           ),

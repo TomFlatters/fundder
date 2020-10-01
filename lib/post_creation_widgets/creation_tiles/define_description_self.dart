@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fundder/global_widgets/buttons.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:fundder/shared/constants.dart';
 
 class DefineDescriptionSelf extends StatefulWidget {
   final Function(String) onSubtitleChange;
@@ -93,7 +94,7 @@ class _DefineDescriptionSelfState extends State<DefineDescriptionSelf> {
                     LengthLimitingTextInputFormatter(50),
                   ],
                   controller: titleController,
-                  decoration: InputDecoration(
+                  decoration: textInputDecoration.copyWith(
                     hintText: 'Eg. Hatford XV performs California Girls',
                   ),
                   onChanged: widget.onTitleChange,
@@ -113,7 +114,7 @@ class _DefineDescriptionSelfState extends State<DefineDescriptionSelf> {
                   controller: subtitleController,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
-                  decoration: InputDecoration(
+                  decoration: textInputDecoration.copyWith(
                       hintText: 'Eg. We will sing @Cornmarket St 12pm Sunday'),
                   onChanged: widget.onSubtitleChange,
                 ),
@@ -147,7 +148,8 @@ class _DefineDescriptionSelfState extends State<DefineDescriptionSelf> {
                         color: Colors.black,
                       ),
                       controller: moneyController,
-                      decoration: InputDecoration(hintText: 'Amount in £'),
+                      decoration:
+                          textInputDecoration.copyWith(hintText: 'Amount in £'),
                     ),
                   )
                 ]),

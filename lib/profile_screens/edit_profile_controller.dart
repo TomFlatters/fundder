@@ -10,6 +10,7 @@ import '../services/database.dart';
 import '../shared/loading.dart';
 import '../global_widgets/buttons.dart';
 import '../global_widgets/dialogs.dart';
+import 'package:fundder/shared/constants.dart';
 
 class EditProfile extends StatefulWidget {
   @override
@@ -180,7 +181,7 @@ class _EditProfileState extends State<EditProfile> {
                                   )
                                 : TextField(
                                     controller: controllers[index],
-                                    decoration: InputDecoration(
+                                    decoration: textInputDecoration.copyWith(
                                       border: InputBorder.none,
                                       hintText: hints[index],
                                     ),

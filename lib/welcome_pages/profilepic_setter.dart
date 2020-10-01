@@ -16,6 +16,7 @@ import 'package:fundder/services/auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:fundder/shared/constants.dart';
 
 class ProfilePicSetter extends StatefulWidget {
   @override
@@ -346,7 +347,7 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
                   FilteringTextInputFormatter.deny(RegExp("[ ]"))
                 ],
                 controller: usernameEntry,
-                decoration: InputDecoration(
+                decoration: textInputDecoration.copyWith(
                   //border: InputBorder.none,
                   hintText: 'Username',
                 ),
@@ -392,7 +393,7 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
                   });
                 },
                 controller: nameEntry,
-                decoration: InputDecoration(
+                decoration: textInputDecoration.copyWith(
                   //border: InputBorder.none,
                   hintText: 'Name',
                 ),

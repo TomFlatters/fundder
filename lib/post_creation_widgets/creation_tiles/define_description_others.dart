@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fundder/shared/constants.dart';
 
 class DefineDescriptionOthers extends StatefulWidget {
   final Function(String) onSubtitleChange;
@@ -73,7 +74,7 @@ class _DefineDescriptionOthersState extends State<DefineDescriptionOthers> {
                     LengthLimitingTextInputFormatter(50),
                   ],
                   controller: titleController,
-                  decoration: InputDecoration(
+                  decoration: textInputDecoration.copyWith(
                     hintText: 'Eg. Perform California Girls by Katy Perry',
                   ),
                   onChanged: widget.onTitleChange,
@@ -93,8 +94,8 @@ class _DefineDescriptionOthersState extends State<DefineDescriptionOthers> {
                   controller: subtitleController,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
-                  decoration:
-                      InputDecoration(hintText: 'Eg. Sing on a crowded street'),
+                  decoration: textInputDecoration.copyWith(
+                      hintText: 'Eg. Sing on a crowded street'),
                   onChanged: widget.onSubtitleChange,
                 ),
               ]))

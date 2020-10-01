@@ -6,6 +6,7 @@ import 'package:fundder/models/user.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fundder/shared/constants.dart';
 
 import '../helper_classes.dart';
 
@@ -61,6 +62,8 @@ class ChatRoom extends StatelessWidget {
                     child: TextField(
                       controller: _messageController,
                       keyboardType: TextInputType.text,
+                      decoration: textInputDecoration.copyWith(
+                          hintText: 'Write your message'),
                       onSubmitted: (txt) {
                         //maybe this won't be necessary
                         //sendText(txt);

@@ -134,22 +134,45 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: TextField(
-            controller: _textController,
-            decoration: InputDecoration(
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  gapPadding: 4.0,
-                  borderSide: BorderSide(color: HexColor("ff6b6c"), width: 1.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  gapPadding: 4.0,
-                  borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                ),
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Search followers...'),
+          padding: const EdgeInsets.symmetric(vertical: 12.0),
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: TextField(
+                controller: _textController,
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(top: 15),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    /*fillColor: Colors.grey[200],
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    gapPadding: 4.0,
+                    //borderSide: BorderSide(color: HexColor("ff6b6c"), width: 1.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    gapPadding: 4.0,
+                    //borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                  ),*/
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.grey,
+                    ),
+                    focusColor: Colors.grey,
+                    fillColor: Colors.grey,
+                    hoverColor: Colors.grey,
+                    hintText: 'Search followers...'),
+              ),
+            ),
           ),
         ),
         (selectedFollowers.length > 0)
