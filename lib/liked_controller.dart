@@ -68,12 +68,12 @@ class _ActivityState extends State<LikedController> {
                   stream: followRequests,
                   builder: (context, snapshot) {
                     // print(snapshot.data);
-                    if (!snapshot.hasData) {
+                    DocumentSnapshot doc = snapshot.data;
+                    if (!snapshot.hasData || doc.data == null) {
                       return SizedBox(
                         height: 0,
                       );
                     } else {
-                      DocumentSnapshot doc = snapshot.data;
                       List requestedToFollowMe =
                           doc.data['requestedToFollowMe'];
                       print('requested to follow me: ' +
