@@ -239,7 +239,21 @@ class SelectedFollowersRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: ListView(
-        children: selectedFollowersIds.map((id) => ProfilePic(id, 40)).toList(),
+        children: selectedFollowersIds
+            .map(
+              (id) => Row(
+                children: [
+                  AspectRatio(
+                    child: ProfilePic(id, 40),
+                    aspectRatio: 1,
+                  ),
+                  SizedBox(
+                    width: 10,
+                  )
+                ],
+              ),
+            )
+            .toList(),
         scrollDirection: Axis.horizontal,
       ),
     );
