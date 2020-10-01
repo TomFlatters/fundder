@@ -447,7 +447,7 @@ class AuthService {
   }
 
   Future linkAccountToFacebook() async {
-    await FacebookLogin().logOut();
+    //await FacebookLogin().logOut();
     final facebookLogin = FacebookLogin();
     final result =
         await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
