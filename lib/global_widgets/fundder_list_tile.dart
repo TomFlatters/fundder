@@ -5,7 +5,7 @@ import 'ListFollowButtonBuilder.dart';
 class FundderListTile extends StatelessWidget {
   final Function onTap;
   final String profilePicUid;
-  final String title;
+  final Widget title;
   final Widget trailing;
   FundderListTile({this.onTap, this.profilePicUid, this.title, this.trailing});
   @override
@@ -25,9 +25,7 @@ class FundderListTile extends StatelessWidget {
               ),
               Expanded(
                   child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(this.title,
-                          style: TextStyle(fontWeight: FontWeight.bold)))),
+                      alignment: Alignment.centerLeft, child: this.title)),
               this.trailing != null
                   ? this.trailing
                   : Container(

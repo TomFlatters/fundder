@@ -267,10 +267,17 @@ class CloudInterfaceForFollowers {
 
 /**Removes newFollower from 'requestedToFollowMe' and adds him to  */
   Future acceptFollowRequest({@required newFollower}) async {
-    await _followersCollection.document(uid).setData(
-        {'requestedToFollowMe': FieldValue.arrayRemove(newFollower)},
-        merge: true);
+    await _followersCollection.document(uid).setData({
+      'requestedToFollowMe': FieldValue.arrayRemove([newFollower])
+    }, merge: true);
 
     await _initiateFollow(uid, newFollower, false);
+  }
+
+  Future rejectFollowRequest({@required newFollower}) async {
+    print('reject folow request uid: ' + newFollower);
+    await _followersCollection.document(uid).setData({
+      'requestedToFollowMe': FieldValue.arrayRemove([newFollower])
+    }, merge: true);
   }
 }

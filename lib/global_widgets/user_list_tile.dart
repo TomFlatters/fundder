@@ -23,7 +23,8 @@ class _UserListTileState extends State<UserListTile> {
           setState(() {});
         },
         profilePicUid: widget.displayUserUid,
-        title: widget.displayUserUsername,
+        title: Text(widget.displayUserUsername,
+            style: TextStyle(fontWeight: FontWeight.bold)),
         trailing: Container(
           width: 0,
         )
