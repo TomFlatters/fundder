@@ -1112,6 +1112,9 @@ function amIallowedAccess(following, postObj, uid){
   const authorId = postObj["author"];
   const isPrivate = postObj["isPrivate"];
   const selectedPrivateViewers = postObj["selectedPrivateViewers"];
+  if (authorId === uid){
+    return true;
+  }
   if (isPrivate === true){
     //the post is private so only followers ought to be able to see
     const isFollowing = following.includes(authorId);
