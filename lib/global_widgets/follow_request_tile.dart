@@ -3,6 +3,7 @@ import 'fundder_list_tile.dart';
 import 'ListFollowButtonBuilder.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/services/followers.dart';
+import 'miniButtons.dart';
 
 class FollowRequestTile extends StatefulWidget {
   final String currentUserUid;
@@ -35,43 +36,25 @@ class _FollowRequestTileState extends State<FollowRequestTile> {
               }
             }),
         trailing: Row(children: [
-          GestureDetector(
-            child: Container(
-                padding:
-                    EdgeInsets.only(top: 5, bottom: 2, left: 10, right: 10),
-                margin: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    color: HexColor('ff6b6c')),
-                child: Center(
-                  child: Text(
-                    'Confirm',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                )),
-            onTap: () => {
-              CloudInterfaceForFollowers(widget.currentUserUid)
-                  .acceptFollowRequest(newFollower: widget.displayUserUid)
-            },
+          Container(
+            margin: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+            child: MiniPrimaryFundderButton(
+              onPressed: () => {
+                CloudInterfaceForFollowers(widget.currentUserUid)
+                    .acceptFollowRequest(newFollower: widget.displayUserUid)
+              },
+              text: 'Confirm',
+            ),
           ),
-          GestureDetector(
-            child: Container(
-                padding: EdgeInsets.only(top: 5, bottom: 2, left: 5, right: 5),
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(color: Colors.grey, width: 1),
-                    color: Colors.white),
-                child: Center(
-                  child: Text(
-                    'Delete',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                )),
-            onTap: () => {
-              CloudInterfaceForFollowers(widget.currentUserUid)
-                  .rejectFollowRequest(newFollower: widget.displayUserUid)
-            },
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: MiniSecondaryFundderButton(
+              onPressed: () => {
+                CloudInterfaceForFollowers(widget.currentUserUid)
+                    .rejectFollowRequest(newFollower: widget.displayUserUid)
+              },
+              text: 'Delete',
+            ),
           ),
         ]));
   }
