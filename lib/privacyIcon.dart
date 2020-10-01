@@ -144,27 +144,51 @@ class VisibilityChosenIcon extends StatelessWidget {
                   builder: (context) {
                     var height = MediaQuery.of(context).size.height;
                     return Container(
-                      height: 0.6 * height,
-                      child: ListView.builder(
-                        itemCount: unames.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return (unames[index] != null)
-                              ? ListTile(
-                                  leading: ProfilePic(unames[index]['uid'], 40),
-                                  title: Text(
-                                      unames[index]['username'].toString()),
-                                )
-                              : Text("Could not load user...");
-                        },
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).canvasColor,
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(10),
-                          topRight: const Radius.circular(10),
-                        ),
-                      ),
-                    );
+                        height: 0.6 * height,
+                        color: Color(0xFF737373),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).canvasColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(10),
+                              topRight: const Radius.circular(10),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(top: 10),
+                                height: 30,
+                                child: Text(
+                                  "Selected Viewers",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: unames.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return (unames[index] != null)
+                                        ? ListTile(
+                                            leading: ProfilePic(
+                                                unames[index]['uid'], 40),
+                                            title: Text(unames[index]
+                                                    ['username']
+                                                .toString()),
+                                            onTap: () => Navigator.pushNamed(
+                                                context,
+                                                '/user/' +
+                                                    unames[index]['uid']),
+                                          )
+                                        : Text("Could not load user...");
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        ));
                   });
             },
           );
