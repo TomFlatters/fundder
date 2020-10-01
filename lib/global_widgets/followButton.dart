@@ -58,18 +58,21 @@ class MiniFollowButton extends StatelessWidget {
   final String profileOwnerId;
   final String myId;
   final CloudInterfaceForFollowers cloudFollowersService;
+  final Function setFutureBuilderState;
 
-  MiniFollowButton(
-    this.isFollowed, {
-    @required this.profileOwnerId,
-    @required this.myId,
-  }) : cloudFollowersService = CloudInterfaceForFollowers(myId);
+  MiniFollowButton(this.isFollowed,
+      {@required this.profileOwnerId,
+      @required this.myId,
+      @required this.setFutureBuilderState})
+      : cloudFollowersService = CloudInterfaceForFollowers(myId);
   @override
   Widget build(BuildContext context) {
     if (isFollowed == 'following') {
       return MiniSecondaryFundderButton(
-        onPressed: () =>
-            {cloudFollowersService.unfollowUser(target: profileOwnerId)},
+        onPressed: () => {
+          cloudFollowersService.unfollowUser(target: profileOwnerId),
+          setFutureBuilderState()
+        },
         text: 'Unfollow',
       );
     } else if (isFollowed == 'follow_requested') {
@@ -79,10 +82,11 @@ class MiniFollowButton extends StatelessWidget {
       );
     } else {
       return MiniPrimaryFundderButton(
-        text: 'Follow',
-        onPressed: () =>
-            cloudFollowersService.followUser(target: profileOwnerId),
-      );
+          text: 'Follow',
+          onPressed: () => {
+                cloudFollowersService.followUser(target: profileOwnerId),
+                setFutureBuilderState()
+              });
     }
   }
 }
