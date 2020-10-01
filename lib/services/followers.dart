@@ -188,7 +188,7 @@ class CloudInterfaceForFollowers {
         'timestamp': Timestamp.now(),
         'category': 'new follower',
         'docLiker': uid,
-        'docLikerUsernamce': username,
+        'docLikerUsername': username,
         'postId': uid,
         'seen': false
       });
@@ -291,7 +291,7 @@ class CloudInterfaceForFollowers {
       'timestamp': Timestamp.now(),
       'category': 'request accepted',
       'docLiker': uid,
-      'docLikerUsernamce': username,
+      'docLikerUsername': username,
       'postId': uid,
       'seen': false
     });
@@ -300,7 +300,7 @@ class CloudInterfaceForFollowers {
       'timestamp': Timestamp.now(),
       'category': 'new follower',
       'docLiker': newFollower,
-      'docLikerUsernamce': followerUsername,
+      'docLikerUsername': followerUsername,
       'postId': newFollower,
       'seen': false
     });
