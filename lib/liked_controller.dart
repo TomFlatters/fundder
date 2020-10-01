@@ -289,7 +289,7 @@ class _ActivityState extends State<LikedController> {
                                                                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                                                                               ),
                                                                               child: Text(
-                                                                                likedItem['category'] == 'new follower' || likedItem['category'] == 'new facebook friend' ? "View User" : "View Post",
+                                                                                likedItem['category'] == 'new follower' || likedItem['category'] == 'new facebook friend' || likedItem['category'] == 'request accepted' ? "View User" : "View Post",
                                                                                 textAlign: TextAlign.center,
                                                                                 style: TextStyle(
                                                                                   fontWeight: FontWeight.bold,
@@ -306,7 +306,7 @@ class _ActivityState extends State<LikedController> {
                                                                                         _batchUpdate(response)
                                                                                       }
                                                                                   });
-                                                                              if (likedItem['category'] == 'new follower' || likedItem['category'] == 'new facebook friend') {
+                                                                              if (likedItem['category'] == 'new follower' || likedItem['category'] == 'new facebook friend' || likedItem['category'] == 'request accepted') {
                                                                                 Navigator.pushNamed(context, '/user/' + likedItem['postId']);
                                                                               } else {
                                                                                 Navigator.pushNamed(context, '/post/' + likedItem['postId']);
@@ -349,6 +349,9 @@ class _ActivityState extends State<LikedController> {
 
       case 'new facebook friend':
         return TextSpan(text: 'who is your facebook friend, is on Fundder');
+
+      case 'request accepted':
+        return TextSpan(text: 'has accepted your follow request');
 
       default:
         return TextSpan(text: 'has done an action');

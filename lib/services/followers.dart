@@ -182,6 +182,17 @@ class CloudInterfaceForFollowers {
         ? false
         : userDoc.data['isPrivate'] == true;
     var status = await _initiateFollow(target, uid, followeeIsPrivate);
+    String username = await GeneralFollowerServices.mapIDtoName(uid);
+    if (userDoc.data['isPrivate'] != true) {
+      await Firestore.instance.collection('users/$target/activity').add({
+        'timestamp': Timestamp.now(),
+        'category': 'new follower',
+        'docLiker': uid,
+        'docLikerUsernamce': username,
+        'postId': uid,
+        'seen': false
+      });
+    }
     return status;
 
     /*
@@ -272,6 +283,27 @@ class CloudInterfaceForFollowers {
     }, merge: true);
 
     await _initiateFollow(uid, newFollower, false);
+    String username = await GeneralFollowerServices.mapIDtoName(uid);
+    String followerUsername =
+        await GeneralFollowerServices.mapIDtoName(newFollower);
+
+    await Firestore.instance.collection('users/$newFollower/activity').add({
+      'timestamp': Timestamp.now(),
+      'category': 'request accepted',
+      'docLiker': uid,
+      'docLikerUsernamce': username,
+      'postId': uid,
+      'seen': false
+    });
+
+    await Firestore.instance.collection('users/$uid/activity').add({
+      'timestamp': Timestamp.now(),
+      'category': 'new follower',
+      'docLiker': newFollower,
+      'docLikerUsernamce': followerUsername,
+      'postId': newFollower,
+      'seen': false
+    });
   }
 
   Future rejectFollowRequest({@required newFollower}) async {
