@@ -301,9 +301,23 @@ class DatabaseService {
   }
 
   /**Get posts by author id */
-  Future<List<Post>> authorPosts(String id) {
+  Future<List<Post>> authorPosts(String id) async {
     //TODO: only if you follow the author
     print('gettig posts by author: ' + id);
+
+    HttpsCallable getAuthorPosts =
+        cloudFunc.getHttpsCallable(functionName: 'getAuthorPosts');
+    HttpsCallableResult res = await getAuthorPosts.call(<String, dynamic>{
+      'id': id,
+    });
+    print("printing result of author posts: " +
+        res.data["listOfJsonDocs"].toString());
+
+    var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
+
+    return postList;
+
+    /*
     return postsCollection
         .where("author", isEqualTo: id)
         .orderBy("timestamp", descending: true)
@@ -311,6 +325,7 @@ class DatabaseService {
         .then((snapshot) {
       return _postsDataFromSnapshot(snapshot);
     });
+    */
   }
 
   Future<List<Post>> likedPosts(String id, List likesList) {

@@ -1058,6 +1058,34 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
 })
 
 
+
+/**Get post by an author */
+exports.getAuthorPosts = functions.https.onCall(async (data, context)=>{
+  const authorId = data.id;
+  const postsCollection = admin.firestore().collection('postsV2');
+  const query = await postsCollection.where('author', '==', authorId).orderBy("timestamp", 'desc').get();
+  const queryDocSnap = query.docs;
+  //filter for posts to which access is not denied
+  const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data())
+  const uid = context.auth.uid;
+
+  const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
+  const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] === undefined)?[]:myFollowersDoc.data()['following']):[];
+  
+
+  let postJSONS = queryData.filter( (postObj)=>{
+      //Check if you're allowed access to this post.
+       const allowedAccess = amIallowedAccess(following, postObj, uid);
+       return allowedAccess;
+  });
+
+  console.log("printing jsons of author posts....")
+  console.log(postJSONS);
+  return {"listOfJsonDocs": postJSONS}
+
+
+})
+
 /**
  * Sets the 'status' of a post in myFeed to newStatus 
  * Invoked when loading up posts from myFeed to display to the user. Status discrepancies that may 
