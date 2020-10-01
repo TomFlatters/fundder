@@ -116,6 +116,8 @@ class VisibilityChosenIcon extends StatelessWidget {
       var map = {};
       map['username'] = await GeneralFollowerServices.mapIDtoName(id);
       map['uid'] = id;
+      print("in map and this is the username ${map['username']}");
+      return map;
     }));
     return res;
   }
@@ -135,6 +137,35 @@ class VisibilityChosenIcon extends StatelessWidget {
             onTap: () {
               //code to see screen of users
               //pass list of uname maps
+              Navigator.of(context).pop();
+              showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) {
+                    var height = MediaQuery.of(context).size.height;
+                    return Container(
+                      height: 0.6 * height,
+                      child: ListView.builder(
+                        itemCount: unames.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return (unames[index] != null)
+                              ? ListTile(
+                                  leading: ProfilePic(unames[index]['uid'], 40),
+                                  title: Text(
+                                      unames[index]['username'].toString()),
+                                )
+                              : Text("Could not load user...");
+                        },
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).canvasColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(10),
+                          topRight: const Radius.circular(10),
+                        ),
+                      ),
+                    );
+                  });
             },
           );
         } else {
