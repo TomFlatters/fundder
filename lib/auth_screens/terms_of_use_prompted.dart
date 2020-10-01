@@ -28,6 +28,7 @@ class TermsViewPrompter extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(true),
             text: 'Accept',
           ),
+          SizedBox(height: 20),
           EditFundderButton(
             onPressed: () {
               DialogManager().showChoiceDialog(
@@ -46,11 +47,12 @@ class TermsViewPrompter extends StatelessWidget {
                         style: TextStyle(color: HexColor('ff6b6c'))),
                     onPressed: () {
                       Navigator.of(context).pop();
-                    })
+                    }),
               ]);
             },
             text: 'Reject',
-          )
+          ),
+          SizedBox(height: 40)
         ]));
   }
 }
