@@ -18,6 +18,7 @@ import '../models/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
+import 'package:fundder/privacyIcon.dart';
 
 class ProfileController extends StatefulWidget {
   @override
@@ -311,6 +312,9 @@ class _ProfileState extends State<ProfileController>
                                         }
                                       },
                                     ),
+                              SizedBox(
+                                height: 20,
+                              ),
                               FutureBuilder(
                                   future: PrivacyService(widget.user.uid)
                                       .isPrivate(),
@@ -513,19 +517,15 @@ class _ProfileState extends State<ProfileController>
                             : Container(width: 0),
                         post.author != uid
                             ? Container(width: 0)
-                            : FlatButton(
-                                onPressed: () {
-                                  print('button pressed');
-                                  DialogManager().showDeleteDialog(
-                                      post, context, _onRefresh);
+                            : IconButton(
+                                icon: Icon(
+                                  Icons.more_horiz,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () => {
+                                  _postOptions(context, widget.user.uid, post)
                                 },
-                                child: Text('Delete',
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    )),
-                              ),
+                              )
                       ]),
                       onTap: () {
                         print("Going onto view post from activity yayy");
@@ -534,6 +534,114 @@ class _ProfileState extends State<ProfileController>
                     ));
               }
             }));
+  }
+
+  _postOptions(context, uid, postData) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            color: Color(0xFF737373),
+            height: 235,
+            child: Container(
+              padding: EdgeInsets.only(top: 10),
+              child: ListView(
+                children: [
+                  SelectedFollowersOnlyPrivacyToggle(postData.id),
+                  _createPrivacyIcon(postData.id),
+                  ListTile(
+                    leading: Icon(Icons.delete_forever),
+                    title: Text('Delete'),
+                    subtitle: Text(
+                        "If this Fundder has not been completed, money raised will be refunded."),
+                    onTap: () async {
+                      print('elipses button pressed');
+                      await _showDeleteDialog(postData);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(10),
+                  topRight: const Radius.circular(10),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  Future<void> _showDeleteDialog(Post post) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Post?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Once you delete this post, all the money donated will be refunded unless you have uploaded proof of challenge completion. This cannot be undone.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Delete', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Firestore.instance
+                    .collection('postsV2')
+                    .document(post.id)
+                    .delete()
+                    .then((value) {
+                  Navigator.of(context).pop();
+                  _onRefresh();
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _createPrivacyIcon(postId) {
+    var postPrivacyToggle = PostPrivacyToggle(postId);
+    return FutureBuilder(
+      future: postPrivacyToggle.isPrivate(),
+      builder: (context, isPrivate) {
+        if (isPrivate.hasData) {
+          var map = isPrivate.data;
+
+          return PrivacyIcon(
+              description: "Make this post viewable only to your followers",
+              isPrivate: map['isPrivate'],
+              onPrivacySettingChanged: (bool newVal) async {
+                if (newVal) {
+                  await postPrivacyToggle.makePrivate();
+                } else {
+                  await postPrivacyToggle.makePostPublic();
+                }
+              });
+        } else {
+          return ListTile(
+            title: Text('Private Mode'),
+            subtitle: Text("Make this post viewable only to your followers"),
+            leading: Icon(Icons.lock_outline),
+          );
+        }
+      },
+    );
   }
 
   void _onRefresh() async {
