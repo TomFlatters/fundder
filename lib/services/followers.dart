@@ -204,11 +204,39 @@ class CloudInterfaceForFollowers {
  */
 
   Future<String> doesXfollowY({@required String x, @required String y}) async {
+    var xDoc = await _followersCollection.document(x).get();
+    if (!xDoc.exists) {
+      return 'not_following';
+    }
+
+    if (xDoc.data['following'] == null) {
+      return 'not_following';
+    }
+
+    var xFollowing = xDoc.data['following'];
+    if (xFollowing.contains(y)) {
+      return 'following';
+    } else {
+      //doesn't follow so either requested to follow or not following
+      var yDoc = await _followersCollection.document(y).get();
+      if (!yDoc.exists) {
+        return 'not_following';
+      }
+      if (yDoc.data["requestedToFollowMe"] != null) {
+        var yRequested = yDoc.data["requestedToFollowMe"];
+        if (yRequested.contains(x)) {
+          return 'follow_requested';
+        }
+      }
+      return 'not_following';
+    }
+    /*
     HttpsCallable doesXfollowY =
         cloudFunc.getHttpsCallable(functionName: 'doesXfollowY');
     HttpsCallableResult res =
         await doesXfollowY.call(<String, dynamic>{'x': x, 'y': y});
     return res.data['status'];
+    */
   }
 
 /**Unfollow 'follower' from 'followee' */
