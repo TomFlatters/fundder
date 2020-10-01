@@ -186,6 +186,9 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                               throw 'Could not launch $donatePage';
                                             }
                                           }),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
                                       user != null
                                           ? user.uid != postData.author ||
                                                   postData.status != 'fund'
