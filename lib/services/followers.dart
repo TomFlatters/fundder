@@ -252,16 +252,16 @@ class CloudInterfaceForFollowers {
 
 /**Unfollow 'follower' from 'followee' */
   Future<String> unfollowUser({@required String target}) async {
-    await _followersCollection.document(target).setData({
+    _followersCollection.document(target).setData({
       'followers': FieldValue.arrayRemove([uid])
     }, merge: true);
-    await _followersCollection.document(uid).setData({
+    _followersCollection.document(uid).setData({
       'following': FieldValue.arrayRemove([target])
     }, merge: true);
-    await _usersCollection
+    _usersCollection
         .document(uid)
         .setData({'noFollowing': FieldValue.increment(-1)}, merge: true);
-    await _usersCollection
+    _usersCollection
         .document(target)
         .setData({'noFollowers': FieldValue.increment(-1)}, merge: true);
     return 'removed';
