@@ -241,11 +241,27 @@ class CloudInterfaceForFollowers {
 
 /**Unfollow 'follower' from 'followee' */
   Future<String> unfollowUser({@required String target}) async {
+    await _followersCollection.document(target).setData({
+      'followers': FieldValue.arrayRemove([uid])
+    }, merge: true);
+    await _followersCollection.document(uid).setData({
+      'following': FieldValue.arrayRemove([target])
+    }, merge: true);
+    await _usersCollection
+        .document(uid)
+        .setData({'noFollowing': FieldValue.increment(-1)}, merge: true);
+    await _usersCollection
+        .document(target)
+        .setData({'noFollowers': FieldValue.increment(-1)}, merge: true);
+    return 'removed';
+
+    /*
     HttpsCallable userFollowedSomeone =
         cloudFunc.getHttpsCallable(functionName: 'unfollowXfromY');
     HttpsCallableResult res = await userFollowedSomeone
         .call(<String, dynamic>{'x': uid, 'y': target});
     String status = res.data['status'];
     return status;
+    */
   }
 }
