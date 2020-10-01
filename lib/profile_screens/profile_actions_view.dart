@@ -58,6 +58,7 @@ class ProfileActions extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
+        _initialiseTheIcon(user.uid),
         ListTile(
           leading: Icon(MaterialCommunityIcons.facebook),
           title: Text('Link With Facebook'),
