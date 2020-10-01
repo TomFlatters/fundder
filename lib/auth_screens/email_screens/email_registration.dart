@@ -171,8 +171,7 @@ class _EmailRegistrationState extends State<EmailRegistration> {
                         }
                       },
                     ),
-                    SizedBox(height: 6.0),
-                    SizedBox(height: 6.0),
+                    SizedBox(height: 25.0),
                   ],
                 ),
               )));
