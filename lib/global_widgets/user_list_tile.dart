@@ -17,25 +17,23 @@ class _UserListTileState extends State<UserListTile> {
   Widget build(BuildContext context) {
     print('building user tiles');
     return FundderListTile(
-        onTap: () async {
-          print('/user/' + widget.displayUserUid);
-          await Navigator.pushNamed(context, '/user/' + widget.displayUserUid);
-          setState(() {});
-        },
-        profilePicUid: widget.displayUserUid,
-        title: Text(widget.displayUserUsername,
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        trailing: Container(
-          width: 0,
-        )
-
-        //widget.currentUserUid != widget.displayUserUid
-        // ? ListFollowButtonBuilder(
-        //     widget.currentUserUid, widget.displayUserUid)
-        // :
-        // Container(
-        //     width: 0,
-        //   ),
-        );
+      onTap: () async {
+        print('/user/' + widget.displayUserUid);
+        await Navigator.pushNamed(context, '/user/' + widget.displayUserUid);
+        setState(() {});
+      },
+      profilePicUid: widget.displayUserUid,
+      title: Text(widget.displayUserUsername,
+          style: TextStyle(fontWeight: FontWeight.bold)),
+      trailing: widget.currentUserUid != widget.displayUserUid
+          ? Container(
+              child: ListFollowButtonBuilder(
+                  widget.currentUserUid, widget.displayUserUid),
+              margin: EdgeInsets.only(right: 20),
+            )
+          : Container(
+              width: 0,
+            ),
+    );
   }
 }
