@@ -87,7 +87,7 @@ class SelectedFollowersOnlyPrivacyToggle extends StatelessWidget {
               : false;
 
           return (hasSelectedFollowers && map["isPrivate"])
-              ? (VisibilityChosenIcon(selectedFollowers))
+              ? (VisibilityChosenIcon(selectedFollowers, postId))
               : ListTile(
                   title: Text("Choose Visibility"),
                   subtitle: Text(
@@ -110,7 +110,8 @@ class SelectedFollowersOnlyPrivacyToggle extends StatelessWidget {
 
 class VisibilityChosenIcon extends StatelessWidget {
   final List ids;
-  VisibilityChosenIcon(this.ids);
+  final String postId;
+  VisibilityChosenIcon(this.ids, this.postId);
   Future<List<Map>> _unames() async {
     List<Map> res = await Future.wait(ids.map((id) async {
       var map = {};
@@ -147,14 +148,37 @@ class VisibilityChosenIcon extends StatelessWidget {
                         height: 0.6 * height,
                         color: Color(0xFF737373),
                         child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).canvasColor,
-                            borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(10),
-                              topRight: const Radius.circular(10),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).canvasColor,
+                              borderRadius: BorderRadius.only(
+                                topLeft: const Radius.circular(10),
+                                topRight: const Radius.circular(10),
+                              ),
                             ),
-                          ),
-                          child: Column(
+                            child: SearchSelectFollowers(
+                              postId,
+                              alreadySelectedFollowers: ids,
+                            )));
+                  });
+            },
+          );
+        } else {
+          return ListTile(
+            title: Text('Choose Visibility'),
+            subtitle: Text(
+                'You\'ve already selected the private audience for this post'),
+            leading: Icon(Icons.people),
+          );
+        }
+      },
+    );
+  }
+}
+
+/*
+
+widget to display a list of followers given a list of user maps with 'username' and 'uid' as keys per map 
+Column(
                             children: [
                               Container(
                                 padding: EdgeInsets.only(top: 10),
@@ -188,19 +212,5 @@ class VisibilityChosenIcon extends StatelessWidget {
                               )
                             ],
                           ),
-                        ));
-                  });
-            },
-          );
-        } else {
-          return ListTile(
-            title: Text('Choose Visibility'),
-            subtitle: Text(
-                'You\'ve already selected the private audience for this post'),
-            leading: Icon(Icons.people),
-          );
-        }
-      },
-    );
-  }
-}
+
+*/
