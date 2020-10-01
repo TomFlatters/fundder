@@ -474,14 +474,6 @@ class AuthService {
       await DatabaseService(uid: currentUser.uid)
           .addFacebookToken(result.accessToken.token);
       await DatabaseService(uid: currentUser.uid).addFacebookId(profile['id']);
-      final friendsGraphResponse = await http.get(
-          'https://graph.facebook.com/v8.0/me/friends?access_token=${result.accessToken.token}');
-      final friends = json.decode(friendsGraphResponse.body);
-      print('profile: ' + profile.toString());
-      print('friends: ' + friends.toString());
-      CloudFunctions()
-          .getHttpsCallable(functionName: 'facebookUser')
-          .call([currentUser.uid, friends]);
 
       return ('Account successfully linked to facebook');
     } catch (e) {
