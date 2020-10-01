@@ -10,8 +10,9 @@ import 'package:provider/provider.dart';
 
 /**Scaffold to hold search bar for followers, with the list of followers preloaded */
 class SearchSelectFollowers extends StatefulWidget {
+  List alreadySelectedFollowers = [];
   final postId;
-  SearchSelectFollowers(this.postId);
+  SearchSelectFollowers(this.postId, {this.alreadySelectedFollowers});
   @override
   _SearchSelectFollowersState createState() => _SearchSelectFollowersState();
 }
@@ -32,7 +33,11 @@ class _SearchSelectFollowersState extends State<SearchSelectFollowers> {
                     "Building Search Bar. Have loaded the usernames follwing the user. \n");
                 print("They are " + snapshot.data.toString());
                 List<Map> myFollowers = snapshot.data;
-                return FollowersSearchSelect(myFollowers, widget.postId);
+                return FollowersSearchSelect(
+                  myFollowers,
+                  widget.postId,
+                  alreadySelectedFollowers: widget.alreadySelectedFollowers,
+                );
               } else {
                 return Container(
                   child: Center(
@@ -48,7 +53,10 @@ class _SearchSelectFollowersState extends State<SearchSelectFollowers> {
 class FollowersSearchSelect extends StatefulWidget {
   final List<Map> myFollowers;
   final String postId;
-  FollowersSearchSelect(this.myFollowers, this.postId);
+
+  List alreadySelectedFollowers = [];
+  FollowersSearchSelect(this.myFollowers, this.postId,
+      {this.alreadySelectedFollowers});
   @override
   _FollowersSearchSelectState createState() => _FollowersSearchSelectState();
 }
@@ -62,7 +70,9 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
   void initState() {
     postPrivacyToggle = PostPrivacyToggle(widget.postId);
     searchedFollowers = widget.myFollowers;
-    selectedFollowers = [];
+    selectedFollowers = (widget.alreadySelectedFollowers == null)
+        ? []
+        : widget.alreadySelectedFollowers;
     _textController.addListener(() {
       if (_textController.text.isEmpty) {
         setState(() {
@@ -122,7 +132,9 @@ class _FollowersSearchSelectState extends State<FollowersSearchSelect> {
                         icon: Icon(AntDesign.check),
                         onPressed: () async {
                           var uidPlusMe = selectedFollowers;
-                          uidPlusMe.add(user.uid);
+                          if (!selectedFollowers.contains(user.uid)) {
+                            uidPlusMe.add(user.uid);
+                          }
                           await postPrivacyToggle
                               .makeAvailableToSpecificPeople(uidPlusMe);
                           Navigator.of(context).pop();

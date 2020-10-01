@@ -155,7 +155,10 @@ class VisibilityChosenIcon extends StatelessWidget {
                                 topRight: const Radius.circular(10),
                               ),
                             ),
-                            child: SearchSelectFollowers(postId)));
+                            child: SearchSelectFollowers(
+                              postId,
+                              alreadySelectedFollowers: ids,
+                            )));
                   });
             },
           );
