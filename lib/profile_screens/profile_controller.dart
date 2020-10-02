@@ -528,7 +528,9 @@ class _ProfileState extends State<ProfileController>
                               )
                       ]),
                       onTap: () {
-                        print("Going onto view post from activity yayy");
+                        print(
+                            "Going onto view post from activity yayy with post id: " +
+                                post.id.toString());
                         Navigator.pushNamed(context, '/post/${post.id}');
                       },
                     ));
