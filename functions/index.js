@@ -683,8 +683,8 @@ exports.facebookUser = functions.https.onCall(async ([userId, friendsList], cont
  * DO NOT DEPLOY
  */
 
- /*
-exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/gva6Vmg8J7yMbvQ6rdQ2').onUpdate(async (change, context)=>{
+
+exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/triggerDoc').onUpdate(async (change, context)=>{
   let res = {};
   const newValue = change.after.data();
   if (newValue.moreUsers  === true){
@@ -743,9 +743,43 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/gv
     userDocs.docs.forEach( (q)=> userCollection.doc(q.id).set({'randomNumber': generateRandomNumber(4)}, {merge: true}))
 
   }
+
+  if (newValue.migratePosts === true){
+    const userCollection = admin.firestore().collection('users');
+    const userDocs = await userCollection.get();
+    const oldPostsCollection = admin.firestore().collection('posts');
+    const oldPosts = await oldPostsCollection.get();
+    const newPostsCollection = admin.firestore().collection('postsV2');
+    oldPosts.docs.forEach((q)=>{const doc = q.data(); doc['isPrivate']=false;newPostsCollection.doc(q.id).set(doc)})
+
+  }
+  if (newValue.migrateWhoLiked ===true){
+    const postId = newValue.postId;
+    const whoLiked = admin.firestore().collection('posts').doc(postId).collection('whoLiked')
+    const whoLikedDocs = await whoLiked.get();
+    const newPostsCollection = admin.firestore().collection('postsV2');
+    whoLikedDocs.forEach((q)=>{const doc = q.data(); newPostsCollection.doc(postId).collection('whoLiked').doc(q.id).set(doc)});
+    
+  }
+  if (newValue.migrateComments ===true){
+    const postId = newValue.postId;
+    const comments =  admin.firestore().collection('posts').doc(postId).collection('comments');
+    const commentDocs = await comments.get();
+    const newPostsCollection = admin.firestore().collection('postsV2');
+    commentDocs.forEach((q)=>{const doc = q.data(); newPostsCollection.doc(postId).collection('comments').doc(q.id).set(doc,{merge: true})});
+    
+  }
+  if (newValue.migrateWhoDonated ===true){
+    const postId = newValue.postId;
+    const whoDonated =  admin.firestore().collection('posts').doc(postId).collection('whoDonated');
+    const whoDonatedDocs = await whoDonated.get();
+    const newPostsCollection = admin.firestore().collection('postsV2');
+    whoDonatedDocs.forEach((q)=>{const doc = q.data(); newPostsCollection.doc(postId).collection('whoDonated').doc(q.id).set(doc,{merge: true})});
+    
+  }
   return res
 })
-*/
+
 
 
 /**Register a follower if followee is public, otherwise sends a follow request. */
@@ -1066,7 +1100,7 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context)=>{
   const query = await postsCollection.where('author', '==', authorId).orderBy("timestamp", 'desc').get();
   const queryDocSnap = query.docs;
   //filter for posts to which access is not denied
-  const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data())
+  const queryData = queryDocSnap.map((qDocSnap)=> {const postJSON = qDocSnap.data(); postJSON['postId']=qDocSnap.id; return postJSON})
   const uid = context.auth.uid;
 
   const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
@@ -1075,9 +1109,12 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context)=>{
 
   let postJSONS = queryData.filter( (postObj)=>{
       //Check if you're allowed access to this post.
+      
        const allowedAccess = amIallowedAccess(following, postObj, uid);
        return allowedAccess;
   });
+
+ 
 
   console.log("printing jsons of author posts....")
   console.log(postJSONS);
@@ -1136,3 +1173,40 @@ function amIallowedAccess(following, postObj, uid){
     return true;
   }
 }
+
+
+/**Assign each user a random number and give them every public post in their feed */
+exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}').onCreate(async (snap, context)=>{
+  const userCollection =  admin.firestore().collection('users');
+  const postsCollection = admin.firestore().collection('postsV2');
+  const uid = context.params.uid;
+  userCollection.doc(uid).set({'randomNumber': 1}, {merge: true});
+
+  //give them every public post
+
+  const myFeed = userCollection.doc(uid).collection('myFeed');
+  const publicPostQuery = await postsCollection.where('isPrivate', '==', false).get();
+  const publicPosts = publicPostQuery.docs
+
+  publicPosts.forEach((q)=>{
+    if (q.exists){
+      const postValue = q.data();
+      const postForMyFeed = {
+        aspectRatio: postValue.aspectRatio,
+        author: postValue.author,
+        authorUsername: postValue.authorUsername,
+        charity: postValue.charity,
+        charityLogo: postValue.charityLogo, 
+        timestamp: postValue.timestamp, 
+        status: postValue.status,
+        postId: q.id,
+        hashtags: postValue.hashtags,
+      }
+      myFeed.doc(q.id).set(postForMyFeed);
+    }
+  })
+
+
+
+})
+
