@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+//import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/models/post.dart';
@@ -187,7 +187,9 @@ class DatabaseService {
       imageUrl: doc.data['imageUrl'],
       id: doc.documentID,
       status: doc.data['status'],
-      aspectRatio: doc.data['aspectRatio'],
+      aspectRatio: (doc.data['aspectRatio'] != null)
+          ? doc.data['aspectRatio'].toDouble()
+          : doc.data['aspectRatio'],
       hashtags: doc.data['hashtags'],
       completionComment: doc.data['completionComment'],
       charityLogo: doc.data['charityLogo'] != null
@@ -238,7 +240,9 @@ class DatabaseService {
       imageUrl: postJSON['imageUrl'],
       id: postJSON['postId'],
       status: postJSON['status'],
-      aspectRatio: postJSON['aspectRatio'],
+      aspectRatio: (postJSON['aspectRatio'] != null)
+          ? postJSON['aspectRatio'].toDouble()
+          : postJSON['aspectRatio'],
       hashtags: postJSON['hashtags'],
       completionComment: postJSON['completionComment'],
       charityLogo: postJSON['charityLogo'] != null
@@ -416,7 +420,9 @@ class DatabaseService {
         acceptedBy: doc.data['acceptedBy'],
         completedBy: doc.data['completedBy'],
         active: doc.data['active'],
-        aspectRatio: doc.data['aspectRatio'],
+        aspectRatio: (doc.data['aspectRatio'] != null)
+            ? doc.data['aspectRatio'].toDouble()
+            : doc.data['aspectRatio'],
         hashtags: doc.data['hashtags'],
         charityLogo: doc.data['charityLogo'] != null
             ? doc.data['charityLogo']

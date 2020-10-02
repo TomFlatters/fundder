@@ -47,8 +47,10 @@ class _FriendsListState extends State<FriendsList> {
         promptNewLogin = true;
       });
     } else {
-      facebookFriends = await _convertFriendsList(friends['data']);
-      print('friend maps: ' + facebookFriends.toString());
+      if (!friends['data'].isEmpty) {
+        facebookFriends = await _convertFriendsList(friends['data']);
+        print('friend maps: ' + facebookFriends.toString());
+      }
       setState(() {
         loading = false;
         haveRetrievedFriends = true;

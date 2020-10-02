@@ -6,7 +6,7 @@ import 'package:fundder/services/database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+//import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +20,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 
 class AuthService {
   String fcmToken;
@@ -201,7 +202,6 @@ class AuthService {
     final AuthResult result = await _auth.signInWithCredential(credential);
     FirebaseUser user = result.user;
     assert(user.email != null);
-    assert(user.displayName != null);
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
 
@@ -232,15 +232,18 @@ class AuthService {
       print('is logged in?: ' + (await FacebookLogin().isLoggedIn).toString());
       await FacebookLogin().logOut();
       final facebookLogin = FacebookLogin();
-      final result = await facebookLogin
-          .logIn(['email', 'user_friends', 'public_profile']);
+      final result = await facebookLogin.logIn(permissions: [
+        FacebookPermission.publicProfile,
+        FacebookPermission.email,
+        FacebookPermission.userFriends
+      ]);
       if (result == null || result.accessToken == null) {
         return 'result: ' +
             result.toString() +
             ' result token: ' +
             result.accessToken.toString() +
             ' result error: ' +
-            result.errorMessage.toString();
+            result.error.toString();
       }
       final AuthCredential credential = FacebookAuthProvider.getCredential(
         accessToken: result.accessToken.token,
@@ -300,7 +303,7 @@ class AuthService {
         _getFCMToken(user.uid);
         return 'Success';
       } catch (e) {
-        print(result.errorMessage);
+        print(result.error);
         print("handle facebook sign in: $e");
         if (e.code == 'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL') {
           // if exists get email of your simple get (i will write the code by this later)
@@ -449,8 +452,11 @@ class AuthService {
   Future linkAccountToFacebook() async {
     //await FacebookLogin().logOut();
     final facebookLogin = FacebookLogin();
-    final result =
-        await facebookLogin.logIn(['email', 'user_friends', 'public_profile']);
+    final result = await facebookLogin.logIn(permissions: [
+      FacebookPermission.publicProfile,
+      FacebookPermission.email,
+      FacebookPermission.userFriends
+    ]);
     if (result == null || result.accessToken == null) {
       return 'No Facebook result';
     }
@@ -489,8 +495,11 @@ class AuthService {
     try {
       await FacebookLogin().logOut();
       final facebookLogin = FacebookLogin();
-      final result = await facebookLogin
-          .logIn(['email', 'user_friends', 'public_profile']);
+      final result = await facebookLogin.logIn(permissions: [
+        FacebookPermission.publicProfile,
+        FacebookPermission.email,
+        FacebookPermission.userFriends
+      ]);
       DatabaseService(uid: uid)
           .addFacebookToken(result.accessToken.token.toString());
       return result.accessToken.token.toString();
