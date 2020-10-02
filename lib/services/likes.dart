@@ -110,6 +110,10 @@ class LikesService {
   Future<String> mapIDtoName(String uid) async {
     //returns corresponding username to uid
     var doc = await userCollection.document(uid).get();
-    return doc.data['username'];
+    if (doc.exists) {
+      return doc.data['username'];
+    } else {
+      return 'Fundder user';
+    }
   }
 }
