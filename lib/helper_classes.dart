@@ -17,7 +17,7 @@ class HexColor extends Color {
 
 // This is called from the feed to retrieve the profile pic from uid rather than url
 class ProfilePic extends StatelessWidget {
-  static Map<String, Widget> existingPics = {};
+  static Map<String, String> existingPics = {};
   final String uid;
   final double size;
   ProfilePic(this.uid, this.size);
@@ -30,8 +30,12 @@ class ProfilePic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (existingPics.containsKey(uid)
-        ? existingPics[uid]
+    return (existingPics.containsKey(uid))
+        ? CircleAvatar(
+            radius: size / 2,
+            backgroundImage: CachedNetworkImageProvider(existingPics[uid]),
+            backgroundColor: Colors.transparent,
+          )
         : FutureBuilder(
             future: _getPicUrlFromId(uid),
             builder: (context, snapshot) {
@@ -42,7 +46,7 @@ class ProfilePic extends StatelessWidget {
                   backgroundImage: CachedNetworkImageProvider(url),
                   backgroundColor: Colors.transparent,
                 );
-                existingPics[uid] = profilePic;
+                existingPics[uid] = url;
                 print("User images that are cached: {$existingPics}");
                 return profilePic;
               } else {
@@ -54,7 +58,7 @@ class ProfilePic extends StatelessWidget {
                 );
               }
             },
-          ));
+          );
   }
 }
 
