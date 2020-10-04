@@ -191,7 +191,21 @@ _peopleWhoDonatedIconRow(postId) {
                         height: 0.6 * height,
                         color: Color(0xFF737373),
                         child: Container(
-                          child: _donorList(ids),
+                          child: Scaffold(
+                            body: _donorList(ids),
+                            appBar: AppBar(
+                              centerTitle: true,
+                              title: Text('Donors'),
+                              actions: <Widget>[
+                                new IconButton(
+                                  icon: new Icon(Icons.close),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(null),
+                                )
+                              ],
+                              leading: new Container(),
+                            ),
+                          ),
                           decoration: BoxDecoration(
                             color: Theme.of(context).canvasColor,
                             borderRadius: BorderRadius.only(
