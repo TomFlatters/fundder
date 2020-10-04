@@ -251,6 +251,7 @@ _donorList(List uids) {
                     return ListTile(
                       leading: ProfilePic(uid, 40),
                       title: Text(username),
+                      onTap: () => Navigator.pushNamed(context, '/user/' + uid),
                     );
                   } else {
                     return Container();
