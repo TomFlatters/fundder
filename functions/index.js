@@ -449,7 +449,7 @@ exports.postDone = functions.firestore
    //////FUNCTIONS TO HANDLE DELETION OF POSTS AND USERS
 
    exports.deletePost = functions.firestore
-    .document('posts/{postID}')
+    .document('postsV2/{postID}')
     .onDelete(async (snap, context) => {
       const postId = context.params.postId;
       // Get an object representing the document prior to deletion
@@ -481,7 +481,7 @@ exports.postDone = functions.firestore
       for(var a=0; a<hashtags.length; a++){
 
         const hashtag = hashtags[a];
-        admin.firestore().collection('hashtags').doc(hashtag).collection('posts').doc('{' + snap.id + '}').delete();
+        admin.firestore().collection('hashtags').doc(hashtag).collection('postsV2').doc('{' + snap.id + '}').delete();
         admin.firestore().collection('hashtags').doc(hashtag).update({'count': FieldValue.increment(-1)});
       }
 
