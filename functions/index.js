@@ -777,6 +777,22 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/tr
     whoDonatedDocs.forEach((q)=>{const doc = q.data(); newPostsCollection.doc(postId).collection('whoDonated').doc(q.id).set(doc,{merge: true})});
     
   }
+
+  if (newValue.migrateFollowing ===true){
+    const FieldValue = require('firebase-admin').firestore.FieldValue;
+    const uid = newValue.uid;
+    //get the people following 
+    const followingCollection = admin.firestore().collection('users').doc(uid).collection('following');
+    const followersCollection = admin.firestore().collection('followers')
+    const followingDocSnaps = await followingCollection.get();
+    followingDocSnaps.forEach((docSnap)=>{
+      const followingId = docSnap.id
+      followersCollection.doc(uid).set({'following': FieldValue.arrayUnion(followingId)}, {merge: true});
+      followersCollection.doc(followingId).set({'followers': FieldValue.arrayUnion(uid)}, {merge: true});
+
+    })
+
+  }
   return res
 })
 
