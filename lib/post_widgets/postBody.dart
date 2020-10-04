@@ -2,6 +2,7 @@
 // with how much money has been raised so far
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/helper_classes.dart';
@@ -80,6 +81,14 @@ class PostBody extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.normal, /*fontSize: 18*/
                     ))),
+        (postData.moneyRaised > 0)
+            ? Container(
+                margin:
+                    EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
+                height: 25,
+                child: _peopleWhoDonatedIconRow(postData.id),
+              )
+            : Container(),
         Container(
           //alignment: Alignment.centerLeft,
           margin: EdgeInsets.only(top: 10, bottom: 10, left: 0, right: 0),
@@ -155,4 +164,38 @@ class PostBody extends StatelessWidget {
             );
     }
   }
+}
+
+_peopleWhoDonatedIconRow(postId) {
+  return FutureBuilder(
+    future: Firestore.instance
+        .collection('postsV2')
+        .document(postId)
+        .collection('whoDonated')
+        .getDocuments(),
+    builder: (context, AsyncSnapshot snapshot) {
+      if (snapshot.hasData) {
+        QuerySnapshot query = snapshot.data;
+        List<DocumentSnapshot> docs = query.documents;
+        if (docs.length > 0) {
+          var ids = docs.map((qDocSnap) => qDocSnap.documentID).toList();
+          print(ids.toString());
+          return ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (BuildContext context, int index) {
+                var uid = ids[index];
+                return ProfilePic(uid, 20);
+              },
+              separatorBuilder: (context, i) => SizedBox(
+                    width: 10,
+                  ),
+              itemCount: ids.length);
+        } else {
+          return Container();
+        }
+      } else {
+        return Container();
+      }
+    },
+  );
 }
