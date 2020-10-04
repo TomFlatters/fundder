@@ -180,16 +180,42 @@ _peopleWhoDonatedIconRow(postId) {
         if (docs.length > 0) {
           var ids = docs.map((qDocSnap) => qDocSnap.documentID).toList();
           print(ids.toString());
-          return ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (BuildContext context, int index) {
-                var uid = ids[index];
-                return ProfilePic(uid, 20);
+          return GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) {
+                      var height = MediaQuery.of(context).size.height;
+                      return Container(
+                        height: 0.6 * height,
+                        color: Color(0xFF737373),
+                        child: Container(
+                          child: _donorList(ids),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).canvasColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(10),
+                              topRight: const Radius.circular(10),
+                            ),
+                          ),
+                        ),
+                      );
+                    });
               },
-              separatorBuilder: (context, i) => SizedBox(
-                    width: 10,
-                  ),
-              itemCount: ids.length);
+              child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (BuildContext context, int index) {
+                    var uid = ids[index];
+                    return AspectRatio(
+                      child: ProfilePic(uid, 20),
+                      aspectRatio: 1,
+                    );
+                  },
+                  separatorBuilder: (context, i) => SizedBox(
+                        width: 10,
+                      ),
+                  itemCount: ids.length));
         } else {
           return Container();
         }
@@ -197,5 +223,46 @@ _peopleWhoDonatedIconRow(postId) {
         return Container();
       }
     },
+  );
+}
+
+Future _getUsers(List uids) async {
+  print("getting users for making donor page");
+  CollectionReference usersCollection = Firestore.instance.collection('users');
+  List userDocs = await Future.wait(
+      uids.map((uid) => usersCollection.document(uid as String).get()));
+  return userDocs.toList();
+}
+
+_donorList(List uids) {
+  return Container(
+    child: FutureBuilder(
+        future: _getUsers(uids),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List docsSnaps = snapshot.data;
+            return ListView.builder(
+                itemCount: uids.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var docSnap = docsSnaps[index];
+                  if (docSnap.exists) {
+                    var uid = docSnap.documentID;
+                    var username = docSnap['username'];
+                    return ListTile(
+                      leading: ProfilePic(uid, 40),
+                      title: Text(username),
+                    );
+                  } else {
+                    return Container();
+                  }
+                });
+          } else {
+            return Container(
+              child: Center(
+                child: Loading(),
+              ),
+            );
+          }
+        }),
   );
 }
