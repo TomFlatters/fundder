@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 class Post {
+  final List selectedPrivateViewers;
   final bool isPrivate;
   final String author;
   final String authorUsername;
@@ -36,7 +37,8 @@ class Post {
   String completionComment;
 
   Post(
-      {@required this.isPrivate,
+      {this.selectedPrivateViewers,
+      @required this.isPrivate,
       this.noComments,
       this.noLikes,
       this.author,
