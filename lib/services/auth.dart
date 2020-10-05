@@ -183,47 +183,51 @@ class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future signInWithGoogle() async {
-    _googleSignIn.signOut();
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) {
-      return 'error';
-    }
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    if (googleAuth == null ||
-        googleAuth.idToken == null ||
-        googleAuth.accessToken == null) {
-      return 'error';
-    }
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-    final AuthResult result = await _auth.signInWithCredential(credential);
-    FirebaseUser user = result.user;
-    assert(user.email != null);
-    assert(await user.getIdToken() != null);
-
-    final FirebaseUser currentUser = await _auth.currentUser();
-    assert(user.uid == currentUser.uid);
-
-    String defaultPic =
-        'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-    // create a new (firestore) document for the user with corresponding uid
-
-    var docRef = Firestore.instance.collection('users').document(user.uid);
-
-    await docRef.get().then((doc) async {
-      if (!doc.exists) {
-        print('Creating new doc');
-        // doc.data() will be undefined in this case
-        await DatabaseService(uid: user.uid)
-            .registerUserData(user.email, null, user.displayName, defaultPic);
+    try {
+      _googleSignIn.signOut();
+      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        return 'error';
       }
-    });
-    _getFCMToken(user.uid);
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      if (googleAuth == null ||
+          googleAuth.idToken == null ||
+          googleAuth.accessToken == null) {
+        return 'error';
+      }
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final AuthResult result = await _auth.signInWithCredential(credential);
+      FirebaseUser user = result.user;
+      assert(user.email != null);
+      assert(await user.getIdToken() != null);
 
-    return 'signInWithGoogle succeeded: $user';
+      final FirebaseUser currentUser = await _auth.currentUser();
+      assert(user.uid == currentUser.uid);
+
+      String defaultPic =
+          'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
+      // create a new (firestore) document for the user with corresponding uid
+
+      var docRef = Firestore.instance.collection('users').document(user.uid);
+
+      await docRef.get().then((doc) async {
+        if (!doc.exists) {
+          print('Creating new doc');
+          // doc.data() will be undefined in this case
+          await DatabaseService(uid: user.uid)
+              .registerUserData(user.email, null, user.displayName, defaultPic);
+        }
+      });
+      _getFCMToken(user.uid);
+
+      return 'signInWithGoogle succeeded: $user';
+    } catch (e) {
+      return e.toString();
+    }
   }
 
   Future loginWithFacebook(BuildContext context) async {
@@ -350,9 +354,6 @@ class AuthService {
             final friends = json.decode(friendsGraphResponse.body);
             print('profile: ' + profile.toString());
             print('friends: ' + friends.toString());
-            CloudFunctions()
-                .getHttpsCallable(functionName: 'facebookUser')
-                .call([guser.uid, friends]);
           } else if (signInMethods.contains('password')) {
             print("email account exists");
             return "Email account exists";
