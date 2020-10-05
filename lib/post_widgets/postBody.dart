@@ -2,6 +2,7 @@
 // with how much money has been raised so far
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/helper_classes.dart';
@@ -80,6 +81,14 @@ class PostBody extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.normal, /*fontSize: 18*/
                     ))),
+        (postData.moneyRaised > 0)
+            ? Container(
+                margin:
+                    EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
+                height: 25,
+                child: _peopleWhoDonatedIconRow(postData.id),
+              )
+            : Container(),
         Container(
           //alignment: Alignment.centerLeft,
           margin: EdgeInsets.only(top: 10, bottom: 10, left: 0, right: 0),
@@ -155,4 +164,120 @@ class PostBody extends StatelessWidget {
             );
     }
   }
+}
+
+_peopleWhoDonatedIconRow(postId) {
+  return FutureBuilder(
+    future: Firestore.instance
+        .collection('postsV2')
+        .document(postId)
+        .collection('whoDonated')
+        .getDocuments(),
+    builder: (context, AsyncSnapshot snapshot) {
+      if (snapshot.hasData) {
+        QuerySnapshot query = snapshot.data;
+        List<DocumentSnapshot> docs = query.documents;
+        if (docs.length > 0) {
+          var ids = docs.map((qDocSnap) => qDocSnap.documentID).toList();
+          print(ids.toString());
+          return GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) {
+                      var height = MediaQuery.of(context).size.height;
+                      return Container(
+                        height: 0.6 * height,
+                        color: Color(0xFF737373),
+                        child: Container(
+                          child: Scaffold(
+                            body: _donorList(ids),
+                            appBar: AppBar(
+                              centerTitle: true,
+                              title: Text('Donors'),
+                              actions: <Widget>[
+                                new IconButton(
+                                  icon: new Icon(Icons.close),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(null),
+                                )
+                              ],
+                              leading: new Container(),
+                            ),
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).canvasColor,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(10),
+                              topRight: const Radius.circular(10),
+                            ),
+                          ),
+                        ),
+                      );
+                    });
+              },
+              child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (BuildContext context, int index) {
+                    var uid = ids[index];
+                    return AspectRatio(
+                      child: ProfilePic(uid, 20),
+                      aspectRatio: 1,
+                    );
+                  },
+                  separatorBuilder: (context, i) => SizedBox(
+                        width: 10,
+                      ),
+                  itemCount: ids.length));
+        } else {
+          return Container();
+        }
+      } else {
+        return Container();
+      }
+    },
+  );
+}
+
+Future _getUsers(List uids) async {
+  print("getting users for making donor page");
+  CollectionReference usersCollection = Firestore.instance.collection('users');
+  List userDocs = await Future.wait(
+      uids.map((uid) => usersCollection.document(uid as String).get()));
+  return userDocs.toList();
+}
+
+_donorList(List uids) {
+  return Container(
+    child: FutureBuilder(
+        future: _getUsers(uids),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List docsSnaps = snapshot.data;
+            return ListView.builder(
+                itemCount: uids.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var docSnap = docsSnaps[index];
+                  if (docSnap.exists) {
+                    var uid = docSnap.documentID;
+                    var username = docSnap['username'];
+                    return ListTile(
+                      leading: ProfilePic(uid, 40),
+                      title: Text(username),
+                      onTap: () => Navigator.pushNamed(context, '/user/' + uid),
+                    );
+                  } else {
+                    return Container();
+                  }
+                });
+          } else {
+            return Container(
+              child: Center(
+                child: Loading(),
+              ),
+            );
+          }
+        }),
+  );
 }
