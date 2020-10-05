@@ -305,7 +305,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                               _chooseCharity(),
                               _setHashtags(),
                               _imageUpload(),
-                              _selectPrivacy(this.isPrivate),
+                              _selectPrivacy(this.isPrivate,
+                                  _onPrivacySettingChanged, _limitVisibility),
                               _postPreview()
                             ]
                           // If fund feed and not all fields filled
@@ -315,7 +316,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                               _chooseCharity(),
                               _setHashtags(),
                               _imageUpload(),
-                              _selectPrivacy(this.isPrivate),
+                              _selectPrivacy(this.isPrivate,
+                                  _onPrivacySettingChanged, _limitVisibility),
                             ]
                       : selected == 1
                           ? canMoveToPreview == true
@@ -345,10 +347,27 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
           );
   }
 
-  Widget _selectPrivacy(isPrivate) {
+  void _onPrivacySettingChanged(newVal) {
+    setState(() {
+      isPrivate = newVal;
+      if (newVal == false) {
+        selectedFollowers = [];
+      }
+    });
+  }
+
+  void _limitVisibility(uids) {
+    setState(() {
+      isPrivate = true;
+      selectedFollowers = uids;
+    });
+  }
+
+  Widget _selectPrivacy(
+      isPrivate, Function onPrivacySettingChanged, Function limitVisibility) {
     return PrivacySelection(
-        onPrivacySettingChanged: (newVal) {},
-        limitVisibility: () {},
+        onPrivacySettingChanged: onPrivacySettingChanged,
+        limitVisibility: limitVisibility,
         isPrivate: isPrivate,
         selectedFollowers: this.selectedFollowers);
   }
