@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/charity.dart';
+import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/services/database.dart';
+import 'package:provider/provider.dart';
 import '../models/user.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fundder/models/post.dart';
@@ -23,12 +25,45 @@ import 'creation_tiles/post_preview.dart';
 import 'creation_tiles/tile_widgets/image_view.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 
-class AddPost extends StatefulWidget {
+class AddPost extends StatelessWidget {
   @override
-  _AddPostState createState() => _AddPostState();
+  Widget build(BuildContext context) {
+    final contextUser = Provider.of<User>(context);
+    String uid = contextUser.uid;
+
+    return FutureBuilder(
+        future: Firestore.instance.collection('users').document(uid).get(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var value = snapshot.data;
+            User user = User(
+                isPrivate: (value.data["isPrivate"] == null)
+                    ? false
+                    : value.data["isPrivate"],
+                uid: uid,
+                name: value.data["name"],
+                username: value.data['username'],
+                email: value.data['email'],
+                profilePic: value.data["profilePic"]);
+
+            return AddPostWithUser(user);
+          } else {
+            return Loading();
+          }
+        });
+  }
 }
 
-class _AddPostState extends State<AddPost> {
+class AddPostWithUser extends StatefulWidget {
+  final User user;
+  AddPostWithUser(this.user);
+  @override
+  _AddPostWithUserState createState() => _AddPostWithUserState();
+}
+
+class _AddPostWithUserState extends State<AddPostWithUser> {
+  bool isPrivate;
+  List selectedFollowers = [];
   User user;
   bool _submitting = false;
   int _current = 0;
@@ -61,14 +96,15 @@ class _AddPostState extends State<AddPost> {
 
   @override
   void initState() {
-    _retrieveUser();
+    // _retrieveUser();
+    this.user = widget.user;
+    this.isPrivate = widget.user.isPrivate;
     _loadCharityList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    //final user = Provider.of<User>(context);
     if ((imageFile == null && selected == 1) ||
         title == "" ||
         subtitle == "" ||
@@ -269,6 +305,7 @@ class _AddPostState extends State<AddPost> {
                               _chooseCharity(),
                               _setHashtags(),
                               _imageUpload(),
+                              _selectPrivacy(this.isPrivate),
                               _postPreview()
                             ]
                           // If fund feed and not all fields filled
@@ -277,7 +314,8 @@ class _AddPostState extends State<AddPost> {
                               _defineDescriptionSelf(),
                               _chooseCharity(),
                               _setHashtags(),
-                              _imageUpload()
+                              _imageUpload(),
+                              _selectPrivacy(this.isPrivate),
                             ]
                       : selected == 1
                           ? canMoveToPreview == true
@@ -305,6 +343,14 @@ class _AddPostState extends State<AddPost> {
               },
             ),
           );
+  }
+
+  Widget _selectPrivacy(isPrivate) {
+    return PrivacySelection(
+        onPrivacySettingChanged: (newVal) {},
+        limitVisibility: () {},
+        isPrivate: isPrivate,
+        selectedFollowers: this.selectedFollowers);
   }
 
   Widget _choosePerson() {
