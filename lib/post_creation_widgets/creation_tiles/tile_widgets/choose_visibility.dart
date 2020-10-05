@@ -18,7 +18,7 @@ class ChooseVisibilityAddPost extends StatelessWidget {
       title: Text('Choose Visibility'),
       subtitle: (selectedFollowers.length > 0)
           ? Text(
-              "This post is only viewable to certain people. Tap to see who can view this post.")
+              "This post is private and only viewable to certain people. Tap to see who can view this post.")
           : Text(
               "Tap to make this post private and viewable to only specific people."),
       onTap: () {
@@ -43,7 +43,7 @@ class ChooseVisibilityAddPost extends StatelessWidget {
                       ),
                       child: SearchSelectFollowersAddPost(
                         alreadySelectedFollowers: selectedFollowers,
-                        limitVisibility: limitVisibility,
+                        limitVisibility: (uids) => this.limitVisibility(uids),
                       )));
             });
       },
@@ -52,8 +52,8 @@ class ChooseVisibilityAddPost extends StatelessWidget {
 }
 
 class SearchSelectFollowersAddPost extends StatefulWidget {
-  List alreadySelectedFollowers;
-  Function limitVisibility;
+  final List alreadySelectedFollowers;
+  final Function limitVisibility;
   SearchSelectFollowersAddPost(
       {@required this.alreadySelectedFollowers,
       @required this.limitVisibility});
@@ -80,7 +80,7 @@ class _SearchSelectFollowersAddPostState
                 return FollowersSearchSelectAddPost(
                   myFollowers,
                   alreadySelectedFollowers: widget.alreadySelectedFollowers,
-                  limitVisibility: widget.limitVisibility,
+                  limitVisibility: (uids) => widget.limitVisibility(uids),
                 );
               } else {
                 return Container(
@@ -95,8 +95,8 @@ class _SearchSelectFollowersAddPostState
 
 class FollowersSearchSelectAddPost extends StatefulWidget {
   final List<Map> myFollowers;
-  Function limitVisibility;
-  List alreadySelectedFollowers = [];
+  final Function limitVisibility;
+  final List alreadySelectedFollowers;
   FollowersSearchSelectAddPost(this.myFollowers,
       {this.alreadySelectedFollowers, @required this.limitVisibility});
   @override
@@ -173,13 +173,14 @@ class _FollowersSearchSelectAddPostState
                 child: (selectedFollowers.length > 0)
                     ? IconButton(
                         icon: Icon(AntDesign.check),
-                        onPressed: () async {
+                        onPressed: () {
                           var uidPlusMe = selectedFollowers;
                           if (!selectedFollowers.contains(user.uid)) {
                             uidPlusMe.add(user.uid);
                           }
-                          await widget.limitVisibility(uidPlusMe);
+
                           Navigator.of(context).pop();
+                          widget.limitVisibility(uidPlusMe);
                         },
                       )
                     : Container(),
