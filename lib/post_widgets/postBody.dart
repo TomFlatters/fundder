@@ -81,13 +81,15 @@ class PostBody extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.normal, /*fontSize: 18*/
                     ))),
-        (postData.moneyRaised > 0)
-            ? Container(
-                margin:
-                    EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
-                height: 25,
-                child: _peopleWhoDonatedIconRow(postData.id),
-              )
+        (postData.moneyRaised != null)
+            ? (postData.moneyRaised > 0)
+                ? Container(
+                    margin: EdgeInsets.only(
+                        top: 10, bottom: 10, left: 10, right: 10),
+                    height: 25,
+                    child: _peopleWhoDonatedIconRow(postData.id),
+                  )
+                : Container()
             : Container(),
         Container(
           //alignment: Alignment.centerLeft,
