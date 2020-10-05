@@ -124,10 +124,12 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                 title: Text("Create Fundder"),
                 actions: <Widget>[
                   new FlatButton(
-                    child: _current == 4
+                    child: (selected == 0 && _current == 5 ||
+                            selected == 1 && _current == 4)
                         ? Text('Preview',
                             style: TextStyle(fontWeight: FontWeight.bold))
-                        : _current == 5
+                        : (selected == 0 && _current == 6 ||
+                                selected == 1 && _current == 5)
                             ? Text('Submit',
                                 style: TextStyle(fontWeight: FontWeight.bold))
                             : selected != -1
@@ -135,7 +137,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold))
                                 : null,
-                    onPressed: _current == 5
+                    onPressed: (selected == 0 && _current == 6 ||
+                            selected == 1 && _current == 5)
                         ? () {
                             try {
                               if (mounted) {
@@ -202,7 +205,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                             /*Navigator.of(context).pushReplacement(_viewPost());*/
 
                             if (selected != -1) {
-                              if (!(_current == 4 &&
+                              if (!((selected == 0 && _current == 5 ||
+                                      selected == 1 && _current == 4) &&
                                   canMoveToPreview == false)) {
                                 _carouselController.nextPage(
                                     duration: Duration(milliseconds: 300),
@@ -499,7 +503,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
         if (whoDoes[selected] == "Myself") {
           DatabaseService(uid: user.uid)
               .uploadPost(new Post(
-                  isPrivate: user.isPrivate,
+                  isPrivate: this.isPrivate,
                   title: title.toString().trimRight(),
                   subtitle: subtitle.toString().trimRight(),
                   author: user.uid,
