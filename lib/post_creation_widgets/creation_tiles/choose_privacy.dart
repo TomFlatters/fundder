@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/post_creation_widgets/creation_tiles/tile_widgets/choose_visibility.dart';
 import 'package:fundder/privacyIcon.dart';
 
 class PrivacySelection extends StatelessWidget {
@@ -37,7 +38,8 @@ class PrivacySelection extends StatelessWidget {
                 onPrivacySettingChanged: (newVal) =>
                     this.onPrivacySettingChanged(newVal),
                 description:
-                    "Posts in Private Mode will only available to followers. This is default for profiles already in Private Mode.")
+                    "Posts in Private Mode will only available to followers. This is default for profiles already in Private Mode."),
+            ChooseVisibilityAddPost(selectedFollowers, limitVisibility),
           ],
         ))
       ],
