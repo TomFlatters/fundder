@@ -125,6 +125,9 @@ class _VerificationState extends State<CheckVerified>
                         }
                       },
                     ),
+                    SizedBox(
+                      height: 20,
+                    ),
                     EditFundderButton(
                         text: 'Send email again',
                         onPressed: () async {
@@ -138,6 +141,9 @@ class _VerificationState extends State<CheckVerified>
                           DialogManager().createDialog(
                               'Email sent', verificationText, context);
                         }),
+                    SizedBox(
+                      height: 20,
+                    ),
                     EditFundderButton(
                       text: 'Sign out',
                       onPressed: () async {
@@ -150,7 +156,7 @@ class _VerificationState extends State<CheckVerified>
                       },
                     ),
                     SizedBox(
-                      height: 30,
+                      height: 40,
                     ),
                   ],
                 ))));

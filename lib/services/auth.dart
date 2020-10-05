@@ -261,12 +261,11 @@ class AuthService {
         final AuthResult authResult =
             await _auth.signInWithCredential(credential);
         FirebaseUser user = authResult.user;
-        assert(user.email != null);
 
         final FirebaseUser currentUser = await _auth.currentUser();
         print('user id: ' + currentUser.uid.toString());
         assert(user.uid == currentUser.uid);
-        currentUser.sendEmailVerification();
+        // currentUser.sendEmailVerification();
         // create a new (firestore) document for the user with corresponding uid
 
         var docRef =
@@ -296,8 +295,13 @@ class AuthService {
             if (profile['name'] != null) {
               name = profile['name'];
             }
-            await DatabaseService(uid: user.uid)
-                .registerUserData(user.email, null, name, profilePic);
+            if (user.email != null) {
+              await DatabaseService(uid: user.uid)
+                  .registerUserData(user.email, null, name, profilePic);
+            } else {
+              await DatabaseService(uid: user.uid)
+                  .registerUserData(null, null, name, profilePic);
+            }
             await DatabaseService(uid: user.uid)
                 .addFacebookToken(result.accessToken.token);
             await DatabaseService(uid: user.uid).addFacebookId(profile['id']);
@@ -342,10 +346,7 @@ class AuthService {
               print("handle google sign in: $e");
             }
             final authResult = guser;
-            if (authResult.email == email) {
-              // link facebook + google.
-              await authResult.linkWithCredential(credential);
-            }
+            await authResult.linkWithCredential(credential);
             await DatabaseService(uid: guser.uid)
                 .addFacebookToken(result.accessToken.token);
             await DatabaseService(uid: guser.uid).addFacebookId(profile['id']);

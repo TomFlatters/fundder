@@ -136,11 +136,11 @@ class _HomeState extends State<Home> {
       }
       List providers = await FirebaseAuth.instance
           .fetchSignInMethodsForEmail(email: user.email);
-      if (user.isEmailVerified == false &&
-          providers.contains('facebook.com') == false) {
+      if (user.isEmailVerified == false && user.email != null) {
         havePresentedWelcome = true;
         final value = await Navigator.pushNamed(
             context, '/' + user.uid + '/verification');
+        // if user chose to logout then return
         if (value == false) {
           return;
         }
