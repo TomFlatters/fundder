@@ -361,9 +361,10 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
   }
 
   void _limitVisibility(uids) {
+    print("setting state and limiting visibility....");
     setState(() {
       isPrivate = true;
-      selectedFollowers = uids;
+      this.selectedFollowers = uids;
     });
   }
 
@@ -503,6 +504,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
         if (whoDoes[selected] == "Myself") {
           DatabaseService(uid: user.uid)
               .uploadPost(new Post(
+                  selectedPrivateViewers: this.selectedFollowers,
                   isPrivate: this.isPrivate,
                   title: title.toString().trimRight(),
                   subtitle: subtitle.toString().trimRight(),
