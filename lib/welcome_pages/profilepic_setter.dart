@@ -28,6 +28,7 @@ class ProfilePicSetter extends StatefulWidget {
 
 class _ProfilePicSetterState extends State<ProfilePicSetter> {
   final AuthService _auth = AuthService();
+  bool _facebookNotifCalled = false;
   bool _loading = false;
   bool _usernameSet = false;
   bool _nameSet = false;
@@ -146,10 +147,13 @@ class _ProfilePicSetterState extends State<ProfilePicSetter> {
                                         final friends = json
                                             .decode(friendsGraphResponse.body);
                                         print('friends: ' + friends.toString());
-                                        CloudFunctions()
-                                            .getHttpsCallable(
-                                                functionName: 'facebookUser')
-                                            .call([_uid, friends]);
+                                        if (_facebookNotifCalled == false) {
+                                          CloudFunctions()
+                                              .getHttpsCallable(
+                                                  functionName: 'facebookUser')
+                                              .call([_uid, friends]);
+                                          _facebookNotifCalled = true;
+                                        }
                                       }
                                       if (imageFile != null) {
                                         final String fileLocation = _uid +
