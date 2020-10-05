@@ -20,7 +20,7 @@ class ChooseVisibilityAddPost extends StatelessWidget {
           ? Text(
               "This post is only viewable to certain people. Tap to see who can view this post.")
           : Text(
-              "Tap to make post private and viewable to only specific people."),
+              "Tap to make this post private and viewable to only specific people."),
       onTap: () {
         //code to see screen of users
         //pass list of uname maps

@@ -38,7 +38,7 @@ class PrivacySelection extends StatelessWidget {
                 onPrivacySettingChanged: (newVal) =>
                     this.onPrivacySettingChanged(newVal),
                 description:
-                    "Posts in Private Mode will only available to followers. This is default for profiles already in Private Mode."),
+                    "Posts in Private Mode will only be available to followers. This is default for profiles already in Private Mode."),
             ChooseVisibilityAddPost(selectedFollowers, limitVisibility),
           ],
         ))
