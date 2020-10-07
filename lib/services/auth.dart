@@ -434,8 +434,15 @@ class AuthService {
         if (!doc.exists) {
           print('Creating new doc');
           // doc.data() will be undefined in this case
+          String name = '';
+          if (appleIdCredential.familyName != null &&
+              appleIdCredential.givenName != null) {
+            name = appleIdCredential.givenName +
+                " " +
+                appleIdCredential.familyName;
+          }
           await DatabaseService(uid: user.uid)
-              .registerUserData(user.email, null, user.displayName, defaultPic);
+              .registerUserData(user.email, null, name, defaultPic);
         }
       });
       _getFCMToken(user.uid);
