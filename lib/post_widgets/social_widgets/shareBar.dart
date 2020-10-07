@@ -11,6 +11,8 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:social_share/social_share.dart';
 import 'package:share/share.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class ShareBar extends StatelessWidget {
   final Post post;
@@ -18,15 +20,15 @@ class ShareBar extends StatelessWidget {
   ShareBar({@required this.post});
 
   void _showShare(context) async {
-    /*File imageFile = await _fileFromImageUrl(post.imageUrl);
+    //File imageFile = await _fileFromImageUrl(post.imageUrl);
     Uri shortUrl = await _createDynamicLinkFromPost(this.post);
     Share.share(
         'Check out this charity fundraiser on Fundder! ' + shortUrl.toString(),
-        subject: post.title);*/
+        subject: post.title);
     /*Share.shareFiles([imageFile.path],
         text: 'Check out this charity fundraiser on Fundder! ' +
             shortUrl.toString());*/
-    showModalBottomSheet(
+    /*showModalBottomSheet(
         context: context,
         builder: (context) {
           return Container(
@@ -38,16 +40,17 @@ class ShareBar extends StatelessWidget {
               ),
             ),
           );
-        });
+        });*/
   }
 
   Future<File> _fileFromImageUrl(url) async {
-    var response = await http.get(url);
-    final documentDirectory = await getApplicationDocumentsDirectory();
+    File file;
 
-    File file = File(join(documentDirectory.path, 'imagetest.png'));
-
-    file.writeAsBytesSync(response.bodyBytes);
+    if (url.contains('video')) {
+      file = await DefaultCacheManager().getSingleFile(url);
+    } else {
+      file = await DefaultCacheManager().getSingleFile(url);
+    }
     return file;
   }
 

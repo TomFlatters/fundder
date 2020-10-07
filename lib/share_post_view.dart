@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:social_share/social_share.dart';
+import 'package:share/share.dart';
+import 'global_widgets/dialogs.dart';
 
 class SharePost extends StatelessWidget {
   final Post post;
@@ -75,35 +77,20 @@ class SharePost extends StatelessWidget {
           onTap: () async {
             File imageFile = await _fileFromImageUrl(post.imageUrl);
             Uri shortUrl = await _createDynamicLinkFromPost(this.post);
-            SocialShare.shareInstagramStory(
+
+            await DialogManager().createDialog(
+                'Text copied',
+                'Paste this text once you are redirected to Instagram',
+                context);
+            await SocialShare.shareInstagramStory(
                 imageFile.path, "#ff6b6c", "#ffffff", shortUrl.toString());
+            SocialShare.copyToClipboard('${post.title} ${shortUrl.toString()}');
           },
-        ),
-        ListTile(
-          leading: Container(
-              width: 30, height: 30, child: Icon(FontAwesome5Brands.instagram)),
-          title: Text('Share to Instagram'),
-          onTap: () async {},
         ),
         ListTile(
           leading: Container(
               width: 30, height: 30, child: Icon(FontAwesome5Brands.facebook)),
           title: Text('Share to Facebook Story'),
-          onTap: () async {},
-        ),
-        ListTile(
-          leading: Container(
-              width: 30, height: 30, child: Icon(FontAwesome5Brands.facebook)),
-          title: Text('Share to Facebook'),
-          onTap: () async {},
-        ),
-        ListTile(
-          leading: Container(
-            width: 30,
-            height: 30,
-            child: Icon(FontAwesome5Brands.facebook_messenger),
-          ),
-          title: Text('Share to Facebook messenger'),
           onTap: () async {},
         ),
         ListTile(
@@ -114,9 +101,22 @@ class SharePost extends StatelessWidget {
         ),
         ListTile(
           leading: Container(
-              width: 30, height: 30, child: Icon(FontAwesome5Brands.twitter)),
-          title: Text('Share to Twitter'),
-          onTap: () async {},
+            width: 30,
+            height: 30,
+            child: Icon(FontAwesome5Brands.facebook_messenger),
+          ),
+          title: Text('Other options'),
+          onTap: () async {
+            Uri shortUrl = await _createDynamicLinkFromPost(this.post);
+            /*Share.share(
+                'Check out this charity fundraiser on Fundder! ' +
+                    shortUrl.toString(),
+                subject: post.title);*/
+            File imageFile = await _fileFromImageUrl(post.imageUrl);
+            Share.shareFiles([imageFile.path],
+                text: 'Check out this charity fundraiser on Fundder! ' +
+                    shortUrl.toString());
+          },
         ),
       ],
     );
@@ -155,9 +155,9 @@ class SharePost extends StatelessWidget {
         campaignToken: 'example-promo',
       ),
       socialMetaTagParameters: SocialMetaTagParameters(
-        title: post.title,
-        description: 'Help support this fundraiser!',
-      ),
+          title: post.title,
+          description: 'Help support this fundraiser!',
+          imageUrl: Uri.parse(post.imageUrl)),
     );
 
     final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
