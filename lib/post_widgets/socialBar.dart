@@ -63,8 +63,7 @@ class _SocialBarState extends State<SocialBar> with TickerProviderStateMixin {
               pid: widget.postData.id,
             ),
             ShareBar(
-              postId: widget.postData.id,
-              postTitle: widget.postData.title,
+              post: widget.postData,
             ),
           ]),
           Container(

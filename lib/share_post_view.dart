@@ -5,11 +5,18 @@ import 'helper_classes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/services.dart';
+import 'models/post.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:social_share/social_share.dart';
+import 'package:share/share.dart';
+import 'global_widgets/dialogs.dart';
 
 class SharePost extends StatelessWidget {
-  final String postId;
-  final String postTitle;
-  SharePost({@required this.postId, @required this.postTitle});
+  final Post post;
+  SharePost({@required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -46,47 +53,12 @@ class SharePost extends StatelessWidget {
           ),
           onTap: () {},
         ),
-        /*ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.facebook_messenger)),
-          title: Text('Messenger'),
-          onTap: (){},
-        ), */
         ListTile(
           leading:
               Container(width: 30, height: 30, child: Icon(FontAwesome.link)),
           title: Text('Copy Link'),
           onTap: () async {
-            final DynamicLinkParameters parameters = DynamicLinkParameters(
-              uriPrefix: 'https://fundder.page.link',
-              link: Uri.parse('https://app.fundder.co/post/${this.postId}'),
-              androidParameters: AndroidParameters(
-                packageName: 'com.fundder',
-                minimumVersion: 0,
-              ),
-              iosParameters: IosParameters(
-                bundleId: 'com.example.fundder',
-                minimumVersion: '1.0.0',
-                appStoreId: '1529120882',
-              ),
-              googleAnalyticsParameters: GoogleAnalyticsParameters(
-                campaign: 'example-promo',
-                medium: 'social',
-                source: 'orkut',
-              ),
-              itunesConnectAnalyticsParameters:
-                  ItunesConnectAnalyticsParameters(
-                providerToken: '123456',
-                campaignToken: 'example-promo',
-              ),
-              socialMetaTagParameters: SocialMetaTagParameters(
-                title: this.postTitle,
-                description: 'Help support this fundraiser!',
-              ),
-            );
-
-            final ShortDynamicLink shortDynamicLink =
-                await parameters.buildShortLink();
-            final Uri shortUrl = shortDynamicLink.shortUrl;
+            Uri shortUrl = await _createDynamicLinkFromPost(this.post);
             print(shortUrl.toString());
             Clipboard.setData(new ClipboardData(text: shortUrl.toString()));
             final snackBar = SnackBar(content: Text('Link Copied'));
@@ -94,40 +66,102 @@ class SharePost extends StatelessWidget {
 // Find the Scaffold in the widget tree and use it to show a SnackBar.
             Scaffold.of(context).showSnackBar(snackBar);
           },
-        ), /*ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.snapchat_ghost)),
-          title: Text('Snapchat'),
-          onTap: (){},
-        ),ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.whatsapp)),
-          title: Text('Whatsapp'),
-          onTap: (){},
-        ),ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.whatsapp)),
-          title: Text('Whatsapp status'),
-          onTap: (){},
-        ),ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.instagram)),
-          title: Text('Instagram'),
-          onTap: (){},
-        ),ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.instagram)),
-          title: Text('Instagram Stories'),
-          onTap: (){},
-        ),ListTile(
-          leading: Container(width:30, height:30, child: Icon(AntDesign.message1)),
-          title: Text('SMS'),
-          onTap: (){},
-        ),ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.facebook_square)),
-          title: Text('Facebook'),
-          onTap: (){},
-        ),ListTile(
-          leading: Container(width:30, height:30, child: Icon(FontAwesome5Brands.twitter)),
-          title: Text('Twitter'),
-          onTap: (){},
-        ),*/
+        ),
+        ListTile(
+          leading: Container(
+            width: 30,
+            height: 30,
+            child: Icon(FontAwesome5Brands.instagram),
+          ),
+          title: Text('Share to Instagram Story'),
+          onTap: () async {
+            File imageFile = await _fileFromImageUrl(post.imageUrl);
+            Uri shortUrl = await _createDynamicLinkFromPost(this.post);
+
+            await DialogManager().createDialog(
+                'Text copied',
+                'Paste this text once you are redirected to Instagram',
+                context);
+            await SocialShare.shareInstagramStory(
+                imageFile.path, "#ff6b6c", "#ffffff", shortUrl.toString());
+            SocialShare.copyToClipboard('${post.title} ${shortUrl.toString()}');
+          },
+        ),
+        ListTile(
+          leading: Container(
+              width: 30, height: 30, child: Icon(FontAwesome5Brands.facebook)),
+          title: Text('Share to Facebook Story'),
+          onTap: () async {},
+        ),
+        ListTile(
+          leading: Container(
+              width: 30, height: 30, child: Icon(FontAwesome5Brands.whatsapp)),
+          title: Text('Share to Whatsapp'),
+          onTap: () async {},
+        ),
+        ListTile(
+          leading: Container(
+            width: 30,
+            height: 30,
+            child: Icon(FontAwesome5Brands.facebook_messenger),
+          ),
+          title: Text('Other options'),
+          onTap: () async {
+            Uri shortUrl = await _createDynamicLinkFromPost(this.post);
+            /*Share.share(
+                'Check out this charity fundraiser on Fundder! ' +
+                    shortUrl.toString(),
+                subject: post.title);*/
+            File imageFile = await _fileFromImageUrl(post.imageUrl);
+            Share.shareFiles([imageFile.path],
+                text: 'Check out this charity fundraiser on Fundder! ' +
+                    shortUrl.toString());
+          },
+        ),
       ],
     );
+  }
+
+  Future<File> _fileFromImageUrl(url) async {
+    var response = await http.get(url);
+    final documentDirectory = await getApplicationDocumentsDirectory();
+
+    File file = File(join(documentDirectory.path, 'imagetest.png'));
+
+    file.writeAsBytesSync(response.bodyBytes);
+    return file;
+  }
+
+  Future<Uri> _createDynamicLinkFromPost(post) async {
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: 'https://fundder.page.link',
+      link: Uri.parse('https://app.fundder.co/post/${post.id}'),
+      androidParameters: AndroidParameters(
+        packageName: 'com.fundder',
+        minimumVersion: 0,
+      ),
+      iosParameters: IosParameters(
+        bundleId: 'com.example.fundder',
+        minimumVersion: '1.0.0',
+        appStoreId: '1529120882',
+      ),
+      googleAnalyticsParameters: GoogleAnalyticsParameters(
+        campaign: 'example-promo',
+        medium: 'social',
+        source: 'orkut',
+      ),
+      itunesConnectAnalyticsParameters: ItunesConnectAnalyticsParameters(
+        providerToken: '123456',
+        campaignToken: 'example-promo',
+      ),
+      socialMetaTagParameters: SocialMetaTagParameters(
+          title: post.title,
+          description: 'Help support this fundraiser!',
+          imageUrl: Uri.parse(post.imageUrl)),
+    );
+
+    final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
+    final Uri shortUrl = shortDynamicLink.shortUrl;
+    return shortUrl;
   }
 }
