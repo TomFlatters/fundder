@@ -266,7 +266,7 @@ _donorList(List uids) {
                     var username = docSnap['username'];
                     return ListTile(
                       leading: ProfilePic(uid, 40),
-                      title: Text(username),
+                      title: Text(username != null ? username : 'anonymous'),
                       onTap: () => Navigator.pushNamed(context, '/user/' + uid),
                     );
                   } else {

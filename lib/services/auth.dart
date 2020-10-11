@@ -442,7 +442,7 @@ class AuthService {
                 appleIdCredential.familyName;
           }
           await DatabaseService(uid: user.uid)
-              .registerUserData(user.email, null, name, defaultPic);
+              .registerUserDataApple(user.email, name, defaultPic);
         }
       });
       _getFCMToken(user.uid);

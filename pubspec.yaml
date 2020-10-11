@@ -79,6 +79,7 @@ dependencies:
   # this one to share to inta and facebook feeds
   # social_share_plugin: ^0.3.1+1
   share: ^0.6.5+2
+  video_compress: ^2.0.0
 
   
 

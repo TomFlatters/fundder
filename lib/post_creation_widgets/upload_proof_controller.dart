@@ -17,6 +17,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 import 'package:fundder/shared/constants.dart';
+import 'package:video_compress/video_compress.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -39,6 +40,7 @@ class _UploadProofState extends State<UploadProofScreen> {
   CarouselController _carouselController = CarouselController();
   int _current = 0;
   bool _loading = true;
+  bool _compressing = false;
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController maxWidthController = TextEditingController();
@@ -49,6 +51,9 @@ class _UploadProofState extends State<UploadProofScreen> {
 
   @override
   void initState() {
+    VideoCompress.compressProgress$.subscribe((progress) {
+      debugPrint('progress: $progress');
+    });
     reloadPost();
     super.initState();
   }
@@ -74,7 +79,7 @@ class _UploadProofState extends State<UploadProofScreen> {
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                       onPressed: _current == 2
-                          ? () {
+                          ? () async {
                               if (mounted)
                                 setState(() {
                                   _submitting = true;
@@ -88,9 +93,24 @@ class _UploadProofState extends State<UploadProofScreen> {
                                         .microsecondsSinceEpoch
                                         .toString();
                                 if (isVideo == true) {
+                                  if (mounted)
+                                    setState(() {
+                                      _compressing = true;
+                                    });
+                                  MediaInfo mediaInfo =
+                                      await VideoCompress.compressVideo(
+                                    _imageFile.path,
+                                    frameRate: 20,
+                                    quality: VideoQuality.DefaultQuality,
+                                    deleteOrigin: true, // It's false by default
+                                  );
+                                  if (mounted)
+                                    setState(() {
+                                      _compressing = false;
+                                    });
                                   DatabaseService(uid: user.uid)
                                       .uploadVideo(
-                                          File(_imageFile.path), fileLocation)
+                                          File(mediaInfo.path), fileLocation)
                                       .then((downloadUrl) => {
                                             print("Successful image upload"),
                                             print(downloadUrl),
@@ -189,8 +209,9 @@ class _UploadProofState extends State<UploadProofScreen> {
                               SizedBox(
                                 height: 50,
                               ),
-                              Text(
-                                  'Uploading media. This may take up to a few minutes.')
+                              Text(_compressing == true
+                                  ? 'Compressing video. This may take up to a few minutes.'
+                                  : 'Uploading media. This may take up to a few minutes.')
                             ]),
                           ),
                           // Define how long the animation should take.

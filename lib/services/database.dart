@@ -11,12 +11,15 @@ import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'auth.dart';
 
 class DatabaseService {
   // initiate the class with the user id
   final String uid;
   final cloudFunc = CloudFunctions.instance;
   // .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+
+  final _auth = AuthService();
 
   DatabaseService({this.uid});
 
@@ -70,6 +73,45 @@ class DatabaseService {
       'profilePic': profilePic,
       'seenTutorial': false,
       'dpSetterPrompted': false,
+    }, merge: true);
+  }
+
+  Future registerUserDataApple(
+      String email, String name, String profilePic) async {
+    // create or update the document with this uid
+    String tryUsername = 'User';
+    if (email.contains("privaterelay") != true) {
+      List<String> splitString = email.split("@");
+      tryUsername = splitString[0];
+    } else {
+      List<String> splitString = name.split(" ");
+      tryUsername = splitString[0];
+    }
+    int i = 1;
+    bool usernameFound = false;
+    if (await _auth.usernameUnique(tryUsername) == true) {
+      usernameFound = true;
+    }
+    while (usernameFound == false) {
+      String checkUsername = tryUsername + i.toString();
+      if (await _auth.usernameUnique(checkUsername) == true) {
+        usernameFound = true;
+        tryUsername = checkUsername;
+      } else {
+        i = i + 1;
+      }
+    }
+
+    String username = tryUsername;
+
+    return await userCollection.document(uid).setData({
+      'email': email,
+      'username': username,
+      'search_username': username != null ? username.toLowerCase() : null,
+      'name': name,
+      'profilePic': profilePic,
+      'seenTutorial': false,
+      'dpSetterPrompted': true,
     }, merge: true);
   }
 
