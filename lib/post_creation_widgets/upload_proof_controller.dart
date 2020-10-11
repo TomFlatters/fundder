@@ -17,6 +17,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 import 'package:fundder/shared/constants.dart';
+import 'package:video_compress/video_compress.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -49,6 +50,9 @@ class _UploadProofState extends State<UploadProofScreen> {
 
   @override
   void initState() {
+    VideoCompress.compressProgress$.subscribe((progress) {
+      debugPrint('progress: $progress');
+    });
     reloadPost();
     super.initState();
   }
@@ -74,7 +78,7 @@ class _UploadProofState extends State<UploadProofScreen> {
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                       onPressed: _current == 2
-                          ? () {
+                          ? () async {
                               if (mounted)
                                 setState(() {
                                   _submitting = true;
@@ -88,9 +92,16 @@ class _UploadProofState extends State<UploadProofScreen> {
                                         .microsecondsSinceEpoch
                                         .toString();
                                 if (isVideo == true) {
+                                  MediaInfo mediaInfo =
+                                      await VideoCompress.compressVideo(
+                                    _imageFile.path,
+                                    frameRate: 30,
+                                    quality: VideoQuality.MediumQuality,
+                                    deleteOrigin: true, // It's false by default
+                                  );
                                   DatabaseService(uid: user.uid)
                                       .uploadVideo(
-                                          File(_imageFile.path), fileLocation)
+                                          File(mediaInfo.path), fileLocation)
                                       .then((downloadUrl) => {
                                             print("Successful image upload"),
                                             print(downloadUrl),
