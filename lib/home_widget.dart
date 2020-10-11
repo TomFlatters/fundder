@@ -134,9 +134,11 @@ class _HomeState extends State<Home> {
           return;
         }
       }
-      //List providers = await FirebaseAuth.instance
-      //.fetchSignInMethodsForEmail(email: user.email);
-      if (user.isEmailVerified == false && user.email != null) {
+      List providers = await FirebaseAuth.instance
+          .fetchSignInMethodsForEmail(email: user.email);
+      if (user.isEmailVerified == false &&
+          user.email != null &&
+          providers.contains('facebook.com') != true) {
         havePresentedWelcome = true;
         final value = await Navigator.pushNamed(
             context, '/' + user.uid + '/verification');

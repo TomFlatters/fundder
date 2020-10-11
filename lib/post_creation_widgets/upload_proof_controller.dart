@@ -40,6 +40,7 @@ class _UploadProofState extends State<UploadProofScreen> {
   CarouselController _carouselController = CarouselController();
   int _current = 0;
   bool _loading = true;
+  bool _compressing = false;
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController maxWidthController = TextEditingController();
@@ -92,13 +93,21 @@ class _UploadProofState extends State<UploadProofScreen> {
                                         .microsecondsSinceEpoch
                                         .toString();
                                 if (isVideo == true) {
+                                  if (mounted)
+                                    setState(() {
+                                      _compressing = true;
+                                    });
                                   MediaInfo mediaInfo =
                                       await VideoCompress.compressVideo(
                                     _imageFile.path,
-                                    frameRate: 30,
-                                    quality: VideoQuality.MediumQuality,
+                                    frameRate: 20,
+                                    quality: VideoQuality.DefaultQuality,
                                     deleteOrigin: true, // It's false by default
                                   );
+                                  if (mounted)
+                                    setState(() {
+                                      _compressing = false;
+                                    });
                                   DatabaseService(uid: user.uid)
                                       .uploadVideo(
                                           File(mediaInfo.path), fileLocation)
@@ -200,8 +209,9 @@ class _UploadProofState extends State<UploadProofScreen> {
                               SizedBox(
                                 height: 50,
                               ),
-                              Text(
-                                  'Uploading media. This may take up to a few minutes.')
+                              Text(_compressing == true
+                                  ? 'Compressing video. This may take up to a few minutes.'
+                                  : 'Uploading media. This may take up to a few minutes.')
                             ]),
                           ),
                           // Define how long the animation should take.
