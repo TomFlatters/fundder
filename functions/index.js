@@ -15,7 +15,7 @@ const { user } = require('firebase-functions/lib/providers/auth');
 admin.initializeApp();
 
 exports.onLike = functions.firestore
-    .document('/posts/{postId}/whoLiked/{userId}')
+    .document('/postsV2/{postId}/whoLiked/{userId}')
     .onCreate(async (snapshot, context) =>
     {
     const userId = context.params.userId;
@@ -67,7 +67,7 @@ exports.onLike = functions.firestore
 });
 
 exports.onComment = functions.firestore
-    .document('/posts/{postId}/comments/{docId}')
+    .document('/postsV2/{postId}/comments/{docId}')
     .onCreate(async (snapshot, context) =>
     {
     console.log('snapshot author uid: ' + snapshot.data()['uid']);
@@ -121,7 +121,7 @@ exports.onComment = functions.firestore
 });
 
 exports.onDonate = functions.firestore
-    .document('/posts/{postId}/whoDonated/{userId}')
+    .document('/postsV2/{postId}/whoDonated/{userId}')
     .onCreate(async (snapshot, context) =>
     {
     const userId = context.params.userId;
@@ -173,7 +173,7 @@ exports.onDonate = functions.firestore
 });
 
 exports.postDone = functions.firestore
-    .document('/posts/{postId}')
+    .document('/postsV2/{postId}')
     .onUpdate(async (change, context) => {
       // Get an object representing the document
       // e.g. {'name': 'Marie', 'age': 66}
@@ -295,7 +295,7 @@ exports.postDone = functions.firestore
     });
 
     exports.postCreated = functions.firestore
-    .document('/posts/{postId}')
+    .document('/postsV2/{postId}')
     .onCreate(async (snapshot, context) => {
 
       const postId = context.params.postId;
