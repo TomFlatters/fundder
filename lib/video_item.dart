@@ -1,62 +1,156 @@
 import 'package:flutter/material.dart';
 import 'package:cached_video_player/cached_video_player.dart';
+import 'package:flutter/services.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'shared/loading.dart';
+import 'package:chewie/chewie.dart';
+import 'package:video_player/video_player.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'custom_cache_manager.dart';
+import 'package:better_player/better_player.dart';
 
 class VideoItem extends StatefulWidget {
   final String url;
+  final double aspectRatio;
 
-  VideoItem({Key key, this.url}) : super(key: key);
+  VideoItem({Key key, this.url, @required this.aspectRatio}) : super(key: key);
   @override
   _VideoItemState createState() => _VideoItemState();
 }
 
 class _VideoItemState extends State<VideoItem> with RouteAware {
   RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
-  CachedVideoPlayerController _controller;
+
+  /*VideoPlayerController videoPlayerController;
+  ChewieController chewieController;*/
+  BetterPlayerListVideoPlayerController controller;
+  BetterPlayerDataSource _dataSource;
 
   @override
   void initState() {
     super.initState();
-    _controller = CachedVideoPlayerController.network(widget.url)
-      ..initialize().then((_) {
-        //_controller.play();
-        _controller.setLooping(true);
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        if (mounted) {
-          setState(() {});
+    controller = BetterPlayerListVideoPlayerController();
+    _setVideoController(widget.url);
+  }
+
+  void _setVideoController(String url) async {
+    try {
+      final cacheManager = CustomCacheManager();
+
+      FileInfo fileInfo;
+
+      fileInfo = await cacheManager
+          .getFileFromCache(url); // Get video from cache first
+
+      if (fileInfo?.file == null) {
+        setState(() {
+          _dataSource = BetterPlayerDataSource(
+              BetterPlayerDataSourceType.NETWORK, widget.url);
+        });
+        cacheManager
+            .downloadFile(url)
+            .then((value) => print('download complete'));
+        /*videoPlayerController = VideoPlayerController.network(url)
+          ..initialize().then((_) {
+            chewieController = ChewieController(
+              videoPlayerController: videoPlayerController,
+              aspectRatio: widget.aspectRatio,
+              autoPlay: false,
+              looping: true,
+            );
+            setState(() {});
+            cacheManager.downloadFile(url); // Download video if not cached yet
+          });*/
+      } else {
+        print('getting from cache');
+        fileInfo = await cacheManager.getFileFromCache(url);
+        if (fileInfo != null) {
+          setState(() {
+            _dataSource = BetterPlayerDataSource(
+                BetterPlayerDataSourceType.FILE, fileInfo.file.path.toString());
+          });
         }
-      });
+        /*videoPlayerController = VideoPlayerController.file(fileInfo?.file)
+          ..initialize().then((_) {
+            chewieController = ChewieController(
+              videoPlayerController: videoPlayerController,
+              aspectRatio: widget.aspectRatio,
+              autoPlay: false,
+              looping: true,
+            );
+            setState(() {});
+          });*/
+      }
+    } catch (e) {
+      throw (e);
+    }
+  }
+
+  @override
+  void didUpdateWidget(VideoItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    controller = BetterPlayerListVideoPlayerController();
   }
 
   @override
   Widget build(BuildContext context) {
-    return VisibilityDetector(
+    return /*VisibilityDetector(
         key: UniqueKey(),
         onVisibilityChanged: (VisibilityInfo info) {
           debugPrint("${info.visibleFraction} of my widget is visible");
           if (mounted) {
             if (info.visibleFraction < 0.3) {
-              _controller.pause();
+              chewieController?.pause();
             } else {
-              _controller.play();
+              chewieController?.play();
             }
           }
         },
-        child: Center(
-          child: _controller.value.initialized
+        child: */ //Center(
+        /*child:*/
+        GestureDetector(
+            onTap: _playPause,
+            child: AspectRatio(
+                aspectRatio: widget.aspectRatio,
+                child: _dataSource != null
+                    ? BetterPlayerListVideoPlayer(
+                        _dataSource,
+                        configuration: BetterPlayerConfiguration(
+                          looping: true,
+                          deviceOrientationsAfterFullScreen: [
+                            DeviceOrientation.portraitUp
+                          ],
+                          autoPlay: false,
+                          aspectRatio: widget.aspectRatio,
+                          fit: BoxFit.fill,
+                          controlsConfiguration:
+                              BetterPlayerControlsConfiguration(
+                                  enableFullscreen: false,
+                                  enableQualities: false,
+                                  enableSubtitles: false),
+                        ),
+                        key: UniqueKey(),
+                        playFraction: 0.3,
+                        betterPlayerListVideoPlayerController: controller,
+                      )
+                    : Loading()));
+    /*videoPlayerController != null &&
+                  videoPlayerController.value.initialized
               ? GestureDetector(
                   onTap: _playPause,
-                  child: _controller.value.initialized
-                      ? AspectRatio(
-                          aspectRatio: _controller.value.aspectRatio,
-                          child: CachedVideoPlayer(_controller),
-                        )
-                      : Container(),
+                  child: Container(
+                      child: videoPlayerController != null &&
+                              videoPlayerController.value.initialized
+                          ? Chewie(
+                              controller: chewieController,
+                            )
+                          : Container()),
                 ) //)
               //])
-              : Loading(),
-        ));
+              : Loading(),*/
+    //));
   }
 
   @override
@@ -84,7 +178,7 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   @override
   void didPush() {
     print("didPush");
-    _controller.pause();
+    //controller?.pause();
     super.didPush();
   }
 
@@ -93,7 +187,7 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   @override
   void didPushNext() {
     print("didPushNext");
-    _controller.pause();
+    //controller?.pause();
     super.didPushNext();
   }
 
@@ -101,16 +195,14 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   void dispose() {
     //routeObserver.unsubscribe(this);
     super.dispose();
-    if (mounted) {
-      _controller.dispose();
-    }
   }
 
   _playPause() {
-    if (_controller.value.isPlaying) {
-      _controller.pause();
+    /*if (videoPlayerController != null &&
+        videoPlayerController.value.isPlaying) {
+      //controller?.pause();
     } else {
-      _controller.play();
-    }
+      //controller?.play();
+    }*/
   }
 }
