@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_video_player/cached_video_player.dart';
+import 'package:flutter/services.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'shared/loading.dart';
 import 'package:chewie/chewie.dart';
@@ -22,16 +23,16 @@ class VideoItem extends StatefulWidget {
 class _VideoItemState extends State<VideoItem> with RouteAware {
   RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
-  VideoPlayerController videoPlayerController;
-  ChewieController chewieController;
+  /*VideoPlayerController videoPlayerController;
+  ChewieController chewieController;*/
   BetterPlayerListVideoPlayerController controller;
   BetterPlayerDataSource _dataSource;
 
   @override
   void initState() {
+    super.initState();
     controller = BetterPlayerListVideoPlayerController();
     _setVideoController(widget.url);
-    super.initState();
   }
 
   void _setVideoController(String url) async {
@@ -88,6 +89,12 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   }
 
   @override
+  void didUpdateWidget(VideoItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    controller = BetterPlayerListVideoPlayerController();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return /*VisibilityDetector(
         key: UniqueKey(),
@@ -111,9 +118,18 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
                     ? BetterPlayerListVideoPlayer(
                         _dataSource,
                         configuration: BetterPlayerConfiguration(
+                          looping: true,
+                          deviceOrientationsAfterFullScreen: [
+                            DeviceOrientation.portraitUp
+                          ],
                           autoPlay: false,
                           aspectRatio: widget.aspectRatio,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.contain,
+                          controlsConfiguration:
+                              BetterPlayerControlsConfiguration(
+                                  enableFullscreen: false,
+                                  enableQualities: false,
+                                  enableSubtitles: false),
                         ),
                         key: UniqueKey(),
                         playFraction: 0.3,
@@ -162,7 +178,7 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   @override
   void didPush() {
     print("didPush");
-    controller?.pause();
+    //controller?.pause();
     super.didPush();
   }
 
@@ -171,7 +187,7 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   @override
   void didPushNext() {
     print("didPushNext");
-    controller?.pause();
+    //controller?.pause();
     super.didPushNext();
   }
 
@@ -179,18 +195,14 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   void dispose() {
     //routeObserver.unsubscribe(this);
     super.dispose();
-    if (mounted && videoPlayerController != null) {
-      videoPlayerController.dispose();
-      chewieController.dispose();
-    }
   }
 
   _playPause() {
-    if (videoPlayerController != null &&
+    /*if (videoPlayerController != null &&
         videoPlayerController.value.isPlaying) {
-      controller?.pause();
+      //controller?.pause();
     } else {
-      controller?.play();
-    }
+      //controller?.play();
+    }*/
   }
 }
