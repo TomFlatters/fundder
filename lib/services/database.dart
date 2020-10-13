@@ -545,8 +545,10 @@ class DatabaseService {
       'acceptedBy': [...template.acceptedBy, fetchedUsername]
     });
     // Add new post with given data
+    Map<String, dynamic> _postDataMadePublic = postData;
+    _postDataMadePublic['isPrivate'] = false;
     DocumentReference postId = postsCollection.document();
-    batch.setData(postId, postData);
+    batch.setData(postId, _postDataMadePublic);
     return await batch.commit().then((_) => postId);
   }
 
