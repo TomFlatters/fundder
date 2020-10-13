@@ -124,7 +124,7 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
                           ],
                           autoPlay: false,
                           aspectRatio: widget.aspectRatio,
-                          fit: BoxFit.contain,
+                          fit: BoxFit.fill,
                           controlsConfiguration:
                               BetterPlayerControlsConfiguration(
                                   enableFullscreen: false,
