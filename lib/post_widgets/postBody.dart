@@ -154,7 +154,11 @@ class PostBody extends StatelessWidget {
   Widget _previewImageVideo(Post postData) {
     if (postData.imageUrl.contains('video')) {
       print('initialising video');
-      return VideoItem(key: UniqueKey(), url: postData.imageUrl);
+      return VideoItem(
+        key: UniqueKey(),
+        url: postData.imageUrl,
+        aspectRatio: postData.aspectRatio,
+      );
     } else {
       return kIsWeb == true
           ? Image.network(postData.imageUrl)
