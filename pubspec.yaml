@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 
-version: 2.1.0+7
+version: 2.1.1+8
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -82,6 +82,7 @@ dependencies:
   video_compress: ^2.0.0
   chewie: ^0.9.10
   better_player: ^0.0.25
+  video_thumbnail: ^0.2.2
 
   
 

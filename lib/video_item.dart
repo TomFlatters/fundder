@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +12,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'custom_cache_manager.dart';
 import 'package:better_player/better_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class VideoItem extends StatefulWidget {
   final String url;
@@ -27,12 +30,21 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   ChewieController chewieController;*/
   BetterPlayerListVideoPlayerController controller;
   BetterPlayerDataSource _dataSource;
+  Uint8List _thumbnail;
 
   @override
   void initState() {
     super.initState();
     controller = BetterPlayerListVideoPlayerController();
+    _loadThumbnail(widget.url);
     _setVideoController(widget.url);
+  }
+
+  void _loadThumbnail(String url) async {
+    final uint8list =
+        await VideoThumbnail.thumbnailData(video: url, quality: 3);
+    _thumbnail = uint8list;
+    setState(() {});
   }
 
   void _setVideoController(String url) async {
@@ -116,8 +128,14 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
                 aspectRatio: widget.aspectRatio,
                 child: _dataSource != null
                     ? BetterPlayerListVideoPlayer(
+                        //BetterPlayerDataSource(
+                        //BetterPlayerDataSourceType.NETWORK, widget.url),
                         _dataSource,
                         configuration: BetterPlayerConfiguration(
+                          placeholder: _thumbnail != null
+                              ? Image.memory(_thumbnail)
+                              : Loading(),
+                          startAt: Duration(milliseconds: 10),
                           looping: true,
                           deviceOrientationsAfterFullScreen: [
                             DeviceOrientation.portraitUp
