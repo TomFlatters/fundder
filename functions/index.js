@@ -680,7 +680,7 @@ exports.facebookUser = functions.https.onCall(async ([userId, friendsList], cont
     });
 
 /**Houses various triggers to perform various actions on db.
- * DO NOT DEPLOY
+ * DO NOT DEPLOY...I deployed it anyway LOL
  */
 
 
@@ -936,6 +936,7 @@ exports.doesXfollowY = functions.https.onCall(async (data, context)=>{
 
 /**Deploy posts to the post's author's feed and their followers. `\n`
  * Additionally, if the post is public then deploy to OTHER random users as well.
+ * TODO: Keep track of Function times....
  */
 exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').onCreate(async (snap, context)=>{
   const postValue = snap.data();
@@ -1191,7 +1192,10 @@ function amIallowedAccess(following, postObj, uid){
 }
 
 
-/**Assign each user a random number and give them every public post in their feed */
+/**
+ * Assign each user a random number and give them every public post in their feed
+ * TODO: update 'feedsDeployedTo' on the post doc subcollection & keep track of function times...
+ */
 exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}').onCreate(async (snap, context)=>{
   const userCollection =  admin.firestore().collection('users');
   const postsCollection = admin.firestore().collection('postsV2');
@@ -1207,6 +1211,7 @@ exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}'
   publicPosts.forEach((q)=>{
     if (q.exists){
       const postValue = q.data();
+      console.log(postValue.authorUsername);
       const postForMyFeed = {
         aspectRatio: postValue.aspectRatio,
         author: postValue.author,
@@ -1226,3 +1231,53 @@ exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}'
 
 })
 
+exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 200 minutes').onRun(async (context) => {
+  const postsCollection = admin.firestore().collection('postsV2');
+  //get the 50 most recent public posts....
+  const publicPostQuery = await postsCollection.where('isPrivate', '==', false).orderBy('timestamp', 'desc').limit(50).get();
+  const publicPosts = publicPostQuery.docs;
+  
+  //get a list of all users (MODIFY THIS IMMEDIATELY ONCE WE GET)
+  admin.auth().listUsers(1000)
+  .then(async function(listUsersResult) {
+    //in parallel deploy posts to all 1000 users
+    promiseOfDeployment = await Promise.all(listUsersResult.users.map(function(userRecord){
+      const uid = userRecord.uid;
+      
+      //async function that takes a user id and a bunch of posts and deploys them to the user
+      console.log("about to execute deploy posts to User")
+      const deployPromiseForUser = deployPostsToUser(uid, publicPosts);
+      return deployPromiseForUser
+    }))
+  return null;
+}).catch(function(error) {
+  console.log('Error managing feed', error);
+});
+});
+
+
+async function deployPostsToUser(uid, publicPosts){
+  console.log("deploying posts to user")
+  const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
+  publicPosts.forEach(function(docSnap){
+    if (docSnap.exists){
+      const postValue = docSnap.data();
+      const postForMyFeed = {
+        aspectRatio: postValue.aspectRatio,
+        author: postValue.author,
+        authorUsername: postValue.authorUsername,
+        charity: postValue.charity,
+        charityLogo: postValue.charityLogo, 
+        timestamp: postValue.timestamp, 
+        status: postValue.status,
+        postId: docSnap.id,
+        hashtags: postValue.hashtags,
+      }
+      myFeed.doc(docSnap.id).set(postForMyFeed);
+      return postValue
+    }
+    else{
+      return null;
+    }
+  });
+}
