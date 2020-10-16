@@ -158,6 +158,7 @@ class PostBody extends StatelessWidget {
         key: UniqueKey(),
         url: postData.imageUrl,
         aspectRatio: postData.aspectRatio,
+        videoThumbnail: postData.videoThumbnail,
       );
     } else {
       return kIsWeb == true

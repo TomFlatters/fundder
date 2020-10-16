@@ -208,36 +208,36 @@ class DatabaseService {
 
     //print("printing noLikes:" + doc["noLikes"]);
     return Post(
-      isPrivate: isPrivate,
-      noLikes: (doc.data["noLikes"] == null)
-          ? (doc['likes'].length)
-          : (doc["noLikes"]),
-      peopleThatLikedThis: Set(),
-      author: doc.data['author'],
-      authorUsername: doc.data['authorUsername'],
-      title: doc.data['title'],
-      charity: doc.data['charity'],
-      amountRaised: doc.data['amountRaised'],
-      moneyRaised: (doc.data['moneyRaised'] != null)
-          ? doc.data['moneyRaised'].toDouble()
-          : doc.data['moneyRaised'],
-      targetAmount: doc.data['targetAmount'],
-      likes: doc.data['likes'],
-      noComments: doc.data['noComments'],
-      subtitle: doc.data['subtitle'],
-      timestamp: doc.data['timestamp'],
-      imageUrl: doc.data['imageUrl'],
-      id: doc.documentID,
-      status: doc.data['status'],
-      aspectRatio: (doc.data['aspectRatio'] != null)
-          ? doc.data['aspectRatio'].toDouble()
-          : doc.data['aspectRatio'],
-      hashtags: doc.data['hashtags'],
-      completionComment: doc.data['completionComment'],
-      charityLogo: doc.data['charityLogo'] != null
-          ? doc.data['charityLogo']
-          : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
-    );
+        isPrivate: isPrivate,
+        noLikes: (doc.data["noLikes"] == null)
+            ? (doc['likes'].length)
+            : (doc["noLikes"]),
+        peopleThatLikedThis: Set(),
+        author: doc.data['author'],
+        authorUsername: doc.data['authorUsername'],
+        title: doc.data['title'],
+        charity: doc.data['charity'],
+        amountRaised: doc.data['amountRaised'],
+        moneyRaised: (doc.data['moneyRaised'] != null)
+            ? doc.data['moneyRaised'].toDouble()
+            : doc.data['moneyRaised'],
+        targetAmount: doc.data['targetAmount'],
+        likes: doc.data['likes'],
+        noComments: doc.data['noComments'],
+        subtitle: doc.data['subtitle'],
+        timestamp: doc.data['timestamp'],
+        imageUrl: doc.data['imageUrl'],
+        id: doc.documentID,
+        status: doc.data['status'],
+        aspectRatio: (doc.data['aspectRatio'] != null)
+            ? doc.data['aspectRatio'].toDouble()
+            : doc.data['aspectRatio'],
+        hashtags: doc.data['hashtags'],
+        completionComment: doc.data['completionComment'],
+        charityLogo: doc.data['charityLogo'] != null
+            ? doc.data['charityLogo']
+            : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
+        videoThumbnail: doc.data['video_thumbnail']);
   }
 
   /**  Get posts list from a query */
@@ -260,37 +260,37 @@ class DatabaseService {
     var timeStampNanoSecs = postJSON['timestamp']['_nanoseconds'];
     //print("printing noLikes:" + doc["noLikes"]);
     return Post(
-      //need to make a fromJSON initialisor in Post
-      isPrivate: isPrivate,
-      noLikes: (postJSON["noLikes"] == null)
-          ? (postJSON['likes'].length)
-          : (postJSON["noLikes"]),
-      peopleThatLikedThis: Set(),
-      author: postJSON['author'],
-      authorUsername: postJSON['authorUsername'],
-      title: postJSON['title'],
-      charity: postJSON['charity'],
-      amountRaised: postJSON['amountRaised'],
-      moneyRaised: (postJSON['moneyRaised'] != null)
-          ? postJSON['moneyRaised'].toDouble()
-          : postJSON['moneyRaised'],
-      targetAmount: postJSON['targetAmount'],
-      likes: postJSON['likes'],
-      noComments: postJSON['noComments'],
-      subtitle: postJSON['subtitle'],
-      timestamp: Timestamp(timeStampSecs, timeStampNanoSecs),
-      imageUrl: postJSON['imageUrl'],
-      id: postJSON['postId'],
-      status: postJSON['status'],
-      aspectRatio: (postJSON['aspectRatio'] != null)
-          ? postJSON['aspectRatio'].toDouble()
-          : postJSON['aspectRatio'],
-      hashtags: postJSON['hashtags'],
-      completionComment: postJSON['completionComment'],
-      charityLogo: postJSON['charityLogo'] != null
-          ? postJSON['charityLogo']
-          : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
-    );
+        //need to make a fromJSON initialisor in Post
+        isPrivate: isPrivate,
+        noLikes: (postJSON["noLikes"] == null)
+            ? (postJSON['likes'].length)
+            : (postJSON["noLikes"]),
+        peopleThatLikedThis: Set(),
+        author: postJSON['author'],
+        authorUsername: postJSON['authorUsername'],
+        title: postJSON['title'],
+        charity: postJSON['charity'],
+        amountRaised: postJSON['amountRaised'],
+        moneyRaised: (postJSON['moneyRaised'] != null)
+            ? postJSON['moneyRaised'].toDouble()
+            : postJSON['moneyRaised'],
+        targetAmount: postJSON['targetAmount'],
+        likes: postJSON['likes'],
+        noComments: postJSON['noComments'],
+        subtitle: postJSON['subtitle'],
+        timestamp: Timestamp(timeStampSecs, timeStampNanoSecs),
+        imageUrl: postJSON['imageUrl'],
+        id: postJSON['postId'],
+        status: postJSON['status'],
+        aspectRatio: (postJSON['aspectRatio'] != null)
+            ? postJSON['aspectRatio'].toDouble()
+            : postJSON['aspectRatio'],
+        hashtags: postJSON['hashtags'],
+        completionComment: postJSON['completionComment'],
+        charityLogo: postJSON['charityLogo'] != null
+            ? postJSON['charityLogo']
+            : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
+        videoThumbnail: postJSON['video_thumbnail']);
   }
 
 /**Make a list of Posts objects from a list of JSONS */
@@ -632,14 +632,16 @@ class DatabaseService {
       String status,
       Timestamp timestamp,
       double aspectRatio,
-      String completionComment) async {
+      String completionComment,
+      String thumbnailUrl) async {
     // create or update the document with this uid
     return await postsCollection.document(postId).updateData({
       "imageUrl": downloadUrl,
       "status": status,
       "timestamp": timestamp,
       "aspectRatio": aspectRatio,
-      "completionComment": completionComment
+      "completionComment": completionComment,
+      'video_thumbnail': thumbnailUrl
     });
   }
 
