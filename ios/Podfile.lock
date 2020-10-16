@@ -227,9 +227,6 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.7):
     - BoringSSL-GRPC/Interface (= 0.0.7)
   - BoringSSL-GRPC/Interface (0.0.7)
-  - cached_video_player (0.0.1):
-    - Flutter
-    - KTVHTTPCache (~> 2.0.0)
   - cloud_firestore (0.0.1):
     - Firebase/Core
     - Firebase/Firestore (~> 6.0)
@@ -238,7 +235,6 @@ PODS:
     - Firebase/Core
     - Firebase/Functions (~> 6.0)
     - Flutter
-  - CocoaAsyncSocket (7.6.4)
   - connectivity (0.0.1):
     - Flutter
     - Reachability
@@ -459,10 +455,6 @@ PODS:
     - GTMSessionFetcher/Core (= 1.4.0)
   - image_picker (0.0.1):
     - Flutter
-  - KTVCocoaHTTPServer (1.0.0):
-    - CocoaAsyncSocket
-  - KTVHTTPCache (2.0.1):
-    - KTVCocoaHTTPServer
   - leveldb-library (1.22)
   - libwebp (1.1.0):
     - libwebp/demux (= 1.1.0)
@@ -513,7 +505,6 @@ PODS:
 DEPENDENCIES:
   - apple_sign_in (from `.symlinks/plugins/apple_sign_in/ios`)
   - better_player (from `.symlinks/plugins/better_player/ios`)
-  - cached_video_player (from `.symlinks/plugins/cached_video_player/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
   - connectivity (from `.symlinks/plugins/connectivity/ios`)
@@ -548,7 +539,6 @@ SPEC REPOS:
     - abseil
     - AppAuth
     - BoringSSL-GRPC
-    - CocoaAsyncSocket
     - Crashlytics
     - Fabric
     - FBSDKCoreKit
@@ -578,8 +568,6 @@ SPEC REPOS:
     - gRPC-Core
     - GTMAppAuth
     - GTMSessionFetcher
-    - KTVCocoaHTTPServer
-    - KTVHTTPCache
     - leveldb-library
     - libwebp
     - nanopb
@@ -593,8 +581,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/apple_sign_in/ios"
   better_player:
     :path: ".symlinks/plugins/better_player/ios"
-  cached_video_player:
-    :path: ".symlinks/plugins/cached_video_player/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   cloud_functions:
@@ -658,10 +644,8 @@ SPEC CHECKSUMS:
   apple_sign_in: 7716c7ddfa195aeab7dec0dc374ef4ff45d1adb4
   better_player: 2c49e8ac681166b15d062b7594a12902c7e05042
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
-  cached_video_player: 449b3d85e95316a0eca125c483f6d9e281ccabc3
   cloud_firestore: 2a4f8f802fb0b701cf809b283b6bec7477ebaa6f
   cloud_functions: 20ba5a917ef4e8f5e60648c7398c272b38a66051
-  CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
   Crashlytics: 9220f5bc89e7a618df411b4f639389dbfb0e03d2
   Fabric: ea977e3cd9c20425516d3dafd3bf8c941c51223f
@@ -705,8 +689,6 @@ SPEC CHECKSUMS:
   GTMAppAuth: 4deac854479704f348309e7b66189e604cf5e01e
   GTMSessionFetcher: 6f5c8abbab8a9bce4bb3f057e317728ec6182b10
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
-  KTVCocoaHTTPServer: df8d7b861e603ff8037e9b2138aca2563a6b768d
-  KTVHTTPCache: 588c3eb16f6bd1e6fde1e230dabfb7bd4e490a4d
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   libwebp: 946cb3063cea9236285f7e9a8505d806d30e07f3
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9

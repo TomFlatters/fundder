@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:cached_video_player/cached_video_player.dart';
+//import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter/services.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'shared/loading.dart';
-import 'package:chewie/chewie.dart';
+//import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path/path.dart' as path;
@@ -13,12 +13,16 @@ import 'package:path_provider/path_provider.dart';
 import 'custom_cache_manager.dart';
 import 'package:better_player/better_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class VideoItem extends StatefulWidget {
   final String url;
   final double aspectRatio;
+  final String videoThumbnail;
 
-  VideoItem({Key key, this.url, @required this.aspectRatio}) : super(key: key);
+  VideoItem(
+      {Key key, this.url, @required this.aspectRatio, this.videoThumbnail})
+      : super(key: key);
   @override
   _VideoItemState createState() => _VideoItemState();
 }
@@ -36,7 +40,9 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
   void initState() {
     super.initState();
     controller = BetterPlayerListVideoPlayerController();
-    _loadThumbnail(widget.url);
+    if (widget.videoThumbnail == null) {
+      _loadThumbnail(widget.url);
+    }
     _setVideoController(widget.url);
   }
 
@@ -132,9 +138,14 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
                         //BetterPlayerDataSourceType.NETWORK, widget.url),
                         _dataSource,
                         configuration: BetterPlayerConfiguration(
-                          placeholder: _thumbnail != null
-                              ? Image.memory(_thumbnail)
-                              : Loading(),
+                          placeholder: widget.videoThumbnail == null
+                              ? _thumbnail != null
+                                  ? Image.memory(_thumbnail)
+                                  : Loading()
+                              : CachedNetworkImage(
+                                  imageUrl: widget.videoThumbnail,
+                                  fit: BoxFit.fill,
+                                ),
                           startAt: Duration(milliseconds: 10),
                           looping: true,
                           deviceOrientationsAfterFullScreen: [
