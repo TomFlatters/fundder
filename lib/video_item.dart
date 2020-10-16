@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'shared/loading.dart';
-import 'package:chewie/chewie.dart';
+//import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path/path.dart' as path;
