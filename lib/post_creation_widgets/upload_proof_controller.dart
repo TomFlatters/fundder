@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -5,7 +7,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import '../services/database.dart';
 import '../models/user.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_video_player/cached_video_player.dart';
+//import 'package:cached_video_player/cached_video_player.dart';
 import '../shared/loading.dart';
 import '../global_widgets/buttons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,6 +20,10 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 import 'package:fundder/shared/constants.dart';
 import 'package:video_compress/video_compress.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
+import 'package:video_player/video_player.dart';
 
 class UploadProofScreen extends StatefulWidget {
   final String postId;
@@ -33,8 +39,8 @@ class _UploadProofState extends State<UploadProofScreen> {
   PickedFile _imageFile;
   dynamic _pickImageError;
   bool isVideo = false;
-  CachedVideoPlayerController _controller;
-  CachedVideoPlayerController _toBeDisposed;
+  VideoPlayerController _controller;
+  VideoPlayerController _toBeDisposed;
   String _retrieveDataError;
   double aspectRatio;
   CarouselController _carouselController = CarouselController();
@@ -51,9 +57,6 @@ class _UploadProofState extends State<UploadProofScreen> {
 
   @override
   void initState() {
-    VideoCompress.compressProgress$.subscribe((progress) {
-      debugPrint('progress: $progress');
-    });
     reloadPost();
     super.initState();
   }
@@ -93,6 +96,7 @@ class _UploadProofState extends State<UploadProofScreen> {
                                         .microsecondsSinceEpoch
                                         .toString();
                                 if (isVideo == true) {
+                                  _controller?.pause();
                                   if (mounted)
                                     setState(() {
                                       _compressing = true;
@@ -108,6 +112,22 @@ class _UploadProofState extends State<UploadProofScreen> {
                                     setState(() {
                                       _compressing = false;
                                     });
+                                  Uint8List image = await _loadThumbnail(
+                                      File(mediaInfo.path));
+                                  final documentDirectory =
+                                      await getApplicationDocumentsDirectory();
+
+                                  File file = File(path.join(
+                                      documentDirectory.path, 'imagetest.png'));
+
+                                  file.writeAsBytesSync(image);
+                                  print('got file');
+                                  String thumbnailUrl = await DatabaseService(
+                                          uid: user.uid)
+                                      .uploadImage(file,
+                                          fileLocation + '_video_thumbnail');
+                                  print('image uploaded');
+
                                   DatabaseService(uid: user.uid)
                                       .uploadVideo(
                                           File(mediaInfo.path), fileLocation)
@@ -122,7 +142,8 @@ class _UploadProofState extends State<UploadProofScreen> {
                                                     Timestamp.now(),
                                                     aspectRatio,
                                                     completionCommentController
-                                                        .text)
+                                                        .text,
+                                                    thumbnailUrl)
                                                 .then((value) => {
                                                       Navigator.of(context)
                                                           .pop(null)
@@ -143,7 +164,8 @@ class _UploadProofState extends State<UploadProofScreen> {
                                                     Timestamp.now(),
                                                     aspectRatio,
                                                     completionCommentController
-                                                        .text)
+                                                        .text,
+                                                    null)
                                                 .then((value) => {
                                                       Navigator.of(context)
                                                           .pop(null)
@@ -254,6 +276,12 @@ class _UploadProofState extends State<UploadProofScreen> {
               },
             ),
     );
+  }
+
+  Future<Uint8List> _loadThumbnail(File file) async {
+    final uint8list =
+        await VideoThumbnail.thumbnailData(video: file.path, quality: 3);
+    return uint8list;
   }
 
   void _changePage() {
@@ -448,6 +476,9 @@ class _UploadProofState extends State<UploadProofScreen> {
           _changeVideo();
         },
       ),
+      SizedBox(
+        height: 20,
+      ),
       PrimaryFundderButton(
         text: "Select Image",
         onPressed: () {
@@ -460,7 +491,7 @@ class _UploadProofState extends State<UploadProofScreen> {
   Future<void> _playVideo(PickedFile file) async {
     if (file != null && mounted) {
       await _disposeVideoController();
-      _controller = CachedVideoPlayerController.file(File(file.path));
+      _controller = VideoPlayerController.file(File(file.path));
       await _controller.setVolume(1.0);
       await _controller.initialize();
       await _controller.setLooping(true);
@@ -528,7 +559,8 @@ class _UploadProofState extends State<UploadProofScreen> {
     if (_controller == null) {
       return Center(child: Text('No media selected'));
     } else {
-      aspectRatio = _controller.value.aspectRatio;
+      aspectRatio =
+          _controller.value.size.height / _controller.value.size.width;
       print(aspectRatio);
     }
     return AspectRatioVideo(_controller);
@@ -702,14 +734,14 @@ class _UploadProofState extends State<UploadProofScreen> {
 class AspectRatioVideo extends StatefulWidget {
   AspectRatioVideo(this.controller);
 
-  final CachedVideoPlayerController controller;
+  final VideoPlayerController controller;
 
   @override
   AspectRatioVideoState createState() => AspectRatioVideoState();
 }
 
 class AspectRatioVideoState extends State<AspectRatioVideo> {
-  CachedVideoPlayerController get controller => widget.controller;
+  VideoPlayerController get controller => widget.controller;
   bool initialized = false;
 
   void _onVideoControllerUpdate() {
@@ -753,8 +785,9 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
               child: GestureDetector(
             onTap: _playPause,
             child: AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: CachedVideoPlayer(controller),
+              aspectRatio:
+                  controller.value.size.height / controller.value.size.width,
+              child: VideoPlayer(controller),
             ),
           ) //)/*AspectRatio(
               /*aspectRatio: controller.value?.aspectRatio,
