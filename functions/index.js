@@ -1196,10 +1196,14 @@ function amIallowedAccess(following, postObj, uid){
  * Assign each user a random number and give them every public post in their feed
  * TODO: update 'feedsDeployedTo' on the post doc subcollection & keep track of function times...
  */
-exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}').onCreate(async (snap, context)=>{
+exports.feedManagementOnUserCreated = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).firestore.document('users/{uid}').onCreate(async (snap, context)=>{
+  const uid = context.params.uid;
+  const FieldValue = require('firebase-admin').firestore.FieldValue;
+  const bookKeepingCollection = admin.firestore().collection('bookKeeping');
+  bookKeepingCollection.doc('userList').set({'listOfUsers': FieldValue.arrayUnion(uid)},  {merge: true});
   const userCollection =  admin.firestore().collection('users');
   const postsCollection = admin.firestore().collection('postsV2');
-  const uid = context.params.uid;
+  
   userCollection.doc(uid).set({'randomNumber': 1}, {merge: true});
 
   //give them every public post
@@ -1231,17 +1235,33 @@ exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}'
 
 })
 
+
+exports.getAListOfUsers = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 2 minutes').onRun(async (context)=>{
+  admin.auth().listUsers(1000).then(async function(listUsersResult) {
+    //in parallel deploy posts to all 1000 users
+    promiseOfDeployment = await Promise.all(listUsersResult.users.map(function(userRecord){
+      const uid = userRecord.uid;
+      const FieldValue = require('firebase-admin').firestore.FieldValue;
+      const bookKeepingCollection = admin.firestore().collection('bookKeeping');
+      return bookKeepingCollection.doc('userList').set({'listOfUsers': FieldValue.arrayUnion(uid)},  {merge: true});
+      
+    }))
+  return null;
+}).catch(function(error) {
+  console.log('Error managing feed', error);
+})
+});
 exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 200 minutes').onRun(async (context) => {
   const postsCollection = admin.firestore().collection('postsV2');
   //get the 50 most recent public posts....
-  const publicPostQuery = await postsCollection.where('isPrivate', '==', false).orderBy('timestamp', 'desc').limit(50).get();
+  const publicPostQuery = await postsCollection.where('isPrivate', '==', false).orderBy('timestamp', 'desc').limit(10).get();
   const publicPosts = publicPostQuery.docs;
   
   //get a list of all users (MODIFY THIS IMMEDIATELY ONCE WE GET)
   admin.auth().listUsers(1000)
   .then(async function(listUsersResult) {
     //in parallel deploy posts to all 1000 users
-    promiseOfDeployment = await Promise.all(listUsersResult.users.map(function(userRecord){
+    const promiseOfDeployment = await Promise.all(listUsersResult.users.map(function(userRecord){
       const uid = userRecord.uid;
       
       //async function that takes a user id and a bunch of posts and deploys them to the user
@@ -1249,7 +1269,7 @@ exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '5
       const deployPromiseForUser = deployPostsToUser(uid, publicPosts);
       return deployPromiseForUser
     }))
-  return null;
+  return promiseOfDeployment;
 }).catch(function(error) {
   console.log('Error managing feed', error);
 });
@@ -1259,7 +1279,7 @@ exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '5
 async function deployPostsToUser(uid, publicPosts){
   console.log("deploying posts to user")
   const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
-  publicPosts.forEach(function(docSnap){
+  const deployPromiseForUser =  await Promise.all(publicPosts.map(async function(docSnap){
     if (docSnap.exists){
       const postValue = docSnap.data();
       const postForMyFeed = {
@@ -1273,11 +1293,14 @@ async function deployPostsToUser(uid, publicPosts){
         postId: docSnap.id,
         hashtags: postValue.hashtags,
       }
-      myFeed.doc(docSnap.id).set(postForMyFeed);
-      return postValue
+      const postDeployedToThisUser = await myFeed.doc(docSnap.id).set(postForMyFeed);
+      return postDeployedToThisUser;
     }
     else{
       return null;
     }
-  });
+  }));
+  return deployPromiseForUser;
 }
+
+
