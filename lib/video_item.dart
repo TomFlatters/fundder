@@ -143,7 +143,9 @@ class _VideoItemState extends State<VideoItem> with RouteAware {
                                   ? Image.memory(_thumbnail)
                                   : Loading()
                               : CachedNetworkImage(
-                                  imageUrl: widget.videoThumbnail),
+                                  imageUrl: widget.videoThumbnail,
+                                  fit: BoxFit.fill,
+                                ),
                           startAt: Duration(milliseconds: 10),
                           looping: true,
                           deviceOrientationsAfterFullScreen: [
