@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:cached_video_player/cached_video_player.dart';
+//import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter/services.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'shared/loading.dart';
