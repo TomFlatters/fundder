@@ -79,7 +79,7 @@ class ShareBar extends StatelessWidget {
       socialMetaTagParameters: SocialMetaTagParameters(
           title: post.title,
           description: 'Help support this fundraiser!',
-          imageUrl: Uri.parse(post.imageUrl)),
+          imageUrl: post.imageUrl != null ? Uri.parse(post.imageUrl) : null),
     );
 
     final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
