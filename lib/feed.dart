@@ -4,20 +4,25 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
-import 'package:fundder/post_widgets/commentBar.dart';
-import 'package:fundder/post_widgets/likeBar.dart';
+import 'package:fundder/post_widgets/social_widgets/commentBar.dart';
+import 'package:fundder/post_widgets/social_widgets/likeButton.dart';
 import 'package:fundder/post_widgets/postBody.dart';
 import 'package:fundder/post_widgets/postHeader.dart';
-import 'package:fundder/post_widgets/shareBar.dart';
+import 'package:fundder/post_widgets/social_widgets/shareBar.dart';
+import 'package:fundder/privacyIcon.dart';
 import 'package:fundder/services/likes.dart';
+import 'package:fundder/services/privacyService.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:provider/provider.dart';
+import 'helper_classes.dart';
 import 'models/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'services/likes.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'routes/FadeTransition.dart';
+import 'post_widgets/socialBar.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 class FeedView extends StatefulWidget {
   @override
@@ -68,12 +73,9 @@ class _FeedViewState extends State<FeedView> {
           // print(postData)
 
           //arbitrarily chosen int
-          StreamController<void> likesManager = StreamController<int>();
+          StreamController<void> likesManager =
+              StreamController<int>.broadcast();
           Stream rebuildLikesButton = likesManager.stream;
-
-          //the previous state of like before it's changed
-          var currLikeButton =
-              createLikesFutureBuilder(likesService, postData, user.uid);
 
           return GestureDetector(
             child: Container(
@@ -98,44 +100,10 @@ class _FeedViewState extends State<FeedView> {
                     maxLines: 2,
                     likesManager: likesManager,
                   ),
-                  Container(
-                    //action bar
-                    key: GlobalKey(),
-                    height: 30,
-                    child: Row(children: <Widget>[
-                      //likeButton goes here
-                      Expanded(
-                        child: StreamBuilder(
-                            stream: rebuildLikesButton,
-                            builder: (context, snapshot) {
-                              print("Building Stream Builder");
-                              if (snapshot.hasData) {
-                                print(
-                                    "New data in stream. Creating new Like Button");
-                                currLikeButton = createLikesFutureBuilder(
-                                    likesService, postData, user.uid);
-                                return currLikeButton;
-                              } else {
-                                print("Using old LikeButton");
-                                return currLikeButton;
-                              }
-                            }),
-                      ),
-
-                      Expanded(
-                          child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: CommentButton(
-                          pid: postData.id,
-                        ),
-                      )),
-                      Expanded(
-                        child: ShareBar(
-                          postId: postData.id,
-                          postTitle: postData.title,
-                        ),
-                      ),
-                    ]),
+                  SocialBar(
+                    key: UniqueKey(),
+                    postData: postData,
+                    rebuildLikesButton: rebuildLikesButton,
                   ),
                   Row(children: [
                     Expanded(
@@ -153,36 +121,26 @@ class _FeedViewState extends State<FeedView> {
                     ),
                     postData.author != user.uid
                         ? Container()
-                        : FlatButton(
-                            onPressed: () {
-                              print('button pressed');
-                              _showDeleteDialog(postData);
-                            },
-                            child: Text('Delete',
-                                textAlign: TextAlign.right,
-                                style: TextStyle(
-                                  fontSize: 14,
+                        : Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.more_horiz,
                                   color: Colors.grey,
-                                )),
+                                ),
+                                onPressed: () =>
+                                    {_postOptions(context, user.uid, postData)},
+                              )
+                            ],
                           ),
                   ])
                 ]),
               ),
             ),
             onTap: () async {
-              //
-              //throw StateError('Uncaught error thrown by app.');
-              // var pid = postData.id;
-              // var noLikes = likesModel.noLikes;
-              // var isLiked = likesModel.isLiked;
-              // var uid = user.uid;
-              // //passing state into ViewPost screen
-              // LikesModel likeState = LikesModel(isLiked, noLikes,
-              //     uid: uid, postId: pid);
-
               print("a post clicked");
-              await Navigator.push(
-                  context, FadeRoute(page: ViewPost(postData)));
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ViewPost(postData)));
               likesManager.add(1);
             },
           );
@@ -194,6 +152,44 @@ class _FeedViewState extends State<FeedView> {
         },
       );
     }
+  }
+
+  _postOptions(context, uid, postData) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            color: Color(0xFF737373),
+            height: 235,
+            child: Container(
+              padding: EdgeInsets.only(top: 10),
+              child: ListView(
+                children: [
+                  SelectedFollowersOnlyPrivacyToggle(postData.id),
+                  _createPrivacyIcon(postData.id),
+                  ListTile(
+                    leading: Icon(Icons.delete_forever),
+                    title: Text('Delete'),
+                    subtitle: Text(
+                        "If this Fundder has not been completed, money raised will be refunded."),
+                    onTap: () async {
+                      print('elipses button pressed');
+                      await _showDeleteDialog(postData);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(10),
+                  topRight: const Radius.circular(10),
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   Future<void> _showDeleteDialog(Post post) async {
@@ -216,7 +212,7 @@ class _FeedViewState extends State<FeedView> {
               child: Text('Delete', style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Firestore.instance
-                    .collection('posts')
+                    .collection('postsV2')
                     .document(post.id)
                     .delete()
                     .then((value) {
@@ -290,4 +286,33 @@ class _FeedViewState extends State<FeedView> {
           );
         });
   }
+}
+
+_createPrivacyIcon(postId) {
+  var postPrivacyToggle = PostPrivacyToggle(postId);
+  return FutureBuilder(
+    future: postPrivacyToggle.isPrivate(),
+    builder: (context, isPrivate) {
+      if (isPrivate.hasData) {
+        var map = isPrivate.data;
+
+        return PrivacyIcon(
+            description: "Make this post viewable only to your followers",
+            isPrivate: map['isPrivate'],
+            onPrivacySettingChanged: (bool newVal) async {
+              if (newVal) {
+                await postPrivacyToggle.makePrivate();
+              } else {
+                await postPrivacyToggle.makePostPublic();
+              }
+            });
+      } else {
+        return ListTile(
+          title: Text('Private Mode'),
+          subtitle: Text("Make this post viewable only to your followers"),
+          leading: Icon(Icons.lock_outline),
+        );
+      }
+    },
+  );
 }

@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/widgets.dart';
+//import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/models/post.dart';
@@ -9,17 +11,23 @@ import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'auth.dart';
 
 class DatabaseService {
   // initiate the class with the user id
   final String uid;
+  final cloudFunc = CloudFunctions.instance;
+  // .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+
+  final _auth = AuthService();
+
   DatabaseService({this.uid});
 
   // Get Firestore collection reference
   final CollectionReference userCollection =
       Firestore.instance.collection('users');
   final CollectionReference postsCollection =
-      Firestore.instance.collection('posts');
+      Firestore.instance.collection('postsV2');
   final CollectionReference templatesCollection =
       Firestore.instance.collection('templates');
   final CollectionReference charitiesCollection =
@@ -32,38 +40,97 @@ class DatabaseService {
   // Create: Users are created upon registration.
   // TBC by refactor
 
-  // Read: user information by the id used to instantiate the DatabaseService
+  /** Read: user information by the id used to instantiate the DatabaseService*/
   Future<User> readUserData() async {
     DocumentSnapshot userData = await userCollection.document(uid).get();
-    User fetchedUser = _userDataFromSnapshot(userData);
+    print("_readUserData invoked: \n" + userData.data.toString());
+    User fetchedUser = userDataFromSnapshot(userData);
     return fetchedUser;
   }
 
-  // Update User
+  /** Update User */
   Future updateUserData(
       String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
     return await userCollection.document(uid).updateData({
       'email': email,
       'username': username,
+      'search_username': username != null ? username.toLowerCase() : null,
       'name': name,
       'profilePic': profilePic,
     });
   }
 
-  // only call this on registration, since it sets profile pic and tutorials viewed as false
+  /**  only call this on registration, since it sets profile pic and tutorials viewed as false */
   Future registerUserData(
       String email, String username, String name, String profilePic) async {
     // create or update the document with this uid
     return await userCollection.document(uid).setData({
       'email': email,
       'username': username,
-      'search_username': username.toLowerCase(),
+      'search_username': username != null ? username.toLowerCase() : null,
       'name': name,
       'profilePic': profilePic,
       'seenTutorial': false,
       'dpSetterPrompted': false,
-    });
+    }, merge: true);
+  }
+
+  Future registerUserDataApple(
+      String email, String name, String profilePic) async {
+    // create or update the document with this uid
+    String tryUsername = 'User';
+    if (email.contains("privaterelay") != true) {
+      List<String> splitString = email.split("@");
+      tryUsername = splitString[0];
+    } else {
+      List<String> splitString = name.split(" ");
+      tryUsername = splitString[0];
+    }
+    int i = 1;
+    bool usernameFound = false;
+    if (await _auth.usernameUnique(tryUsername) == true) {
+      usernameFound = true;
+    }
+    while (usernameFound == false) {
+      String checkUsername = tryUsername + i.toString();
+      if (await _auth.usernameUnique(checkUsername) == true) {
+        usernameFound = true;
+        tryUsername = checkUsername;
+      } else {
+        i = i + 1;
+      }
+    }
+
+    String username = tryUsername;
+
+    return await userCollection.document(uid).setData({
+      'email': email,
+      'username': username,
+      'search_username': username != null ? username.toLowerCase() : null,
+      'name': name,
+      'profilePic': profilePic,
+      'seenTutorial': false,
+      'dpSetterPrompted': true,
+    }, merge: true);
+  }
+
+  Future addFacebookId(String facebookId) async {
+    return await userCollection
+        .document(uid)
+        .setData({'facebookId': facebookId}, merge: true);
+  }
+
+  Future addFacebookToken(String facebookToken) async {
+    return await userCollection
+        .document(uid)
+        .setData({'facebookToken': facebookToken}, merge: true);
+  }
+
+  Future addProfilePic(String location) async {
+    return await userCollection
+        .document(uid)
+        .setData({'profilePic': location}, merge: true);
   }
 
   Future addFCMToken(String token) async {
@@ -89,30 +156,59 @@ class DatabaseService {
     return userCollection.snapshots();
   }
 
-  // Given a document return a User type object
-  User _userDataFromSnapshot(DocumentSnapshot doc) {
+  Stream<DocumentSnapshot> userStream(String uid) {
+    return Firestore.instance.collection('users').document(uid).snapshots();
+  }
+
+  /**Given a document return a User type object*/
+  User userDataFromSnapshot(DocumentSnapshot doc) {
+    //print("_userDataFromSnapshot invoked. This is the username: " +
+    //   doc.data["username"]);
+
+    //print("this is the field value for isPrivate!!!!! : " +
+    //   doc.data['isPrivate']);
     return User(
-        uid: doc.data['uid'],
-        name: doc.data['name'],
+        isPrivate: (doc.data['isPrivate'] != null)
+            ? (true == doc.data['isPrivate'])
+            : false, //isPrivate,
+        uid: doc.documentID,
         username: doc.data['username'],
         email: doc.data['email'],
         bio: doc.data['bio'],
-        followers: doc.data['followers'],
-        following: doc.data['following'],
+        followers: doc.data['noFollowers'],
+        following: doc.data['noFollowing'],
         gender: doc.data['gender'],
-        profilePic: doc.data['profilePic']);
+        name: doc.data['name'],
+        profilePic: doc.data['profilePic'],
+        seenTutorial: doc.data['seenTutorial'],
+        dpSetterPrompted: doc.data['dpSetterPrompted'],
+        verified: doc.data['verified'],
+        profileTutorialSeen: doc.data['profileTutorialSeen'],
+        fundTutorialSeen: doc.data['fundTutorialSeen'],
+        doTutorialSeen: doc.data['doTutorialSeen'],
+        doneTutorialSeen: doc.data['doneTutorialSeen'],
+        likes: doc.data['likes'],
+        facebookId: doc.data['facebookId'],
+        facebookToken: doc.data['facebookToken'],
+        amountDonated: doc.data['amountDonated'] != null
+            ? doc.data['amountDonated'].toDouble()
+            : 0.0);
   }
 
   // -------------
   // 2. Posts CRUD:
   // -------------
 
-  // Given a document return a Post type object
+  /**  Given a document return a Post type object */
   Post _makePost(DocumentSnapshot doc) {
     print("_makePost being run");
+    var isPrivate =
+        (doc.data["isPrivate"] == null) ? false : doc.data['isPrivate'];
+    print("private setting of this post is: " + isPrivate.toString());
 
     //print("printing noLikes:" + doc["noLikes"]);
     return Post(
+      isPrivate: isPrivate,
       noLikes: (doc.data["noLikes"] == null)
           ? (doc['likes'].length)
           : (doc["noLikes"]),
@@ -133,7 +229,9 @@ class DatabaseService {
       imageUrl: doc.data['imageUrl'],
       id: doc.documentID,
       status: doc.data['status'],
-      aspectRatio: doc.data['aspectRatio'],
+      aspectRatio: (doc.data['aspectRatio'] != null)
+          ? doc.data['aspectRatio'].toDouble()
+          : doc.data['aspectRatio'],
       hashtags: doc.data['hashtags'],
       completionComment: doc.data['completionComment'],
       charityLogo: doc.data['charityLogo'] != null
@@ -142,7 +240,7 @@ class DatabaseService {
     );
   }
 
-  // Get posts list stream is mapped to the Post object
+  /**  Get posts list from a query */
   List<Post> _postsDataFromSnapshot(QuerySnapshot snapshot) {
     print('mapping the posts to Post model');
     return snapshot.documents.map((DocumentSnapshot doc) {
@@ -150,58 +248,122 @@ class DatabaseService {
     }).toList();
   }
 
-  // Get list of posts ordered by time
-  Stream<List<Post>> get fundPosts {
-    return postsCollection
-        .orderBy("timestamp", descending: true)
-        .limit(10)
-        .where('status', isEqualTo: 'fund')
-        .snapshots()
-        .map(_postsDataFromSnapshot);
+/**Make a post object from a JSON */
+  Post aJSONtoPost(postJSON) {
+    print("aJSONtoPost being run");
+    var isPrivate =
+        (postJSON["isPrivate"] == null) ? false : postJSON['isPrivate'];
+    print("private setting of this post is: " + isPrivate.toString());
+    print(
+        "in aJSONtoPost and the values of the seconds in the timestamp is ${postJSON['timestamp']['_seconds']}");
+    var timeStampSecs = postJSON['timestamp']['_seconds'];
+    var timeStampNanoSecs = postJSON['timestamp']['_nanoseconds'];
+    //print("printing noLikes:" + doc["noLikes"]);
+    return Post(
+      //need to make a fromJSON initialisor in Post
+      isPrivate: isPrivate,
+      noLikes: (postJSON["noLikes"] == null)
+          ? (postJSON['likes'].length)
+          : (postJSON["noLikes"]),
+      peopleThatLikedThis: Set(),
+      author: postJSON['author'],
+      authorUsername: postJSON['authorUsername'],
+      title: postJSON['title'],
+      charity: postJSON['charity'],
+      amountRaised: postJSON['amountRaised'],
+      moneyRaised: (postJSON['moneyRaised'] != null)
+          ? postJSON['moneyRaised'].toDouble()
+          : postJSON['moneyRaised'],
+      targetAmount: postJSON['targetAmount'],
+      likes: postJSON['likes'],
+      noComments: postJSON['noComments'],
+      subtitle: postJSON['subtitle'],
+      timestamp: Timestamp(timeStampSecs, timeStampNanoSecs),
+      imageUrl: postJSON['imageUrl'],
+      id: postJSON['postId'],
+      status: postJSON['status'],
+      aspectRatio: (postJSON['aspectRatio'] != null)
+          ? postJSON['aspectRatio'].toDouble()
+          : postJSON['aspectRatio'],
+      hashtags: postJSON['hashtags'],
+      completionComment: postJSON['completionComment'],
+      charityLogo: postJSON['charityLogo'] != null
+          ? postJSON['charityLogo']
+          : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
+    );
   }
 
-  Stream<List<Post>> get donePosts {
-    print('returning done posts');
-    return postsCollection
-        .orderBy("timestamp", descending: true)
-        .limit(10)
-        .where('status', isEqualTo: 'done')
-        .snapshots()
-        .map(_postsDataFromSnapshot);
+/**Make a list of Posts objects from a list of JSONS */
+  List<Post> jsonsToPosts(List<Object> postJSONS) {
+    print('mapping the posts to Post model');
+    return postJSONS.map((postJSON) {
+      return aJSONtoPost(postJSON);
+    }).toList();
   }
 
+/**Get a list of up to three new posts of appropriate status (fund/done) */
   Future<List<Post>> refreshPosts(
-      String status, int limit, Timestamp startTimestamp) {
-    print('limit: ' + limit.toString());
-    return postsCollection
-        .orderBy("timestamp", descending: true)
-        .startAfter([startTimestamp])
-        .limit(limit)
-        .where('status', isEqualTo: status)
-        .getDocuments()
-        .then((snapshot) {
-          print(_postsDataFromSnapshot(snapshot));
-          return _postsDataFromSnapshot(snapshot);
-        });
+      String status, int limit, Timestamp startTimestamp) async {
+    print("in refresh posts");
+    HttpsCallable cloudRefreshPosts =
+        cloudFunc.getHttpsCallable(functionName: 'onRefreshPost');
+    HttpsCallableResult res = await cloudRefreshPosts.call(<String, dynamic>{
+      'status': status,
+      'limit': limit,
+      "timeStamp":
+          startTimestamp.toString(), //needs to be converted server side
+    });
+    print("printing timestamp in toString format ${startTimestamp.toString()}");
+    print("printing result of refresh feed: " +
+        res.data["listOfJsonDocs"].toString());
+
+    var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
+
+    return postList;
   }
 
+  /**Get up to 'limit' number of post documents ordered by timestamp
+   * starting at 'startTimestamp' containing hashtag 'hashtag' 
+   */
   Future<List<Post>> refreshHashtag(
-      String hashtag, int limit, Timestamp startTimestamp) {
+      String hashtag, int limit, Timestamp startTimestamp) async {
+    print("running refresh hashtag");
     print('limit: ' + limit.toString());
-    return postsCollection
-        .orderBy("timestamp", descending: true)
-        .startAfter([startTimestamp])
-        .limit(limit)
-        .where('hashtags', arrayContains: hashtag)
-        .getDocuments()
-        .then((snapshot) {
-          print(_postsDataFromSnapshot(snapshot));
-          return _postsDataFromSnapshot(snapshot);
-        });
+
+    HttpsCallable cloudRefreshHashtag =
+        cloudFunc.getHttpsCallable(functionName: 'onRefreshHashtag');
+    HttpsCallableResult res = await cloudRefreshHashtag.call(<String, dynamic>{
+      'hashtag': hashtag,
+      'limit': limit,
+      "timeStamp": startTimestamp.toString(), //this is converted server side
+    });
+
+    print("printing result of refresh hashtag: " +
+        res.data["listOfJsonDocs"].toString());
+
+    var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
+
+    return postList;
   }
 
-  Future<List<Post>> authorPosts(String id) {
+  /**Get posts by author id */
+  Future<List<Post>> authorPosts(String id) async {
+    //TODO: only if you follow the author
     print('gettig posts by author: ' + id);
+
+    HttpsCallable getAuthorPosts =
+        cloudFunc.getHttpsCallable(functionName: 'getAuthorPosts');
+    HttpsCallableResult res = await getAuthorPosts.call(<String, dynamic>{
+      'id': id,
+    });
+    print("printing result of author posts: " +
+        res.data["listOfJsonDocs"].toString());
+
+    var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
+
+    return postList;
+
+    /*
     return postsCollection
         .where("author", isEqualTo: id)
         .orderBy("timestamp", descending: true)
@@ -209,6 +371,7 @@ class DatabaseService {
         .then((snapshot) {
       return _postsDataFromSnapshot(snapshot);
     });
+    */
   }
 
   Future<List<Post>> likedPosts(String id, List likesList) {
@@ -221,31 +384,11 @@ class DatabaseService {
     });
   }
 
-  // Get list of posts for given author
-  Stream<List<Post>> postsByUser(id) {
-    return postsCollection
-        .where("author", isEqualTo: id)
-        .orderBy("timestamp", descending: true)
-        .limit(10)
-        .snapshots()
-        .map(_postsDataFromSnapshot);
-  }
-
-/*
-  Stream<List<Post>> postsLikedByUser(id) {
-    return postsCollection
-        .where("likes", arrayContains: id)
-        .orderBy("timestamp", descending: true)
-        .limit(10)
-        .snapshots()
-        .map(_postsDataFromSnapshot);
-  }
-*/
-
-  // Upload post and return the document id
+  /** Upload post and return the document id*/
   Future uploadPost(Post post) async {
     return await postsCollection
         .add({
+          "isPrivate": post.isPrivate,
           "author": post.author,
           "authorUsername": post.authorUsername,
           "title": post.title,
@@ -319,7 +462,9 @@ class DatabaseService {
         acceptedBy: doc.data['acceptedBy'],
         completedBy: doc.data['completedBy'],
         active: doc.data['active'],
-        aspectRatio: doc.data['aspectRatio'],
+        aspectRatio: (doc.data['aspectRatio'] != null)
+            ? doc.data['aspectRatio'].toDouble()
+            : doc.data['aspectRatio'],
         hashtags: doc.data['hashtags'],
         charityLogo: doc.data['charityLogo'] != null
             ? doc.data['charityLogo']

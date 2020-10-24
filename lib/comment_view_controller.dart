@@ -8,6 +8,7 @@ import 'models/user.dart';
 import 'package:provider/provider.dart';
 import 'shared/helper_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fundder/shared/constants.dart';
 
 class CommentPage extends StatefulWidget {
   final String pid;
@@ -128,7 +129,7 @@ class _CommentPageState extends State<CommentPage> {
                           padding: EdgeInsets.only(top: 20, bottom: 20),
                           child: TextField(
                             controller: _textController,
-                            decoration: InputDecoration(
+                            decoration: textInputDecoration.copyWith(
                                 border: OutlineInputBorder(
                                   borderRadius: const BorderRadius.all(
                                     const Radius.circular(20.0),
@@ -143,6 +144,10 @@ class _CommentPageState extends State<CommentPage> {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         String username = snapshot.data.username;
+                        print(
+                            "in FutureBuilder of the comment view controller rn.....\n the is private status is " +
+                                snapshot.data.isPrivate.toString());
+                        //snapshot.data.search_username;
                         return GestureDetector(
                           child: Container(
                             child: GestureDetector(

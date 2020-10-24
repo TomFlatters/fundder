@@ -6,7 +6,11 @@
 //WARNING: THIS IS A DEPRECATED MODEL OF POST, WITHOUT MANY OF ITS FEATURES AND SOME STALE FEATURES.
 //NEEDS REFACTORING
 
+import 'package:flutter/material.dart';
+
 class Post {
+  final List selectedPrivateViewers;
+  final bool isPrivate;
   final String author;
   final String authorUsername;
   final String title;
@@ -33,7 +37,9 @@ class Post {
   String completionComment;
 
   Post(
-      {this.noComments,
+      {this.selectedPrivateViewers,
+      @required this.isPrivate,
+      this.noComments,
       this.noLikes,
       this.author,
       this.authorUsername,

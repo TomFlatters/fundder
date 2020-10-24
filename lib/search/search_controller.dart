@@ -2,9 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flappy_search_bar/search_bar_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import '../web_pages/web_menu.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../services/database.dart';
@@ -62,85 +59,71 @@ class _SearchState extends State<SearchController>
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    if (user == null && kIsWeb == true) {
-      Future.microtask(() => Navigator.pushNamed(context, '/web/login'));
-      return Scaffold(
-        body: Text(
-          "Redirecting",
-          style: TextStyle(
-              fontFamily: 'Founders Grotesk',
-              fontSize: 20,
-              color: Colors.black,
-              decoration: null),
-        ),
-      );
-    } else
-    // This size provide us total height and width  of our screen
-    {
-      return Scaffold(
-        body: SafeArea(
-          child: Column(children: [
-            kIsWeb == true ? WebMenu(2) : Container(),
-            Expanded(
-              child: SearchBar<DocumentSnapshot>(
-                searchBarPadding: EdgeInsets.symmetric(horizontal: 20),
-                searchBarController: _searchBarController,
-                header: DefaultTabController(
-                  length: 2,
-                  initialIndex: 0,
-                  child: TabBar(
-                    tabs: [Tab(text: 'Users'), Tab(text: 'Hashtags')],
-                    controller: _tabController,
-                  ),
+    return Scaffold(
+      body: SafeArea(
+        child: Column(children: [
+          Expanded(
+            child: SearchBar<DocumentSnapshot>(
+              searchBarPadding: EdgeInsets.symmetric(horizontal: 20),
+              searchBarStyle: SearchBarStyle(
+                  backgroundColor: Colors.grey[200],
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              searchBarController: _searchBarController,
+              header: DefaultTabController(
+                length: 2,
+                initialIndex: 0,
+                child: TabBar(
+                  tabs: [Tab(text: 'Users'), Tab(text: 'Hashtags')],
+                  controller: _tabController,
                 ),
-                onCancelled: () {
-                  FocusScope.of(context).unfocus();
-                },
-                listPadding: EdgeInsets.only(top: 10),
-                hintText: _tabController.index == 0
-                    ? 'search accounts'
-                    : 'search hashtags',
-                onSearch: search,
-                emptyWidget: SearchDescriptor(),
-                minimumChars: 0,
-                onItemFound: (DocumentSnapshot doc, int index) {
-                  // if they are searching for users
-                  if (_tabController.index == 0) {
-                    return ListTile(
-                      leading: ProfilePicFromUrl(doc.data['profilePic'], 40),
-                      title: Text(
-                        doc.data['username'],
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/user/' + doc.documentID);
-                      },
-                    );
-                    // if they are searching for posts
-                  } else {
-                    return ListTile(
-                      //leading: ProfilePic(doc.data['author'], 40),
-                      title: Text("#" + doc.documentID.toString(),
-                          style: TextStyle(color: Colors.blueGrey)),
-                      subtitle: Text(
-                        doc.data['count'].toString() + " challenges",
-                      ),
-                      onTap: () {
-                        Navigator.pushNamed(
-                            context,
-                            '/hashtag/' +
-                                doc.documentID.toString() +
-                                '/' +
-                                doc.data['count'].toString());
-                      },
-                    );
-                  }
-                },
               ),
+              onCancelled: () {
+                FocusScope.of(context).unfocus();
+              },
+              listPadding: EdgeInsets.only(top: 10),
+              hintText: _tabController.index == 0
+                  ? 'search accounts'
+                  : 'search hashtags',
+              onSearch: search,
+              emptyWidget: SearchDescriptor(),
+              minimumChars: 0,
+              onItemFound: (DocumentSnapshot doc, int index) {
+                // if they are searching for users
+                if (_tabController.index == 0) {
+                  return ListTile(
+                    leading: ProfilePicFromUrl(doc.data['profilePic'], 40),
+                    title: Text(
+                      doc.data['username'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/user/' + doc.documentID);
+                    },
+                  );
+                  // if they are searching for posts
+                } else {
+                  return ListTile(
+                    //leading: ProfilePic(doc.data['author'], 40),
+                    title: Text("#" + doc.documentID.toString(),
+                        style: TextStyle(color: Colors.blueGrey)),
+                    subtitle: Text(
+                      doc.data['count'].toString() + " challenges",
+                    ),
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context,
+                          '/hashtag/' +
+                              doc.documentID.toString() +
+                              '/' +
+                              doc.data['count'].toString());
+                    },
+                  );
+                }
+              },
             ),
-          ]),
-        ),
-      );
-    }
+          ),
+        ]),
+      ),
+    );
   }
 }

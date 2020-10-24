@@ -24,7 +24,7 @@ class PostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    print('charity logo: ' + this.charityLogo);
+    //print('charity logo: ' + this.charityLogo);
     return Container(
       height: 60,
       child: Row(
@@ -60,22 +60,24 @@ class PostHeader extends StatelessWidget {
             },
           ),
           Expanded(
-              child: Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(
-                            context, '/charity/' + this.targetCharity);
-                      },
-                      child: Container(
-                          constraints: BoxConstraints(maxWidth: 100),
-                          margin: EdgeInsets.only(left: 20, right: 10),
-                          height: 30,
-                          //color: Colors.blue,
-                          child: CachedNetworkImage(
-                            imageUrl: this.charityLogo,
-                            //color: Colors.red,
-                          ))))),
+              child: this.targetCharity == ""
+                  ? Container()
+                  : Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, '/charity/' + this.targetCharity);
+                          },
+                          child: Container(
+                              constraints: BoxConstraints(maxWidth: 100),
+                              margin: EdgeInsets.only(left: 20, right: 10),
+                              height: 30,
+                              //color: Colors.blue,
+                              child: CachedNetworkImage(
+                                imageUrl: this.charityLogo,
+                                //color: Colors.red,
+                              ))))),
           this.postStatus == 'done'
               ? Row(children: [
                   Icon(

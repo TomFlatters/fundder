@@ -16,65 +16,49 @@ class HexColor extends Color {
 }
 
 // This is called from the feed to retrieve the profile pic from uid rather than url
-
-class ProfilePic extends StatefulWidget {
-  @override
-  _ProfilePicState createState() => _ProfilePicState();
-
+class ProfilePic extends StatelessWidget {
+  static Map<String, String> existingPics = {};
   final String uid;
   final double size;
   ProfilePic(this.uid, this.size);
-}
 
-class _ProfilePicState extends State<ProfilePic> {
-  String url =
-      'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283';
-
-  @override
-  void initState() {
-    if (widget.uid != null) {
-      print("profile pic instantiated with uid " + widget.uid);
-      _retrieveUser();
-    } else {
-      print("no uid provided");
-    }
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(ProfilePic oldwidget) {
-    super.didUpdateWidget(oldwidget);
-    if (widget.uid != null) {
-      _retrieveUser();
-    } else {
-      print("no uid provided");
-    }
-  }
-
-  void _retrieveUser() async {
-    Firestore.instance
-        .collection("users")
-        .document(widget.uid)
-        .get()
-        .then((value) {
-      if (mounted) {
-        if (mounted)
-          setState(() {
-            if (value.data != null) {
-              url = value.data["profilePic"];
-            }
-          });
-      }
-    });
+  Future<String> _getPicUrlFromId(id) async {
+    var userDoc =
+        await Firestore.instance.collection("users").document(id).get();
+    return userDoc["profilePic"];
   }
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: widget.size / 2,
-      backgroundImage: CachedNetworkImageProvider(url),
-      backgroundColor: Colors.transparent,
-    );
+    return (existingPics.containsKey(uid))
+        ? CircleAvatar(
+            radius: size / 2,
+            backgroundImage: CachedNetworkImageProvider(existingPics[uid]),
+            backgroundColor: Colors.transparent,
+          )
+        : FutureBuilder(
+            future: _getPicUrlFromId(uid),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var url = snapshot.data;
+                var profilePic = CircleAvatar(
+                  radius: size / 2,
+                  backgroundImage: CachedNetworkImageProvider(url),
+                  backgroundColor: Colors.transparent,
+                );
+                existingPics[uid] = url;
+                print("User images that are cached: {$existingPics}");
+                return profilePic;
+              } else {
+                return CircleAvatar(
+                  radius: size / 2,
+                  backgroundImage: CachedNetworkImageProvider(
+                      'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/images%2Fprofile_pic_default-01.png?alt=media&token=cea24849-7590-43f8-a2ff-b630801e7283'),
+                  backgroundColor: Colors.transparent,
+                );
+              }
+            },
+          );
   }
 }
 

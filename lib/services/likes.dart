@@ -21,7 +21,7 @@ class LikesService {
   LikesService({this.uid});
 
   final CollectionReference postsCollection =
-      Firestore.instance.collection('posts');
+      Firestore.instance.collection('postsV2');
   final CollectionReference userCollection =
       Firestore.instance.collection('users');
 
@@ -75,5 +75,45 @@ class LikesService {
   Future<int> noOfLikes(String postId) async {
     var postDoc = await postsCollection.document(postId).get();
     return postDoc.data['noLikes'];
+  }
+
+  Future<List<dynamic>> idsOfPostLikers(String postId) async {
+    //returns the user id of all users following user 'uid'
+    QuerySnapshot q = await postsCollection
+        .document(postId)
+        .collection('whoLiked')
+        .getDocuments();
+    //remember that the doc ids are the user ids of the followers]
+    List<String> likers = [];
+    for (int i = 0; i < q.documents.length; i++) {
+      if (q.documents[i][q.documents[i].documentID] == true) {
+        likers.add(q.documents[i].documentID);
+      }
+    }
+    return likers;
+  }
+
+  Future<List<Map>> unamesOfPostLikers(String postId) async {
+    //return the usernames of all users following the user
+    List<String> uids = await idsOfPostLikers(postId);
+    List<Map> res = [];
+    if (uids != null) {
+      print("uids: " + uids.toString());
+      for (int i = 0; i < uids.length; i++) {
+        var uname = await mapIDtoName(uids[i]);
+        res.add(<String, String>{"username": uname, "uid": uids[i]});
+      }
+    }
+    return res;
+  }
+
+  Future<String> mapIDtoName(String uid) async {
+    //returns corresponding username to uid
+    var doc = await userCollection.document(uid).get();
+    if (doc.exists) {
+      return doc.data['username'];
+    } else {
+      return 'Fundder user';
+    }
   }
 }

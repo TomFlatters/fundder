@@ -1,31 +1,29 @@
 import 'package:fluro/fluro.dart';
 import 'package:fluro/src/router.dart' as Router;
 import 'package:flutter/material.dart';
+import 'package:fundder/challenge_friend/challenge_friend_controller.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
 import 'package:fundder/donation/donate_page_controller.dart';
-import 'package:fundder/add_post_controller.dart';
+import 'package:fundder/post_creation_widgets/add_post_controller.dart';
 import 'package:fundder/do_challenge_detail.dart';
 import 'package:fundder/challenge_steps_view.dart';
-import 'package:fundder/view_followers_controller.dart';
-import 'package:fundder/profile_controller.dart';
-import 'package:fundder/edit_profile_controller.dart';
-import 'package:fundder/feed_controller.dart';
-import 'package:fundder/web_pages/feed_web.dart';
-import 'package:fundder/web_pages/about_page.dart';
-import 'package:fundder/web_pages/login_web.dart';
-import 'package:fundder/search/search_controller.dart';
-import 'package:fundder/liked_controller.dart';
-import 'package:fundder/web_pages/temparary_upload_page.dart';
-import 'package:fundder/upload_proof_controller.dart';
+import 'package:fundder/profile_screens/view_followers_controller.dart';
+import 'package:fundder/profile_screens/edit_profile_controller.dart';
+import 'package:fundder/post_creation_widgets/upload_proof_controller.dart';
 import 'package:fundder/welcome_pages/profilepic_setter.dart';
 import 'package:fundder/welcome_pages/tutorial.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/auth_screens/check_verified.dart';
 import 'package:fundder/search/hashtag_feed.dart';
 import 'package:fundder/charity_view_controller.dart';
+
+import 'package:fundder/post_widgets/view_likers_controller.dart';
+
+import 'package:fundder/messaging/chat_room.dart';
+import 'package:fundder/profile_screens/user_loader.dart';
 
 class FluroRouter {
   static Router.Router router = Router.Router();
@@ -67,6 +65,9 @@ class FluroRouter {
       },
     );
   });
+  static Handler _chatRoomHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ChatRoom(params['uid'][0], params['username'][0]));
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(pid: params['id'][0]));
@@ -80,7 +81,7 @@ class FluroRouter {
           DonatePage(postId: params['id'][0]));
   static Handler _viewOtherProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ProfileController(
+          UserLoader(
             uid: params['id'][0],
           ));
   static Handler _followersHandler = Handler(
@@ -97,9 +98,17 @@ class FluroRouter {
             startIndex: 1,
             username: params['username'][0],
           ));
+  static Handler _likersHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ViewLikers(
+            postId: params['id'][0],
+          ));
   static Handler _editProfileHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           EditProfile());
+  static Handler _challengeFriendHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ChallengeFriend());
   static Handler _addPostHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           AddPost());
@@ -124,175 +133,119 @@ class FluroRouter {
   static Handler _hashtagHandler2 = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           HashtagFeed(params['id'][0], null));
-
-  // Web handlers
-
-  static Handler _feedHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          WebFeed());
-  static Handler _aboutHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          AboutPage());
-  static Handler _webLoginHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          LoginWeb());
-  static Handler _loggingOutHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          LoginWeb());
-  static Handler _searchHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          SearchController());
-  static Handler _activityHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          LikedController());
-  static Handler _profileHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          ProfileController());
-  static Handler _tempAddPostHandler = Handler(
-      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
-          TemporaryUpload());
   static Handler _checkVerifiedHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CheckVerified());
 
   static void setupRouter() {
     router.define(
+      '/post/:id/likers',
+      handler: _likersHandler,
+    );
+    router.define(
+      '/chatroom/:uid/:username',
+      handler: _chatRoomHandler,
+      transitionType: TransitionType.material,
+    );
+    router.define(
       '/charity/:id',
       handler: _charityHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/post/:id',
       handler: _postHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/?post=:id',
       handler: _postHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/post/:id/comments',
       handler: _commentHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/post/:id/donate',
       handler: _donateHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/user/:id',
       handler: _viewOtherProfileHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/user/:id/:username/followers',
       handler: _followersHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/user/:id/:username/following',
       handler: _followingHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/account/edit',
       handler: _editProfileHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/addpost',
       handler: _addPostHandler,
     );
     router.define(
+      '/challengefriend',
+      handler: _challengeFriendHandler,
+    );
+    router.define(
       '/challenge/:id',
       handler: _challengeDetailHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
     router.define(
       '/challenge/:id/steps',
       handler: _challengeStepsHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/post/:id/uploadProof',
       handler: _uploadProofHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/:id/addProfilePic',
       handler: _profilePicHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/:id/tutorial',
       handler: _tutorialHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       '/:id/verification',
       handler: _checkVerifiedHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       'hashtag/:id/:id2',
       handler: _hashtagHandler1,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
 
     router.define(
       'hashtag/:id',
       handler: _hashtagHandler2,
-      transitionType: TransitionType.fadeIn,
-    );
-
-    // Web routes
-    router.define(
-      '/web/feed',
-      handler: _feedHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/about',
-      handler: _aboutHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/search',
-      handler: _searchHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/activity',
-      handler: _activityHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/profile',
-      handler: _profileHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/login',
-      handler: _webLoginHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/logging_out',
-      handler: _loggingOutHandler,
-      transitionType: TransitionType.fadeIn,
-    );
-    router.define(
-      '/web/addpost',
-      handler: _tempAddPostHandler,
-      transitionType: TransitionType.fadeIn,
+      transitionType: TransitionType.material,
     );
   }
 }

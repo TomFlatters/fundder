@@ -8,12 +8,28 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:256734528568:android:633cf0106f679c816a52cd",
+        "mobilesdk_app_id": "1:256734528568:android:c8b8b5202a7d63746a52cd",
         "android_client_info": {
           "package_name": "com.fundder"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "256734528568-h6392dejib0jss56g4i23164vvk9mqei.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fundder",
+            "certificate_hash": "4c3307ef486ed21d2d676c42fe0d2d5a12c7a2c4"
+          }
+        },
+        {
+          "client_id": "256734528568-7b7gd7lpmbfr9vecdce5vqr8e64s0pu3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fundder",
+            "certificate_hash": "22f845b4ff94c92878a02b2d4dbb78a1820ee0bc"
+          }
+        },
         {
           "client_id": "256734528568-6r5ic6a5tk417ki1t58gaipbhe68t8h4.apps.googleusercontent.com",
           "client_type": 3
@@ -35,7 +51,8 @@
               "client_id": "256734528568-0jo2ar8d8hj0n0dbkisurv3ph37u2s65.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.fundder"
+                "bundle_id": "com.fundder",
+                "app_store_id": "1234567890"
               }
             }
           ]

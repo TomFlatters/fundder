@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'models/charity.dart';
 import 'package:fundder/services/database.dart';
-import 'global_widgets/buttons.dart';
-import 'web_pages/web_menu.dart';
 import 'shared/loading.dart';
 import 'package:fundder/shared/helper_functions.dart';
 
@@ -30,36 +27,31 @@ class _CharityViewState extends State<CharityView> {
         builder: (BuildContext context, AsyncSnapshot<Charity> snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
-              appBar: kIsWeb == true
-                  ? null
-                  : AppBar(
-                      centerTitle: true,
-                      title: null,
-                      actions: <Widget>[
-                        new IconButton(
-                          icon: new Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop(null),
-                        )
-                      ],
-                      leading: new Container(),
-                    ),
+              appBar: AppBar(
+                centerTitle: true,
+                title: null,
+                actions: <Widget>[
+                  new IconButton(
+                    icon: new Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(null),
+                  )
+                ],
+                leading: new Container(),
+              ),
               body: Column(children: [
-                kIsWeb == true ? WebMenu(-1) : Container(),
                 Expanded(
                   child: ListView(
                     children: <Widget>[
                       Container(
                         height: 60,
-                        child: kIsWeb == true
-                            ? Image.network(snapshot.data.image)
-                            : CachedNetworkImage(
-                                imageUrl: snapshot.data.image != null
-                                    ? snapshot.data.image
-                                    : "",
-                                placeholder: (context, url) => Loading(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                              ),
+                        child: CachedNetworkImage(
+                          imageUrl: snapshot.data.image != null
+                              ? snapshot.data.image
+                              : "",
+                          placeholder: (context, url) => Loading(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
                         margin: EdgeInsets.symmetric(vertical: 10.0),
                       ),
                       Container(

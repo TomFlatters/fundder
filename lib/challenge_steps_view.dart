@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'global_widgets/buttons.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
+import 'package:fundder/shared/constants.dart';
 
 class StepsPage extends StatefulWidget {
   final Template template;
@@ -119,24 +121,26 @@ class _StepsPageState extends State<StepsPage> {
                                       ),
                                       Expanded(
                                           child: TextField(
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w100,
-                                                fontFamily: 'Founders Grotesk',
-                                                fontSize: 45,
-                                              ),
-                                              controller: moneyController,
-                                              decoration: InputDecoration(
-                                                  hintText: 'Amount in £'))),
+                                        keyboardType: TextInputType.number,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w100,
+                                          fontFamily: 'Founders Grotesk',
+                                          fontSize: 45,
+                                        ),
+                                        controller: moneyController,
+                                        decoration: textInputDecoration
+                                            .copyWith(hintText: 'Amount in £'),
+                                      ))
                                     ])
                                   ])),
                           PrimaryFundderButton(
                               text: 'Accept Challenge',
                               onPressed: () {
                                 if (double.parse(moneyController.text) < 2) {
-                                  _showErrorDialog(
-                                      'The minimum donation target amount is £2');
+                                  DialogManager().createDialog(
+                                      'Error',
+                                      'The minimum donation target amount is £2',
+                                      context);
                                 } else {
                                   _makePostFromTemplate(template, user,
                                       moneyController.text.toString());
@@ -183,32 +187,5 @@ class _StepsPageState extends State<StepsPage> {
               Navigator.pushReplacementNamed(
                   context, '/post/' + postId.documentID.toString())
             });
-  }
-
-  Future<void> _showErrorDialog(String string) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error Creating Challenge'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(string),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }
