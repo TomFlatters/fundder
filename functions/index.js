@@ -1251,7 +1251,7 @@ exports.getAListOfUsers = functions.runWith({memory: '2GB', timeoutSeconds: '540
   console.log('Error managing feed', error);
 })
 });
-exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 200 minutes').onRun(async (context) => {
+exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 120 minutes').onRun(async (context) => {
   const postsCollection = admin.firestore().collection('postsV2');
   //get the 50 most recent public posts....
   const publicPostQuery = await postsCollection.where('isPrivate', '==', false).orderBy('timestamp', 'desc').limit(10).get();
@@ -1265,7 +1265,7 @@ exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '5
       const uid = userRecord.uid;
       
       //async function that takes a user id and a bunch of posts and deploys them to the user
-      console.log("about to execute deploy posts to User")
+      
       const deployPromiseForUser = deployPostsToUser(uid, publicPosts);
       return deployPromiseForUser
     }))
@@ -1277,7 +1277,7 @@ exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '5
 
 
 async function deployPostsToUser(uid, publicPosts){
-  console.log("deploying posts to user")
+  
   const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
   const deployPromiseForUser =  await Promise.all(publicPosts.map(async function(docSnap){
     if (docSnap.exists){
