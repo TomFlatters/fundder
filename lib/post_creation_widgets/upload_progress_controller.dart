@@ -23,15 +23,15 @@ import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
 import 'aspect_ratio_video.dart';
 
-class UploadProofScreen extends StatefulWidget {
+class UploadProgressScreen extends StatefulWidget {
   final String postId;
-  UploadProofScreen({this.postId});
+  UploadProgressScreen({this.postId});
 
   @override
-  _UploadProofState createState() => _UploadProofState();
+  _UploadProgressState createState() => _UploadProgressState();
 }
 
-class _UploadProofState extends State<UploadProofScreen> {
+class _UploadProgressState extends State<UploadProgressScreen> {
   Post postData;
   bool _submitting = false;
   PickedFile _imageFile;
@@ -70,130 +70,99 @@ class _UploadProofState extends State<UploadProofScreen> {
               ? null
               : <Widget>[
                   new FlatButton(
-                      child: _current == 2
-                          ? Text('Submit',
-                              style: TextStyle(fontWeight: FontWeight.bold))
-                          : _current == 0
-                              ? Text('Next',
-                                  style: TextStyle(fontWeight: FontWeight.bold))
-                              : Text('Preview',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                      onPressed: _current == 2
-                          ? () async {
-                              if (mounted)
-                                setState(() {
-                                  _submitting = true;
-                                });
-                              print('Submit pressed');
-                              if (_imageFile != null) {
-                                print('not null');
-                                final String fileLocation = user.uid +
-                                    "/" +
-                                    DateTime.now()
-                                        .microsecondsSinceEpoch
-                                        .toString();
-                                if (isVideo == true) {
-                                  _controller?.pause();
-                                  if (mounted)
-                                    setState(() {
-                                      _compressing = true;
+                      child: Text('Submit',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: () async {
+                        if (mounted)
+                          setState(() {
+                            _submitting = true;
+                          });
+                        print('Submit pressed');
+                        if (_imageFile != null) {
+                          print('not null');
+                          final String fileLocation = user.uid +
+                              "/" +
+                              DateTime.now().microsecondsSinceEpoch.toString();
+                          if (isVideo == true) {
+                            _controller?.pause();
+                            if (mounted)
+                              setState(() {
+                                _compressing = true;
+                              });
+                            MediaInfo mediaInfo =
+                                await VideoCompress.compressVideo(
+                              _imageFile.path,
+                              frameRate: 20,
+                              quality: VideoQuality.DefaultQuality,
+                              deleteOrigin: true, // It's false by default
+                            );
+                            if (mounted)
+                              setState(() {
+                                _compressing = false;
+                              });
+                            Uint8List image =
+                                await _loadThumbnail(File(mediaInfo.path));
+                            final documentDirectory =
+                                await getApplicationDocumentsDirectory();
+
+                            File file = File(path.join(
+                                documentDirectory.path, 'imagetest.png'));
+
+                            file.writeAsBytesSync(image);
+                            print('got file');
+                            String thumbnailUrl = await DatabaseService(
+                                    uid: user.uid)
+                                .uploadImage(
+                                    file, fileLocation + '_video_thumbnail');
+                            print('image uploaded');
+
+                            DatabaseService(uid: user.uid)
+                                .uploadVideo(File(mediaInfo.path), fileLocation)
+                                .then((downloadUrl) => {
+                                      print("Successful image upload"),
+                                      print(downloadUrl),
+                                      DatabaseService(uid: user.uid)
+                                          .updatePostProgress(
+                                              widget.postId,
+                                              downloadUrl,
+                                              Timestamp.now(),
+                                              aspectRatio,
+                                              thumbnailUrl)
+                                          .then((value) => {
+                                                Navigator.of(context).pop(null)
+                                              }),
                                     });
-                                  MediaInfo mediaInfo =
-                                      await VideoCompress.compressVideo(
-                                    _imageFile.path,
-                                    frameRate: 20,
-                                    quality: VideoQuality.DefaultQuality,
-                                    deleteOrigin: true, // It's false by default
-                                  );
-                                  if (mounted)
-                                    setState(() {
-                                      _compressing = false;
+                          } else {
+                            DatabaseService(uid: user.uid)
+                                .uploadImage(
+                                    File(_imageFile.path), fileLocation)
+                                .then((downloadUrl) => {
+                                      print("Successful image upload"),
+                                      print(downloadUrl),
+                                      DatabaseService(uid: user.uid)
+                                          .updatePostProgress(
+                                              widget.postId,
+                                              downloadUrl,
+                                              Timestamp.now(),
+                                              aspectRatio,
+                                              null)
+                                          .then((value) => {
+                                                Navigator.of(context).pop(null)
+                                              }),
                                     });
-                                  Uint8List image = await _loadThumbnail(
-                                      File(mediaInfo.path));
-                                  final documentDirectory =
-                                      await getApplicationDocumentsDirectory();
-
-                                  File file = File(path.join(
-                                      documentDirectory.path, 'imagetest.png'));
-
-                                  file.writeAsBytesSync(image);
-                                  print('got file');
-                                  String thumbnailUrl = await DatabaseService(
-                                          uid: user.uid)
-                                      .uploadImage(file,
-                                          fileLocation + '_video_thumbnail');
-                                  print('image uploaded');
-
-                                  DatabaseService(uid: user.uid)
-                                      .uploadVideo(
-                                          File(mediaInfo.path), fileLocation)
-                                      .then((downloadUrl) => {
-                                            print("Successful image upload"),
-                                            print(downloadUrl),
-                                            DatabaseService(uid: user.uid)
-                                                .updatePostStatusImageTimestampRatioComment(
-                                                    widget.postId,
-                                                    downloadUrl,
-                                                    'done',
-                                                    Timestamp.now(),
-                                                    aspectRatio,
-                                                    completionCommentController
-                                                        .text,
-                                                    thumbnailUrl)
-                                                .then((value) => {
-                                                      Navigator.of(context)
-                                                          .pop(null)
-                                                    }),
-                                          });
-                                } else {
-                                  DatabaseService(uid: user.uid)
-                                      .uploadImage(
-                                          File(_imageFile.path), fileLocation)
-                                      .then((downloadUrl) => {
-                                            print("Successful image upload"),
-                                            print(downloadUrl),
-                                            DatabaseService(uid: user.uid)
-                                                .updatePostStatusImageTimestampRatioComment(
-                                                    widget.postId,
-                                                    downloadUrl,
-                                                    'done',
-                                                    Timestamp.now(),
-                                                    aspectRatio,
-                                                    completionCommentController
-                                                        .text,
-                                                    null)
-                                                .then((value) => {
-                                                      Navigator.of(context)
-                                                          .pop(null)
-                                                    }),
-                                          });
-                                }
-                              } else {
-                                if (mounted)
-                                  setState(() {
-                                    _submitting = false;
-                                  });
-                                print('Error');
-                                DialogManager().createDialog(
-                                    'Error',
-                                    'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.',
-                                    context);
-                              }
-                            }
-                          : () {
-                              if (_imageFile != null || _current == 0) {
-                                _carouselController.nextPage(
-                                    duration: Duration(milliseconds: 300),
-                                    curve: Curves.linear);
-                              } else {
-                                DialogManager().createDialog(
-                                    'Error',
-                                    'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.',
-                                    context);
-                              }
-                            })
+                          }
+                        } else {
+                          if (mounted)
+                            setState(() {
+                              _submitting = false;
+                            });
+                          print('Error');
+                          DialogManager().createDialog(
+                              'Error',
+                              'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.',
+                              context);
+                        }
+                      }),
                 ],
           leading: Container(
               width: 100,
@@ -243,36 +212,7 @@ class _UploadProofState extends State<UploadProofScreen> {
                   ),
                 )
               : Loading()
-          : Builder(
-              builder: (context) {
-                final double height = MediaQuery.of(context).size.height;
-                return CarouselSlider(
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
-                    onPageChanged: (index, reason) {
-                      _changePage();
-                      if (mounted) {
-                        setState(() {
-                          _current = index;
-                        });
-                      }
-                    },
-                    enableInfiniteScroll: false,
-                    height: height,
-                    viewportFraction: 1.0,
-                    enlargeCenterPage: false,
-                    // autoPlay: false,
-                  ),
-                  items: _imageFile != null
-                      ? [
-                          _completionComment(),
-                          _uploadImageVideo(),
-                          _previewPost()
-                        ]
-                      : [_completionComment(), _uploadImageVideo()],
-                );
-              },
-            ),
+          : _uploadImageVideo(),
     );
   }
 
@@ -292,116 +232,6 @@ class _UploadProofState extends State<UploadProofScreen> {
     setState(() {
       _loading = false;
     });
-  }
-
-  Widget _previewPost() {
-    postData.imageUrl = null;
-    if (completionCommentController.text != "") {
-      postData.completionComment = completionCommentController.text;
-    } else {
-      postData.completionComment = null;
-    }
-    return ListView(children: [
-      /*Container(
-        decoration: new BoxDecoration(
-            color: Colors.white,
-            borderRadius: new BorderRadius.all(
-              Radius.circular(10.0),
-            )),
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-        child: Text(
-          'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
-          style: TextStyle(
-              fontFamily: 'Founders Grotesk',
-              fontWeight: FontWeight.w500,
-              fontSize: 18),
-        ),
-      ),*/
-      Container(
-        color: Colors.grey[200],
-        child: Container(
-          margin: EdgeInsets.only(top: 10),
-          decoration: new BoxDecoration(
-              color: Colors.white,
-              borderRadius: new BorderRadius.all(
-                Radius.circular(10.0),
-              )),
-          child: Column(children: <Widget>[
-            PostHeader(
-                postAuthorId: postData.author,
-                postAuthorUserName: postData.authorUsername,
-                targetCharity: postData.charity,
-                charityLogo: postData.charityLogo),
-            Container(
-              margin: EdgeInsets.only(bottom: 10),
-              color: Colors.grey[200],
-              child: Center(child: isVideo ? _previewVideo() : _previewImage()),
-            ),
-            PostBody(
-              postData: postData,
-              hashtag: null,
-              maxLines: 9999999999,
-              likesManager: null,
-            ),
-            SizedBox(
-              height: 60,
-            )
-          ]),
-        ),
-      )
-    ]);
-  }
-
-  Widget _completionComment() {
-    return ListView(children: [
-      Container(
-          color: Colors.grey[200],
-          child: Container(
-              margin: EdgeInsets.only(top: 10),
-              decoration: new BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: new BorderRadius.all(
-                    Radius.circular(10.0),
-                  )),
-              child: Container(
-                  color: Colors.white,
-                  margin: EdgeInsets.symmetric(vertical: 5),
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                            text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  color: Colors.black,
-                                  fontFamily: 'Founders Grotesk',
-                                ),
-                                children: [
-                              TextSpan(
-                                  text: 'Add a completion comment ',
-                                  style: TextStyle(
-                                    fontFamily: 'Founders Grotesk',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  )),
-                              TextSpan(
-                                  text: 'this is optional',
-                                  style: TextStyle(
-                                    fontFamily: 'Founders Grotesk',
-                                    fontSize: 12,
-                                  ))
-                            ])),
-                        TextField(
-                          controller: completionCommentController,
-                          decoration: textInputDecoration.copyWith(
-                            //border: InputBorder.none,
-                            hintText: 'Name',
-                          ),
-                        ),
-                      ]))))
-    ]);
   }
 
   Widget _uploadImageVideo() {
@@ -555,7 +385,8 @@ class _UploadProofState extends State<UploadProofScreen> {
     if (_controller == null) {
       return Center(child: Text('No media selected'));
     } else {
-      aspectRatio = _controller.value.aspectRatio;
+      aspectRatio =
+          _controller.value.size.height / _controller.value.size.width;
       print(aspectRatio);
     }
     return AspectRatioVideo(_controller);

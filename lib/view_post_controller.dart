@@ -208,16 +208,33 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                                                             .authorUsername)));
                                                       })
                                                   : Container()
-                                              : PrimaryFundderButton(
-                                                  text: 'Complete Challenge',
-                                                  onPressed: () {
-                                                    willNeedUpdate = true;
-                                                    Navigator.pushNamed(
-                                                        context,
-                                                        '/post/' +
-                                                            postData.id +
-                                                            '/uploadProof');
-                                                  })
+                                              : Column(children: [
+                                                  PrimaryFundderButton(
+                                                      text:
+                                                          'Complete Challenge',
+                                                      onPressed: () {
+                                                        willNeedUpdate = true;
+                                                        Navigator.pushNamed(
+                                                            context,
+                                                            '/post/' +
+                                                                postData.id +
+                                                                '/uploadProof');
+                                                      }),
+                                                  /*SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  SecondaryFundderButton(
+                                                    onPressed: () {
+                                                      willNeedUpdate = true;
+                                                      Navigator.pushNamed(
+                                                          context,
+                                                          '/post/' +
+                                                              postData.id +
+                                                              '/uploadProgress');
+                                                    },
+                                                    text: 'Upload Progress',
+                                                  )*/
+                                                ])
                                           : Container(),
                                     ],
                                   )))

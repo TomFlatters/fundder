@@ -23,6 +23,7 @@ import 'package:fundder/post_widgets/view_likers_controller.dart';
 
 import 'package:fundder/messaging/chat_room.dart';
 import 'package:fundder/profile_screens/user_loader.dart';
+import 'package:fundder/post_creation_widgets/upload_progress_controller.dart';
 
 class FluroRouter {
   static Router.Router router = Router.Router();
@@ -117,6 +118,9 @@ class FluroRouter {
   static Handler _uploadProofHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           UploadProofScreen(postId: params['id'][0]));
+  static Handler _uploadProgressHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          UploadProgressScreen(postId: params['id'][0]));
   static Handler _profilePicHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ProfilePicSetter(uid: params['id'][0]));
@@ -207,6 +211,12 @@ class FluroRouter {
     router.define(
       '/post/:id/uploadProof',
       handler: _uploadProofHandler,
+      transitionType: TransitionType.material,
+    );
+
+    router.define(
+      '/post/:id/uploadProgress',
+      handler: _uploadProgressHandler,
       transitionType: TransitionType.material,
     );
 
