@@ -199,6 +199,22 @@ class DatabaseService {
   // 2. Posts CRUD:
   // -------------
 
+  /// Add progress to a post
+  Future updatePostProgress(String postId, String downloadUrl,
+      Timestamp timestamp, double aspectRatio, String thumbnailUrl) async {
+    // create or update the document with this uid
+    return await postsCollection
+        .document(postId)
+        .collection('progress')
+        .document(timestamp.toString())
+        .setData({
+      "imageUrl": downloadUrl,
+      "timestamp": timestamp,
+      "aspectRatio": aspectRatio,
+      'video_thumbnail': thumbnailUrl
+    });
+  }
+
   /**  Given a document return a Post type object */
   Post _makePost(DocumentSnapshot doc) {
     print("_makePost being run");
