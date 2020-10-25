@@ -86,13 +86,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
   String subtitle = "";
   String targetAmount = '0.00';
 
-  // The type of challenge: 0 = for yourself, 1 = for someone else
-  int selected = -1;
-  final List<String> whoDoes = <String>['Myself', 'Someone Else'];
-  final List<String> subWho = <String>[
-    'Raise money for your own challenge',
-    'Will be public and anyone will be able to accept the challenge. This appears in the "Do" tab in the Feed'
-  ];
+  // The type of challenge: 0 = for yourself, 1 = for someone else, 2 for challenge a friend
+  int selected = 2;
 
   @override
   void initState() {
@@ -109,9 +104,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
         title == "" ||
         subtitle == "" ||
         charity == -1 ||
-        (targetAmount == "0.00" && whoDoes[selected] == "Myself") ||
         hashtags.length < 2 ||
-        (double.parse(targetAmount) < 2 && whoDoes[selected] == "Myself")) {
+        (double.parse(targetAmount) < 2)) {
       canMoveToPreview = false;
     } else {
       canMoveToPreview = true;
@@ -124,19 +118,14 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                 title: Text("Challenge a Friend"),
                 actions: <Widget>[
                   new FlatButton(
-                    child: (selected == 0 && _current == 5 ||
-                            selected == 1 && _current == 4)
+                    child: (_current == 3)
                         ? Text('Preview',
                             style: TextStyle(fontWeight: FontWeight.bold))
-                        : (selected == 0 && _current == 6 ||
-                                selected == 1 && _current == 5)
+                        : (_current == 4)
                             ? Text('Submit',
                                 style: TextStyle(fontWeight: FontWeight.bold))
-                            : selected != -1
-                                ? Text('Next',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold))
-                                : null,
+                            : Text('Next',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
                     onPressed: (selected == 0 && _current == 6 ||
                             selected == 1 && _current == 5)
                         ? () {
@@ -223,8 +212,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                   'You have not written a description for the challenge',
                                   context,
                                 );
-                              } else if (double.parse(targetAmount) < 2 &&
-                                  whoDoes[selected] == "Myself") {
+                              } else if (double.parse(targetAmount) < 2) {
                                 DialogManager().createDialog(
                                   'Error',
                                   'Minimum target fundraising amount is £2.00',
@@ -434,11 +422,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
 
   void _pushItem(String downloadUrl, User user) {
     // Validate form
-    if (title == "" ||
-        subtitle == "" ||
-        charity == -1 ||
-        (targetAmount == "0.00" && whoDoes[selected] == "Myself") ||
-        hashtags.length < 2) {
+    if (title == "" || subtitle == "" || charity == -1 || hashtags.length < 2) {
       if (mounted) {
         setState(() {
           _current = 0;
@@ -451,7 +435,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
         context,
       );
     } else {
-      if (double.parse(targetAmount) < 2 && whoDoes[selected] == "Myself") {
+      if (double.parse(targetAmount) < 2) {
         if (mounted) {
           setState(() {
             _submitting = false;
@@ -463,80 +447,83 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
           context,
         );
       } else {
-        if (whoDoes[selected] == "Myself") {
-          DatabaseService(uid: user.uid)
-              .uploadPost(new Post(
-                  selectedPrivateViewers: this.selectedFollowers,
-                  isPrivate: this.isPrivate,
-                  title: title.toString().trimRight(),
-                  subtitle: subtitle.toString().trimRight(),
-                  author: user.uid,
-                  authorUsername: user.username,
-                  charity: charities[charity].id,
-                  noLikes: 0,
-                  noComments: 0,
-                  timestamp: DateTime.now(),
-                  moneyRaised: 0,
-                  targetAmount: targetAmount.toString(),
-                  imageUrl: downloadUrl,
-                  status: 'fund',
-                  aspectRatio: aspectRatio,
-                  hashtags: hashtags,
-                  charityLogo: charities[charity].image))
-              .then((postId) => {
-                    if (postId == null)
-                      {
-                        if (mounted)
-                          {
-                            setState(() {
-                              _submitting = false;
-                            })
-                          }
-                      }
-                    else
-                      {
-                        print("The doc id is " +
-                            postId
-                                .toString()
-                                .substring(1, postId.toString().length - 1)),
-                        HashtagsService(uid: user.uid)
-                            .addHashtag(postId.toString(), hashtags),
-                        Navigator.pushReplacementNamed(
-                            context,
-                            '/post/' +
-                                postId
-                                    .toString()
-                                    .substring(1, postId.toString().length - 1))
-                      } //the substring is very important as postId.toString() is in brackets
-                  });
-        } else {
-          // Create a template
-          DatabaseService(uid: user.uid)
-              .uploadTemplate(new Template(
-                  title: title.toString(),
-                  subtitle: subtitle.toString(),
-                  author: user.uid,
-                  authorUsername: user.username,
-                  charity: charities[charity].id,
-                  likes: [],
-                  comments: {},
-                  timestamp: DateTime.now(),
-                  moneyRaised: 0,
-                  targetAmount: targetAmount.toString(),
-                  imageUrl: downloadUrl,
-                  whoDoes: whoDoes[selected].toString(),
-                  acceptedBy: [],
-                  completedBy: [],
-                  aspectRatio: aspectRatio,
-                  hashtags: hashtags,
-                  active: true,
-                  charityLogo: charities[charity].image))
-              .then((templateId) => {
-                    // if the post is successfully added, view the post
-                    Navigator.pushReplacementNamed(
-                        context, '/challenge/' + templateId.toString())
-                  });
-        }
+        /* 
+        TO DO: ADD UPLOAD FUNCTION
+        */
+        // if (whoDoes[selected] == "Myself") {
+        //   DatabaseService(uid: user.uid)
+        //       .uploadPost(new Post(
+        //           selectedPrivateViewers: this.selectedFollowers,
+        //           isPrivate: this.isPrivate,
+        //           title: title.toString().trimRight(),
+        //           subtitle: subtitle.toString().trimRight(),
+        //           author: user.uid,
+        //           authorUsername: user.username,
+        //           charity: charities[charity].id,
+        //           noLikes: 0,
+        //           noComments: 0,
+        //           timestamp: DateTime.now(),
+        //           moneyRaised: 0,
+        //           targetAmount: targetAmount.toString(),
+        //           imageUrl: downloadUrl,
+        //           status: 'fund',
+        //           aspectRatio: aspectRatio,
+        //           hashtags: hashtags,
+        //           charityLogo: charities[charity].image))
+        //       .then((postId) => {
+        //             if (postId == null)
+        //               {
+        //                 if (mounted)
+        //                   {
+        //                     setState(() {
+        //                       _submitting = false;
+        //                     })
+        //                   }
+        //               }
+        //             else
+        //               {
+        //                 print("The doc id is " +
+        //                     postId
+        //                         .toString()
+        //                         .substring(1, postId.toString().length - 1)),
+        //                 HashtagsService(uid: user.uid)
+        //                     .addHashtag(postId.toString(), hashtags),
+        //                 Navigator.pushReplacementNamed(
+        //                     context,
+        //                     '/post/' +
+        //                         postId
+        //                             .toString()
+        //                             .substring(1, postId.toString().length - 1))
+        //               } //the substring is very important as postId.toString() is in brackets
+        //           });
+        // } else {
+        //   // Create a template
+        //   DatabaseService(uid: user.uid)
+        //       .uploadTemplate(new Template(
+        //           title: title.toString(),
+        //           subtitle: subtitle.toString(),
+        //           author: user.uid,
+        //           authorUsername: user.username,
+        //           charity: charities[charity].id,
+        //           likes: [],
+        //           comments: {},
+        //           timestamp: DateTime.now(),
+        //           moneyRaised: 0,
+        //           targetAmount: targetAmount.toString(),
+        //           imageUrl: downloadUrl,
+        //           whoDoes: whoDoes[selected].toString(),
+        //           acceptedBy: [],
+        //           completedBy: [],
+        //           aspectRatio: aspectRatio,
+        //           hashtags: hashtags,
+        //           active: true,
+        //           charityLogo: charities[charity].image))
+        //       .then((templateId) => {
+        //             // if the post is successfully added, view the post
+        //             Navigator.pushReplacementNamed(
+        //                 context, '/challenge/' + templateId.toString())
+        //           });
+        // }
       }
     }
   }

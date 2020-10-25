@@ -112,7 +112,7 @@ class _FeedControllerState extends State<FeedController>
           ),
           leading: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/addpost');
+                Navigator.pushNamed(context, '/challengefriend');
               },
               child: new Icon(MdiIcons.swordCross)),
           actions: [
