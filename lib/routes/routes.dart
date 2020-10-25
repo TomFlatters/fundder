@@ -2,6 +2,7 @@ import 'package:fluro/fluro.dart';
 import 'package:fluro/src/router.dart' as Router;
 import 'package:flutter/material.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/post_creation_widgets/share_post_controller.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
@@ -136,6 +137,11 @@ class FluroRouter {
   static Handler _checkVerifiedHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CheckVerified());
+  static Handler _shareNewPostHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          SharePostController(
+            postId: params['id'][0],
+          ));
 
   static void setupRouter() {
     router.define(
@@ -247,6 +253,12 @@ class FluroRouter {
     router.define(
       'hashtag/:id',
       handler: _hashtagHandler2,
+      transitionType: TransitionType.material,
+    );
+
+    router.define(
+      'sharePost/:id',
+      handler: _shareNewPostHandler,
       transitionType: TransitionType.material,
     );
   }

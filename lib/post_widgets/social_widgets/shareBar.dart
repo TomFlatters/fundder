@@ -80,7 +80,7 @@ class ShareBar extends StatelessWidget {
           title: post.title,
           description: 'Help support this fundraiser!',
           imageUrl: post.videoThumbnail != null
-              ? Uri.parse(post.imageUrl)
+              ? Uri.parse(post.videoThumbnail)
               : post.imageUrl != null
                   ? Uri.parse(post.imageUrl)
                   : null),
