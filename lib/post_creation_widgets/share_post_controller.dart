@@ -140,9 +140,7 @@ class _SharePostControllerState extends State<SharePostController> {
           description: 'Help support this fundraiser!',
           imageUrl: post.videoThumbnail != null
               ? Uri.parse(post.videoThumbnail)
-              : post.imageUrl != null
-                  ? Uri.parse(post.imageUrl)
-                  : null),
+              : post.imageUrl != null ? Uri.parse(post.imageUrl) : null),
     );
 
     final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
