@@ -203,15 +203,16 @@ class DatabaseService {
   Future updatePostProgress(String postId, String downloadUrl,
       Timestamp timestamp, double aspectRatio, String thumbnailUrl) async {
     // create or update the document with this uid
-    return await postsCollection
-        .document(postId)
-        .collection('progress')
-        .document(timestamp.toString())
-        .setData({
-      "imageUrl": downloadUrl,
-      "timestamp": timestamp,
-      "aspectRatio": aspectRatio,
-      'video_thumbnail': thumbnailUrl
+    // add an array of maps here for progress
+    return await postsCollection.document(postId).updateData({
+      "progress": FieldValue.arrayUnion([
+        {
+          "imageUrl": downloadUrl,
+          "timestamp": timestamp,
+          "aspectRatio": aspectRatio,
+          'video_thumbnail': thumbnailUrl
+        }
+      ]),
     });
   }
 
