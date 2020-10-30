@@ -5,8 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/post.dart';
+import 'package:fundder/shared/helper_functions.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:fundder/video_item.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -14,9 +16,9 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class PostBody extends StatelessWidget {
-  StreamController<void> likesManager;
   final Post postData;
   final String hashtag;
   final int maxLines;
@@ -25,6 +27,8 @@ class PostBody extends StatelessWidget {
       this.hashtag,
       this.maxLines,
       @required this.likesManager});
+  StreamController<void> likesManager;
+  CarouselController _carouselController = CarouselController();
   @override
   Widget build(BuildContext context) {
     final User user = Provider.of<User>(context);
@@ -32,15 +36,13 @@ class PostBody extends StatelessWidget {
       children: <Widget>[
         (postData.imageUrl == null)
             ? Container()
-            : Container(
-                child: postData.aspectRatio == null
-                    ? SizedBox(child: _previewImageVideo(postData))
-                    : SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.width /
-                            postData.aspectRatio,
-                        child: _previewImageVideo(postData)),
-                margin: EdgeInsets.only(bottom: 10.0),
+            : CarouselSlider(
+                items: _progressImages(context),
+                carouselController: _carouselController,
+                options: CarouselOptions(
+                    enableInfiniteScroll: false,
+                    aspectRatio: postData.aspectRatio,
+                    viewportFraction: 1),
               ),
         Container(
             alignment: Alignment.centerLeft,
@@ -113,6 +115,111 @@ class PostBody extends StatelessWidget {
             )),
       ],
     );
+  }
+
+  List<Widget> _progressImages(BuildContext context) {
+    List<Widget> images = [
+      Stack(children: <Widget>[
+        Container(
+          child: postData.aspectRatio == null
+              ? SizedBox(child: _previewImageVideo(postData))
+              : SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height:
+                      MediaQuery.of(context).size.width / postData.aspectRatio,
+                  child: _previewImageVideo(postData)),
+          margin: EdgeInsets.only(bottom: 10.0),
+        ),
+        postData.postProgress != null
+            ? Container(
+                alignment: Alignment.bottomRight,
+                child: Row(
+                    children: ([
+                  Expanded(
+                      child: Container(
+                    height: 0,
+                  )),
+                  DecoratedBox(
+                      decoration: const BoxDecoration(
+                          borderRadius:
+                              BorderRadius.only(topLeft: Radius.circular(5)),
+                          color: Color.fromRGBO(255, 255, 255, 0.7)),
+                      child: Container(
+                          padding: EdgeInsets.only(
+                              right: 5, bottom: 15, left: 10, top: 5),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Icon(MaterialCommunityIcons
+                                    .gesture_swipe_horizontal),
+                                SizedBox(width: 3),
+                                Text('for progress',
+                                    style: TextStyle(fontSize: 12)),
+                              ])))
+                ])))
+            : Container(),
+      ])
+    ];
+    List<Widget> imagesTemp = [];
+    if (postData.postProgress != null) {
+      print('retrieving post progress');
+
+      for (Map item in postData.postProgress) {
+        print('timestamp: ' + item['timestamp'].toString());
+        Timestamp progressTimestamp;
+        if (item['timestamp'] is Timestamp) {
+          progressTimestamp = item['timestamp'];
+        } else {
+          int timeStampSecs = item['timestamp']['_seconds'];
+          int timeStampNanoSecs = item['timestamp']['_nanoseconds'];
+          progressTimestamp = Timestamp(timeStampSecs, timeStampNanoSecs);
+        }
+        imagesTemp.add(Stack(children: <Widget>[
+          Container(
+            child: item['aspectRatio'] == null
+                ? SizedBox(
+                    child: _previewImageVideo(Post(
+                        imageUrl: item['imageUrl'],
+                        timestamp: item['timestamp'],
+                        videoThumbnail: item['video_thumbnail'],
+                        aspectRatio: item['aspectRatio'] != null
+                            ? item['aspectRatio'].toDouble()
+                            : null,
+                        isPrivate: false)))
+                : SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width /
+                        postData.aspectRatio,
+                    child: _previewImageVideo(Post(
+                        imageUrl: item['imageUrl'],
+                        timestamp: item['timestamp'],
+                        videoThumbnail: item['video_thumbnail'],
+                        aspectRatio: item['aspectRatio'] != null
+                            ? item['aspectRatio'].toDouble()
+                            : null,
+                        isPrivate: false))),
+            margin: EdgeInsets.only(bottom: 10.0),
+          ),
+          Container(
+              alignment: Alignment.bottomRight,
+              child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                      borderRadius:
+                          BorderRadius.only(topLeft: Radius.circular(5)),
+                      color: Color.fromRGBO(255, 255, 255, 0.7)),
+                  child: Container(
+                    padding:
+                        EdgeInsets.only(right: 5, bottom: 15, left: 10, top: 5),
+                    child: Text(howLongAgo(progressTimestamp),
+                        style: TextStyle(fontSize: 12)),
+                  )))
+        ]));
+      }
+    } else {
+      print('no post progress found');
+    }
+    images = images + imagesTemp.reversed.toList();
+    return images;
   }
 
   List<TextSpan> _returnHashtags(

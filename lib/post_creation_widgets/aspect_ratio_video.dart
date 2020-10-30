@@ -59,9 +59,9 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
                 ? AspectRatio(
                     aspectRatio: controller.value.aspectRatio,
                     child: Container(
-                      constraints: BoxConstraints(
-                          minHeight:
-                              MediaQuery.of(context).size.width * 9 / 16),
+                      //constraints: BoxConstraints(
+                      //minHeight:
+                      //   MediaQuery.of(context).size.width * 9 / 16),
                       child: VideoPlayer(
                         controller,
                       ),
