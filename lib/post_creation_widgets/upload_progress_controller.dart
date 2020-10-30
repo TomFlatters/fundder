@@ -65,7 +65,7 @@ class _UploadProgressState extends State<UploadProgressScreen> {
     return Scaffold(
       appBar: AppBar(
           centerTitle: true,
-          title: Text("Complete Fundder"),
+          title: Text("Update Progress"),
           actions: _submitting == true
               ? null
               : <Widget>[
@@ -157,10 +157,8 @@ class _UploadProgressState extends State<UploadProgressScreen> {
                               _submitting = false;
                             });
                           print('Error');
-                          DialogManager().createDialog(
-                              'Error',
-                              'You must upload video or image proof of completing the challenge for all the money to be donated. This will be checked by a moderator.',
-                              context);
+                          DialogManager().createDialog('Error',
+                              'You must upload video or image', context);
                         }
                       }),
                 ],
@@ -222,10 +220,6 @@ class _UploadProgressState extends State<UploadProgressScreen> {
     return uint8list;
   }
 
-  void _changePage() {
-    FocusScope.of(context).unfocus();
-  }
-
   void reloadPost() async {
     print('reloading');
     postData = await DatabaseService(uid: "123").getPostById(widget.postId);
@@ -261,7 +255,7 @@ class _UploadProgressState extends State<UploadProgressScreen> {
                   children: [
                 TextSpan(
                     text:
-                        'Upload proof of completing the challenge. Once proof is uploaded and approved by a moderator, the raised money will be sent to charity',
+                        'Upload progress on your Fundder. Others can see it if they swipe through your post.',
                     style: TextStyle(
                       fontFamily: 'Founders Grotesk',
                       fontWeight: FontWeight.bold,
@@ -317,7 +311,8 @@ class _UploadProgressState extends State<UploadProgressScreen> {
   Future<void> _playVideo(PickedFile file) async {
     if (file != null && mounted) {
       await _disposeVideoController();
-      _controller = VideoPlayerController.file(File(file.path));
+      _controller = VideoPlayerController.file(File(file.path),
+          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
       await _controller.setVolume(1.0);
       await _controller.initialize();
       await _controller.setLooping(true);
@@ -385,8 +380,7 @@ class _UploadProgressState extends State<UploadProgressScreen> {
     if (_controller == null) {
       return Center(child: Text('No media selected'));
     } else {
-      aspectRatio =
-          _controller.value.size.height / _controller.value.size.width;
+      aspectRatio = _controller.value.aspectRatio;
       print(aspectRatio);
     }
     return AspectRatioVideo(_controller);
