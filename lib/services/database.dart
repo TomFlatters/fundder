@@ -203,15 +203,16 @@ class DatabaseService {
   Future updatePostProgress(String postId, String downloadUrl,
       Timestamp timestamp, double aspectRatio, String thumbnailUrl) async {
     // create or update the document with this uid
-    return await postsCollection
-        .document(postId)
-        .collection('progress')
-        .document(timestamp.toString())
-        .setData({
-      "imageUrl": downloadUrl,
-      "timestamp": timestamp,
-      "aspectRatio": aspectRatio,
-      'video_thumbnail': thumbnailUrl
+    // add an array of maps here for progress
+    return await postsCollection.document(postId).updateData({
+      "progress": FieldValue.arrayUnion([
+        {
+          "imageUrl": downloadUrl,
+          "timestamp": timestamp,
+          "aspectRatio": aspectRatio,
+          'video_thumbnail': thumbnailUrl
+        }
+      ]),
     });
   }
 
@@ -253,7 +254,8 @@ class DatabaseService {
         charityLogo: doc.data['charityLogo'] != null
             ? doc.data['charityLogo']
             : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
-        videoThumbnail: doc.data['video_thumbnail']);
+        videoThumbnail: doc.data['video_thumbnail'],
+        postProgress: doc.data['progress']);
   }
 
   /**  Get posts list from a query */
@@ -306,7 +308,8 @@ class DatabaseService {
         charityLogo: postJSON['charityLogo'] != null
             ? postJSON['charityLogo']
             : 'https://firebasestorage.googleapis.com/v0/b/fundder-c4a64.appspot.com/o/charity_logos%2FImage%201.png?alt=media&token=5c937368-4081-4ac1-bb13-36be561e4f1a',
-        videoThumbnail: postJSON['video_thumbnail']);
+        videoThumbnail: postJSON['video_thumbnail'],
+        postProgress: postJSON['progress']);
   }
 
 /**Make a list of Posts objects from a list of JSONS */

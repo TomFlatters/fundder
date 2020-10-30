@@ -220,7 +220,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                                                 postData.id +
                                                                 '/uploadProof');
                                                       }),
-                                                  /*SizedBox(
+                                                  SizedBox(
                                                     height: 20,
                                                   ),
                                                   SecondaryFundderButton(
@@ -233,7 +233,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                                               '/uploadProgress');
                                                     },
                                                     text: 'Upload Progress',
-                                                  )*/
+                                                  )
                                                 ])
                                           : Container(),
                                     ],
