@@ -488,8 +488,11 @@ class _ProfileState extends State<ProfileController>
                               ),
                               child: CachedNetworkImage(
                                 fit: BoxFit.cover,
-                                imageUrl:
-                                    post.imageUrl != null ? post.imageUrl : "",
+                                imageUrl: post.videoThumbnail != null
+                                    ? post.videoThumbnail
+                                    : post.imageUrl != null
+                                        ? post.imageUrl
+                                        : "",
                                 placeholder: (context, url) => Loading(),
                                 errorWidget: (context, url, error) => Container(
                                   color: Colors.grey[100],

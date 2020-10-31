@@ -219,15 +219,17 @@ PODS:
   - AppAuth/ExternalUserAgent (1.4.0)
   - apple_sign_in (0.0.1):
     - Flutter
+<<<<<<< HEAD
+=======
+  - better_player (0.0.1):
+    - Flutter
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   - BoringSSL-GRPC (0.0.7):
     - BoringSSL-GRPC/Implementation (= 0.0.7)
     - BoringSSL-GRPC/Interface (= 0.0.7)
   - BoringSSL-GRPC/Implementation (0.0.7):
     - BoringSSL-GRPC/Interface (= 0.0.7)
   - BoringSSL-GRPC/Interface (0.0.7)
-  - cached_video_player (0.0.1):
-    - Flutter
-    - KTVHTTPCache (~> 2.0.0)
   - cloud_firestore (0.0.1):
     - Firebase/Core
     - Firebase/Firestore (~> 6.0)
@@ -236,7 +238,6 @@ PODS:
     - Firebase/Core
     - Firebase/Functions (~> 6.0)
     - Flutter
-  - CocoaAsyncSocket (7.6.4)
   - connectivity (0.0.1):
     - Flutter
     - Reachability
@@ -377,6 +378,11 @@ PODS:
     - FirebaseCore (~> 6.6)
     - GTMSessionFetcher/Core (~> 1.1)
   - Flutter (1.0.0)
+<<<<<<< HEAD
+=======
+  - flutter_hls_parser (0.0.1):
+    - Flutter
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   - flutter_login_facebook (0.1.0):
     - FBSDKLoginKit (~> 7.0)
     - Flutter
@@ -455,11 +461,16 @@ PODS:
     - GTMSessionFetcher/Core (= 1.4.0)
   - image_picker (0.0.1):
     - Flutter
-  - KTVCocoaHTTPServer (1.0.0):
-    - CocoaAsyncSocket
-  - KTVHTTPCache (2.0.1):
-    - KTVCocoaHTTPServer
   - leveldb-library (1.22)
+  - libwebp (1.1.0):
+    - libwebp/demux (= 1.1.0)
+    - libwebp/mux (= 1.1.0)
+    - libwebp/webp (= 1.1.0)
+  - libwebp/demux (1.1.0):
+    - libwebp/webp
+  - libwebp/mux (1.1.0):
+    - libwebp/demux
+  - libwebp/webp (1.1.0)
   - nanopb (1.30905.0):
     - nanopb/decode (= 1.30905.0)
     - nanopb/encode (= 1.30905.0)
@@ -487,12 +498,26 @@ PODS:
     - Flutter
   - video_compress (0.3.0):
     - Flutter
+<<<<<<< HEAD
+=======
+  - video_player (0.0.1):
+    - Flutter
+  - video_thumbnail (0.0.1):
+    - Flutter
+    - libwebp
+  - wakelock (0.0.1):
+    - Flutter
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   - webview_flutter (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - apple_sign_in (from `.symlinks/plugins/apple_sign_in/ios`)
+<<<<<<< HEAD
   - cached_video_player (from `.symlinks/plugins/cached_video_player/ios`)
+=======
+  - better_player (from `.symlinks/plugins/better_player/ios`)
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
   - connectivity (from `.symlinks/plugins/connectivity/ios`)
@@ -504,6 +529,10 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
+<<<<<<< HEAD
+=======
+  - flutter_hls_parser (from `.symlinks/plugins/flutter_hls_parser/ios`)
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   - flutter_login_facebook (from `.symlinks/plugins/flutter_login_facebook/ios`)
   - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
   - google_sign_in (from `.symlinks/plugins/google_sign_in/ios`)
@@ -516,6 +545,12 @@ DEPENDENCIES:
   - stripe_payment (from `.symlinks/plugins/stripe_payment/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
   - video_compress (from `.symlinks/plugins/video_compress/ios`)
+<<<<<<< HEAD
+=======
+  - video_player (from `.symlinks/plugins/video_player/ios`)
+  - video_thumbnail (from `.symlinks/plugins/video_thumbnail/ios`)
+  - wakelock (from `.symlinks/plugins/wakelock/ios`)
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
 
 SPEC REPOS:
@@ -523,7 +558,6 @@ SPEC REPOS:
     - abseil
     - AppAuth
     - BoringSSL-GRPC
-    - CocoaAsyncSocket
     - Crashlytics
     - Fabric
     - FBSDKCoreKit
@@ -553,9 +587,8 @@ SPEC REPOS:
     - gRPC-Core
     - GTMAppAuth
     - GTMSessionFetcher
-    - KTVCocoaHTTPServer
-    - KTVHTTPCache
     - leveldb-library
+    - libwebp
     - nanopb
     - PromisesObjC
     - Protobuf
@@ -565,8 +598,13 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   apple_sign_in:
     :path: ".symlinks/plugins/apple_sign_in/ios"
+<<<<<<< HEAD
   cached_video_player:
     :path: ".symlinks/plugins/cached_video_player/ios"
+=======
+  better_player:
+    :path: ".symlinks/plugins/better_player/ios"
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   cloud_functions:
@@ -589,6 +627,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_storage/ios"
   Flutter:
     :path: Flutter
+<<<<<<< HEAD
+=======
+  flutter_hls_parser:
+    :path: ".symlinks/plugins/flutter_hls_parser/ios"
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   flutter_login_facebook:
     :path: ".symlinks/plugins/flutter_login_facebook/ios"
   flutter_webview_plugin:
@@ -613,6 +656,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher/ios"
   video_compress:
     :path: ".symlinks/plugins/video_compress/ios"
+<<<<<<< HEAD
+=======
+  video_player:
+    :path: ".symlinks/plugins/video_player/ios"
+  video_thumbnail:
+    :path: ".symlinks/plugins/video_thumbnail/ios"
+  wakelock:
+    :path: ".symlinks/plugins/wakelock/ios"
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   webview_flutter:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
@@ -620,11 +672,13 @@ SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
   apple_sign_in: 7716c7ddfa195aeab7dec0dc374ef4ff45d1adb4
+<<<<<<< HEAD
+=======
+  better_player: 2c49e8ac681166b15d062b7594a12902c7e05042
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
-  cached_video_player: 449b3d85e95316a0eca125c483f6d9e281ccabc3
   cloud_firestore: 2a4f8f802fb0b701cf809b283b6bec7477ebaa6f
   cloud_functions: 20ba5a917ef4e8f5e60648c7398c272b38a66051
-  CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
   Crashlytics: 9220f5bc89e7a618df411b4f639389dbfb0e03d2
   Fabric: ea977e3cd9c20425516d3dafd3bf8c941c51223f
@@ -653,7 +707,12 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 29543feb343b09546ab3aa04d008ee8595b43c44
   FirebaseStorage: f4f39ae834a7145963b913f54e2f24a9db1d8fac
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+<<<<<<< HEAD
   flutter_login_facebook: 7f2123e68cbe29ec9483b7a1111a9f6016ab24ab
+=======
+  flutter_hls_parser: be41df963ec4f909fb5c318d483c4483556553e0
+  flutter_login_facebook: 81cc30306ef15c30d5c7f5f52bb3fd98f16942fe
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   google_sign_in: 6bd214b9c154f881422f5fe27b66aaa7bbd580cc
@@ -667,9 +726,8 @@ SPEC CHECKSUMS:
   GTMAppAuth: 4deac854479704f348309e7b66189e604cf5e01e
   GTMSessionFetcher: 6f5c8abbab8a9bce4bb3f057e317728ec6182b10
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
-  KTVCocoaHTTPServer: df8d7b861e603ff8037e9b2138aca2563a6b768d
-  KTVHTTPCache: 588c3eb16f6bd1e6fde1e230dabfb7bd4e490a4d
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
+  libwebp: 946cb3063cea9236285f7e9a8505d806d30e07f3
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
@@ -683,8 +741,14 @@ SPEC CHECKSUMS:
   stripe_payment: ad86f099179edb7b9fe12b9b62ac3746d5e56802
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
   video_compress: fce97e4fb1dfd88175aa07d2ffc8a2f297f87fbe
+<<<<<<< HEAD
+=======
+  video_player: 9cc823b1d9da7e8427ee591e8438bfbcde500e6e
+  video_thumbnail: c4e2a3c539e247d4de13cd545344fd2d26ffafd1
+  wakelock: 0d4a70faf8950410735e3f61fb15d517c8a6efc4
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   webview_flutter: d2b4d6c66968ad042ad94cbb791f5b72b4678a96
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: 7368163408c647b7eb699d0d788ba6718e18fb8d
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0

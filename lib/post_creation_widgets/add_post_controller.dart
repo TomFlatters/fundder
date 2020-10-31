@@ -541,7 +541,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                             .addHashtag(postId.toString(), hashtags),
                         Navigator.pushReplacementNamed(
                             context,
-                            '/post/' +
+                            '/sharePost/' +
                                 postId
                                     .toString()
                                     .substring(1, postId.toString().length - 1))

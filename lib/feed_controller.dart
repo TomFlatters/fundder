@@ -114,7 +114,7 @@ class _FeedControllerState extends State<FeedController>
               onTap: () {
                 Navigator.pushNamed(context, '/challengefriend');
               },
-              child: new Icon(MdiIcons.swordCross)),
+              child: new Icon(MdiIcons.sword)),
           actions: [
             MessagingIcon(user.uid),
           ],
@@ -124,9 +124,38 @@ class _FeedControllerState extends State<FeedController>
             physics: NeverScrollableScrollPhysics(),
             //indicatorColor: HexColor(colors[_tabController.index]),
             tabs: [
-              Tab(text: 'Do'),
-              Tab(text: 'Fund'),
-              Tab(text: 'Done'),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Icon(Icons.lightbulb_outline, size: 16)),
+                    Text("Challenge")
+                  ])),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Icon(Icons.local_play, size: 16)),
+                    Text(
+                      " Fund",
+                    )
+                  ])),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Icon(Icons.local_movies, size: 16)),
+                    Text(" Done")
+                  ])),
             ],
           ),
         ),

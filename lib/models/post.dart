@@ -35,6 +35,8 @@ class Post {
   final String charityLogo;
   final String charityId;
   String completionComment;
+  final String videoThumbnail;
+  final List<dynamic> postProgress;
 
   Post(
       {this.selectedPrivateViewers,
@@ -61,7 +63,9 @@ class Post {
       this.hashtags,
       this.charityLogo,
       this.charityId,
-      this.completionComment});
+      this.completionComment,
+      this.videoThumbnail,
+      this.postProgress});
 
   double percentRaised() {
     double processAmount(String s) =>
