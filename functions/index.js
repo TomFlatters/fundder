@@ -1251,7 +1251,7 @@ exports.getAListOfUsers = functions.runWith({memory: '2GB', timeoutSeconds: '540
   console.log('Error managing feed', error);
 })
 });
-exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 120 minutes').onRun(async (context) => {
+exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 10 minutes').onRun(async (context) => {
   const postsCollection = admin.firestore().collection('postsV2');
   //get the 50 most recent public posts....
   const publicPostQuery = await postsCollection.where('isPrivate', '==', false).orderBy('timestamp', 'desc').limit(10).get();
