@@ -127,25 +127,33 @@ class _FeedControllerState extends State<FeedController>
               Tab(
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                    Icon(Icons.lightbulb_outline, size: 20),
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Icon(Icons.lightbulb_outline, size: 16)),
                     Text("Challenge")
                   ])),
               Tab(
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                    Icon(Icons.local_play, size: 20),
-                    Text(" Fund")
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Icon(Icons.local_play, size: 16)),
+                    Text(
+                      " Fund",
+                    )
                   ])),
               Tab(
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                    Icon(Icons.local_movies, size: 20),
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Icon(Icons.local_movies, size: 16)),
                     Text(" Done")
                   ])),
             ],
