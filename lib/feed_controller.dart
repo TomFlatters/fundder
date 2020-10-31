@@ -114,7 +114,7 @@ class _FeedControllerState extends State<FeedController>
               onTap: () {
                 Navigator.pushNamed(context, '/challengefriend');
               },
-              child: new Icon(MdiIcons.swordCross)),
+              child: new Icon(MdiIcons.sword)),
           actions: [
             MessagingIcon(user.uid),
           ],
@@ -128,17 +128,26 @@ class _FeedControllerState extends State<FeedController>
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [Icon(Icons.lightbulb_outline), Text("Do")])),
+                      children: [
+                    Icon(Icons.lightbulb_outline, size: 20),
+                    Text("Challenge")
+                  ])),
               Tab(
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [Icon(Icons.local_play), Text(" Fund")])),
+                      children: [
+                    Icon(Icons.local_play, size: 20),
+                    Text(" Fund")
+                  ])),
               Tab(
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [Icon(Icons.local_movies), Text(" Done")])),
+                      children: [
+                    Icon(Icons.local_movies, size: 20),
+                    Text(" Done")
+                  ])),
             ],
           ),
         ),
