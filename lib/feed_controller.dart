@@ -124,9 +124,21 @@ class _FeedControllerState extends State<FeedController>
             physics: NeverScrollableScrollPhysics(),
             //indicatorColor: HexColor(colors[_tabController.index]),
             tabs: [
-              Tab(text: 'Do'),
-              Tab(text: 'Fund'),
-              Tab(text: 'Done'),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [Icon(Icons.lightbulb_outline), Text("Do")])),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [Icon(Icons.local_play), Text(" Fund")])),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [Icon(Icons.local_movies), Text(" Done")])),
             ],
           ),
         ),

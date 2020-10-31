@@ -338,6 +338,7 @@ class _HomeState extends State<Home> {
         });
     } else {
       Navigator.pushNamed(context, '/addpost');
+      //Navigator.pushNamed(context, 'sharePost/c4TXXzXhcbRQPVstT75r');
     }
   }
 }

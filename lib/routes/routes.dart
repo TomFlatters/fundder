@@ -3,6 +3,7 @@ import 'package:fluro/src/router.dart' as Router;
 import 'package:flutter/material.dart';
 import 'package:fundder/challenge_friend/challenge_friend_controller.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/post_creation_widgets/share_post_controller.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
@@ -24,6 +25,7 @@ import 'package:fundder/post_widgets/view_likers_controller.dart';
 
 import 'package:fundder/messaging/chat_room.dart';
 import 'package:fundder/profile_screens/user_loader.dart';
+import 'package:fundder/post_creation_widgets/upload_progress_controller.dart';
 
 class FluroRouter {
   static Router.Router router = Router.Router();
@@ -121,6 +123,9 @@ class FluroRouter {
   static Handler _uploadProofHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           UploadProofScreen(postId: params['id'][0]));
+  static Handler _uploadProgressHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          UploadProgressScreen(postId: params['id'][0]));
   static Handler _profilePicHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ProfilePicSetter(uid: params['id'][0]));
@@ -136,6 +141,11 @@ class FluroRouter {
   static Handler _checkVerifiedHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CheckVerified());
+  static Handler _shareNewPostHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          SharePostController(
+            postId: params['id'][0],
+          ));
 
   static void setupRouter() {
     router.define(
@@ -219,6 +229,12 @@ class FluroRouter {
     );
 
     router.define(
+      '/post/:id/uploadProgress',
+      handler: _uploadProgressHandler,
+      transitionType: TransitionType.material,
+    );
+
+    router.define(
       '/:id/addProfilePic',
       handler: _profilePicHandler,
       transitionType: TransitionType.material,
@@ -245,6 +261,12 @@ class FluroRouter {
     router.define(
       'hashtag/:id',
       handler: _hashtagHandler2,
+      transitionType: TransitionType.material,
+    );
+
+    router.define(
+      'sharePost/:id',
+      handler: _shareNewPostHandler,
       transitionType: TransitionType.material,
     );
   }

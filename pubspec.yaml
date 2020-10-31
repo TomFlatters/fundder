@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 
-version: 2.1.0+7
+version: 2.1.4+11
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -58,8 +58,8 @@ dependencies:
 
   percent_indicator: ^2.1.5
   fluro: ^1.6.3
-  #video_player: ^0.10.11+2
-  cached_video_player: ^1.0.3
+  video_player: ^0.11.1+2
+  # cached_video_player: ^1.0.3
   firebase_messaging: ^6.0.16
   visibility_detector: ^0.1.5
   cloud_functions: ^0.5.0
@@ -80,6 +80,9 @@ dependencies:
   # social_share_plugin: ^0.3.1+1
   share: ^0.6.5+2
   video_compress: ^2.0.0
+  # chewie: ^0.9.10
+  better_player: ^0.0.25
+  video_thumbnail: ^0.2.2
 
   
 

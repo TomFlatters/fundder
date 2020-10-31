@@ -680,7 +680,11 @@ exports.facebookUser = functions.https.onCall(async ([userId, friendsList], cont
     });
 
 /**Houses various triggers to perform various actions on db.
+<<<<<<< HEAD
  * DO NOT DEPLOY
+=======
+ * DO NOT DEPLOY...I deployed it anyway LOL
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
  */
 
 
@@ -936,6 +940,10 @@ exports.doesXfollowY = functions.https.onCall(async (data, context)=>{
 
 /**Deploy posts to the post's author's feed and their followers. `\n`
  * Additionally, if the post is public then deploy to OTHER random users as well.
+<<<<<<< HEAD
+=======
+ * TODO: Keep track of Function times....
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
  */
 exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').onCreate(async (snap, context)=>{
   const postValue = snap.data();
@@ -1191,11 +1199,26 @@ function amIallowedAccess(following, postObj, uid){
 }
 
 
+<<<<<<< HEAD
 /**Assign each user a random number and give them every public post in their feed */
 exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}').onCreate(async (snap, context)=>{
   const userCollection =  admin.firestore().collection('users');
   const postsCollection = admin.firestore().collection('postsV2');
   const uid = context.params.uid;
+=======
+/**
+ * Assign each user a random number and give them every public post in their feed
+ * TODO: update 'feedsDeployedTo' on the post doc subcollection & keep track of function times...
+ */
+exports.feedManagementOnUserCreated = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).firestore.document('users/{uid}').onCreate(async (snap, context)=>{
+  const uid = context.params.uid;
+  const FieldValue = require('firebase-admin').firestore.FieldValue;
+  const bookKeepingCollection = admin.firestore().collection('bookKeeping');
+  bookKeepingCollection.doc('userList').set({'listOfUsers': FieldValue.arrayUnion(uid)},  {merge: true});
+  const userCollection =  admin.firestore().collection('users');
+  const postsCollection = admin.firestore().collection('postsV2');
+  
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
   userCollection.doc(uid).set({'randomNumber': 1}, {merge: true});
 
   //give them every public post
@@ -1207,6 +1230,10 @@ exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}'
   publicPosts.forEach((q)=>{
     if (q.exists){
       const postValue = q.data();
+<<<<<<< HEAD
+=======
+      console.log(postValue.authorUsername);
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
       const postForMyFeed = {
         aspectRatio: postValue.aspectRatio,
         author: postValue.author,
@@ -1225,4 +1252,76 @@ exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}'
 
 
 })
+<<<<<<< HEAD
+=======
+
+
+exports.getAListOfUsers = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 2 minutes').onRun(async (context)=>{
+  admin.auth().listUsers(1000).then(async function(listUsersResult) {
+    //in parallel deploy posts to all 1000 users
+    promiseOfDeployment = await Promise.all(listUsersResult.users.map(function(userRecord){
+      const uid = userRecord.uid;
+      const FieldValue = require('firebase-admin').firestore.FieldValue;
+      const bookKeepingCollection = admin.firestore().collection('bookKeeping');
+      return bookKeepingCollection.doc('userList').set({'listOfUsers': FieldValue.arrayUnion(uid)},  {merge: true});
+      
+    }))
+  return null;
+}).catch(function(error) {
+  console.log('Error managing feed', error);
+})
+});
+exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 120 minutes').onRun(async (context) => {
+  const postsCollection = admin.firestore().collection('postsV2');
+  //get the 50 most recent public posts....
+  const publicPostQuery = await postsCollection.where('isPrivate', '==', false).orderBy('timestamp', 'desc').limit(10).get();
+  const publicPosts = publicPostQuery.docs;
+  
+  //get a list of all users (MODIFY THIS IMMEDIATELY ONCE WE GET)
+  admin.auth().listUsers(1000)
+  .then(async function(listUsersResult) {
+    //in parallel deploy posts to all 1000 users
+    const promiseOfDeployment = await Promise.all(listUsersResult.users.map(function(userRecord){
+      const uid = userRecord.uid;
+      
+      //async function that takes a user id and a bunch of posts and deploys them to the user
+      
+      const deployPromiseForUser = deployPostsToUser(uid, publicPosts);
+      return deployPromiseForUser
+    }))
+  return promiseOfDeployment;
+}).catch(function(error) {
+  console.log('Error managing feed', error);
+});
+});
+
+
+async function deployPostsToUser(uid, publicPosts){
+  
+  const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
+  const deployPromiseForUser =  await Promise.all(publicPosts.map(async function(docSnap){
+    if (docSnap.exists){
+      const postValue = docSnap.data();
+      const postForMyFeed = {
+        aspectRatio: postValue.aspectRatio,
+        author: postValue.author,
+        authorUsername: postValue.authorUsername,
+        charity: postValue.charity,
+        charityLogo: postValue.charityLogo, 
+        timestamp: postValue.timestamp, 
+        status: postValue.status,
+        postId: docSnap.id,
+        hashtags: postValue.hashtags,
+      }
+      const postDeployedToThisUser = await myFeed.doc(docSnap.id).set(postForMyFeed);
+      return postDeployedToThisUser;
+    }
+    else{
+      return null;
+    }
+  }));
+  return deployPromiseForUser;
+}
+
+>>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
 
