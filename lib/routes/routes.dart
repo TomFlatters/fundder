@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/challenge_friend/challenge_friend_controller.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/post_creation_widgets/share_post_controller.dart';
+import 'package:fundder/rewards/rewardspage.dart';
 import 'package:fundder/services/database.dart';
 import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
@@ -67,9 +68,15 @@ class FluroRouter {
       },
     );
   });
+
+  static Handler _rewardsHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          RewardsPage(uid: params['uid'][0]));
+
   static Handler _chatRoomHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           ChatRoom(params['uid'][0], params['username'][0]));
+
   static Handler _commentHandler = Handler(
       handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
           CommentPage(pid: params['id'][0]));
@@ -151,6 +158,10 @@ class FluroRouter {
     router.define(
       '/post/:id/likers',
       handler: _likersHandler,
+    );
+    router.define(
+      '/rewards/:uid',
+      handler: _rewardsHandler,
     );
     router.define(
       '/chatroom/:uid/:username',

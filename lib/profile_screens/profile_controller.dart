@@ -4,6 +4,7 @@ import 'package:fundder/global_widgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/followers.dart';
 import 'package:fundder/services/privacyService.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'profile_actions_view.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/models/user.dart';
@@ -81,19 +82,28 @@ class _ProfileState extends State<ProfileController>
         ? Loading()
         : Scaffold(
             backgroundColor: Colors.grey[200],
-            appBar: AppBar(
-                centerTitle: true,
-                title: Text(widget.user.username),
-                actions: widget.user.uid == firebaseUser.uid
-                    ? <Widget>[
+            appBar: widget.user.uid == firebaseUser.uid
+                ? AppBar(
+                    centerTitle: true,
+                    title: Text(widget.user.username),
+                    leading: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, '/rewards/' + widget.user.uid);
+                        },
+                        child: new Icon(MaterialCommunityIcons.gift_outline)),
+                    actions: <Widget>[
                         IconButton(
                           onPressed: () {
                             _showOptions();
                           },
                           icon: Icon(AntDesign.ellipsis1),
                         )
-                      ]
-                    : <Widget>[
+                      ])
+                : AppBar(
+                    centerTitle: true,
+                    title: Text(widget.user.username),
+                    actions: <Widget>[
                         IconButton(
                             icon: Icon(SimpleLineIcons.bubble),
                             onPressed: () {
