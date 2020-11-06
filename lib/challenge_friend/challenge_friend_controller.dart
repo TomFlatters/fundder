@@ -123,8 +123,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                 style: TextStyle(fontWeight: FontWeight.bold))
                             : Text('Next',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: (selected == 0 && _current == 6 ||
-                            selected == 1 && _current == 5)
+                    onPressed: (selected == 2 && _current == 3)
                         ? () {
                             try {
                               if (mounted) {
@@ -162,17 +161,13 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                           });
                                 }
                               } else {
-                                if (selected == 0) {
-                                  _pushItem(null, user);
-                                } else {
-                                  DialogManager().createDialog(
-                                      'Error',
-                                      "'Do' feed challenges require an image",
-                                      context);
-                                  setState(() {
-                                    _submitting = false;
-                                  });
-                                }
+                                DialogManager().createDialog(
+                                    'Hold on...',
+                                    "Spice the challenge up with an image",
+                                    context);
+                                setState(() {
+                                  _submitting = false;
+                                });
                               }
                             } catch (e) {
                               if (mounted) {
@@ -181,7 +176,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                 });
                               }
                               DialogManager().createDialog(
-                                'Error',
+                                'Hold on...',
                                 e.toString(),
                                 context,
                               );
@@ -230,7 +225,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                               } else if (selected == 1 && imageFile == null) {
                                 DialogManager().createDialog(
                                   'Error',
-                                  "'Do' feed challenges require an image",
+                                  "Spice the challenge up with an image",
                                   context,
                                 );
                               } else {
