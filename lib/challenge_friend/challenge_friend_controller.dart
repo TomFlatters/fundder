@@ -62,8 +62,6 @@ class AddPostWithUser extends StatefulWidget {
 }
 
 class _AddPostWithUserState extends State<AddPostWithUser> {
-  bool isPrivate;
-  List selectedFollowers = [];
   User user;
   bool _submitting = false;
   int _current = 0;
@@ -93,14 +91,13 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
   void initState() {
     // _retrieveUser();
     this.user = widget.user;
-    this.isPrivate = widget.user.isPrivate;
     _loadCharityList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if ((imageFile == null && selected == 1) ||
+    if ((imageFile == null && selected > 0) ||
         title == "" ||
         subtitle == "" ||
         charity == -1 ||
@@ -292,39 +289,12 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                     _defineDescriptionSelf(),
                     _chooseCharity(),
                     _setHashtags(),
-                    _selectPrivacy(this.isPrivate, _onPrivacySettingChanged,
-                        _limitVisibility),
+                    _imageUpload(),
                   ],
                 );
               },
             ),
           );
-  }
-
-  void _onPrivacySettingChanged(newVal) {
-    setState(() {
-      isPrivate = newVal;
-      if (newVal == false) {
-        selectedFollowers = [];
-      }
-    });
-  }
-
-  void _limitVisibility(uids) {
-    print("setting state and limiting visibility....");
-    setState(() {
-      isPrivate = true;
-      this.selectedFollowers = uids;
-    });
-  }
-
-  Widget _selectPrivacy(
-      isPrivate, Function onPrivacySettingChanged, Function limitVisibility) {
-    return PrivacySelection(
-        onPrivacySettingChanged: onPrivacySettingChanged,
-        limitVisibility: limitVisibility,
-        isPrivate: isPrivate,
-        selectedFollowers: this.selectedFollowers);
   }
 
   Widget _choosePerson() {
