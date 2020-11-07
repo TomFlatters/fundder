@@ -106,10 +106,20 @@ class _FeedControllerState extends State<FeedController>
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
           centerTitle: true,
-          title: Text(
-            'Fundder',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ),
+          title: Container(
+              width: 110,
+              child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Image.asset(
+                  'assets/images/pink_bear.png',
+                  height: 20,
+                ),
+                SizedBox(width: 5),
+                Text(
+                  'Fundder',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ])),
           leading: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/challengefriend');
