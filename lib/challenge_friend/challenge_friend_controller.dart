@@ -146,19 +146,15 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                       context,
                                     );
                                   } else {
-                                    final String fileLocation = user.uid +
-                                        "/" +
-                                        DateTime.now()
-                                            .microsecondsSinceEpoch
-                                            .toString();
-                                    DatabaseService(uid: user.uid)
-                                        .uploadImage(
-                                            File(imageFile.path), fileLocation)
-                                        .then((downloadUrl) => {
-                                              print("Successful image upload"),
-                                              print(downloadUrl),
-                                              _pushItem(downloadUrl, user)
-                                            });
+                                    print(
+                                        "Have created a challenge. Now a link will be created.");
+                                    setState(() {
+                                      _submitting = false;
+                                    });
+
+                                    _carouselController.nextPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.linear);
                                   }
                                 } else {
                                   DialogManager().createDialog(
@@ -281,7 +277,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                           _chooseCharity(),
                           _setHashtags(),
                           _imageUpload(),
-                          _postPreview()
+                          Center(child: Text("Link Page")),
                         ],
                 );
               },
