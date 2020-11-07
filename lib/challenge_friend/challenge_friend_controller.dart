@@ -97,7 +97,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
 
   @override
   Widget build(BuildContext context) {
-    if ((imageFile == null && selected > 0) ||
+    if ((imageFile == null) ||
         title == "" ||
         subtitle == "" ||
         charity == -1 ||
@@ -115,86 +115,83 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                 title: Text("Challenge a Friend"),
                 actions: <Widget>[
                   new FlatButton(
-                    child: (_current == 3)
-                        ? Text('Preview',
-                            style: TextStyle(fontWeight: FontWeight.bold))
-                        : (_current == 4)
-                            ? Text('Submit',
-                                style: TextStyle(fontWeight: FontWeight.bold))
-                            : Text('Next',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: (selected == 2 && _current == 3)
-                        ? () {
-                            try {
-                              if (mounted) {
-                                setState(() {
-                                  _submitting = true;
-                                });
-                              }
-
-                              // add image to firebase storage
-                              if (imageFile != null) {
-                                if (canMoveToPreview == false) {
-                                  if (mounted) {
-                                    setState(() {
-                                      _submitting = false;
-                                    });
-                                  }
-                                  DialogManager().createDialog(
-                                    'Error',
-                                    'You have not filled all the required fields',
-                                    context,
-                                  );
-                                } else {
-                                  final String fileLocation = user.uid +
-                                      "/" +
-                                      DateTime.now()
-                                          .microsecondsSinceEpoch
-                                          .toString();
-                                  DatabaseService(uid: user.uid)
-                                      .uploadImage(
-                                          File(imageFile.path), fileLocation)
-                                      .then((downloadUrl) => {
-                                            print("Successful image upload"),
-                                            print(downloadUrl),
-                                            _pushItem(downloadUrl, user)
-                                          });
+                      child: (_current == 3)
+                          ? Text('Create',
+                              style: TextStyle(fontWeight: FontWeight.bold))
+                          : (_current == 4)
+                              ? Container()
+                              : Text('Next',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: (_current == 3)
+                          ? () {
+                              try {
+                                if (mounted) {
+                                  setState(() {
+                                    _submitting = true;
+                                  });
                                 }
-                              } else {
-                                DialogManager().createDialog(
-                                    'Hold on...',
-                                    "Spice the challenge up with an image",
-                                    context);
-                                setState(() {
-                                  _submitting = false;
-                                });
-                              }
-                            } catch (e) {
-                              if (mounted) {
-                                setState(() {
-                                  _submitting = false;
-                                });
-                              }
-                              DialogManager().createDialog(
-                                'Hold on...',
-                                e.toString(),
-                                context,
-                              );
-                            }
-                          }
-                        : () {
-                            /*Navigator.of(context).pushReplacement(_viewPost());*/
 
-                            if (selected != -1) {
-                              if (!((selected == 0 && _current == 5 ||
-                                      selected == 1 && _current == 4) &&
-                                  canMoveToPreview == false)) {
+                                // add image to firebase storage
+                                if (imageFile != null) {
+                                  if (canMoveToPreview == false) {
+                                    if (mounted) {
+                                      setState(() {
+                                        _submitting = false;
+                                      });
+                                    }
+                                    DialogManager().createDialog(
+                                      'Error',
+                                      'You have not filled all the required fields',
+                                      context,
+                                    );
+                                  } else {
+                                    final String fileLocation = user.uid +
+                                        "/" +
+                                        DateTime.now()
+                                            .microsecondsSinceEpoch
+                                            .toString();
+                                    DatabaseService(uid: user.uid)
+                                        .uploadImage(
+                                            File(imageFile.path), fileLocation)
+                                        .then((downloadUrl) => {
+                                              print("Successful image upload"),
+                                              print(downloadUrl),
+                                              _pushItem(downloadUrl, user)
+                                            });
+                                  }
+                                } else {
+                                  DialogManager().createDialog(
+                                      'Hold on...',
+                                      "Spice the challenge up with an image",
+                                      context);
+                                  setState(() {
+                                    _submitting = false;
+                                  });
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  setState(() {
+                                    _submitting = false;
+                                  });
+                                }
+                                DialogManager().createDialog(
+                                  'Error',
+                                  e.toString(),
+                                  context,
+                                );
+                              }
+                            }
+                          : () {
+                              /*Navigator.of(context).pushReplacement(_viewPost());*/
+                              if (_current <= 3 && canMoveToPreview == false) {
+                                //basically: slide if not all info has been filled
                                 _carouselController.nextPage(
                                     duration: Duration(milliseconds: 300),
                                     curve: Curves.linear);
                               } else if (title == "") {
                                 DialogManager().createDialog(
-                                  'Error',
+                                  'Hold on...',
                                   'You have not chosen a title',
                                   context,
                                 );
@@ -224,7 +221,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                 );
                               } else if (selected == 1 && imageFile == null) {
                                 DialogManager().createDialog(
-                                  'Error',
+                                  'Hold on...',
                                   "Spice the challenge up with an image",
                                   context,
                                 );
@@ -235,15 +232,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                   context,
                                 );
                               }
-                            } else {
-                              DialogManager().createDialog(
-                                'Error',
-                                "You need to choose who you'd like to do the challenge",
-                                context,
-                              );
-                            }
-                          },
-                  )
+                            })
                 ],
                 leading: Container(
                     width: 100,
@@ -280,12 +269,20 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                     enlargeCenterPage: false,
                     // autoPlay: false,
                   ),
-                  items: [
-                    _defineDescriptionSelf(),
-                    _chooseCharity(),
-                    _setHashtags(),
-                    _imageUpload(),
-                  ],
+                  items: (canMoveToPreview == true)
+                      ? [
+                          _defineDescriptionSelf(),
+                          _chooseCharity(),
+                          _setHashtags(),
+                          _imageUpload(),
+                        ]
+                      : [
+                          _defineDescriptionSelf(),
+                          _chooseCharity(),
+                          _setHashtags(),
+                          _imageUpload(),
+                          _postPreview()
+                        ],
                 );
               },
             ),
