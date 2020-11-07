@@ -184,7 +184,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                             }
                           : () {
                               /*Navigator.of(context).pushReplacement(_viewPost());*/
-                              if (_current <= 3 && canMoveToPreview == false) {
+                              if (_current < 3 && canMoveToPreview == false) {
                                 //basically: slide if not all info has been filled
                                 _carouselController.nextPage(
                                     duration: Duration(milliseconds: 300),
@@ -269,7 +269,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                     enlargeCenterPage: false,
                     // autoPlay: false,
                   ),
-                  items: (canMoveToPreview == true)
+                  items: (canMoveToPreview == false)
                       ? [
                           _defineDescriptionSelf(),
                           _chooseCharity(),
