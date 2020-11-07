@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/challenge_friend/share_link_Screen.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
@@ -69,6 +70,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
   double aspectRatio;
   bool canMoveToPreview = false;
 
+  String downloadUrl;
   // The image file
   PickedFile imageFile;
 
@@ -148,9 +150,22 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                   } else {
                                     print(
                                         "Have created a challenge. Now a link will be created.");
-                                    setState(() {
-                                      _submitting = false;
-                                    });
+                                    final String fileLocation = user.uid +
+                                        "/" +
+                                        DateTime.now()
+                                            .microsecondsSinceEpoch
+                                            .toString();
+                                    DatabaseService(uid: user.uid)
+                                        .uploadImage(
+                                            File(imageFile.path), fileLocation)
+                                        .then((_downloadUrl) => {
+                                              print("Successful image upload"),
+                                              print(_downloadUrl),
+                                              setState(() {
+                                                downloadUrl = _downloadUrl;
+                                                _submitting = false;
+                                              })
+                                            });
 
                                     _carouselController.nextPage(
                                         duration: Duration(milliseconds: 300),
@@ -277,7 +292,19 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                           _chooseCharity(),
                           _setHashtags(),
                           _imageUpload(),
-                          Center(child: Text("Link Page")),
+                          ShareScreen(
+                            title: title.toString(),
+                            subtitle: subtitle.toString(),
+                            author: user.uid,
+                            authorUsername: user.username,
+                            charity: charities[charity].id,
+                            timestamp: Timestamp.now(),
+                            targetAmount: targetAmount.toString(),
+                            imageUrl: downloadUrl,
+                            aspectRatio: aspectRatio,
+                            hashtags: hashtags,
+                            charityLogo: charities[charity].image,
+                          ),
                         ],
                 );
               },
