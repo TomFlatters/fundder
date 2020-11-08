@@ -68,9 +68,10 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
   int _current = 0;
   CarouselController _carouselController = CarouselController();
   double aspectRatio;
+
+  /**canMoveToPreview has been repurposed to 'can create a challenge' */
   bool canMoveToPreview = false;
 
-  String downloadUrl;
   // The image file
   PickedFile imageFile;
 
@@ -158,13 +159,24 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                     DatabaseService(uid: user.uid)
                                         .uploadImage(
                                             File(imageFile.path), fileLocation)
-                                        .then((_downloadUrl) => {
+                                        .then((downloadUrl) => {
                                               print("Successful image upload"),
-                                              print(_downloadUrl),
-                                              setState(() {
-                                                downloadUrl = _downloadUrl;
-                                                _submitting = false;
-                                              })
+                                              print(downloadUrl),
+                                              Navigator.pop(context),
+                                              showModalBottomSheet(
+                                                  isScrollControlled: true,
+                                                  context: context,
+                                                  builder: (context) {
+                                                    var height =
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .height;
+                                                    return Container(
+                                                        height: 0.6 * height,
+                                                        child:
+                                                            _createShareScreen(
+                                                                downloadUrl));
+                                                  }),
                                             });
 
                                     _carouselController.nextPage(
@@ -264,49 +276,28 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
               builder: (context) {
                 final double height = MediaQuery.of(context).size.height;
                 return CarouselSlider(
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
-                    onPageChanged: (index, reason) {
-                      _changePage();
-                      if (mounted) {
-                        setState(() {
-                          _current = index;
-                        });
-                      }
-                    },
-                    enableInfiniteScroll: false,
-                    height: height,
-                    viewportFraction: 1.0,
-                    enlargeCenterPage: false,
-                    // autoPlay: false,
-                  ),
-                  items: (canMoveToPreview == false)
-                      ? [
-                          _defineDescriptionSelf(),
-                          _chooseCharity(),
-                          _setHashtags(),
-                          _imageUpload(),
-                        ]
-                      : [
-                          _defineDescriptionSelf(),
-                          _chooseCharity(),
-                          _setHashtags(),
-                          _imageUpload(),
-                          ShareScreen(
-                            title: title.toString(),
-                            subtitle: subtitle.toString(),
-                            author: user.uid,
-                            authorUsername: user.username,
-                            charity: charities[charity].id,
-                            timestamp: Timestamp.now(),
-                            targetAmount: targetAmount.toString(),
-                            imageUrl: downloadUrl,
-                            aspectRatio: aspectRatio,
-                            hashtags: hashtags,
-                            charityLogo: charities[charity].image,
-                          ),
-                        ],
-                );
+                    carouselController: _carouselController,
+                    options: CarouselOptions(
+                      onPageChanged: (index, reason) {
+                        _changePage();
+                        if (mounted) {
+                          setState(() {
+                            _current = index;
+                          });
+                        }
+                      },
+                      enableInfiniteScroll: false,
+                      height: height,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      // autoPlay: false,
+                    ),
+                    items: [
+                      _defineDescriptionSelf(),
+                      _chooseCharity(),
+                      _setHashtags(),
+                      _imageUpload(),
+                    ]);
               },
             ),
           );
@@ -583,5 +574,21 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
 
   void _changedAspectRatio(double newAspectRatio) {
     aspectRatio = newAspectRatio;
+  }
+
+  Widget _createShareScreen(String downloadUrl) {
+    return ShareScreen(
+      title: title.toString(),
+      subtitle: subtitle.toString(),
+      author: user.uid,
+      authorUsername: user.username,
+      charity: charities[charity].id,
+      timestamp: Timestamp.now(),
+      targetAmount: targetAmount.toString(),
+      imageUrl: downloadUrl,
+      aspectRatio: aspectRatio,
+      hashtags: hashtags,
+      charityLogo: charities[charity].image,
+    );
   }
 }
