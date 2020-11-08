@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 
 class ChallengeService {
@@ -38,5 +39,25 @@ class ChallengeService {
     });
 
     return newChallengeDoc.documentID;
+  }
+
+  Future<String> createFirstPostLink(String title) async {
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: 'https://fundderchallenge.page.link',
+      link: Uri.parse('enter url with challenge doc id'),
+      androidParameters: AndroidParameters(
+        packageName: 'com.fundder',
+        minimumVersion: 0,
+      ),
+      iosParameters: IosParameters(
+        bundleId: 'com.example.fundder',
+        minimumVersion: '1.0.0',
+        appStoreId: '1529120882',
+      ),
+    );
+
+    final Uri dynamicUrl = await parameters.buildUrl();
+
+    return dynamicUrl.toString();
   }
 }
