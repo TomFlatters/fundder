@@ -7,6 +7,12 @@ class ChallengeService {
   final CollectionReference challengesCollection =
       Firestore.instance.collection('challenges');
 
+  /**Get the the document of a specfic challenge from the challenge collection
+   */
+
+  Future<DocumentSnapshot> getChallenge(String challengeId) =>
+      challengesCollection.document(challengeId).get();
+
   /**Upload a challenge on to the database and return the docid of that 
    * challenge in the database.
    */
@@ -41,10 +47,10 @@ class ChallengeService {
     return newChallengeDoc.documentID;
   }
 
-  Future<String> createFirstPostLink(String title) async {
+  Future<String> createChallengeLink(String challengeDocId) async {
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://fundderchallenge.page.link',
-      link: Uri.parse('enter url with challenge doc id'),
+      link: Uri.parse('https://app.fundder.co/challenge/${challengeDocId}'),
       androidParameters: AndroidParameters(
         packageName: 'com.fundder',
         minimumVersion: 0,
