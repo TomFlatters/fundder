@@ -2,6 +2,7 @@ import 'package:fluro/fluro.dart';
 import 'package:fluro/src/router.dart' as Router;
 import 'package:flutter/material.dart';
 import 'package:fundder/challenge_friend/challenge_friend_controller.dart';
+import 'package:fundder/challenge_friend/view_challenge.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/post_creation_widgets/share_post_controller.dart';
 import 'package:fundder/services/database.dart';
@@ -33,6 +34,9 @@ class FluroRouter {
   //     handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
   //         ViewPost(postData: params['id'][0]));
 
+  static Handler _viewChallengeHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ViewChallenge(challengeId: params['id'][0]));
   static Handler _postHandler =
       Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
     String pid = params['id'][0];
@@ -163,6 +167,11 @@ class FluroRouter {
       transitionType: TransitionType.material,
     );
     router.define(
+      '/direct_challenge/:id',
+      handler: _viewChallengeHandler,
+      transitionType: TransitionType.material,
+    );
+    router.define(
       '/post/:id',
       handler: _postHandler,
       transitionType: TransitionType.material,
@@ -211,11 +220,13 @@ class FluroRouter {
       '/challengefriend',
       handler: _challengeFriendHandler,
     );
+
     router.define(
       '/challenge/:id',
       handler: _challengeDetailHandler,
       transitionType: TransitionType.material,
     );
+
     router.define(
       '/challenge/:id/steps',
       handler: _challengeStepsHandler,
