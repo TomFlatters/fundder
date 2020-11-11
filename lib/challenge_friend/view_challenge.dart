@@ -1,7 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/challenge_friend/challengeService.dart';
+import 'package:fundder/models/user.dart';
+import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/shared/loading.dart';
+import 'package:provider/provider.dart';
 
 class ViewChallenge extends StatelessWidget {
   final String challengeId;
@@ -34,9 +39,7 @@ class ViewChallenge extends StatelessWidget {
         if (snapshot.hasData) {
           DocumentSnapshot challengeDoc = snapshot.data;
           return (challengeDoc.exists)
-              ? Container(
-                  child: Text(challengeDoc.data.toString()),
-                )
+              ? _renderUIfromDoc(challengeDoc.data, context)
               : Container(
                   child: Center(
                       child: Text(
@@ -47,5 +50,111 @@ class ViewChallenge extends StatelessWidget {
         }
       },
     );
+  }
+
+  Widget _renderUIfromDoc(Map challengeInfo, context) {
+    User user = Provider.of<User>(context);
+    return ListView(
+      //crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PostHeader(
+            postAuthorId: challengeInfo['author'],
+            postAuthorUserName: challengeInfo['authorUsername'],
+            targetCharity: challengeInfo["charity"],
+            charityLogo: challengeInfo["charityLogo"]),
+        challengeInfo["aspectRatio"] != null
+            ? Container(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.width /
+                      challengeInfo["aspectRatio"],
+                  child: CachedNetworkImage(
+                    imageUrl: challengeInfo["imageUrl"] != null
+                        ? challengeInfo["imageUrl"]
+                        : "",
+                    placeholder: (context, url) => Loading(),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[100],
+                    ),
+                  ),
+                ),
+                margin: EdgeInsets.symmetric(vertical: 0.0),
+              )
+            : Container(
+                height: 0,
+              ),
+        Container(
+            //title
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.all(10),
+            child: Text(challengeInfo["title"],
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, /*fontSize: 18*/
+                ))),
+        Container(
+            //subtitle
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.all(10),
+            child: Text(challengeInfo["subtitle"],
+                style: TextStyle(
+                  fontWeight: FontWeight.normal, /*fontSize: 18*/
+                ))),
+        Container(
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
+            child: RichText(
+                maxLines: 7,
+                overflow: TextOverflow.ellipsis,
+                text: TextSpan(
+                    children: _returnHashtags(challengeInfo["hashtags"],
+                        context, user, challengeInfo["subtitle"])))),
+        Container(
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.only(bottom: 10, top: 0, left: 10, right: 10),
+            child: Text(
+              challengeInfo["targetAmount"] != '-1'
+                  ? '£${challengeInfo["targetAmount"]} target'
+                  : '£0.00 user-selected target',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            )),
+        /*Container(
+          child: Text(challengeInfo.toString()),
+        )*/
+      ],
+    );
+  }
+
+  List<TextSpan> _returnHashtags(
+      List hashtags, BuildContext context, User user, subtitle) {
+    List<TextSpan> hashtagText = [
+      TextSpan(
+          text: subtitle + " ",
+          style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Founders Grotesk',
+              fontSize: 16))
+    ];
+    if (hashtags != null) {
+      for (var i = 0; i < hashtags.length; i++) {
+        hashtagText.add(TextSpan(
+            text: "#" + hashtags[i].toString() + " ",
+            style: TextStyle(
+                color: Colors.blueGrey[700] /*HexColor('ff6b6c')*/,
+                fontFamily: 'Founders Grotesk',
+                fontSize: 16),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                if (user != null) {
+                  _openFeed(context, hashtags[i]);
+                }
+              }));
+      }
+    }
+    return hashtagText;
+  }
+
+  void _openFeed(BuildContext context, String hashtag) async {
+    await Navigator.pushNamed(context, '/hashtag/' + hashtag.toString());
+    //this.likesManager.add(1);
   }
 }
