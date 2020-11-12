@@ -151,8 +151,6 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                       context,
                                     );
                                   } else {
-                                    ChallengeService challengeService =
-                                        ChallengeService();
                                     print(
                                         "Have created a challenge. Now a link will be created.");
                                     final String fileLocation = user.uid +
