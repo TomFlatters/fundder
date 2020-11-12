@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/challenge_friend/challengeService.dart';
+import 'package:fundder/global_widgets/buttons.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/post_widgets/postHeader.dart';
 import 'package:fundder/shared/loading.dart';
@@ -39,7 +40,7 @@ class ViewChallenge extends StatelessWidget {
         if (snapshot.hasData) {
           DocumentSnapshot challengeDoc = snapshot.data;
           return (challengeDoc.exists)
-              ? _renderUIfromDoc(challengeDoc.data, context)
+              ? _renderUIfromDoc(challengeDoc, context)
               : Container(
                   child: Center(
                       child: Text(
@@ -52,7 +53,8 @@ class ViewChallenge extends StatelessWidget {
     );
   }
 
-  Widget _renderUIfromDoc(Map challengeInfo, context) {
+  Widget _renderUIfromDoc(DocumentSnapshot challengeDoc, context) {
+    Map challengeInfo = challengeDoc.data;
     User user = Provider.of<User>(context);
     return ListView(
       //crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,6 +122,27 @@ class ViewChallenge extends StatelessWidget {
         /*Container(
           child: Text(challengeInfo.toString()),
         )*/
+        SizedBox(
+          height: 10,
+        ),
+        PrimaryFundderButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            ChallengeService challengeService = ChallengeService();
+            var newPostRef = await challengeService.acceptChallenge(
+                challengeDoc, user.uid, user.username);
+            SnackBar snackBar = newPostRef != null
+                ? SnackBar(
+                    duration: const Duration(seconds: 3),
+                    content: Text('Challenge Accepted'))
+                : SnackBar(
+                    duration: const Duration(seconds: 3),
+                    content: Text('oops...something went wrong'));
+
+            Scaffold.of(context).showSnackBar(snackBar);
+          },
+          text: "Accept",
+        )
       ],
     );
   }
