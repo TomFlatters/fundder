@@ -81,11 +81,14 @@ class ChallengeService {
   Future acceptChallenge(
       DocumentSnapshot challengeDoc, String uid, String username) async {
     print("accepting the challenge");
+    //refactor this to make less calls to the db...turns out the username parameter is always an empty string....
+    DocumentSnapshot userDoc =
+        await Firestore.instance.collection('users').document(uid).get();
     DocumentReference newPostRef = await postsCollection.add({
       "challengeId": challengeDoc.documentID,
       "isPrivate": false,
       "author": uid,
-      "authorUsername": username,
+      "authorUsername": userDoc.exists ? userDoc.data["username"] : "",
       "title": challengeDoc["title"],
       "charity": challengeDoc["charity"],
       "amountRaised": "0.00",
