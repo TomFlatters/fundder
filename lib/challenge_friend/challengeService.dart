@@ -53,10 +53,12 @@ class ChallengeService {
  * clicked will lead to a view in the app where the user can accept the challenge 
  * or reject the challenge.
  */
-  Future<String> createChallengeLink(String challengeDocId) async {
+  Future<Uri> createChallengeLink(
+      String challengeDocId, String imageUrl) async {
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://fundderchallenge.page.link',
-      link: Uri.parse('https://app.fundder.co/challenge/${challengeDocId}'),
+      link: Uri.parse(
+          'https://app.fundder.co/direct_challenge/${challengeDocId}'),
       androidParameters: AndroidParameters(
         packageName: 'com.fundder',
         minimumVersion: 0,
@@ -66,11 +68,15 @@ class ChallengeService {
         minimumVersion: '1.0.0',
         appStoreId: '1529120882',
       ),
+      socialMetaTagParameters: SocialMetaTagParameters(
+        title: "Accept this challenge",
+        description: 'Do it for a good cause',
+        imageUrl: Uri.parse(imageUrl),
+      ),
     );
-
-    final Uri dynamicUrl = await parameters.buildUrl();
-
-    return dynamicUrl.toString();
+    final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
+    final Uri shortUrl = shortDynamicLink.shortUrl;
+    return shortUrl;
   }
 
 /**When the user accepts a challenge, make a post out of it and upload to the 
