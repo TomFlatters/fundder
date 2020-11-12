@@ -39,6 +39,7 @@
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
 		<string>https://fundder.page.link</string>
+		<string>https://fundderchallenge.page.link</string>
 		<string>https://fundder.co</string>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
@@ -104,5 +105,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartobservatory._tcp</string>
+	</array>
 </dict>
 </plist>

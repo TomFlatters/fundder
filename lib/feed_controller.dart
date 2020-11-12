@@ -114,7 +114,7 @@ class _FeedControllerState extends State<FeedController>
                   'assets/images/pink_bear.png',
                   height: 20,
                 ),
-                SizedBox(width: 5),
+                SizedBox(width: 7),
                 Text(
                   'Fundder',
                   style: TextStyle(fontWeight: FontWeight.w500),
@@ -140,7 +140,7 @@ class _FeedControllerState extends State<FeedController>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                     Padding(
-                        padding: EdgeInsets.only(bottom: 5),
+                        padding: EdgeInsets.only(bottom: 5, right: 3),
                         child: Icon(Icons.lightbulb_outline, size: 16)),
                     Text("Challenge")
                   ])),
@@ -150,8 +150,8 @@ class _FeedControllerState extends State<FeedController>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                     Padding(
-                        padding: EdgeInsets.only(bottom: 5),
-                        child: Icon(Icons.local_play, size: 16)),
+                        padding: EdgeInsets.only(bottom: 5, right: 3),
+                        child: Icon(Icons.monetization_on_outlined, size: 16)),
                     Text(
                       " Fund",
                     )
@@ -162,7 +162,7 @@ class _FeedControllerState extends State<FeedController>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                     Padding(
-                        padding: EdgeInsets.only(bottom: 5),
+                        padding: EdgeInsets.only(bottom: 5, right: 3),
                         child: Icon(Icons.local_movies, size: 16)),
                     Text(" Done")
                   ])),
