@@ -6,6 +6,8 @@ class ChallengeService {
   //need a mechanism to upload to the challenges collection....
   final CollectionReference challengesCollection =
       Firestore.instance.collection('challenges');
+  final CollectionReference postsCollection =
+      Firestore.instance.collection('postsV2');
 
   /**Get the the document of a specfic challenge from the challenge collection
    */
@@ -47,6 +49,10 @@ class ChallengeService {
     return newChallengeDoc.documentID;
   }
 
+/**Create a link for a challenge in the Challenges collection. This link, when
+ * clicked will lead to a view in the app where the user can accept the challenge 
+ * or reject the challenge.
+ */
   Future<String> createChallengeLink(String challengeDocId) async {
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://fundderchallenge.page.link',
@@ -65,5 +71,41 @@ class ChallengeService {
     final Uri dynamicUrl = await parameters.buildUrl();
 
     return dynamicUrl.toString();
+  }
+
+/**When the user accepts a challenge, make a post out of it and upload to the 
+ * db and add the user to list of people who accepted the challenge.
+ * 
+ */
+
+  Future acceptChallenge(
+      DocumentSnapshot challengeDoc, String uid, String username) async {
+    DocumentReference newPostRef = await postsCollection.add({
+      "challengeId": challengeDoc.documentID,
+      "isPrivate": false,
+      "author": uid,
+      "authorUsername": username,
+      "title": challengeDoc["title"],
+      "charity": challengeDoc["charity"],
+      "amountRaised": "0.00",
+      "moneyRaised": 0.00,
+      "targetAmount": challengeDoc["targetAmount"],
+      "noLikes": 0,
+      "noComments": 0,
+      "subtitle": challengeDoc["subtitle"],
+      "timestamp": Timestamp.now(),
+      "imageUrl": challengeDoc["imageUrl"],
+      "status": "fund",
+      "aspectRatio": challengeDoc["aspectRatio"],
+      "hashtags": challengeDoc["hashtags"],
+      "charityLogo": challengeDoc["charityLogo"],
+    });
+
+    //add this user the the list of people who've accepted the challenge
+    challengesCollection.document(challengeDoc.documentID).updateData({
+      "acceptedBy": FieldValue.arrayUnion([uid])
+    });
+
+    return newPostRef;
   }
 }
