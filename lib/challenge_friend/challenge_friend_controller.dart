@@ -508,7 +508,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
     String challengeDocId = await getChallengeDocId(downloadUrl);
     Uri shortUrl =
         await challengeService.createChallengeLink(challengeDocId, downloadUrl);
-    Share.share('${user.username} challenged you!' + shortUrl.toString(),
+    Share.share('${user.username} challenged you!\n ' + shortUrl.toString(),
         subject: this.title);
   }
 
