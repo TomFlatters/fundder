@@ -80,6 +80,7 @@ class ChallengeService {
 
   Future acceptChallenge(
       DocumentSnapshot challengeDoc, String uid, String username) async {
+    print("accepting the challenge");
     DocumentReference newPostRef = await postsCollection.add({
       "challengeId": challengeDoc.documentID,
       "isPrivate": false,
@@ -101,9 +102,27 @@ class ChallengeService {
       "charityLogo": challengeDoc["charityLogo"],
     });
 
+    //add this post straight away to my own feed
+
     //add this user the the list of people who've accepted the challenge
     challengesCollection.document(challengeDoc.documentID).updateData({
       "acceptedBy": FieldValue.arrayUnion([uid])
+    });
+    CollectionReference myFeed = Firestore.instance
+        .collection('users')
+        .document(uid)
+        .collection('myFeed');
+    myFeed.document(newPostRef.documentID).setData({
+      "timestamp": Timestamp.now(),
+      "imageUrl": challengeDoc["imageUrl"],
+      "status": "fund",
+      "aspectRatio": challengeDoc["aspectRatio"],
+      "hashtags": challengeDoc["hashtags"],
+      "charityLogo": challengeDoc["charityLogo"],
+      "author": uid,
+      "authorUsername": username,
+      "charity": challengeDoc["charity"],
+      "postId": newPostRef.documentID,
     });
 
     return newPostRef;
