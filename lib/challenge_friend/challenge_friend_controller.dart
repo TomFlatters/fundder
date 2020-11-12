@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/challenge_friend/challengeService.dart';
 import 'package:fundder/challenge_friend/share_link_Screen.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import '../models/user.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fundder/models/post.dart';
@@ -149,6 +151,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                       context,
                                     );
                                   } else {
+                                    ChallengeService challengeService =
+                                        ChallengeService();
                                     print(
                                         "Have created a challenge. Now a link will be created.");
                                     final String fileLocation = user.uid +
@@ -162,21 +166,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                         .then((downloadUrl) => {
                                               print("Successful image upload"),
                                               print(downloadUrl),
+                                              _shareThisChallenge(downloadUrl),
                                               Navigator.pop(context),
-                                              showModalBottomSheet(
-                                                  isScrollControlled: true,
-                                                  context: context,
-                                                  builder: (context) {
-                                                    var height =
-                                                        MediaQuery.of(context)
-                                                            .size
-                                                            .height;
-                                                    return Container(
-                                                        height: 0.6 * height,
-                                                        child:
-                                                            _createShareScreen(
-                                                                downloadUrl));
-                                                  }),
                                             });
 
                                     _carouselController.nextPage(
@@ -422,84 +413,6 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
           'The minimum donation target amount is £2',
           context,
         );
-      } else {
-        /* 
-        TO DO: ADD UPLOAD FUNCTION
-        */
-        // if (whoDoes[selected] == "Myself") {
-        //   DatabaseService(uid: user.uid)
-        //       .uploadPost(new Post(
-        //           selectedPrivateViewers: this.selectedFollowers,
-        //           isPrivate: this.isPrivate,
-        //           title: title.toString().trimRight(),
-        //           subtitle: subtitle.toString().trimRight(),
-        //           author: user.uid,
-        //           authorUsername: user.username,
-        //           charity: charities[charity].id,
-        //           noLikes: 0,
-        //           noComments: 0,
-        //           timestamp: DateTime.now(),
-        //           moneyRaised: 0,
-        //           targetAmount: targetAmount.toString(),
-        //           imageUrl: downloadUrl,
-        //           status: 'fund',
-        //           aspectRatio: aspectRatio,
-        //           hashtags: hashtags,
-        //           charityLogo: charities[charity].image))
-        //       .then((postId) => {
-        //             if (postId == null)
-        //               {
-        //                 if (mounted)
-        //                   {
-        //                     setState(() {
-        //                       _submitting = false;
-        //                     })
-        //                   }
-        //               }
-        //             else
-        //               {
-        //                 print("The doc id is " +
-        //                     postId
-        //                         .toString()
-        //                         .substring(1, postId.toString().length - 1)),
-        //                 HashtagsService(uid: user.uid)
-        //                     .addHashtag(postId.toString(), hashtags),
-        //                 Navigator.pushReplacementNamed(
-        //                     context,
-        //                     '/post/' +
-        //                         postId
-        //                             .toString()
-        //                             .substring(1, postId.toString().length - 1))
-        //               } //the substring is very important as postId.toString() is in brackets
-        //           });
-        // } else {
-        //   // Create a template
-        //   DatabaseService(uid: user.uid)
-        //       .uploadTemplate(new Template(
-        //           title: title.toString(),
-        //           subtitle: subtitle.toString(),
-        //           author: user.uid,
-        //           authorUsername: user.username,
-        //           charity: charities[charity].id,
-        //           likes: [],
-        //           comments: {},
-        //           timestamp: DateTime.now(),
-        //           moneyRaised: 0,
-        //           targetAmount: targetAmount.toString(),
-        //           imageUrl: downloadUrl,
-        //           whoDoes: whoDoes[selected].toString(),
-        //           acceptedBy: [],
-        //           completedBy: [],
-        //           aspectRatio: aspectRatio,
-        //           hashtags: hashtags,
-        //           active: true,
-        //           charityLogo: charities[charity].image))
-        //       .then((templateId) => {
-        //             // if the post is successfully added, view the post
-        //             Navigator.pushReplacementNamed(
-        //                 context, '/challenge/' + templateId.toString())
-        //           });
-        // }
       }
     }
   }
@@ -590,5 +503,30 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
       hashtags: hashtags,
       charityLogo: charities[charity].image,
     );
+  }
+
+  Future _shareThisChallenge(downloadUrl) async {
+    ChallengeService challengeService = ChallengeService();
+    String challengeDocId = await getChallengeDocId(downloadUrl);
+    Uri shortUrl =
+        await challengeService.createChallengeLink(challengeDocId, downloadUrl);
+    Share.share('${user.username} challenged you!' + shortUrl.toString(),
+        subject: this.title);
+  }
+
+  Future<String> getChallengeDocId(downloadUrl) {
+    ChallengeService challengeService = ChallengeService();
+    return challengeService.uploadChallenge(
+        title: title,
+        subtitle: subtitle,
+        author: user.uid,
+        authorUsername: user.username,
+        charity: charities[charity].id,
+        timestamp: Timestamp.now(),
+        targetAmount: targetAmount,
+        imageUrl: downloadUrl,
+        aspectRatio: aspectRatio,
+        hashtags: hashtags,
+        charityLogo: charities[charity].image);
   }
 }
