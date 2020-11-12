@@ -36,14 +36,18 @@ class PostBody extends StatelessWidget {
       children: <Widget>[
         (postData.imageUrl == null)
             ? Container()
-            : CarouselSlider(
-                items: _progressImages(context),
-                carouselController: _carouselController,
-                options: CarouselOptions(
-                    enableInfiniteScroll: false,
-                    aspectRatio: postData.aspectRatio,
-                    viewportFraction: 1),
-              ),
+            : Container(
+                margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    child: CarouselSlider(
+                      items: _progressImages(context),
+                      carouselController: _carouselController,
+                      options: CarouselOptions(
+                          enableInfiniteScroll: false,
+                          aspectRatio: postData.aspectRatio,
+                          viewportFraction: 1),
+                    ))),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.all(10),
@@ -128,7 +132,6 @@ class PostBody extends StatelessWidget {
                   height:
                       MediaQuery.of(context).size.width / postData.aspectRatio,
                   child: _previewImageVideo(postData)),
-          margin: EdgeInsets.only(bottom: 10.0),
         ),
         postData.postProgress != null
             ? Container(

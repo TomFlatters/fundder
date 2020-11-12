@@ -79,14 +79,14 @@ class _FeedViewState extends State<FeedView> {
 
           return GestureDetector(
             child: Container(
+              margin: EdgeInsets.only(left: 10, right: 10, top: 0),
               decoration: new BoxDecoration(
                   color: Colors.white,
                   borderRadius: new BorderRadius.all(
                     Radius.circular(10.0),
                   )),
-              width: MediaQuery.of(context).size.width,
+              //width: MediaQuery.of(context).size.width,
               child: Container(
-                margin: EdgeInsets.only(left: 0, right: 0, top: 0),
                 child: Column(children: <Widget>[
                   PostHeader(
                       postAuthorId: postData.author,
