@@ -65,6 +65,7 @@ class TermsOfUseText extends StatelessWidget {
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           SizedBox(height: 12),
+          Text('- Pornography or content of a sexual nature'),
           Text(
               '- Any content or account impersonating another person without their permission'),
           Text('- Any content violating domestic law'),
