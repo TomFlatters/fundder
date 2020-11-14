@@ -1019,12 +1019,14 @@ exports.onRefreshHashtag = functions.https.onCall(async (data, context)=>{
   const [secs, nanoSecs] = startTimestamp.match(regEx); //returns an array in the formt [1601043492,743686000]
   const timeStamp = new  admin.firestore.Timestamp( parseInt(secs),  parseInt(nanoSecs));
   const uid = context.auth.uid;
+  const userDoc = await admin.firestore().collection('users').doc(uid).get();
+  const userData = userDoc.data();
 
   const postsCollection = admin.firestore().collection('postsV2');
 
   const query = await postsCollection.where("hashtags", "array-contains", hashtag).orderBy("timestamp", 'desc').startAfter(timeStamp).limit(limit).get();
   const queryDocSnap = query.docs
-  const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data())
+  const queryData = queryDocSnap.map((qDocSnap)=> {const postJSON = qDocSnap.data(); postJSON['postId']=qDocSnap.id; return postJSON})
 
 
   const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
@@ -1033,7 +1035,7 @@ exports.onRefreshHashtag = functions.https.onCall(async (data, context)=>{
 
   let postJSONS = queryData.filter( (postObj)=>{
       //Check if you're allowed access to this post.
-       allowedAccess = amIallowedAccess(following, postObj, uid);
+       allowedAccess = amIallowedAccess(following, postObj, uid, userData);
        return allowedAccess;
   });
 
@@ -1059,6 +1061,8 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
   const [secs, nanoSecs] = startTimestamp.match(regEx); //returns an array in the formt [1601043492,743686000]
   const timeStamp = new  admin.firestore.Timestamp( parseInt(secs),  parseInt(nanoSecs));
   const uid = context.auth.uid;
+  const userDoc = await admin.firestore().collection('users').doc(uid).get();
+  const userData = userDoc.data();
   const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
   const postsCollection = admin.firestore().collection('postsV2');
 
@@ -1074,8 +1078,9 @@ exports.onRefreshPost = functions.https.onCall(async (data, context)=>{
     const postDoc = await postsCollection.doc(postId).get();
     if (postDoc.exists){
       let postObj = postDoc.data();
+      postObj["postId"] = postId;
       //Check if you're allowed access to this post.
-      const allowedAccess = amIallowedAccess(following, postObj, uid);
+      const allowedAccess =  amIallowedAccess(following, postObj, uid, userData);
       (allowedAccess)?console.log("Access allowed"):console.log("Access is denied");
       if (allowedAccess === true){
         if (postObj['status']===postStatus){ 
@@ -1119,6 +1124,8 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context)=>{
   //filter for posts to which access is not denied
   const queryData = queryDocSnap.map((qDocSnap)=> {const postJSON = qDocSnap.data(); postJSON['postId']=qDocSnap.id; return postJSON})
   const uid = context.auth.uid;
+  const userDoc = await admin.firestore().collection('users').doc(uid).get();
+  const userData = userDoc.data();
 
   const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
   const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] === undefined)?[]:myFollowersDoc.data()['following']):[];
@@ -1127,7 +1134,7 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context)=>{
   let postJSONS = queryData.filter( (postObj)=>{
       //Check if you're allowed access to this post.
 
-       const allowedAccess = amIallowedAccess(following, postObj, uid);
+       const allowedAccess = amIallowedAccess(following, postObj, uid, userData);
        return allowedAccess;
   });
 
@@ -1146,7 +1153,7 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context)=>{
  * be caused when the user migrates a post from fund to done will be fixed here, on the fly.
 */
 
-function changePostStatusInFeed(feedUid, postId, newStatus){
+function changePostStatusInFeed(feedUid, postId, newStatus)  {
   const myFeed = admin.firestore().collection('users').doc(feedUid).collection('myFeed');
   myFeed.doc(postId).set({'status': newStatus}, {merge: true});
 }
@@ -1161,14 +1168,32 @@ function deletePostFromMyFeed(postId, uid){
 
 /**Check to see if user is allowed access to a certain post */
 
-function amIallowedAccess(following, postObj, uid){
+ function  amIallowedAccess (following, postObj, uid, userData)  {
+  
+  
   console.log("Checking if access is allowed");
   const authorId = postObj["author"];
   const isPrivate = postObj["isPrivate"];
+  const postId = postObj["postId"];
   const selectedPrivateViewers = postObj["selectedPrivateViewers"];
   if (authorId === uid){
     return true;
   }
+  //if this post is in the 'hiddenPosts' of the user doc then don't show it 
+  if (userData["hiddenPosts"]!== undefined ){
+    console.log("making post hidden");
+    console.log(postId)
+    if (userData["hiddenPosts"].includes(postId)){
+      return false;
+    }
+  }
+  //if the author of this post is in the 'hiddenUsers' of the user doc then don't show it
+  if (userData["hiddenUsers"] !== undefined){
+    if (userData["hiddenUsers"].includes(authorId)){
+      return false;
+    }
+  }
+
   if (isPrivate === true){
     //the post is private so only followers ought to be able to see
     const isFollowing = following.includes(authorId);
