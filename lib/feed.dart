@@ -166,7 +166,7 @@ class _FeedViewState extends State<FeedView> {
     }
   }
 
-  _reportOptions(context, uid, postData) {
+  _reportOptions(context, uid, Post postData) {
     return showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -205,7 +205,7 @@ class _FeedViewState extends State<FeedView> {
                     subtitle: Text("Block the creator of this post."),
                     onTap: () async {
                       print('elipses button pressed');
-                      await _blockUser(uid);
+                      await _blockUser(uid, postData);
                       Navigator.of(context).pop();
                     },
                   ),
@@ -346,7 +346,7 @@ class _FeedViewState extends State<FeedView> {
     );
   }
 
-  Future _blockUser(String uid) async {
+  Future _blockUser(String uid, Post postData) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -366,7 +366,7 @@ class _FeedViewState extends State<FeedView> {
               child: Text('Block', style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Firestore.instance.collection('users').document(uid).setData({
-                  'hiddenUsers': FieldValue.arrayUnion([uid])
+                  'hiddenUsers': FieldValue.arrayUnion([postData.author])
                 }, merge: true).then((value) {
                   Navigator.of(context).pop();
                   widget.onDeletePressed();
