@@ -30,10 +30,13 @@ class _WrapperState extends State<Wrapper> {
       print(e.message);
     });
 
+//IS THIS SEGMENT USELESS @AK, cos handleLinkData does this nah?
     final PendingDynamicLinkData dynamicLink =
         await FirebaseDynamicLinks.instance.getInitialLink();
     if (dynamicLink != null) {
       if (dynamicLink != null) {
+        print("This is the dynamic link path for this dynamic link");
+        print(dynamicLink.link.path);
         Navigator.pushNamed(context, dynamicLink.link.path);
       }
       //handleLinkData(dynamicLink);
@@ -44,6 +47,8 @@ class _WrapperState extends State<Wrapper> {
     final Uri uri = data?.link;
     print("uri: " + uri.toString());
     if (uri != null) {
+      print("This is the dynamic link path for this dynamic link  " + uri.path);
+
       Navigator.pushNamed(context, uri.path);
     }
     /*final queryParams = uri.queryParameters;

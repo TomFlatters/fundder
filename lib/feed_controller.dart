@@ -12,6 +12,7 @@ import 'package:fundder/messaging/chat_lobby.dart';
 import 'package:provider/provider.dart';
 import 'do_challenge.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'models/user.dart';
 import 'feed_wrapper.dart';
 
@@ -105,10 +106,25 @@ class _FeedControllerState extends State<FeedController>
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
           centerTitle: true,
-          title: Text(
-            'Fundder',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ),
+          title: Container(
+              width: 110,
+              child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Image.asset(
+                  'assets/images/pink_bear.png',
+                  height: 20,
+                ),
+                SizedBox(width: 7),
+                Text(
+                  'Fundder',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ])),
+          leading: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/challengefriend');
+              },
+              child: new Icon(MdiIcons.sword)),
           actions: [
             MessagingIcon(user.uid),
           ],
@@ -118,9 +134,38 @@ class _FeedControllerState extends State<FeedController>
             physics: NeverScrollableScrollPhysics(),
             //indicatorColor: HexColor(colors[_tabController.index]),
             tabs: [
-              Tab(text: 'Do'),
-              Tab(text: 'Fund'),
-              Tab(text: 'Done'),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5, right: 3),
+                        child: Icon(Icons.lightbulb_outline, size: 16)),
+                    Text("Challenge")
+                  ])),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5, right: 3),
+                        child: Icon(Icons.monetization_on_outlined, size: 16)),
+                    Text(
+                      " Fund",
+                    )
+                  ])),
+              Tab(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                    Padding(
+                        padding: EdgeInsets.only(bottom: 5, right: 3),
+                        child: Icon(Icons.local_movies, size: 16)),
+                    Text(" Done")
+                  ])),
             ],
           ),
         ),

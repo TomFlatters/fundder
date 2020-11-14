@@ -64,7 +64,7 @@ class _SharePostControllerState extends State<SharePostController> {
                   opacity: opacity,
                   duration: Duration(seconds: 1),
                   child: Icon(
-                    Icons.celebration,
+                    Icons.crop_square,
                     size: 130,
                     color: HexColor('ff6b6c'),
                   ),

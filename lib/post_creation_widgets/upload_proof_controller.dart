@@ -55,6 +55,9 @@ class _UploadProofState extends State<UploadProofScreen> {
 
   @override
   void initState() {
+    VideoCompress.compressProgress$.subscribe((progress) {
+      debugPrint('progress: $progress');
+    });
     reloadPost();
     super.initState();
   }

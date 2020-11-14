@@ -59,7 +59,7 @@ class _ImageUploadState extends State<ImageUpload> {
                 TextSpan(
                     text: widget.selected == 0
                         ? 'optional'
-                        : "required for 'do' feed challenges",
+                        : "required for challenges",
                     style: TextStyle(
                       fontFamily: 'Founders Grotesk',
                       fontSize: 12,
@@ -87,6 +87,9 @@ class _ImageUploadState extends State<ImageUpload> {
         onPressed: () {
           _changePic();
         },
+      ),
+      SizedBox(
+        height: 20,
       ),
     ]);
   }
