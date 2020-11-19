@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/challenge_friend/challengeService.dart';
+import 'package:fundder/challenge_friend/share_link_Screen.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import '../models/user.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fundder/models/post.dart';
@@ -62,13 +65,13 @@ class AddPostWithUser extends StatefulWidget {
 }
 
 class _AddPostWithUserState extends State<AddPostWithUser> {
-  bool isPrivate;
-  List selectedFollowers = [];
   User user;
   bool _submitting = false;
   int _current = 0;
   CarouselController _carouselController = CarouselController();
   double aspectRatio;
+
+  /**canMoveToPreview has been repurposed to 'can create a challenge' */
   bool canMoveToPreview = false;
 
   // The image file
@@ -93,14 +96,13 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
   void initState() {
     // _retrieveUser();
     this.user = widget.user;
-    this.isPrivate = widget.user.isPrivate;
     _loadCharityList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if ((imageFile == null && selected == 1) ||
+    if ((imageFile == null) ||
         title == "" ||
         subtitle == "" ||
         charity == -1 ||
@@ -118,91 +120,90 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                 title: Text("Challenge a Friend"),
                 actions: <Widget>[
                   new FlatButton(
-                    child: (_current == 3)
-                        ? Text('Preview',
-                            style: TextStyle(fontWeight: FontWeight.bold))
-                        : (_current == 4)
-                            ? Text('Submit',
-                                style: TextStyle(fontWeight: FontWeight.bold))
-                            : Text('Next',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: (selected == 0 && _current == 6 ||
-                            selected == 1 && _current == 5)
-                        ? () {
-                            try {
-                              if (mounted) {
-                                setState(() {
-                                  _submitting = true;
-                                });
-                              }
-
-                              // add image to firebase storage
-                              if (imageFile != null) {
-                                if (canMoveToPreview == false) {
-                                  if (mounted) {
-                                    setState(() {
-                                      _submitting = false;
-                                    });
-                                  }
-                                  DialogManager().createDialog(
-                                    'Error',
-                                    'You have not filled all the required fields',
-                                    context,
-                                  );
-                                } else {
-                                  final String fileLocation = user.uid +
-                                      "/" +
-                                      DateTime.now()
-                                          .microsecondsSinceEpoch
-                                          .toString();
-                                  DatabaseService(uid: user.uid)
-                                      .uploadImage(
-                                          File(imageFile.path), fileLocation)
-                                      .then((downloadUrl) => {
-                                            print("Successful image upload"),
-                                            print(downloadUrl),
-                                            _pushItem(downloadUrl, user)
-                                          });
+                      child: (_current == 3)
+                          ? Text('Create',
+                              style: TextStyle(fontWeight: FontWeight.bold))
+                          : (_current == 4)
+                              ? Container()
+                              : Text('Next',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: (_current == 3)
+                          ? () {
+                              try {
+                                if (mounted) {
+                                  setState(() {
+                                    _submitting = true;
+                                  });
                                 }
-                              } else {
-                                if (selected == 0) {
-                                  _pushItem(null, user);
+
+                                // add image to firebase storage
+                                if (imageFile != null) {
+                                  if (canMoveToPreview == false) {
+                                    if (mounted) {
+                                      setState(() {
+                                        _submitting = false;
+                                      });
+                                    }
+                                    DialogManager().createDialog(
+                                      'Error',
+                                      'You have not filled all the required fields',
+                                      context,
+                                    );
+                                  } else {
+                                    print(
+                                        "Have created a challenge. Now a link will be created.");
+                                    final String fileLocation = user.uid +
+                                        "/" +
+                                        DateTime.now()
+                                            .microsecondsSinceEpoch
+                                            .toString();
+                                    DatabaseService(uid: user.uid)
+                                        .uploadImage(
+                                            File(imageFile.path), fileLocation)
+                                        .then((downloadUrl) => {
+                                              print("Successful image upload"),
+                                              print(downloadUrl),
+                                              _shareThisChallenge(downloadUrl),
+                                              Navigator.pop(context),
+                                            });
+
+                                    _carouselController.nextPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.linear);
+                                  }
                                 } else {
                                   DialogManager().createDialog(
-                                      'Error',
-                                      "'Do' feed challenges require an image",
+                                      'Hold on...',
+                                      "Spice the challenge up with an image",
                                       context);
                                   setState(() {
                                     _submitting = false;
                                   });
                                 }
+                              } catch (e) {
+                                if (mounted) {
+                                  setState(() {
+                                    _submitting = false;
+                                  });
+                                }
+                                DialogManager().createDialog(
+                                  'Error',
+                                  e.toString(),
+                                  context,
+                                );
                               }
-                            } catch (e) {
-                              if (mounted) {
-                                setState(() {
-                                  _submitting = false;
-                                });
-                              }
-                              DialogManager().createDialog(
-                                'Error',
-                                e.toString(),
-                                context,
-                              );
                             }
-                          }
-                        : () {
-                            /*Navigator.of(context).pushReplacement(_viewPost());*/
-
-                            if (selected != -1) {
-                              if (!((selected == 0 && _current == 5 ||
-                                      selected == 1 && _current == 4) &&
-                                  canMoveToPreview == false)) {
+                          : () {
+                              /*Navigator.of(context).pushReplacement(_viewPost());*/
+                              if (_current < 3 && canMoveToPreview == false) {
+                                //basically: slide if not all info has been filled
                                 _carouselController.nextPage(
                                     duration: Duration(milliseconds: 300),
                                     curve: Curves.linear);
                               } else if (title == "") {
                                 DialogManager().createDialog(
-                                  'Error',
+                                  'Hold on...',
                                   'You have not chosen a title',
                                   context,
                                 );
@@ -232,8 +233,8 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                 );
                               } else if (selected == 1 && imageFile == null) {
                                 DialogManager().createDialog(
-                                  'Error',
-                                  "'Do' feed challenges require an image",
+                                  'Hold on...',
+                                  "Spice the challenge up with an image",
                                   context,
                                 );
                               } else {
@@ -243,15 +244,7 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                                   context,
                                 );
                               }
-                            } else {
-                              DialogManager().createDialog(
-                                'Error',
-                                "You need to choose who you'd like to do the challenge",
-                                context,
-                              );
-                            }
-                          },
-                  )
+                            })
                 ],
                 leading: Container(
                     width: 100,
@@ -272,59 +265,31 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
               builder: (context) {
                 final double height = MediaQuery.of(context).size.height;
                 return CarouselSlider(
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
-                    onPageChanged: (index, reason) {
-                      _changePage();
-                      if (mounted) {
-                        setState(() {
-                          _current = index;
-                        });
-                      }
-                    },
-                    enableInfiniteScroll: false,
-                    height: height,
-                    viewportFraction: 1.0,
-                    enlargeCenterPage: false,
-                    // autoPlay: false,
-                  ),
-                  items: [
-                    _defineDescriptionSelf(),
-                    _chooseCharity(),
-                    _setHashtags(),
-                    _selectPrivacy(this.isPrivate, _onPrivacySettingChanged,
-                        _limitVisibility),
-                  ],
-                );
+                    carouselController: _carouselController,
+                    options: CarouselOptions(
+                      onPageChanged: (index, reason) {
+                        _changePage();
+                        if (mounted) {
+                          setState(() {
+                            _current = index;
+                          });
+                        }
+                      },
+                      enableInfiniteScroll: false,
+                      height: height,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      // autoPlay: false,
+                    ),
+                    items: [
+                      _defineDescriptionSelf(),
+                      _chooseCharity(),
+                      _setHashtags(),
+                      _imageUpload(),
+                    ]);
               },
             ),
           );
-  }
-
-  void _onPrivacySettingChanged(newVal) {
-    setState(() {
-      isPrivate = newVal;
-      if (newVal == false) {
-        selectedFollowers = [];
-      }
-    });
-  }
-
-  void _limitVisibility(uids) {
-    print("setting state and limiting visibility....");
-    setState(() {
-      isPrivate = true;
-      this.selectedFollowers = uids;
-    });
-  }
-
-  Widget _selectPrivacy(
-      isPrivate, Function onPrivacySettingChanged, Function limitVisibility) {
-    return PrivacySelection(
-        onPrivacySettingChanged: onPrivacySettingChanged,
-        limitVisibility: limitVisibility,
-        isPrivate: isPrivate,
-        selectedFollowers: this.selectedFollowers);
   }
 
   Widget _choosePerson() {
@@ -446,84 +411,6 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
           'The minimum donation target amount is £2',
           context,
         );
-      } else {
-        /* 
-        TO DO: ADD UPLOAD FUNCTION
-        */
-        // if (whoDoes[selected] == "Myself") {
-        //   DatabaseService(uid: user.uid)
-        //       .uploadPost(new Post(
-        //           selectedPrivateViewers: this.selectedFollowers,
-        //           isPrivate: this.isPrivate,
-        //           title: title.toString().trimRight(),
-        //           subtitle: subtitle.toString().trimRight(),
-        //           author: user.uid,
-        //           authorUsername: user.username,
-        //           charity: charities[charity].id,
-        //           noLikes: 0,
-        //           noComments: 0,
-        //           timestamp: DateTime.now(),
-        //           moneyRaised: 0,
-        //           targetAmount: targetAmount.toString(),
-        //           imageUrl: downloadUrl,
-        //           status: 'fund',
-        //           aspectRatio: aspectRatio,
-        //           hashtags: hashtags,
-        //           charityLogo: charities[charity].image))
-        //       .then((postId) => {
-        //             if (postId == null)
-        //               {
-        //                 if (mounted)
-        //                   {
-        //                     setState(() {
-        //                       _submitting = false;
-        //                     })
-        //                   }
-        //               }
-        //             else
-        //               {
-        //                 print("The doc id is " +
-        //                     postId
-        //                         .toString()
-        //                         .substring(1, postId.toString().length - 1)),
-        //                 HashtagsService(uid: user.uid)
-        //                     .addHashtag(postId.toString(), hashtags),
-        //                 Navigator.pushReplacementNamed(
-        //                     context,
-        //                     '/post/' +
-        //                         postId
-        //                             .toString()
-        //                             .substring(1, postId.toString().length - 1))
-        //               } //the substring is very important as postId.toString() is in brackets
-        //           });
-        // } else {
-        //   // Create a template
-        //   DatabaseService(uid: user.uid)
-        //       .uploadTemplate(new Template(
-        //           title: title.toString(),
-        //           subtitle: subtitle.toString(),
-        //           author: user.uid,
-        //           authorUsername: user.username,
-        //           charity: charities[charity].id,
-        //           likes: [],
-        //           comments: {},
-        //           timestamp: DateTime.now(),
-        //           moneyRaised: 0,
-        //           targetAmount: targetAmount.toString(),
-        //           imageUrl: downloadUrl,
-        //           whoDoes: whoDoes[selected].toString(),
-        //           acceptedBy: [],
-        //           completedBy: [],
-        //           aspectRatio: aspectRatio,
-        //           hashtags: hashtags,
-        //           active: true,
-        //           charityLogo: charities[charity].image))
-        //       .then((templateId) => {
-        //             // if the post is successfully added, view the post
-        //             Navigator.pushReplacementNamed(
-        //                 context, '/challenge/' + templateId.toString())
-        //           });
-        // }
       }
     }
   }
@@ -598,5 +485,46 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
 
   void _changedAspectRatio(double newAspectRatio) {
     aspectRatio = newAspectRatio;
+  }
+
+  Widget _createShareScreen(String downloadUrl) {
+    return ShareScreen(
+      title: title.toString(),
+      subtitle: subtitle.toString(),
+      author: user.uid,
+      authorUsername: user.username,
+      charity: charities[charity].id,
+      timestamp: Timestamp.now(),
+      targetAmount: targetAmount.toString(),
+      imageUrl: downloadUrl,
+      aspectRatio: aspectRatio,
+      hashtags: hashtags,
+      charityLogo: charities[charity].image,
+    );
+  }
+
+  Future _shareThisChallenge(downloadUrl) async {
+    ChallengeService challengeService = ChallengeService();
+    String challengeDocId = await getChallengeDocId(downloadUrl);
+    Uri shortUrl =
+        await challengeService.createChallengeLink(challengeDocId, downloadUrl);
+    Share.share('${user.username} challenged you!\n ' + shortUrl.toString(),
+        subject: this.title);
+  }
+
+  Future<String> getChallengeDocId(downloadUrl) {
+    ChallengeService challengeService = ChallengeService();
+    return challengeService.uploadChallenge(
+        title: title,
+        subtitle: subtitle,
+        author: user.uid,
+        authorUsername: user.username,
+        charity: charities[charity].id,
+        timestamp: Timestamp.now(),
+        targetAmount: targetAmount,
+        imageUrl: downloadUrl,
+        aspectRatio: aspectRatio,
+        hashtags: hashtags,
+        charityLogo: charities[charity].image);
   }
 }

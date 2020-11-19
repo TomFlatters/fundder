@@ -61,7 +61,12 @@ class MyselfTile extends StatelessWidget {
                 height: 10,
               ),
               Text(
-                  'This will start raising money in the fund feed immediately after creation.'),
+                'This will start raising money in the fund feed immediately after creation.',
+                style: TextStyle(
+                  fontFamily: 'Founders Grotesk',
+                  fontSize: 14,
+                ),
+              ),
               SizedBox(
                 height: 10,
               )
@@ -171,7 +176,13 @@ class OthersTile extends StatelessWidget {
                                   alignment: Alignment.topLeft,
                                   child: Container(
                                     margin: EdgeInsets.only(right: 10),
-                                    child: Text(subtitles[index]),
+                                    child: Text(
+                                      subtitles[index],
+                                      style: TextStyle(
+                                        fontFamily: 'Founders Grotesk',
+                                        fontSize: 14,
+                                      ),
+                                    ),
                                   )),
                             ]),
                       ),

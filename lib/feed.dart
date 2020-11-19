@@ -120,7 +120,19 @@ class _FeedViewState extends State<FeedView> {
                       ),
                     ),
                     postData.author != user.uid
-                        ? Container()
+                        ? Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.more_horiz,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () => {
+                                  _reportOptions(context, user.uid, postData)
+                                },
+                              )
+                            ],
+                          )
                         : Row(
                             children: [
                               IconButton(
@@ -152,6 +164,63 @@ class _FeedViewState extends State<FeedView> {
         },
       );
     }
+  }
+
+  _reportOptions(context, uid, Post postData) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            color: Color(0xFF737373),
+            height: 235,
+            child: Container(
+              padding: EdgeInsets.only(top: 10),
+              child: ListView(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.visibility_off),
+                    title: Text('Hide this post'),
+                    subtitle: Text(
+                        "Once this post is hidden, it cannot be made visible again."),
+                    onTap: () async {
+                      print('elipses button pressed');
+                      await _hidePost(postData, uid);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.report),
+                    title: Text('Report this post'),
+                    subtitle: Text(
+                        "Report this post if you believe it breaks our terms of use."),
+                    onTap: () async {
+                      print('elipses button pressed');
+                      await _reportPost(postData, uid);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.block),
+                    title: Text('Block User'),
+                    subtitle: Text("Block the creator of this post."),
+                    onTap: () async {
+                      print('elipses button pressed');
+                      await _blockUser(uid, postData);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(10),
+                  topRight: const Radius.circular(10),
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   _postOptions(context, uid, postData) {
@@ -190,6 +259,130 @@ class _FeedViewState extends State<FeedView> {
             ),
           );
         });
+  }
+
+  Future _hidePost(Post postData, String uid) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Hide Post?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('This post will not appear on your feed anymore.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Hide', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Firestore.instance.collection('users').document(uid).setData({
+                  'hiddenPosts': FieldValue.arrayUnion([postData.id])
+                }, merge: true).then((value) {
+                  Navigator.of(context).pop();
+                  widget.onDeletePressed();
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future _reportPost(Post postData, String uid) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Report Post?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'This post will be submitted for moderation and will not appear on your feed anymore. Are you sure you would like to report this post?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Report', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Firestore.instance
+                    .collection('reports')
+                    .document(postData.id)
+                    .setData({
+                  'reports': FieldValue.increment(1),
+                  'reportees': FieldValue.arrayUnion([uid]),
+                  'latestReport': Timestamp.now()
+                }, merge: true);
+                Firestore.instance.collection('users').document(uid).setData({
+                  'hiddenPosts': FieldValue.arrayUnion([postData.id])
+                }, merge: true).then((value) {
+                  Navigator.of(context).pop();
+                  widget.onDeletePressed();
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future _blockUser(String uid, Post postData) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Block User?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'No posts from this user will appear in your feed anymore. Are you sure you would like to block the creator of this post?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Block', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Firestore.instance.collection('users').document(uid).setData({
+                  'hiddenUsers': FieldValue.arrayUnion([postData.author])
+                }, merge: true).then((value) {
+                  Navigator.of(context).pop();
+                  widget.onDeletePressed();
+                });
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _showDeleteDialog(Post post) async {

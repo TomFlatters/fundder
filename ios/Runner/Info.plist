@@ -39,6 +39,7 @@
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
 		<string>https://fundder.page.link</string>
+		<string>https://fundderchallenge.page.link</string>
 		<string>https://fundder.co</string>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
@@ -76,6 +77,10 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartobservatory._tcp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>To allow users to upload photos for their fundraisers</string>
 	<key>NSMicrophoneUsageDescription</key>

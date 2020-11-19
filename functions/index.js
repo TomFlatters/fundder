@@ -30,7 +30,7 @@ exports.onLike = functions.firestore
     };
 
     const postId = context.params.postId;
-    const doc = await admin.firestore().doc(`posts/${postId}`).get();
+    const doc = await admin.firestore().doc(`postsV2/${postId}`).get();
 
     console.log("doc " + doc.data());
 
@@ -50,7 +50,7 @@ exports.onLike = functions.firestore
         postId: postId,
         seen: false
     };
-      
+
       // Add a new document in collection "cities" with ID 'LA'
     const res = await admin.firestore().collection(`users/${author}/activity`).add(data);
 
@@ -83,7 +83,7 @@ exports.onComment = functions.firestore
     };
 
     const postId = context.params.postId;
-    const doc = await admin.firestore().doc(`posts/${postId}`).get();
+    const doc = await admin.firestore().doc(`postsV2/${postId}`).get();
 
     console.log("doc " + doc.data());
 
@@ -104,7 +104,7 @@ exports.onComment = functions.firestore
         postId: postId,
         seen: false
     };
-      
+
       // Add a new document in collection "cities" with ID 'LA'
     const res = await admin.firestore().collection(`users/${author}/activity`).add(data);
 
@@ -136,7 +136,7 @@ exports.onDonate = functions.firestore
     };
 
     const postId = context.params.postId;
-    const doc = await admin.firestore().doc(`posts/${postId}`).get();
+    const doc = await admin.firestore().doc(`postsV2/${postId}`).get();
 
     console.log("doc " + doc.data());
 
@@ -156,7 +156,7 @@ exports.onDonate = functions.firestore
         postId: postId,
         seen: false
     };
-      
+
       // Add a new document in collection "cities" with ID 'LA'
     const res = await admin.firestore().collection(`users/${author}/activity`).add(data);
 
@@ -187,18 +187,18 @@ exports.postDone = functions.firestore
       // access a particular field as you would any JS property
       if(newValue["status"] === 'done' && previousValue["status"] === 'fund')
       {
-        
+
         // first send a notification to all those that liked a post
-        const whoLikedSnapshot = await admin.firestore().collection(`posts/${postId}/whoLiked`).get();
+        const whoLikedSnapshot = await admin.firestore().collection(`postsV2/${postId}/whoLiked`).get();
         const whoLikedDoc = whoLikedSnapshot.docs.map(doc => doc);
 
         console.log(whoLikedDoc);
 
         var tokens = [];
 
-        
 
-        
+
+
         /* eslint-disable no-await-in-loop */
         for(var i=0; i<whoLikedDoc.length; i++){
             console.log(whoLikedDoc[i]);
@@ -241,7 +241,7 @@ exports.postDone = functions.firestore
             }
 
         // then send a notification to all those that donated to a post
-        const whoDonatedSnapshot = await admin.firestore().collection(`posts/${postId}/whoDonated`).get();
+        const whoDonatedSnapshot = await admin.firestore().collection(`postsV2/${postId}/whoDonated`).get();
         const whoDonatedDoc = whoDonatedSnapshot.docs.map(doc => doc);
 
         console.log(whoDonatedDoc);
@@ -288,7 +288,7 @@ exports.postDone = functions.firestore
             //await cleanupTokens(response, tokens);
             console.log('Notifications have been sent and tokens cleaned up.');
             }
-        
+
       }
 
       // perform desired operations ...
@@ -319,14 +319,14 @@ exports.postDone = functions.firestore
           }
           batch.commit();
         }
-        
+
 
         var tokens = [];
         // first find the post owner followers
         const postOwnerFollowers = await admin.firestore().collection(`users/${snapshot.data()['author']}/myFollowers`).get();
         const postOwnerFollowersDoc = postOwnerFollowers.docs.map(doc => doc);
 
-        
+
         /* eslint-disable no-await-in-loop */
         for(var i=0; i<postOwnerFollowersDoc.length; i++){
             console.log(postOwnerFollowersDoc[i]);
@@ -377,7 +377,7 @@ exports.postDone = functions.firestore
 
       const userId = context.params.userId;
       const user = await admin.firestore().doc(`users/${userId}`).get();
-        
+
       const followerId = context.params.followerId;
       const follower = await admin.firestore().doc(`users/${followerId}`).get();
 
@@ -442,7 +442,7 @@ exports.postDone = functions.firestore
       }
     });
     batch.commit();
-    
+
    }
 
 
@@ -510,13 +510,13 @@ exports.postDone = functions.firestore
       let leftChatData = {};
       leftChatData[uid1] = null;
       leftChatData[uid2] = null;
-      
+
       const data = {
         'chatMembers' : chatMemberIds,
         leftChat: leftChatData
       }
       admin.firestore().collection('chats').doc(chatId).update(data);
-      
+
 
     })
 
@@ -526,7 +526,7 @@ exports.postDone = functions.firestore
     {
     // Getting chat id from input
     const chatId = context.params.chatId;
-    
+
     // Getting sennder id from snapshot and using it to find sender doc for username
     const senderId = snapshot.data()['from'];
     const senderDoc = await admin.firestore().doc(`users/${senderId}`).get();
@@ -536,7 +536,7 @@ exports.postDone = functions.firestore
     const chat = await chatRef.get();
     const chatMembers = chat.data()['chatMembers'];
 
-    
+
 
     // Create notification payload
     const payload =
@@ -545,10 +545,10 @@ exports.postDone = functions.firestore
             title: `Message from ${senderDoc.data()['username']}`,
             body: `${snapshot.data()['msg']}`, 
             click_action: "FLUTTER_NOTIFICATION_CLICK",
-            
+
         },
         data: {
-          
+
           type: 'Chat',
           senderUid: senderId,
           senderUsername: senderDoc.data()['username']
@@ -598,7 +598,7 @@ exports.handleUnreadMessages = functions.firestore.document('chats/{chatId}').on
     admin.firestore().collection('userChatStatus').doc(uid2).set(data, {merge: true})
   }
 
-  
+
 
 
 })
@@ -626,7 +626,7 @@ exports.facebookUser = functions.https.onCall(async ([userId, friendsList], cont
       }
 
       console.log('facebook friends: ' + friendsFacebookIds);
-      
+
       // Retrieve users with the facebook ids in the array
       const userFriendsSnapshot = await admin.firestore().collection('users').where('facebookId', 'in', friendsFacebookIds).get();
       const userFriends = userFriendsSnapshot.docs.map(doc => doc);
@@ -646,12 +646,12 @@ exports.facebookUser = functions.https.onCall(async ([userId, friendsList], cont
           seen: false};
 
         console.log('data: ' + doc.id);
-        
+
         const res = await admin.firestore().collection(`users/${doc.id}/activity`).add(data);
-        
+
         // Retrieve each receiver to find out their fcm token to send notification to
         const receiver = await admin.firestore().doc(`users/${doc.id}`).get();
-        
+
         console.log('Added document with ID: ', res.id);
         if (receiver.data()['fcm'] !== null) {
           tokens = tokens.concat(receiver.data()['fcm']);
@@ -680,11 +680,7 @@ exports.facebookUser = functions.https.onCall(async ([userId, friendsList], cont
     });
 
 /**Houses various triggers to perform various actions on db.
-<<<<<<< HEAD
- * DO NOT DEPLOY
-=======
  * DO NOT DEPLOY...I deployed it anyway LOL
->>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
  */
 
 
@@ -696,8 +692,8 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/tr
     //populate the users collection 
     let users = admin.firestore().collection('users');
     let faker = require('faker');
-    
-    
+
+
     var i;
     for (i =0; i<10; i++){
       const name = faker.name.findName();
@@ -721,12 +717,12 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/tr
     } 
   }
 
-  
+
   if (newValue.getMoreFollowers === true){
     //set a follower and followee and make the follower follow the followee
     res['moreFollowersAcquired'] = true;
- 
-    
+
+
       console.log("running userFollowedSomeone");
       const FieldValue = require('firebase-admin').firestore.FieldValue;
       const follower = newValue.dummyFollower; 
@@ -735,8 +731,8 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/tr
       const userDoc = await userCollection.doc(followee).get();
       const followeeIsPrivate = (userDoc.get('isPrivate')===null)?false:userDoc.get('isPrivate');
       const status = await initiateFollow(followee, follower, followeeIsPrivate);
-    
-    
+
+
   }
 
   if (newValue.assignUsersRandomNumbers===true){
@@ -763,7 +759,7 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/tr
     const whoLikedDocs = await whoLiked.get();
     const newPostsCollection = admin.firestore().collection('postsV2');
     whoLikedDocs.forEach((q)=>{const doc = q.data(); newPostsCollection.doc(postId).collection('whoLiked').doc(q.id).set(doc)});
-    
+
   }
   if (newValue.migrateComments ===true){
     const postId = newValue.postId;
@@ -771,7 +767,7 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/tr
     const commentDocs = await comments.get();
     const newPostsCollection = admin.firestore().collection('postsV2');
     commentDocs.forEach((q)=>{const doc = q.data(); newPostsCollection.doc(postId).collection('comments').doc(q.id).set(doc,{merge: true})});
-    
+
   }
   if (newValue.migrateWhoDonated ===true){
     const postId = newValue.postId;
@@ -779,7 +775,7 @@ exports.populateDB = functions.firestore.document('dummyCollectionForTriggers/tr
     const whoDonatedDocs = await whoDonated.get();
     const newPostsCollection = admin.firestore().collection('postsV2');
     whoDonatedDocs.forEach((q)=>{const doc = q.data(); newPostsCollection.doc(postId).collection('whoDonated').doc(q.id).set(doc,{merge: true})});
-    
+
   }
 
   if (newValue.migrateFollowing ===true){
@@ -811,7 +807,7 @@ exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
   const FieldValue = require('firebase-admin').firestore.FieldValue;
   const follower = data.follower; 
   const followee = data.followee;
-  
+
   const userCollection = admin.firestore().collection('users')
   const userDoc = await userCollection.doc(followee).get();
   const followeeIsPrivate = (userDoc.get('isPrivate')===null)?false:userDoc.get('isPrivate');
@@ -885,7 +881,7 @@ exports.userFollowedSomeone = functions.https.onCall(async (data, context)=>  {
     {
         const yRequested = yDoc.get('requestedToFollowMe')
         if (yRequested.includes(x)){
-      
+
           return 'follow_requested'
         }
     }
@@ -907,11 +903,11 @@ async function initiateFollow (followee, follower, followeeIsPrivate){
      //if the user has nothing in the 'followers' field, initialise it to empty array
      const followerDoc = await followersCollection.doc(follower).get()
      if (!followerDoc.exists){
-       
+
         followersCollection.doc(follower).set({'following': []}, {merge: true})
-       
+
      }
-     
+
     status ="requested"
     userCollection.doc(followee).set({'noFollowRequestsForMe': FieldValue.increment(1)}, {merge: true});
    }    
@@ -940,10 +936,7 @@ exports.doesXfollowY = functions.https.onCall(async (data, context)=>{
 
 /**Deploy posts to the post's author's feed and their followers. `\n`
  * Additionally, if the post is public then deploy to OTHER random users as well.
-<<<<<<< HEAD
-=======
  * TODO: Keep track of Function times....
->>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
  */
 exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').onCreate(async (snap, context)=>{
   const postValue = snap.data();
@@ -962,7 +955,7 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
 
   //info regarding the nature of the post has been omitted if the author deletes the post later on. These posts in myFeed will persist but all sensitive data about them in the central collection will have 
   //been removed
-  
+
   const postForMyFeed = {
     aspectRatio: postValue.aspectRatio,
     author: postValue.author,
@@ -984,20 +977,20 @@ exports.deployPostsToFeeds = functions.firestore.document('postsV2/{postId}').on
         (followerId)=> {
           userCollection.doc(followerId).collection('myFeed').doc(postId).set(postForMyFeed);
           admin.firestore().collection('postsV2').doc(postId).collection('feedsDeployedTo').doc(followerId).set({'following': true, 'timestamp':FieldValue.serverTimestamp()});
-    
+
         }
       );
     }
   }
-  
+
   //if this post is public, deploy to random people to now....probability of random deployment can be adjusted
   //All random deployment will be to non-followers, as followers already have the post in their feed and we do
   // not want to override it with wrong info about follow relationship.
- 
+
   if (!isPrivate){
     //right now each doc has a random integer between 0 to 4
     //in deployment generate a random number in the appropriate range but for now, we will use one
-    
+
     const query = await userCollection.where('randomNumber', "==", 1).get();
     query.forEach((q)=>{
       const id = q.id;
@@ -1026,9 +1019,9 @@ exports.onRefreshHashtag = functions.https.onCall(async (data, context)=>{
   const [secs, nanoSecs] = startTimestamp.match(regEx); //returns an array in the formt [1601043492,743686000]
   const timeStamp = new  admin.firestore.Timestamp( parseInt(secs),  parseInt(nanoSecs));
   const uid = context.auth.uid;
-  
+
   const postsCollection = admin.firestore().collection('postsV2');
-  
+
   const query = await postsCollection.where("hashtags", "array-contains", hashtag).orderBy("timestamp", 'desc').startAfter(timeStamp).limit(limit).get();
   const queryDocSnap = query.docs
   const queryData = queryDocSnap.map((qDocSnap)=> qDocSnap.data())
@@ -1036,7 +1029,7 @@ exports.onRefreshHashtag = functions.https.onCall(async (data, context)=>{
 
   const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
   const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] === undefined)?[]:myFollowersDoc.data()['following']):[];
-  
+
 
   let postJSONS = queryData.filter( (postObj)=>{
       //Check if you're allowed access to this post.
@@ -1050,7 +1043,7 @@ exports.onRefreshHashtag = functions.https.onCall(async (data, context)=>{
   console.log(postJSONS);
   return {"listOfJsonDocs": postJSONS}
 
-  
+
 });
 /**Returns a list of json objects representing the latest 'limit' posts
  * of either a fund or done status from a specified timestamp for a given user.
@@ -1129,16 +1122,16 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context)=>{
 
   const myFollowersDoc = await admin.firestore().collection('followers').doc(uid).get();
   const following = myFollowersDoc.exists?((myFollowersDoc.data()['following'] === undefined)?[]:myFollowersDoc.data()['following']):[];
-  
+
 
   let postJSONS = queryData.filter( (postObj)=>{
       //Check if you're allowed access to this post.
-      
+
        const allowedAccess = amIallowedAccess(following, postObj, uid);
        return allowedAccess;
   });
 
- 
+
 
   console.log("printing jsons of author posts....")
   console.log(postJSONS);
@@ -1199,13 +1192,6 @@ function amIallowedAccess(following, postObj, uid){
 }
 
 
-<<<<<<< HEAD
-/**Assign each user a random number and give them every public post in their feed */
-exports.feedManagementOnUserCreated = functions.firestore.document('users/{uid}').onCreate(async (snap, context)=>{
-  const userCollection =  admin.firestore().collection('users');
-  const postsCollection = admin.firestore().collection('postsV2');
-  const uid = context.params.uid;
-=======
 /**
  * Assign each user a random number and give them every public post in their feed
  * TODO: update 'feedsDeployedTo' on the post doc subcollection & keep track of function times...
@@ -1217,8 +1203,7 @@ exports.feedManagementOnUserCreated = functions.runWith({memory: '2GB', timeoutS
   bookKeepingCollection.doc('userList').set({'listOfUsers': FieldValue.arrayUnion(uid)},  {merge: true});
   const userCollection =  admin.firestore().collection('users');
   const postsCollection = admin.firestore().collection('postsV2');
-  
->>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
+
   userCollection.doc(uid).set({'randomNumber': 1}, {merge: true});
 
   //give them every public post
@@ -1230,10 +1215,7 @@ exports.feedManagementOnUserCreated = functions.runWith({memory: '2GB', timeoutS
   publicPosts.forEach((q)=>{
     if (q.exists){
       const postValue = q.data();
-<<<<<<< HEAD
-=======
       console.log(postValue.authorUsername);
->>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
       const postForMyFeed = {
         aspectRatio: postValue.aspectRatio,
         author: postValue.author,
@@ -1252,8 +1234,6 @@ exports.feedManagementOnUserCreated = functions.runWith({memory: '2GB', timeoutS
 
 
 })
-<<<<<<< HEAD
-=======
 
 
 exports.getAListOfUsers = functions.runWith({memory: '2GB', timeoutSeconds: '540' }).pubsub.schedule('every 2 minutes').onRun(async (context)=>{
@@ -1264,7 +1244,7 @@ exports.getAListOfUsers = functions.runWith({memory: '2GB', timeoutSeconds: '540
       const FieldValue = require('firebase-admin').firestore.FieldValue;
       const bookKeepingCollection = admin.firestore().collection('bookKeeping');
       return bookKeepingCollection.doc('userList').set({'listOfUsers': FieldValue.arrayUnion(uid)},  {merge: true});
-      
+
     }))
   return null;
 }).catch(function(error) {
@@ -1276,16 +1256,16 @@ exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '5
   //get the 50 most recent public posts....
   const publicPostQuery = await postsCollection.where('isPrivate', '==', false).orderBy('timestamp', 'desc').limit(10).get();
   const publicPosts = publicPostQuery.docs;
-  
+
   //get a list of all users (MODIFY THIS IMMEDIATELY ONCE WE GET)
   admin.auth().listUsers(1000)
   .then(async function(listUsersResult) {
     //in parallel deploy posts to all 1000 users
     const promiseOfDeployment = await Promise.all(listUsersResult.users.map(function(userRecord){
       const uid = userRecord.uid;
-      
+
       //async function that takes a user id and a bunch of posts and deploys them to the user
-      
+
       const deployPromiseForUser = deployPostsToUser(uid, publicPosts);
       return deployPromiseForUser
     }))
@@ -1297,7 +1277,7 @@ exports.scheduledFunction = functions.runWith({memory: '2GB', timeoutSeconds: '5
 
 
 async function deployPostsToUser(uid, publicPosts){
-  
+
   const myFeed = admin.firestore().collection('users').doc(uid).collection('myFeed');
   const deployPromiseForUser =  await Promise.all(publicPosts.map(async function(docSnap){
     if (docSnap.exists){
@@ -1322,6 +1302,3 @@ async function deployPostsToUser(uid, publicPosts){
   }));
   return deployPromiseForUser;
 }
-
->>>>>>> f1d54047f235018da0f3e413e4c9f8d6acdeb3d4
-
