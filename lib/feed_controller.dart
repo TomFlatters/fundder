@@ -151,7 +151,7 @@ class _FeedControllerState extends State<FeedController>
                       children: [
                     Padding(
                         padding: EdgeInsets.only(bottom: 5, right: 3),
-                        child: Icon(Icons.monetization_on_outlined, size: 16)),
+                        child: Icon(Icons.monetization_on, size: 16)),
                     Text(
                       " Fund",
                     )

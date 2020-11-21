@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/global_widgets/followButton.dart';
@@ -69,6 +71,23 @@ class _ProfileState extends State<ProfileController>
     if (_tabController.indexIsChanging) {
       if (mounted) setState(() {});
     }
+  }
+
+  double _getLastDate(List<Post> postList) {
+    if (postList.length == 0) {
+      return 0;
+    }
+    List<double> times = [];
+    for (var i = 0; i < postList.length; i++) {
+      times.add(postList[i]
+          .timestamp
+          .toDate()
+          .difference(DateTime.utc(2020, 11, 18))
+          .inHours
+          .toDouble());
+    }
+    // print(times);
+    return times.reduce(max);
   }
 
   @override
