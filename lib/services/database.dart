@@ -383,7 +383,9 @@ class DatabaseService {
         res.data["listOfJsonDocs"].toString());
 
     var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
-    print(postList[0]);
+    if (postList.isEmpty == false) {
+      print(postList[0]);
+    }
 
     return postList;
 

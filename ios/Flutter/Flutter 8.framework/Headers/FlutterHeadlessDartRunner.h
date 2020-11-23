@@ -7,10 +7,10 @@
 
 #import <Foundation/Foundation.h>
 
-#import "FlutterBinaryMessenger.h"
-#import "FlutterDartProject.h"
-#import "FlutterEngine.h"
-#import "FlutterMacros.h"
+#include "FlutterBinaryMessenger.h"
+#include "FlutterDartProject.h"
+#include "FlutterEngine.h"
+#include "FlutterMacros.h"
 
 /**
  * A callback for when FlutterHeadlessDartRunner has attempted to start a Dart
