@@ -1302,3 +1302,51 @@ async function deployPostsToUser(uid, publicPosts){
   }));
   return deployPromiseForUser;
 }
+
+// REWARDS FUNCTIONS
+
+exports.rewardsTaylorsCoffee = functions.https.onCall(async (data, context)=>{
+
+  let uid = data['uid'];
+  let rewardID = data['rewardid'];
+
+  // First find user posts and test if one has been created since 20th November
+  const userPosts = await admin.firestore().collection('postsV2').where("author","==",uid).get();
+  const userDocs = userPosts.docs
+  const timestamps = userDocs.map((qDocSnap)=> qDocSnap.data().timestamp.toDate());
+
+  // If no posts return false
+  if (timestamps.length===0){
+    return {"rewardAvailable": false, "titleMessage": "Challenge not completed", "bodyMessage": "You need to create a new Fundder to get this reward."}
+  }
+  
+  // If the last post was not recent enough then return false
+  lastPostDate = timestamps.reduce((a,b) => ( a>b ? a: b));
+  const deadlineDate = new Date("11/20/2020");
+  if (deadlineDate.getTime()-lastPostDate.getTime()>0){
+    return {"rewardAvailable": false, "titleMessage": "Challenge not completed", "bodyMessage": "You need to create a new Fundder to get this reward."};
+  }
+
+  // Otherwise check that the person hasn't claimed the reward already
+  const userDoc = await admin.firestore().collection('users').doc(uid);
+  let userClaimedRewards = await userDoc.get()
+  userClaimedRewards = userClaimedRewards.data()['claimedRewards'];
+
+  // If they have already claimed return False and set the response message
+  if(userClaimedRewards.indexOf(rewardID)>=0){
+    return {"rewardAvailable": false, "titleMessage": "Reward Already Claimed", "bodyMessage": "You have already claimed this reward!"};
+  } else {
+    // If they haven't claimed the reward then update the document as they now have
+    userClaimedRewards.push(rewardID);
+    userDoc.update({'claimedRewards': userClaimedRewards});
+
+    // At this stage also update the master record
+    let rewardRef = admin.firestore().collection('rewardsClaimed').doc(rewardID);
+    data = {};
+    data[uid] = {'claimed': true, 'timestamp': Date.now()}
+    rewardRef.set(data);
+  }
+
+  // Otherwise return a congralutory message about how the person will receive the reward
+  return {"rewardAvailable": true, "titleMessage": "Congratulations!", "bodyMessage": "We'll be in touch to send you your voucher shortly."};
+})

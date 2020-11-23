@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/global_widgets/followButton.dart';
 import 'package:fundder/services/auth.dart';
 import 'package:fundder/services/followers.dart';
 import 'package:fundder/services/privacyService.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'profile_actions_view.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/models/user.dart';
@@ -70,6 +73,23 @@ class _ProfileState extends State<ProfileController>
     }
   }
 
+  double _getLastDate(List<Post> postList) {
+    if (postList.length == 0) {
+      return 0;
+    }
+    List<double> times = [];
+    for (var i = 0; i < postList.length; i++) {
+      times.add(postList[i]
+          .timestamp
+          .toDate()
+          .difference(DateTime.utc(2020, 11, 18))
+          .inHours
+          .toDouble());
+    }
+    // print(times);
+    return times.reduce(max);
+  }
+
   @override
   Widget build(BuildContext context) {
     final firebaseUser = Provider.of<User>(context);
@@ -81,19 +101,28 @@ class _ProfileState extends State<ProfileController>
         ? Loading()
         : Scaffold(
             backgroundColor: Colors.grey[200],
-            appBar: AppBar(
-                centerTitle: true,
-                title: Text(widget.user.username),
-                actions: widget.user.uid == firebaseUser.uid
-                    ? <Widget>[
+            appBar: widget.user.uid == firebaseUser.uid
+                ? AppBar(
+                    centerTitle: true,
+                    title: Text(widget.user.username),
+                    leading: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, '/rewards/' + widget.user.uid);
+                        },
+                        child: new Icon(MaterialCommunityIcons.gift_outline)),
+                    actions: <Widget>[
                         IconButton(
                           onPressed: () {
                             _showOptions();
                           },
                           icon: Icon(AntDesign.ellipsis1),
                         )
-                      ]
-                    : <Widget>[
+                      ])
+                : AppBar(
+                    centerTitle: true,
+                    title: Text(widget.user.username),
+                    actions: <Widget>[
                         IconButton(
                             icon: Icon(SimpleLineIcons.bubble),
                             onPressed: () {

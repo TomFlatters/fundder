@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/models/post.dart';
+import 'package:fundder/models/rewards.dart';
 import 'package:fundder/models/template.dart';
 import 'package:fundder/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -32,6 +33,8 @@ class DatabaseService {
       Firestore.instance.collection('templates');
   final CollectionReference charitiesCollection =
       Firestore.instance.collection('charities');
+  final CollectionReference rewardsCollection =
+      Firestore.instance.collection('rewards');
 
   // -------------
   // 1. User CRUD:
@@ -320,7 +323,7 @@ class DatabaseService {
     }).toList();
   }
 
-/**Get a list of up to three new posts of appropriate status (fund/done) */
+/* Get a list of up to three new posts of appropriate status (fund/done) */
   Future<List<Post>> refreshPosts(
       String status, int limit, Timestamp startTimestamp) async {
     print("in refresh posts");
@@ -341,9 +344,10 @@ class DatabaseService {
     return postList;
   }
 
-  /**Get up to 'limit' number of post documents ordered by timestamp
-   * starting at 'startTimestamp' containing hashtag 'hashtag' 
-   */
+  /*
+   Get up to 'limit' number of post documents ordered by timestamp
+   starting at 'startTimestamp' containing hashtag 'hashtag' 
+  */
   Future<List<Post>> refreshHashtag(
       String hashtag, int limit, Timestamp startTimestamp) async {
     print("running refresh hashtag");
@@ -368,7 +372,7 @@ class DatabaseService {
   /**Get posts by author id */
   Future<List<Post>> authorPosts(String id) async {
     //TODO: only if you follow the author
-    print('gettig posts by author: ' + id);
+    print('getting posts by author: ' + id);
 
     HttpsCallable getAuthorPosts =
         cloudFunc.getHttpsCallable(functionName: 'getAuthorPosts');
@@ -379,6 +383,9 @@ class DatabaseService {
         res.data["listOfJsonDocs"].toString());
 
     var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
+    if (postList.isEmpty == false) {
+      print(postList[0]);
+    }
 
     return postList;
 
@@ -733,6 +740,28 @@ class DatabaseService {
     QuerySnapshot charitiesSnapshot = await charitiesCollection.getDocuments();
     return charitiesSnapshot.documents.map((DocumentSnapshot doc) {
       return _charityDataFromDoc(doc);
+    }).toList();
+  }
+
+// --------------------
+// 6. Rewards
+// --------------------
+
+  Reward _rewardsDataFromDoc(DocumentSnapshot doc) {
+    return Reward(
+        title: doc.data['title'],
+        task: doc.data['task'],
+        reward: doc.data['reward'],
+        function: doc.data['function'],
+        rewardId: doc.documentID);
+  }
+
+  Future<List<Reward>> getRewardsList() async {
+    QuerySnapshot rewardsSnapshot = await rewardsCollection
+        .where('expired', isEqualTo: false)
+        .getDocuments();
+    return rewardsSnapshot.documents.map((DocumentSnapshot doc) {
+      return _rewardsDataFromDoc(doc);
     }).toList();
   }
 }
