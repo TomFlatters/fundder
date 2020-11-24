@@ -26,12 +26,17 @@ class _UserListTileState extends State<UserListTile> {
             return FundderListTile(
               onTap: () async {
                 print('/user/' + widget.displayUserUid);
-                await Navigator.pushNamed(
-                    context, '/user/' + widget.displayUserUid);
+                if (widget.displayUserUsername != null) {
+                  await Navigator.pushNamed(
+                      context, '/user/' + widget.displayUserUid);
+                }
                 setState(() {});
               },
               profilePicUid: widget.displayUserUid,
-              title: Text(widget.displayUserUsername,
+              title: Text(
+                  widget.displayUserUsername == null
+                      ? ''
+                      : widget.displayUserUsername,
                   style: TextStyle(fontWeight: FontWeight.bold)),
               trailing: widget.currentUserUid != widget.displayUserUid
                   ? Container(

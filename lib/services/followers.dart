@@ -24,7 +24,11 @@ class GeneralFollowerServices {
 /**returns corresponding username to uid*/
   static Future<String> mapIDtoName(String uid) async {
     var doc = await userCollection.document(uid).get();
-    return doc.data['username'];
+    if (doc.data != null) {
+      return doc.data['username'];
+    } else {
+      return '';
+    }
   }
 
 ///////////////////////////// change after launch to give ten at time kind of thing////////
