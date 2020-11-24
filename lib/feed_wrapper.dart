@@ -6,6 +6,7 @@ import 'feed.dart';
 import 'package:flutter/cupertino.dart';
 import 'helper_classes.dart';
 import 'services/database.dart';
+import 'shared/loading.dart';
 
 // This class adds the refresh indicator to feeds not in the profile
 
@@ -27,6 +28,7 @@ class FeedWrapper extends StatefulWidget {
 }
 
 class _FeedWrapperState extends State<FeedWrapper> {
+  bool initialLoadComplete = false;
   int limit = 5;
   Timestamp loadingTimestamp;
   List<FeedView> postList;
@@ -62,6 +64,7 @@ class _FeedWrapperState extends State<FeedWrapper> {
         loadingTimestamp = post.timestamp;
       }
     }
+    initialLoadComplete = true;
     if (mounted) setState(() {});
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
@@ -96,40 +99,42 @@ class _FeedWrapperState extends State<FeedWrapper> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: true,
-        header: WaterDropHeader(),
-        footer: CustomFooter(
-          builder: (BuildContext context, LoadStatus mode) {
-            Widget body;
-            if (mode == LoadStatus.idle) {
-              body = Text("pull up load");
-            } else if (mode == LoadStatus.loading) {
-              body = CupertinoActivityIndicator();
-            } else if (mode == LoadStatus.failed) {
-              body = Text("Load Failed!Click retry!");
-            } else if (mode == LoadStatus.canLoading) {
-              body = Text("release to load more");
-            } else {
-              body = Text("No more Data");
-            }
-            return Container(
-              height: 55.0,
-              child: Center(child: body),
-            );
-          },
-        ),
-        controller: _refreshController,
-        onRefresh: _onRefresh,
-        onLoading: _onLoading,
-        child: postList == null
-            ? Container()
-            : ListView.builder(
-                itemBuilder: (c, i) => postList[i],
-                itemCount: postList.length,
+      body: initialLoadComplete == false
+          ? Loading()
+          : SmartRefresher(
+              enablePullDown: true,
+              enablePullUp: true,
+              header: WaterDropHeader(),
+              footer: CustomFooter(
+                builder: (BuildContext context, LoadStatus mode) {
+                  Widget body;
+                  if (mode == LoadStatus.idle) {
+                    body = Text("pull up load");
+                  } else if (mode == LoadStatus.loading) {
+                    body = CupertinoActivityIndicator();
+                  } else if (mode == LoadStatus.failed) {
+                    body = Text("Load Failed!Click retry!");
+                  } else if (mode == LoadStatus.canLoading) {
+                    body = Text("release to load more");
+                  } else {
+                    body = Text("No more Data");
+                  }
+                  return Container(
+                    height: 55.0,
+                    child: Center(child: body),
+                  );
+                },
               ),
-      ),
+              controller: _refreshController,
+              onRefresh: _onRefresh,
+              onLoading: _onLoading,
+              child: postList == null
+                  ? Container()
+                  : ListView.builder(
+                      itemBuilder: (c, i) => postList[i],
+                      itemCount: postList.length,
+                    ),
+            ),
     );
   }
 }
