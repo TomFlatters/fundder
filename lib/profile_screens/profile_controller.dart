@@ -102,15 +102,13 @@ class _ProfileState extends State<ProfileController>
         : Scaffold(
             backgroundColor: Colors.grey[200],
             appBar: widget.user.uid == firebaseUser.uid
-                ? AppBar(
-                    centerTitle: true,
-                    title: Text(widget.user.username),
-                    leading: GestureDetector(
+                ? AppBar(centerTitle: true, title: Text(widget.user.username),
+                    /*leading: GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(
                               context, '/rewards/' + widget.user.uid);
                         },
-                        child: new Icon(MaterialCommunityIcons.gift_outline)),
+                        child: new Icon(MaterialCommunityIcons.gift_outline))*/
                     actions: <Widget>[
                         IconButton(
                           onPressed: () {

@@ -60,6 +60,10 @@ class _SearchState extends State<SearchController>
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Search'),
+      ),
       body: SafeArea(
         child: Column(children: [
           Expanded(
