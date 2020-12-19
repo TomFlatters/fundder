@@ -21,6 +21,8 @@ import 'tutorial_screens/done_tutorial.dart';
 import 'tutorial_screens/do_tutorial.dart';
 
 import 'routes/FadeTransition.dart';
+import 'liked_controller.dart';
+import 'search/search_controller.dart';
 
 class FeedController extends StatefulWidget {
   final bool doTutorialSeen;
@@ -105,7 +107,7 @@ class _FeedControllerState extends State<FeedController>
       child: Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
-          centerTitle: true,
+          centerTitle: false,
           title: Container(
               width: 110,
               child:
@@ -120,12 +122,14 @@ class _FeedControllerState extends State<FeedController>
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),
               ])),
-          leading: GestureDetector(
+          /*leading: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/challengefriend');
               },
-              child: new Icon(MdiIcons.sword)),
+              child: new Icon(MdiIcons.sword)),*/
           actions: [
+            SearchIcon(),
+            ActivityIcon(),
             MessagingIcon(user.uid),
           ],
           bottom: TabBar(
@@ -237,6 +241,32 @@ class MessagingIcon extends StatelessWidget {
           } else {
             return _iconWithoutDot(context);
           }
+        });
+  }
+}
+
+class ActivityIcon extends StatelessWidget {
+  ActivityIcon();
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        icon: Icon(AntDesign.hearto),
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => LikedController()));
+        });
+  }
+}
+
+class SearchIcon extends StatelessWidget {
+  SearchIcon();
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        icon: Icon(AntDesign.search1),
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => SearchController()));
         });
   }
 }

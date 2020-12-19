@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/rewards/rewardspage.dart';
 import 'package:fundder/services/auth.dart';
 //import 'package:fundder/feed_controller.dart';
 import 'placeholder_widget.dart';
@@ -24,6 +25,9 @@ import 'auth_screens/terms_of_use.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_screens/terms_of_use_prompted.dart';
 import 'welcome_pages/find_friends.dart';
+import 'challenge_friend/challenge_friend_controller.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -242,9 +246,11 @@ class _HomeState extends State<Home> {
                       fundTutorialSeen: user.fundTutorialSeen,
                       doneTutorialSeen: user
                           .doneTutorialSeen), //i.e. the one from home button
-                  SearchController(),
+                  //SearchController(),
+                  ChallengeFriend(),
                   PlaceholderWidget(Colors.white),
-                  LikedController(),
+                  //LikedController(),
+                  RewardsPage(uid: firebaseUser.uid),
                   ProfileController(
                     user: user,
                   ),
@@ -275,8 +281,8 @@ class _HomeState extends State<Home> {
                       ),
                       new BottomNavigationBarItem(
                         icon: Icon(
-                          AntDesign.search1,
-                        ),
+                            //AntDesign.search1,
+                            MdiIcons.sword),
                         title: showIndicator(_currentIndex == 1),
                       ),
                       new BottomNavigationBarItem(
@@ -286,13 +292,14 @@ class _HomeState extends State<Home> {
                         title: showIndicator(_currentIndex == 2),
                       ),
                       new BottomNavigationBarItem(
-                        icon: Icon(
+                        icon: Icon(MaterialCommunityIcons.gift_outline),
+                        /*Icon(
                           unreadNotifs == false
                               ? AntDesign.hearto
                               : AntDesign.heart,
                           color:
                               unreadNotifs == false ? null : HexColor('ff6b6c'),
-                        ),
+                        ),*/
                         title: showIndicator(_currentIndex == 3),
                       ),
                       new BottomNavigationBarItem(
