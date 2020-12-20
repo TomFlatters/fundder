@@ -105,75 +105,39 @@ class _FeedControllerState extends State<FeedController>
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: AppBar(
-          centerTitle: false,
-          title: Container(
-              width: 110,
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Image.asset(
-                  'assets/images/pink_bear.png',
-                  height: 20,
-                ),
-                SizedBox(width: 7),
-                Text(
-                  'Fundder',
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-              ])),
-          /*leading: GestureDetector(
+          backgroundColor: Colors.grey[200],
+          appBar: AppBar(
+            centerTitle: false,
+            title: Container(
+                width: 110,
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        'assets/images/pink_bear.png',
+                        height: 20,
+                      ),
+                      SizedBox(width: 7),
+                      Text(
+                        'Fundder',
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ])),
+            /*leading: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/challengefriend');
               },
               child: new Icon(MdiIcons.sword)),*/
-          actions: [
-            SearchIcon(),
-            ActivityIcon(),
-            MessagingIcon(user.uid),
-          ],
-          bottom: TabBar(
-            onTap: _onItemTapped,
-            controller: _tabController,
-            physics: NeverScrollableScrollPhysics(),
-            //indicatorColor: HexColor(colors[_tabController.index]),
-            tabs: [
-              Tab(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    Padding(
-                        padding: EdgeInsets.only(bottom: 5, right: 3),
-                        child: Icon(Icons.lightbulb_outline, size: 16)),
-                    Text("Challenge")
-                  ])),
-              Tab(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    Padding(
-                        padding: EdgeInsets.only(bottom: 5, right: 3),
-                        child: Icon(Icons.monetization_on, size: 16)),
-                    Text(
-                      " Fund",
-                    )
-                  ])),
-              Tab(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    Padding(
-                        padding: EdgeInsets.only(bottom: 5, right: 3),
-                        child: Icon(Icons.local_movies, size: 16)),
-                    Text(" Done")
-                  ])),
+            actions: [
+              SearchIcon(),
+              ActivityIcon(),
+              MessagingIcon(user.uid),
             ],
           ),
-        ),
-        body: //FeedView('Do', HexColor('ff6b6c'))
+          body: Center(
+            child: FeedWrapper("Fund", null, "fund"),
+          )
+          /*
             TabBarView(
                 physics: NeverScrollableScrollPhysics(),
                 controller: _tabController,
@@ -181,8 +145,8 @@ class _FeedControllerState extends State<FeedController>
               DoChallenge(user),
               FeedWrapper("Fund", null, "fund"),
               FeedWrapper("Done", null, "done"),
-            ]),
-      ),
+            ]),*/
+          ),
     );
   }
 }
