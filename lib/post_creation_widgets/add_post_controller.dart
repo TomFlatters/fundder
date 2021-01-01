@@ -28,6 +28,37 @@ import 'package:fundder/global_widgets/dialogs.dart';
 class AddPost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final double height = MediaQuery.of(context).size.height;
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("Create Fundder"),
+      ),
+      body: Builder(
+        builder: (context) => CarouselSlider.builder(
+          itemCount: 3,
+          itemBuilder: (BuildContext context, int itemIndex) => Container(
+            child: Text(itemIndex.toString()),
+          ),
+          options: CarouselOptions(
+            onPageChanged: (index, reason) {},
+            enableInfiniteScroll: false,
+            height: height,
+            viewportFraction: 1.0,
+            enlargeCenterPage: false,
+            // autoPlay: false,
+          ),
+        ),
+      ),
+    );
+
+    /**/
+  }
+}
+/*
+class AddPost extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final contextUser = Provider.of<User>(context);
     String uid = contextUser.uid;
 
@@ -651,3 +682,5 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
     aspectRatio = newAspectRatio;
   }
 }
+
+*/
