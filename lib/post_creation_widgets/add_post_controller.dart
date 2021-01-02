@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
+import 'package:fundder/post_creation_widgets/screens/1st_addpost_screen.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
@@ -35,13 +36,14 @@ class AddPost extends StatelessWidget {
         title: Text("Create Fundder"),
       ),
       body: Builder(
-        builder: (context) => CarouselSlider.builder(
-          itemCount: 3,
-          itemBuilder: (BuildContext context, int itemIndex) => Container(
-            child: Text(itemIndex.toString()),
-          ),
+        builder: (context) => CarouselSlider(
+          items: [
+            FirstAddPostScreen(),
+          ],
           options: CarouselOptions(
-            onPageChanged: (index, reason) {},
+            onPageChanged: (index, reason) {
+              //TODO: implement this!
+            },
             enableInfiniteScroll: false,
             height: height,
             viewportFraction: 1.0,
