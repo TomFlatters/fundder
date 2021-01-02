@@ -4,18 +4,24 @@ import 'dart:io';
 
 class ImageView extends StatelessWidget {
   final PickedFile imageFile;
-  final Function(double) aspectRatioChange;
-  ImageView({this.aspectRatioChange, this.imageFile});
+  final double height;
+  final double width;
+
+  ImageView({this.imageFile, @required this.height, @required this.width});
 
   @override
   Widget build(BuildContext context) {
     if (imageFile == null) {
-      return Container();
+      return Container(child: Text("Add an image or a video"));
     } else {
       File image =
           new File(imageFile.path); // Or any other way to get a File instance.
       _findAspectRatio(image);
-      return Image.file(image);
+      return Image.file(
+        image,
+        width: this.width,
+        height: this.height,
+      );
     }
   }
 
@@ -24,6 +30,5 @@ class ImageView extends StatelessWidget {
     print(decodedImage.width);
     print(decodedImage.height);
     double aspectRatio = decodedImage.width / decodedImage.height;
-    aspectRatioChange(aspectRatio);
   }
 }
