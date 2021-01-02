@@ -2,7 +2,9 @@ import 'package:fluro/fluro.dart';
 import 'package:fluro/src/router.dart' as Router;
 import 'package:flutter/material.dart';
 import 'package:fundder/challenge_friend/challenge_friend_controller.dart';
+import 'package:fundder/challenge_friend/challenge_hub.dart';
 import 'package:fundder/challenge_friend/view_challenge.dart';
+import 'package:fundder/challenge_friend/challenge_detail.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/post_creation_widgets/share_post_controller.dart';
 import 'package:fundder/rewards/rewardspage.dart';
@@ -11,7 +13,7 @@ import 'package:fundder/view_post_controller.dart';
 import 'package:fundder/comment_view_controller.dart';
 import 'package:fundder/donation/donate_page_controller.dart';
 import 'package:fundder/post_creation_widgets/add_post_controller.dart';
-import 'package:fundder/do_challenge_detail.dart';
+//import 'package:fundder/do_challenge_detail.dart';
 import 'package:fundder/challenge_steps_view.dart';
 import 'package:fundder/profile_screens/view_followers_controller.dart';
 import 'package:fundder/profile_screens/edit_profile_controller.dart';
@@ -28,6 +30,7 @@ import 'package:fundder/post_widgets/view_likers_controller.dart';
 import 'package:fundder/messaging/chat_room.dart';
 import 'package:fundder/profile_screens/user_loader.dart';
 import 'package:fundder/post_creation_widgets/upload_progress_controller.dart';
+import 'package:fundder/challenge_friend/challenges_feed.dart';
 
 class FluroRouter {
   static Router.Router router = Router.Router();
@@ -157,6 +160,13 @@ class FluroRouter {
           SharePostController(
             postId: params['id'][0],
           ));
+  static Handler _challengeHubHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ChallengeHub());
+  static Handler _challengeFeedHandler = Handler(
+      handlerFunc: (BuildContext context, Map<String, dynamic> params) =>
+          ChallengesFeed(params['challengeId'][0], params['challengeTitle'][0],
+              params['count'][0]));
 
   static void setupRouter() {
     router.define(
@@ -231,6 +241,10 @@ class FluroRouter {
       '/challengefriend',
       handler: _challengeFriendHandler,
     );
+    router.define(
+      '/challengehub',
+      handler: _challengeHubHandler,
+    );
 
     router.define(
       '/challenge/:id',
@@ -289,6 +303,12 @@ class FluroRouter {
     router.define(
       'sharePost/:id',
       handler: _shareNewPostHandler,
+      transitionType: TransitionType.material,
+    );
+
+    router.define(
+      'challengesFeed/:challengeId/:challengeTitle/:count',
+      handler: _challengeFeedHandler,
       transitionType: TransitionType.material,
     );
   }

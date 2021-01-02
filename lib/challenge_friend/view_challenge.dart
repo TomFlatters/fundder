@@ -142,6 +142,9 @@ class ViewChallenge extends StatelessWidget {
             Scaffold.of(context).showSnackBar(snackBar);
           },
           text: "Accept",
+        ),
+        SizedBox(
+          height: 20,
         )
       ],
     );
