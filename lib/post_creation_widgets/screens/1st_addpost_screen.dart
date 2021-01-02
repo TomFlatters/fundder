@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/media_upload.dart';
 import 'package:fundder/post_creation_widgets/screens/screen_interface.dart';
 import 'package:fundder/post_creation_widgets/screens/top_curved_grey_rounded_decor.dart';
 
@@ -12,9 +13,7 @@ class FirstAddPostScreen extends A_CreationScreen {
   Widget build(BuildContext context) {
     return ListView(
       shrinkWrap: true,
-      children: [
-        GreyGapRounded(),
-      ],
+      children: [GreyGapRounded(), MediaUploadBox()],
     );
   }
 }
