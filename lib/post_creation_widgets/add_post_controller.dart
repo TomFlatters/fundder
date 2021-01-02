@@ -26,6 +26,7 @@ import 'creation_tiles/post_preview.dart';
 import 'creation_tiles/tile_widgets/image_view.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 
+/**UI for adding a post */
 class AddPost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
