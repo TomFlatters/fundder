@@ -13,7 +13,7 @@ class FirstAddPostScreen extends A_CreationScreen {
   Widget build(BuildContext context) {
     return ListView(
       shrinkWrap: true,
-      children: [GreyGapRounded(), MediaUploadBox()],
+      children: [GreyGapRounded(), MediaInputField().buildWidget()],
     );
   }
 }
