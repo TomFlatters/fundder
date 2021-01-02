@@ -3,18 +3,47 @@ import 'package:flutter_icons/flutter_icons.dart';
 
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/tile_widgets/image_view.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_interface.dart';
 import 'package:image_picker/image_picker.dart';
 
 /**Widget handling valid video/image upload */
 
+class MediaInputField extends InputField {
+  bool _isValid = false;
+  bool get isInputValid {
+    return _isValid;
+  }
+
+  void _updateValidity(bool newValidity) {
+    _isValid = newValidity;
+    print("validity status of media input field is ${newValidity.toString()}");
+  }
+
+  StatefulWidget buildWidget() =>
+      MediaUploadBox(updateValidityFunction: this._updateValidity);
+}
+
 class MediaUploadBox extends StatefulWidget {
+  /*Dependency injection constructor called after media is uploaded or removed. */
+  final Function updateValidityFunction;
+  MediaUploadBox({this.updateValidityFunction});
+
   @override
   _MediaUploadBoxState createState() => _MediaUploadBoxState();
 }
 
 class _MediaUploadBoxState extends State<MediaUploadBox> {
   PickedFile _imageFile;
+  /**changes the input validity status of external loosely coupled class 
+   * whenever the input changes.
+   */
+  Function updateValidityFunction;
   final picker = ImagePicker();
+  @override
+  initState() {
+    super.initState();
+    updateValidityFunction = widget.updateValidityFunction;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +63,7 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
                         ),
                         children: [
                       TextSpan(
-                          text:
-                              'Add a photo to make your Fundder more recognisable ',
+                          text: 'Tap to add a video or photo for your Fundder ',
                           style: TextStyle(
                             fontFamily: 'Founders Grotesk',
                             fontWeight: FontWeight.bold,
@@ -87,20 +115,26 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
   _openGallery() async {
     _imageFile = await picker.getImage(source: ImageSource.gallery);
 
-    this.setState(() {});
+    this.setState(() {
+      updateValidityFunction(_imageFile != null);
+    });
   }
 
   _openCamera() async {
     _imageFile = await picker.getImage(source: ImageSource.camera);
 
-    this.setState(() {});
+    this.setState(() {
+      updateValidityFunction(_imageFile != null);
+    });
   }
 
   _removePhoto() {
     _imageFile = null;
     ;
 
-    this.setState(() {});
+    this.setState(() {
+      updateValidityFunction(_imageFile != null);
+    });
   }
 
   ListView _buildBottomNavigationMenu(context) {
