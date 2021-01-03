@@ -27,23 +27,49 @@ import 'creation_tiles/tile_widgets/image_view.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 
 /**UI for adding a post */
-class AddPost extends StatelessWidget {
+
+class AddPost extends StatefulWidget {
+  @override
+  _AddPostState createState() => _AddPostState();
+}
+
+class _AddPostState extends State<AddPost> {
+  int _currentScreen = 0;
+  CarouselController _carouselController = CarouselController();
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text("Create Fundder"),
-      ),
+          centerTitle: true,
+          title: Text("Create Fundder"),
+          leading: Container(
+              width: 100,
+              child: IconButton(
+                  icon: _currentScreen == 0
+                      ? Icon(Icons.close)
+                      : Icon(Icons.arrow_back),
+                  onPressed: _currentScreen == 0
+                      ? () {
+                          Navigator.of(context).pop(null);
+                        }
+                      : () {
+                          _carouselController.previousPage(
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.linear);
+                        }))),
       body: Builder(
         builder: (context) => CarouselSlider(
-          items: [
-            FirstAddPostScreen(),
-          ],
+          carouselController: _carouselController,
+          items: [FirstAddPostScreen(), Center(child: Text("Kurt Cobain"))],
           options: CarouselOptions(
             onPageChanged: (index, reason) {
-              //TODO: implement this!
+              FocusScope.of(context).unfocus();
+              if (mounted) {
+                setState(() {
+                  _currentScreen = index;
+                });
+              }
             },
             enableInfiniteScroll: false,
             height: height,
@@ -54,10 +80,9 @@ class AddPost extends StatelessWidget {
         ),
       ),
     );
-
-    /**/
   }
 }
+
 /*
 class AddPost extends StatelessWidget {
   @override
