@@ -46,34 +46,42 @@ class _MoneyInputBoxState extends State<MoneyInputBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      Text('My target amount: ',
-          style: TextStyle(
-            fontFamily: 'Founders Grotesk',
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          )),
-      Text(
-        '£',
-        style: TextStyle(
-            fontWeight: FontWeight.w100,
-            fontFamily: 'Founders Grotesk',
-            fontSize: 18,
-            color: HexColor('ff6b6c')),
-      ),
-      Expanded(
-        child: TextField(
-          keyboardType: TextInputType.number,
-          style: TextStyle(
-            fontWeight: FontWeight.w100,
-            fontFamily: 'Founders Grotesk',
-            fontSize: 18,
-            color: Colors.black,
-          ),
-          controller: moneyController,
-          decoration: textInputDecoration.copyWith(hintText: 'Amount in £'),
+    return Column(
+      children: [
+        Container(
+          alignment: Alignment.centerLeft,
+          child: Text('My target amount: ',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                fontFamily: 'Founders Grotesk',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              )),
         ),
-      )
-    ]);
+        Row(children: [
+          Text(
+            '£',
+            style: TextStyle(
+                fontWeight: FontWeight.w100,
+                fontFamily: 'Founders Grotesk',
+                fontSize: 35,
+                color: HexColor('ff6b6c')),
+          ),
+          Expanded(
+            child: TextField(
+              keyboardType: TextInputType.number,
+              style: TextStyle(
+                fontWeight: FontWeight.w100,
+                fontFamily: 'Founders Grotesk',
+                fontSize: 35,
+                color: Colors.black,
+              ),
+              controller: moneyController,
+              decoration: textInputDecoration.copyWith(hintText: 'Amount in £'),
+            ),
+          )
+        ])
+      ],
+    );
   }
 }
