@@ -19,14 +19,23 @@ class FirstAddPostScreen extends A_CreationScreen {
       children: [
         GreyGapRounded(),
         MediaInputField().buildWidget(),
-        SizedBox(height: 25),
-        TitleInputField().buildWidget(),
-        SizedBox(
-          height: 25,
+        SizedBox(height: 10),
+        Padding(
+          padding: EdgeInsets.all(10.0),
+          child: TitleInputField().buildWidget(),
         ),
-        DescriptionInputField().buildWidget(),
-        SizedBox(height: 25),
-        MoneyInputField().buildWidget(),
+        SizedBox(
+          height: 10,
+        ),
+        Padding(
+          padding: EdgeInsets.all(10.0),
+          child: DescriptionInputField().buildWidget(),
+        ),
+        SizedBox(height: 10),
+        Padding(
+          padding: EdgeInsets.all(10.0),
+          child: MoneyInputField().buildWidget(),
+        ),
       ],
     );
   }
