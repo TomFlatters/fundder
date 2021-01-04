@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/global_widgets/buttons.dart';
 
 class Fund4 extends StatelessWidget {
   @override
@@ -7,16 +8,23 @@ class Fund4 extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Fundders can move between the 3 tabs in the feed.',
+          Text('Donations', style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          Text(
+              'You can donate by opening the Fundder detailed view through the feed and pressing',
               textAlign: TextAlign.center,
               style: TextStyle(fontWeight: FontWeight.normal)),
           Expanded(
             child: Center(
-              child: Container(
-                  margin: EdgeInsets.all(20),
-                  child: Image.asset('assets/images/tutorial_pics-03.png')),
+              child: PrimaryFundderButton(text: 'Donate', onPressed: () {}),
             ),
           ),
+          Text('as a sign of appreciation',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.normal)),
+          Expanded(
+            child: Container(),
+          )
         ]);
   }
 }

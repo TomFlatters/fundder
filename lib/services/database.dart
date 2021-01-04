@@ -187,7 +187,7 @@ class DatabaseService {
         dpSetterPrompted: doc.data['dpSetterPrompted'],
         verified: doc.data['verified'],
         profileTutorialSeen: doc.data['profileTutorialSeen'],
-        fundTutorialSeen: doc.data['fundTutorialSeen'],
+        fundTutorialSeen: doc.data['tutorialSeenV2'],
         doTutorialSeen: doc.data['doTutorialSeen'],
         doneTutorialSeen: doc.data['doneTutorialSeen'],
         likes: doc.data['likes'],

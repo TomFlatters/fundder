@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'Do/do_1.dart';
-import 'Do/do_2.dart';
-import 'Done/done_1.dart';
 import 'Profile/profile_1.dart';
 import 'package:fundder/global_widgets/buttons.dart';
 import 'package:fundder/helper_classes.dart';
