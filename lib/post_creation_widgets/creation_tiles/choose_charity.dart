@@ -4,7 +4,7 @@ import 'tile_widgets/charity_tiles.dart';
 import 'package:fundder/shared/loading.dart';
 
 class ChooseCharity extends StatefulWidget {
-  final ValueChanged<int> charitySelected;
+  final Function charitySelected;
   List<Charity> charities;
   int charity;
   ChooseCharity({this.charitySelected, this.charities, this.charity});
@@ -13,6 +13,14 @@ class ChooseCharity extends StatefulWidget {
 }
 
 class _ChooseCharityState extends State<ChooseCharity> {
+  int selectedCharity;
+
+  @override
+  void initState() {
+    selectedCharity = widget.charity;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(children: <Widget>[
@@ -54,13 +62,13 @@ class _ChooseCharityState extends State<ChooseCharity> {
                           ? widget.charities.length
                           : 0,
                       itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          child: CharityTile(widget.charities[index],
-                              widget.charity == index ? true : false),
-                          onTap: () {
-                            widget.charitySelected(index);
-                          },
-                        );
+                        return CharityTile(widget.charities[index],
+                            selectedCharity == index ? true : false, () {
+                          widget.charitySelected(index);
+                          setState(() {
+                            this.selectedCharity = index;
+                          });
+                        });
                       })
                   : Loading()
             ],
