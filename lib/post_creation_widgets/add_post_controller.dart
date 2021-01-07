@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/description_input.dart';
 import 'package:fundder/post_creation_widgets/screens/1st_addpost_screen.dart';
+import 'package:fundder/post_creation_widgets/screens/charity_list_screen.dart';
+import 'package:fundder/post_creation_widgets/screens/hashtag_adding_screen.dart';
+import 'package:fundder/post_creation_widgets/screens/screen_interface.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
@@ -35,12 +39,14 @@ class AddPost extends StatefulWidget {
 
 class _AddPostState extends State<AddPost> {
   int _currentScreen = 0;
+
   CarouselController _carouselController = CarouselController();
+
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
           centerTitle: true,
           title: Text("Create Fundder"),
           leading: Container(
@@ -57,28 +63,63 @@ class _AddPostState extends State<AddPost> {
                           _carouselController.previousPage(
                               duration: Duration(milliseconds: 300),
                               curve: Curves.linear);
-                        }))),
-      body: Builder(
-        builder: (context) => CarouselSlider(
-          carouselController: _carouselController,
-          items: [FirstAddPostScreen(), Center(child: Text("Kurt Cobain"))],
-          options: CarouselOptions(
-            onPageChanged: (index, reason) {
-              FocusScope.of(context).unfocus();
-              if (mounted) {
-                setState(() {
-                  _currentScreen = index;
-                });
-              }
-            },
-            enableInfiniteScroll: false,
-            height: height,
-            viewportFraction: 1.0,
-            enlargeCenterPage: false,
-            // autoPlay: false,
-          ),
+                        })),
+          actions: [
+            (_currentScreen < 2) ? _createNextButton() : _createPreviewButton(),
+          ],
         ),
-      ),
+        body: MultiProvider(
+          providers: [
+            Provider<DescriptionInputStateManager>(
+              create: (_) => DescriptionInputStateManager(),
+            )
+          ],
+          child: Builder(
+            builder: (context) => CarouselSlider(
+              carouselController: _carouselController,
+              items: [
+                FirstAddPostScreen(),
+                CharitySelectionScreen(),
+                HashtaggingScreen()
+              ],
+              options: CarouselOptions(
+                onPageChanged: (index, reason) {
+                  FocusScope.of(context).unfocus();
+                  if (mounted) {
+                    setState(() {
+                      _currentScreen = index;
+                    });
+                  }
+                },
+                enableInfiniteScroll: false,
+                height: height,
+                viewportFraction: 1.0,
+                enlargeCenterPage: false,
+                // autoPlay: false,
+              ),
+            ),
+          ),
+        ));
+  }
+
+  _createNextButton() {
+    return FlatButton(
+      child: Text("Next",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+      onPressed: () {
+        _carouselController.nextPage(
+            duration: Duration(milliseconds: 300), curve: Curves.linear);
+      },
+    );
+  }
+
+  _createPreviewButton() {
+    return FlatButton(
+      child: Text("Preview",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+      onPressed: () {
+        print("Preview button pressed on AddPost");
+      },
     );
   }
 }
