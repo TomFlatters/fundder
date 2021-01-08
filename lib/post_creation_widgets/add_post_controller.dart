@@ -102,7 +102,7 @@ class _AddPostState extends State<AddPost> {
                           ? _createNextButton()
                           : (!_inPreview)
                               ? _createPreviewButton(context)
-                              : Container(),
+                              : _createUploadButton(context),
                     ],
                   ),
                   body: CarouselSlider(
@@ -250,11 +250,28 @@ class _AddPostState extends State<AddPost> {
       child: Text("Post",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
       onPressed: () {
-        _uploadPost(context);
+        Navigator.of(context).pop(null);
+        showDialog(
+            context: context,
+            builder: (context2) => Dialog(
+                  child: FutureBuilder(
+                    future: _uploadPost(context),
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        String pid = snapshot.data as String;
+                        return (pid != null)
+                            ? Text(pid.toString())
+                            : Text("It seems something went wrong...");
+                      } else
+                        return Loading();
+                    },
+                  ),
+                ));
       },
     );
   }
 
+/**Returns the postId of the post on successful upload */
   Future<String> _uploadPost(context) async {
     //getting all the relevant states
     final descriptionState =
@@ -274,8 +291,10 @@ class _AddPostState extends State<AddPost> {
 
     final String fileLocation =
         user.uid + "/" + DateTime.now().microsecondsSinceEpoch.toString();
+    print("uploading image");
     String downloadUrl = await DatabaseService(uid: user.uid)
         .uploadImage(File(mediaState.imageFile.path), fileLocation);
+    print("uploading post now");
     String postId = await DatabaseService(uid: user.uid).uploadPost(new Post(
         isPrivate: privateStatusState.currentValue,
         title: titleState.currentValue.trimRight(),
@@ -294,7 +313,7 @@ class _AddPostState extends State<AddPost> {
         hashtags: hashtagState.currentValue,
         charityLogo:
             charityState.charityList[charityState.currentValue].image));
-
+    print("post uploaded now");
     return postId;
   }
 }
