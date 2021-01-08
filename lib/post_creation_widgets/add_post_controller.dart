@@ -7,6 +7,7 @@ import 'package:fundder/post_creation_widgets/input_field_widgets/description_in
 import 'package:fundder/post_creation_widgets/input_field_widgets/media_upload.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/money_input.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/title_input.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/which_charity_input.dart';
 import 'package:fundder/post_creation_widgets/screens/1st_addpost_screen.dart';
 import 'package:fundder/post_creation_widgets/screens/charity_list_screen.dart';
 import 'package:fundder/post_creation_widgets/screens/hashtag_adding_screen.dart';
@@ -83,6 +84,9 @@ class _AddPostState extends State<AddPost> {
                 create: (_) => MediaStateManager()),
             Provider<MoneyInputStateManager>(
               create: (_) => MoneyInputStateManager(),
+            ),
+            ChangeNotifierProvider<CharitySelectionStateManager>(
+              create: (_) => CharitySelectionStateManager(),
             )
           ],
           child: Builder(
