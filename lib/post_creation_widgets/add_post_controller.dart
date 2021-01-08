@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/description_input.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/hashtag_input_field.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/isPrivate_input.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/media_upload.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/money_input.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/title_input.dart';
@@ -64,6 +65,9 @@ class _AddPostState extends State<AddPost> {
           Provider<HashtagsStateManager>(
             create: (_) => HashtagsStateManager(),
           ),
+          Provider<PrivateStatusStateManager>(
+            create: (_) => PrivateStatusStateManager(),
+          )
         ],
         child: Builder(
             builder: (context) => Scaffold(
@@ -150,6 +154,8 @@ class _AddPostState extends State<AddPost> {
         Provider.of<CharitySelectionStateManager>(context, listen: false);
     final hashtagState =
         Provider.of<HashtagsStateManager>(context, listen: false);
+    final privateStatusState =
+        Provider.of<PrivateStatusStateManager>(context, listen: false);
 
     List validityCheckers = [
       descriptionState,
@@ -190,10 +196,12 @@ class _AddPostState extends State<AddPost> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   var value = snapshot.data;
+                  bool isPrivate = (value.data["isPrivate"] == null)
+                      ? false
+                      : value.data["isPrivate"];
+                  privateStatusState.updateValue(isPrivate);
                   User user = User(
-                      isPrivate: (value.data["isPrivate"] == null)
-                          ? false
-                          : value.data["isPrivate"],
+                      isPrivate: isPrivate,
                       uid: _user.uid,
                       name: value.data["name"],
                       username: value.data['username'],
