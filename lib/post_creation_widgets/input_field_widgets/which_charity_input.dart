@@ -29,6 +29,8 @@ class CharitySelectionField extends StatelessWidget {
 /**Holds the state for which charity has been selected. */
 class CharitySelectionStateManager
     with ChangeNotifier, InputFieldValidityChecker {
+  List<Charity> _charities = [];
+
   /**
    * 
    * Numerical index of the currently chosen charity. It's 
@@ -68,4 +70,20 @@ class CharitySelectionStateManager
       context,
     );
   }
+
+  /**Sets the list of actual charities. This can only be initialised after the user
+   * has  actually chosen the charity as the charity selection screen loads up 
+   * the charities list from Firestore.
+   */
+
+  void setCharityList(List<Charity> newCharities) {
+    _charities = newCharities;
+    print("Charity list added to state; ${charityList.toString()}");
+  }
+
+/**This will only give the list of charities if the user has actually chosen a 
+ * charity from the charity selection screen, due to awkward implementation. 
+ * Soz...
+ */
+  List<Charity> get charityList => this._charities;
 }
