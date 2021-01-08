@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:fundder/shared/constants.dart';
 
 class SetHashtags extends StatefulWidget {
+  /**List of hashtags selected by the user.
+   * It always has the most up to date hashtags.
+   */
   final List<String> hashtags;
   final Function(List<String>) onHasthagChange;
   SetHashtags({this.hashtags, this.onHasthagChange});
