@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/models/charity.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/which_charity_input.dart';
+import 'package:provider/provider.dart';
 import 'tile_widgets/charity_tiles.dart';
 import 'package:fundder/shared/loading.dart';
 
@@ -23,6 +25,9 @@ class _ChooseCharityState extends State<ChooseCharity> {
 
   @override
   Widget build(BuildContext context) {
+    final charityState =
+        Provider.of<CharitySelectionStateManager>(context, listen: false);
+    charityState.setCharityList(widget.charities);
     return ListView(children: <Widget>[
       Container(
         color: Colors.grey[200],
