@@ -9,7 +9,7 @@ import 'package:fundder/shared/loading.dart';
  * screen.
  */
 
-class CharitySelectionScreen extends A_CreationScreen {
+class CharitySelectionScreen extends StatelessWidget {
   bool get allFieldsValid {
     //TODO: to be implemented by logical conjunction of the validity of all input fields.
     return false;
