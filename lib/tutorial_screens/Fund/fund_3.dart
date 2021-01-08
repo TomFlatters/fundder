@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fundder/helper_classes.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class Fund3 extends StatelessWidget {
   @override
@@ -8,20 +10,53 @@ class Fund3 extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-              "Your followers 'crowdfund' your Fundder! They have 14 days! (but you can extend that)",
+          Text('Creating Fundders',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          RichText(
               textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.normal)),
-          SizedBox(
-            height: 20,
+              text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.black,
+                    fontFamily: 'Founders Grotesk',
+                  ),
+                  children: [
+                    TextSpan(
+                        text: 'To add your own Fundder to the ',
+                        style: TextStyle()),
+                    TextSpan(
+                        text:
+                            'feed, you can either create your own by pressing',
+                        style: TextStyle()),
+                  ])),
+          Expanded(
+            child: Center(
+              child: Container(
+                margin: EdgeInsets.all(10),
+                child: Icon(
+                  AntDesign.plussquareo,
+                  color: HexColor('ff6b6c'),
+                  size: 40,
+                ),
+              ),
+            ),
           ),
           Text(
-              "When you reach your target amount, you will be prompted to complete the challenge you set yourself in the Fundder.",
+              "in the bottom bar. You can challenge people to Fundders by pressing",
               textAlign: TextAlign.center,
               style: TextStyle(fontWeight: FontWeight.normal)),
           Expanded(
-            child: Container(),
-          )
+            child: Center(
+                child: Container(
+              margin: EdgeInsets.all(10),
+              child: Icon(
+                MdiIcons.sword,
+                color: HexColor('ff6b6c'),
+                size: 40,
+              ),
+            )),
+          ),
         ]);
   }
 }

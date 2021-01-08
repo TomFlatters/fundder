@@ -17,8 +17,8 @@ import 'auth.dart';
 class DatabaseService {
   // initiate the class with the user id
   final String uid;
-  final cloudFunc = CloudFunctions.instance;
-  // .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+  final cloudFunc = CloudFunctions.instance
+      .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
 
   final _auth = AuthService();
 
@@ -189,7 +189,7 @@ class DatabaseService {
         dpSetterPrompted: doc.data['dpSetterPrompted'],
         verified: doc.data['verified'],
         profileTutorialSeen: doc.data['profileTutorialSeen'],
-        fundTutorialSeen: doc.data['fundTutorialSeen'],
+        fundTutorialSeen: doc.data['tutorialSeenV2'],
         doTutorialSeen: doc.data['doTutorialSeen'],
         doneTutorialSeen: doc.data['doneTutorialSeen'],
         likes: doc.data['likes'],

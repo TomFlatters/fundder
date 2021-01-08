@@ -70,7 +70,6 @@ class _ImageUploadState extends State<ImageUpload> {
       ),
       Container(
           child: ImageView(
-            aspectRatioChange: widget.aspectRatioChange,
             imageFile: widget.imageFile,
           ),
           constraints: BoxConstraints(

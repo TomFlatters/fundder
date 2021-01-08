@@ -17,21 +17,14 @@ import 'models/user.dart';
 import 'feed_wrapper.dart';
 
 import 'tutorial_screens/fund_tutorial.dart';
-import 'tutorial_screens/done_tutorial.dart';
-import 'tutorial_screens/do_tutorial.dart';
 
 import 'routes/FadeTransition.dart';
 import 'liked_controller.dart';
 import 'search/search_controller.dart';
 
 class FeedController extends StatefulWidget {
-  final bool doTutorialSeen;
   final bool fundTutorialSeen;
-  final bool doneTutorialSeen;
-  FeedController(
-      {@required this.doTutorialSeen,
-      @required this.fundTutorialSeen,
-      @required this.doneTutorialSeen});
+  FeedController({@required this.fundTutorialSeen});
 
   @override
   _FeedControllerState createState() => _FeedControllerState();
@@ -51,14 +44,8 @@ class _FeedControllerState extends State<FeedController>
   }
 
   void _checkTutorials() async {
-    if (widget.doTutorialSeen != true && _tabController.index == 0) {
-      _showDoTutorial(context);
-    }
     if (widget.fundTutorialSeen != true && _tabController.index == 1) {
       _showFundTutorial(context);
-    }
-    if (widget.doneTutorialSeen != true && _tabController.index == 2) {
-      _showDoneTutorial(context);
     }
   }
 
@@ -68,26 +55,6 @@ class _FeedControllerState extends State<FeedController>
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return FundTutorial();
-      },
-    );
-  }
-
-  Future<void> _showDoneTutorial(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return DoneTutorial();
-      },
-    );
-  }
-
-  Future<void> _showDoTutorial(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return DoTutorial();
       },
     );
   }
@@ -105,75 +72,39 @@ class _FeedControllerState extends State<FeedController>
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: AppBar(
-          centerTitle: false,
-          title: Container(
-              width: 110,
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Image.asset(
-                  'assets/images/pink_bear.png',
-                  height: 20,
-                ),
-                SizedBox(width: 7),
-                Text(
-                  'Fundder',
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-              ])),
-          /*leading: GestureDetector(
+          backgroundColor: Colors.grey[200],
+          appBar: AppBar(
+            centerTitle: false,
+            title: Container(
+                width: 110,
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        'assets/images/pink_bear.png',
+                        height: 20,
+                      ),
+                      SizedBox(width: 7),
+                      Text(
+                        'Fundder',
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ])),
+            /*leading: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/challengefriend');
               },
               child: new Icon(MdiIcons.sword)),*/
-          actions: [
-            SearchIcon(),
-            ActivityIcon(),
-            MessagingIcon(user.uid),
-          ],
-          bottom: TabBar(
-            onTap: _onItemTapped,
-            controller: _tabController,
-            physics: NeverScrollableScrollPhysics(),
-            //indicatorColor: HexColor(colors[_tabController.index]),
-            tabs: [
-              Tab(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    Padding(
-                        padding: EdgeInsets.only(bottom: 5, right: 3),
-                        child: Icon(Icons.lightbulb_outline, size: 16)),
-                    Text("Challenge")
-                  ])),
-              Tab(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    Padding(
-                        padding: EdgeInsets.only(bottom: 5, right: 3),
-                        child: Icon(Icons.monetization_on, size: 16)),
-                    Text(
-                      " Fund",
-                    )
-                  ])),
-              Tab(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    Padding(
-                        padding: EdgeInsets.only(bottom: 5, right: 3),
-                        child: Icon(Icons.local_movies, size: 16)),
-                    Text(" Done")
-                  ])),
+            actions: [
+              SearchIcon(),
+              ActivityIcon(),
+              MessagingIcon(user.uid),
             ],
           ),
-        ),
-        body: //FeedView('Do', HexColor('ff6b6c'))
+          body: Center(
+            child: FeedWrapper("Fund", null, "fund"),
+          )
+          /*
             TabBarView(
                 physics: NeverScrollableScrollPhysics(),
                 controller: _tabController,
@@ -181,8 +112,8 @@ class _FeedControllerState extends State<FeedController>
               DoChallenge(user),
               FeedWrapper("Fund", null, "fund"),
               FeedWrapper("Done", null, "done"),
-            ]),
-      ),
+            ]),*/
+          ),
     );
   }
 }

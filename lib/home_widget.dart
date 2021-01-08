@@ -243,10 +243,8 @@ class _HomeState extends State<Home> {
                 print(user.toString());
                 final List<Widget> screens = [
                   FeedController(
-                      doTutorialSeen: user.doTutorialSeen,
-                      fundTutorialSeen: user.fundTutorialSeen,
-                      doneTutorialSeen: user
-                          .doneTutorialSeen), //i.e. the one from home button
+                    fundTutorialSeen: user.fundTutorialSeen,
+                  ), //i.e. the one from home button
                   //SearchController(),
                   ChallengeHub(),
                   PlaceholderWidget(Colors.white),

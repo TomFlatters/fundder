@@ -11,7 +11,8 @@ class CharityTile extends StatefulWidget {
 
   final Charity charity;
   final bool selected;
-  CharityTile(this.charity, this.selected);
+  final Function charitySelected;
+  CharityTile(this.charity, this.selected, this.charitySelected);
 }
 
 class _CharityTileState extends State<CharityTile> {
@@ -25,24 +26,30 @@ class _CharityTileState extends State<CharityTile> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-        duration: Duration(milliseconds: 500),
-        curve: Curves.fastOutSlowIn,
-        decoration: BoxDecoration(
-          borderRadius: new BorderRadius.only(
-            topLeft: Radius.circular(10.0),
-            bottomLeft: Radius.circular(10.0),
-            topRight: Radius.circular(10.0),
-            bottomRight: Radius.circular(10.0),
-          ),
-          color:
-              widget.selected == true ? HexColor('ff6b6c') : Colors.grey[200],
-        ),
-        child: ExpandableCardContainer(
-          expandedChild: createExpandedColumn(context),
-          collapsedChild: createCollapsedColumn(context),
-          isExpanded: isExpanded,
-        ));
+    return GestureDetector(
+        onTap: () {
+          widget.charitySelected();
+          ;
+        },
+        child: AnimatedContainer(
+            duration: Duration(milliseconds: 500),
+            curve: Curves.fastOutSlowIn,
+            decoration: BoxDecoration(
+              borderRadius: new BorderRadius.only(
+                topLeft: Radius.circular(10.0),
+                bottomLeft: Radius.circular(10.0),
+                topRight: Radius.circular(10.0),
+                bottomRight: Radius.circular(10.0),
+              ),
+              color: widget.selected == true
+                  ? HexColor('ff6b6c')
+                  : Colors.grey[200],
+            ),
+            child: ExpandableCardContainer(
+              expandedChild: createExpandedColumn(context),
+              collapsedChild: createCollapsedColumn(context),
+              isExpanded: isExpanded,
+            )));
   }
 
   Widget createExpandedColumn(context) {

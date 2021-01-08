@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'models/post.dart';
@@ -14,6 +16,7 @@ import 'shared/loading.dart';
 // scrolling more seamless with no realoding of video controllers previously made
 
 class FeedWrapper extends StatefulWidget {
+  //all of these parameters for FeedWrapper are now unnecessary
   @override
   _FeedWrapperState createState() => _FeedWrapperState();
 
@@ -41,10 +44,25 @@ class _FeedWrapperState extends State<FeedWrapper> {
     _onRefresh();
   }
 
+/**Creates a mixed list where the first two elements of the mixed list are from 
+ * list1. If there aren't two elements in list 1, then simply concatenate list1 
+ * list2 in that order. 
+ */
+  List<Post> _mixLists(List<Post> list1, List<Post> list2) {
+    if (list1.length <= 2) {
+      return new List.from(list1)..addAll(list2);
+    } else {
+      //to be changed:
+      return new List.from(list1)..addAll(list2);
+    }
+  }
+
   void _onRefresh() async {
     // monitor network fetch
     loadingTimestamp = Timestamp.now();
     List<Post> futurePost;
+    List<Post> futureFundPost;
+    List<Post> futureDonePost;
     if (widget.status == 'hashtag') {
       futurePost = await DatabaseService()
           .refreshHashtag(widget.identifier, limit, loadingTimestamp);
@@ -52,8 +70,14 @@ class _FeedWrapperState extends State<FeedWrapper> {
       futurePost = await DatabaseService()
           .refreshChallenge(widget.identifier, limit, loadingTimestamp);
     } else {
-      futurePost = await DatabaseService()
-          .refreshPosts(widget.status, limit, loadingTimestamp);
+      Random random = new Random();
+      int noOfFundPosts = random.nextInt(2);
+      int noOfDonePosts = random.nextInt(2) + 2;
+      futureDonePost = await DatabaseService()
+          .refreshPosts('done', noOfDonePosts, loadingTimestamp);
+      futureFundPost = await DatabaseService()
+          .refreshPosts('fund', noOfFundPosts, loadingTimestamp);
+      futurePost = _mixLists(futureDonePost, futureFundPost);
     }
     postList = [
       FeedView(futurePost, () {
