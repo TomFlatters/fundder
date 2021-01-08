@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fundder/models/post.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/description_input.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/hashtag_input_field.dart';
@@ -166,6 +169,7 @@ class _AddPostState extends State<AddPost> {
       hashtagState
     ];
     return FlatButton(
+      //minimise for code readability
       child: Text("Preview",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
       onPressed: () {
@@ -200,6 +204,9 @@ class _AddPostState extends State<AddPost> {
                       ? false
                       : value.data["isPrivate"];
                   privateStatusState.updateValue(isPrivate);
+
+                  //this is terrible easter egg coding from me but life moves on I suppose
+                  privateStatusState.setUsername(value.data['username']);
                   User user = User(
                       isPrivate: isPrivate,
                       uid: _user.uid,
@@ -223,7 +230,6 @@ class _AddPostState extends State<AddPost> {
                       selected: 0, //to make compatible with legacy code
                       targetAmount: targetAmountState.currentValue,
                       hashtags: hashtagState.currentValue);
-                  ;
                 } else {
                   return Loading();
                 }
@@ -237,6 +243,59 @@ class _AddPostState extends State<AddPost> {
         }
       },
     );
+  }
+
+  _createUploadButton(context) {
+    return FlatButton(
+      child: Text("Post",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+      onPressed: () {
+        _uploadPost(context);
+      },
+    );
+  }
+
+  Future<String> _uploadPost(context) async {
+    //getting all the relevant states
+    final descriptionState =
+        Provider.of<DescriptionInputStateManager>(context, listen: false);
+    final titleState =
+        Provider.of<TitleInputStateManager>(context, listen: false);
+    final targetAmountState =
+        Provider.of<MoneyInputStateManager>(context, listen: false);
+    final mediaState = Provider.of<MediaStateManager>(context, listen: false);
+    final charityState =
+        Provider.of<CharitySelectionStateManager>(context, listen: false);
+    final hashtagState =
+        Provider.of<HashtagsStateManager>(context, listen: false);
+    final privateStatusState =
+        Provider.of<PrivateStatusStateManager>(context, listen: false);
+    final user = Provider.of<User>(context, listen: false);
+
+    final String fileLocation =
+        user.uid + "/" + DateTime.now().microsecondsSinceEpoch.toString();
+    String downloadUrl = await DatabaseService(uid: user.uid)
+        .uploadImage(File(mediaState.imageFile.path), fileLocation);
+    String postId = await DatabaseService(uid: user.uid).uploadPost(new Post(
+        isPrivate: privateStatusState.currentValue,
+        title: titleState.currentValue.trimRight(),
+        subtitle: descriptionState.currentValue.toString().trimRight(),
+        author: user.uid,
+        authorUsername: privateStatusState.authorUsername,
+        charity: charityState.charityList[charityState.currentValue].id,
+        noLikes: 0,
+        noComments: 0,
+        timestamp: DateTime.now(),
+        moneyRaised: 0,
+        targetAmount: targetAmountState.currentValue.toString(),
+        imageUrl: downloadUrl,
+        status: 'fund',
+        aspectRatio: mediaState.aspectRatio,
+        hashtags: hashtagState.currentValue,
+        charityLogo:
+            charityState.charityList[charityState.currentValue].image));
+
+    return postId;
   }
 }
 
