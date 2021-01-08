@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/description_input.dart';
@@ -10,6 +11,7 @@ import 'package:fundder/post_creation_widgets/screens/1st_addpost_screen.dart';
 import 'package:fundder/post_creation_widgets/screens/charity_list_screen.dart';
 import 'package:fundder/post_creation_widgets/screens/hashtag_adding_screen.dart';
 import 'package:fundder/services/database.dart';
+import 'package:fundder/shared/loading.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -31,7 +33,7 @@ class _AddPostState extends State<AddPost> {
     return (_currentScreen > noOfInputScreens - 1);
   }
 
-  List<StatelessWidget> _screens = [
+  List<Widget> _screens = [
     FirstAddPostScreen(),
     CharitySelectionScreen(),
     HashtaggingScreen()
@@ -176,23 +178,49 @@ class _AddPostState extends State<AddPost> {
         if (areInputsValid) {
           //all inputs are clearly valid. Execute code to move onto preview.
           print("Can Move to Preview");
-          User user = Provider.of<User>(context);
+          User _user = Provider.of<User>(context);
           final height = (MediaQuery.of(context).size.height) * 2 / 5;
           final width = MediaQuery.of(context).size.width;
-          var postPreview = PostPreview(
-              charity: charityState.charityList[charityState.currentValue],
-              authorUid: user != null ? user.uid : '',
-              authorUsername: user != null ? user.username : '',
-              imageView: ImageView(
-                imageFile: mediaState.imageFile,
-                height: height,
-                width: width,
-              ),
-              title: titleState.currentValue,
-              subtitle: descriptionState.currentValue,
-              selected: 0, //to make compatible with legacy code
-              targetAmount: targetAmountState.currentValue,
-              hashtags: hashtagState.currentValue);
+
+          var postPreview = FutureBuilder(
+              future: Firestore.instance
+                  .collection('users')
+                  .document(_user.uid)
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var value = snapshot.data;
+                  User user = User(
+                      isPrivate: (value.data["isPrivate"] == null)
+                          ? false
+                          : value.data["isPrivate"],
+                      uid: _user.uid,
+                      name: value.data["name"],
+                      username: value.data['username'],
+                      email: value.data['email'],
+                      profilePic: value.data["profilePic"]);
+
+                  return PostPreview(
+                      charity:
+                          charityState.charityList[charityState.currentValue],
+                      authorUid: user != null ? user.uid : '',
+                      authorUsername: user != null ? user.username : '',
+                      imageView: ImageView(
+                        imageFile: mediaState.imageFile,
+                        height: height,
+                        width: width,
+                      ),
+                      title: titleState.currentValue,
+                      subtitle: descriptionState.currentValue,
+                      selected: 0, //to make compatible with legacy code
+                      targetAmount: targetAmountState.currentValue,
+                      hashtags: hashtagState.currentValue);
+                  ;
+                } else {
+                  return Loading();
+                }
+              });
+
           setState(() {
             _screens.add(postPreview);
           });
