@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/media_upload.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+import 'package:provider/provider.dart';
 
 class ImageView extends StatelessWidget {
   final PickedFile imageFile;
@@ -16,7 +19,7 @@ class ImageView extends StatelessWidget {
     } else {
       File image =
           new File(imageFile.path); // Or any other way to get a File instance.
-      _findAspectRatio(image);
+      _findAspectRatio(image, context);
       return Image.file(
         image,
         width: this.width,
@@ -25,10 +28,12 @@ class ImageView extends StatelessWidget {
     }
   }
 
-  void _findAspectRatio(File image) async {
+  void _findAspectRatio(File image, context) async {
+    final mediaState = Provider.of<MediaStateManager>(context, listen: false);
     var decodedImage = await decodeImageFromList(image.readAsBytesSync());
     print(decodedImage.width);
     print(decodedImage.height);
     double aspectRatio = decodedImage.width / decodedImage.height;
+    mediaState.setAspectRatio(aspectRatio);
   }
 }

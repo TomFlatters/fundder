@@ -33,6 +33,10 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
     return _imageFile;
   }
 
+  double _aspectRatio;
+  double get aspectRatio => _aspectRatio;
+  void setAspectRatio(double ratio) => _aspectRatio = ratio;
+
   void updateImageFile(PickedFile newImage) {
     this._imageFile = newImage;
     notifyListeners();
