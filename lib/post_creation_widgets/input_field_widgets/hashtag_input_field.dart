@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/set_hashtags.dart';
-import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_interface.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_validity_interface.dart';
 import 'package:provider/provider.dart';
 
-class HashtagsStateManager {
+class HashtagsStateManager with InputFieldValidityChecker {
   List<String> _hashtags = [];
   List<String> get currentValue {
     return _hashtags;
@@ -18,6 +19,14 @@ class HashtagsStateManager {
 
   bool get isInputValid {
     return (_hashtags.length >= 2);
+  }
+
+  void createErrorDialog(context) {
+    DialogManager().createDialog(
+      'Error',
+      'Please have two or more hashtags',
+      context,
+    );
   }
 }
 

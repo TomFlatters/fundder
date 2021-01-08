@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_interface.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_validity_interface.dart';
 import 'package:fundder/shared/constants.dart';
 import 'package:provider/provider.dart';
 
 /**Holds the state for TitleInputBox */
-class TitleInputStateManager {
+class TitleInputStateManager with InputFieldValidityChecker {
   String _title = "";
 
   /**Returns the current title entered by the user */
@@ -17,8 +18,23 @@ class TitleInputStateManager {
   void updateValue(String newValue) {
     _title = newValue;
   }
+
+  bool get isInputValid {
+    return _title.length > 0;
+  }
+
+  void createErrorDialog(context) {
+    DialogManager().createDialog(
+      'Error',
+      'You have not written a title for this challenge',
+      context,
+    );
+  }
 }
 
+/**UI for inputting the title of a post. A Provider providing 'TitleInputStateManager' 
+ * must be above this in the widget tree.
+ */
 class TitleInputBox extends StatefulWidget {
   @override
   _TitleInputBoxState createState() => _TitleInputBoxState();

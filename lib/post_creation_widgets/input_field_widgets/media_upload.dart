@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/tile_widgets/image_view.dart';
-import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_interface.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_validity_interface.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,7 @@ import 'package:provider/provider.dart';
 // }
 
 /**State manager for MediaUploadBox*/
-class MediaStateManager with ChangeNotifier {
+class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
   PickedFile _imageFile = null;
 
   PickedFile get imageFile {
@@ -44,6 +45,19 @@ class MediaStateManager with ChangeNotifier {
 
   bool get hasImage {
     return _imageFile != null;
+  }
+
+  bool get isInputValid {
+    //TODO: amend implementation after adding support for videoing.
+    return hasImage;
+  }
+
+  void createErrorDialog(context) {
+    DialogManager().createDialog(
+      'Error',
+      'Please upload a video or image for your Fundder on the first screen',
+      context,
+    );
   }
 }
 

@@ -1,30 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 import 'package:fundder/helper_classes.dart';
-import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_interface.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_validity_interface.dart';
 import 'package:fundder/shared/constants.dart';
 import 'package:provider/provider.dart';
 
-// class MoneyInputField extends InputField {
-//   String _targetAmount = "0.00";
-
-//   bool get isInputValid {
-//     return double.parse(_targetAmount) >= 2.00;
-//   }
-
-//   StatefulWidget buildWidget() {
-//     return MoneyInputBox(
-//       onMoneyChanged: this.onMoneyChanged,
-//     );
-//   }
-
-//   void onMoneyChanged(String newAmount) {
-//     this._targetAmount = newAmount;
-//     print("The validity status of money input field is: $isInputValid");
-//   }
-// }
-
-class MoneyInputStateManager {
+class MoneyInputStateManager with InputFieldValidityChecker {
   String _targetAmount = "0.00";
 
   /**Returns the current amount entered by the user or 0.00 if nothing
@@ -36,6 +18,18 @@ class MoneyInputStateManager {
   /**Updates the target amount to 'newValue' */
   void updateValue(String newValue) {
     _targetAmount = newValue;
+  }
+
+  bool get isInputValid {
+    return double.parse(_targetAmount) >= 2.00;
+  }
+
+  void createErrorDialog(context) {
+    DialogManager().createDialog(
+      'Error',
+      'Minimum fundraising target amount is £2.00',
+      context,
+    );
   }
 }
 

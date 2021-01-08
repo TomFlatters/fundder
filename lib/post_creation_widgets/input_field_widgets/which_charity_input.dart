@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
 
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_charity.dart';
-import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_interface.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_validity_interface.dart';
 import 'package:provider/provider.dart';
 
 /**UI for selcting charity. Contains a lot of legacy code in the 'ChooseCharity'
@@ -26,7 +27,8 @@ class CharitySelectionField extends StatelessWidget {
 }
 
 /**Holds the state for which charity has been selected. */
-class CharitySelectionStateManager with ChangeNotifier {
+class CharitySelectionStateManager
+    with ChangeNotifier, InputFieldValidityChecker {
   /**
    * 
    * Numerical index of the currently chosen charity. It's 
@@ -53,5 +55,17 @@ class CharitySelectionStateManager with ChangeNotifier {
     print("the charity selected is now $newCharityIndex");
     _selected = newCharityIndex;
     notifyListeners();
+  }
+
+  bool get isInputValid {
+    return _selected > -1;
+  }
+
+  void createErrorDialog(context) {
+    DialogManager().createDialog(
+      'Error',
+      'You have not chosen a charity for your Fundder.',
+      context,
+    );
   }
 }

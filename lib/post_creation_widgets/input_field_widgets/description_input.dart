@@ -1,29 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_interface.dart';
+import 'package:fundder/global_widgets/dialogs.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_validity_interface.dart';
 import 'package:fundder/shared/constants.dart';
 import 'package:provider/provider.dart';
 
-/*
-class DescriptionInputField extends InputField {
-  bool get isInputValid {
-    return (_description != null && _description.length > 0);
-  }
-
-  void _onDescriptionChange(String description) {
-    _description = description;
-    print("new title is: $description");
-    print("validity status for title input is now: ${this.isInputValid}");
-  }
-
-  StatefulWidget buildWidget() {
-    //TO BE IMPLEMENTED;
-    return DescriptionInputBox();
-  }
-}
-*/
-
-class DescriptionInputStateManager {
+/**Holds the state for DescriptionInputBox */
+class DescriptionInputStateManager with InputFieldValidityChecker {
   String _description = "";
 
   /**Returns the current description entered by the user */
@@ -34,6 +17,18 @@ class DescriptionInputStateManager {
   /**Updates the description value to the new description */
   void updateValue(String newValue) {
     _description = newValue;
+  }
+
+  bool get isInputValid {
+    return _description.length > 0;
+  }
+
+  void createErrorDialog(context) {
+    DialogManager().createDialog(
+      'Error',
+      'You have not written a description for the challenge',
+      context,
+    );
   }
 }
 
@@ -47,14 +42,6 @@ class DescriptionInputBox extends StatefulWidget {
 
 class _DescriptionInputBoxState extends State<DescriptionInputBox> {
   final descriptionController = TextEditingController();
-
-  /*
-  @override
-  void initState() {
-    super.initState();
-    descriptionController.text = widget.currentDescription;
-  }
-  */
 
   @override
   void dispose() {
