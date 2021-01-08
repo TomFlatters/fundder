@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 
-abstract class InputField {
+abstract class InputFieldValidityChecker {
   /**Returns true if user has inputted a valid entry into this field, otherwise
    * returns false.
    */
 
   bool get isInputValid;
 
-/**Create the stateful widget ui */
-  StatefulWidget buildWidget();
+/**Creates an error dialog if the input isn't valid */
+  void createErrorDialog(context);
 }
