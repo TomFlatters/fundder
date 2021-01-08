@@ -17,8 +17,8 @@ import 'auth.dart';
 class DatabaseService {
   // initiate the class with the user id
   final String uid;
-  final cloudFunc = CloudFunctions.instance
-      .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+  final cloudFunc = CloudFunctions.instance;
+  // .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
 
   final _auth = AuthService();
 

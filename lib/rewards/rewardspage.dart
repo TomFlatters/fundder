@@ -29,8 +29,8 @@ class _RewardsPageState extends State<RewardsPage> {
   //   return rewardList;
   // }
 
-  final cloudFunc = CloudFunctions.instance
-      .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+  final cloudFunc = CloudFunctions.instance;
+  // .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
   bool loading = false;
 
   Future<List<Reward>> _getRewards() async {
