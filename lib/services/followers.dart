@@ -125,8 +125,8 @@ class GeneralFollowerServices {
 /**Note that this service no longer interfaces with the cloud */
 class CloudInterfaceForFollowers {
   final uid;
-  final cloudFunc = CloudFunctions.instance;
-  // .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
+  final cloudFunc = CloudFunctions.instance
+      .useFunctionsEmulator(origin: 'http://10.0.2.2:5001');
   final CollectionReference _followersCollection =
       Firestore.instance.collection('followers');
   final CollectionReference _usersCollection =
