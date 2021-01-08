@@ -35,6 +35,8 @@ class DatabaseService {
       Firestore.instance.collection('charities');
   final CollectionReference rewardsCollection =
       Firestore.instance.collection('rewards');
+  final CollectionReference challengesCollection =
+      Firestore.instance.collection('challenges');
 
   // -------------
   // 1. User CRUD:
@@ -763,5 +765,55 @@ class DatabaseService {
     return rewardsSnapshot.documents.map((DocumentSnapshot doc) {
       return _rewardsDataFromDoc(doc);
     }).toList();
+  }
+
+// --------------------
+// 7. Challenges
+// --------------------
+
+  Future<List<DocumentSnapshot>> getChallengesForMe() async {
+    QuerySnapshot challengesSnapshot = await challengesCollection
+        .where('acceptedBy', arrayContains: this.uid)
+        .getDocuments();
+    return challengesSnapshot.documents.map((DocumentSnapshot doc) {
+      return doc;
+    }).toList();
+  }
+
+  Future<List<DocumentSnapshot>> getChallengesByMe() async {
+    QuerySnapshot challengesSnapshot = await challengesCollection
+        .where('author', isEqualTo: this.uid)
+        .getDocuments();
+    return challengesSnapshot.documents.map((DocumentSnapshot doc) {
+      return doc;
+    }).toList();
+  }
+
+  Future<DocumentSnapshot> getChallengeById(String id) async {
+    DocumentSnapshot challengeSnapshot =
+        await challengesCollection.document(id).get();
+    return challengeSnapshot;
+  }
+
+  Future<List<Post>> refreshChallenge(
+      String challengeId, int limit, Timestamp startTimestamp) async {
+    print("running refresh challenge");
+    print('limit: ' + limit.toString());
+
+    HttpsCallable cloudRefreshChallenge =
+        cloudFunc.getHttpsCallable(functionName: 'onRefreshChallenge');
+    HttpsCallableResult res =
+        await cloudRefreshChallenge.call(<String, dynamic>{
+      'challenge': challengeId,
+      'limit': limit,
+      "timeStamp": startTimestamp.toString(), //this is converted server side
+    });
+
+    print("printing result of refresh hashtag: " +
+        res.data["listOfJsonDocs"].toString());
+
+    var postList = jsonsToPosts(res.data["listOfJsonDocs"]);
+
+    return postList;
   }
 }

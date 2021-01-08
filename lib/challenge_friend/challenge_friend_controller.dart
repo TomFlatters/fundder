@@ -250,11 +250,13 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
                     width: 100,
                     child: IconButton(
                         icon: _current == 0
-                            ? Icon(Icons.close)
+                            ? Icon(
+                                Icons.close,
+                              )
                             : Icon(Icons.arrow_back),
                         onPressed: _current == 0
                             ? () {
-                                Navigator.of(context).pop(null);
+                                Navigator.pop(context);
                               }
                             : () {
                                 _carouselController.previousPage(

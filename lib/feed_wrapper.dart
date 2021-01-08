@@ -48,6 +48,9 @@ class _FeedWrapperState extends State<FeedWrapper> {
     if (widget.status == 'hashtag') {
       futurePost = await DatabaseService()
           .refreshHashtag(widget.identifier, limit, loadingTimestamp);
+    } else if (widget.status == 'challenge') {
+      futurePost = await DatabaseService()
+          .refreshChallenge(widget.identifier, limit, loadingTimestamp);
     } else {
       futurePost = await DatabaseService()
           .refreshPosts(widget.status, limit, loadingTimestamp);
@@ -77,6 +80,9 @@ class _FeedWrapperState extends State<FeedWrapper> {
     if (widget.status == 'hashtag') {
       futurePost = await DatabaseService()
           .refreshHashtag(widget.identifier, limit, loadingTimestamp);
+    } else if (widget.status == 'challenge') {
+      futurePost = await DatabaseService()
+          .refreshChallenge(widget.identifier, limit, loadingTimestamp);
     } else {
       futurePost = await DatabaseService()
           .refreshPosts(widget.status, limit, loadingTimestamp);

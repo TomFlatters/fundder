@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fundder/challenge_friend/challenge_hub.dart';
 import 'package:fundder/rewards/rewardspage.dart';
 import 'package:fundder/services/auth.dart';
 //import 'package:fundder/feed_controller.dart';
@@ -247,7 +248,7 @@ class _HomeState extends State<Home> {
                       doneTutorialSeen: user
                           .doneTutorialSeen), //i.e. the one from home button
                   //SearchController(),
-                  ChallengeFriend(),
+                  ChallengeHub(),
                   PlaceholderWidget(Colors.white),
                   //LikedController(),
                   RewardsPage(uid: firebaseUser.uid),
@@ -266,7 +267,7 @@ class _HomeState extends State<Home> {
                   ]), // new : in the body, load the child widget depending on the current index, which is determined by which button is clicked in the bottomNavBar
                   bottomNavigationBar: BottomNavigationBar(
                     type: BottomNavigationBarType.fixed,
-                    selectedItemColor: Colors.black,
+                    selectedItemColor: HexColor('ff6b6c'),
                     unselectedItemColor: Color.fromRGBO(
                         0, 0, 0, 0.5), //hexcolor method is custom at bottom
                     iconSize: 26,
@@ -325,7 +326,7 @@ class _HomeState extends State<Home> {
     return show
         ? Padding(
             padding: const EdgeInsets.only(top: 4, bottom: 0),
-            child: Icon(Icons.brightness_1, size: 4, color: Colors.black),
+            child: Icon(Icons.brightness_1, size: 4, color: HexColor('ff6b6c')),
           )
         : SizedBox(height: 8);
   }
