@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fundder/models/charity.dart';
-import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/description_input.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/hashtag_input_field.dart';
@@ -12,28 +9,12 @@ import 'package:fundder/post_creation_widgets/input_field_widgets/which_charity_
 import 'package:fundder/post_creation_widgets/screens/1st_addpost_screen.dart';
 import 'package:fundder/post_creation_widgets/screens/charity_list_screen.dart';
 import 'package:fundder/post_creation_widgets/screens/hashtag_adding_screen.dart';
-import 'package:fundder/post_creation_widgets/screens/screen_interface.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:fundder/models/post.dart';
-import 'package:fundder/models/template.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import '../shared/loading.dart';
-import '../global_widgets/buttons.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../services/hashtags.dart';
-import 'creation_tiles/choose_person.dart';
-import 'creation_tiles/define_description_self.dart';
-import 'creation_tiles/define_description_others.dart';
-import 'creation_tiles/choose_charity.dart';
-import 'creation_tiles/set_hashtags.dart';
 import 'creation_tiles/post_preview.dart';
 import 'creation_tiles/tile_widgets/image_view.dart';
-import 'package:fundder/global_widgets/dialogs.dart';
 
 /**UI for adding a post */
 
@@ -44,6 +25,17 @@ class AddPost extends StatefulWidget {
 
 class _AddPostState extends State<AddPost> {
   int _currentScreen = 0;
+  /**Number of screens in which the user can enter details about their post */
+  final int noOfInputScreens = 3;
+  bool get _inPreview {
+    return (_currentScreen > noOfInputScreens - 1);
+  }
+
+  List<StatelessWidget> _screens = [
+    FirstAddPostScreen(),
+    CharitySelectionScreen(),
+    HashtaggingScreen()
+  ];
 
   CarouselController _carouselController = CarouselController();
 
@@ -90,27 +82,37 @@ class _AddPostState extends State<AddPost> {
                                     _carouselController.previousPage(
                                         duration: Duration(milliseconds: 300),
                                         curve: Curves.linear);
+                                    if (_inPreview) {
+                                      setState(() {
+                                        _screens.removeLast();
+                                      });
+                                    }
                                   })),
                     actions: [
-                      (_currentScreen < 2)
+                      (_currentScreen < noOfInputScreens - 1)
                           ? _createNextButton()
-                          : _createPreviewButton(context),
+                          : (!_inPreview)
+                              ? _createPreviewButton(context)
+                              : Container(),
                     ],
                   ),
                   body: CarouselSlider(
                     carouselController: _carouselController,
-                    items: [
-                      FirstAddPostScreen(),
-                      CharitySelectionScreen(),
-                      HashtaggingScreen()
-                    ],
+                    items: _screens,
                     options: CarouselOptions(
                       onPageChanged: (index, reason) {
                         FocusScope.of(context).unfocus();
                         if (mounted) {
-                          setState(() {
-                            _currentScreen = index;
-                          });
+                          if (_inPreview) {
+                            setState(() {
+                              _screens.removeLast();
+                              _currentScreen = _screens.length - 1;
+                            });
+                          } else {
+                            setState(() {
+                              _currentScreen = index;
+                            });
+                          }
                         }
                       },
                       enableInfiniteScroll: false,
@@ -174,6 +176,28 @@ class _AddPostState extends State<AddPost> {
         if (areInputsValid) {
           //all inputs are clearly valid. Execute code to move onto preview.
           print("Can Move to Preview");
+          User user = Provider.of<User>(context);
+          final height = (MediaQuery.of(context).size.height) * 2 / 5;
+          final width = MediaQuery.of(context).size.width;
+          var postPreview = PostPreview(
+              charity: charityState.charityList[charityState.currentValue],
+              authorUid: user != null ? user.uid : '',
+              authorUsername: user != null ? user.username : '',
+              imageView: ImageView(
+                imageFile: mediaState.imageFile,
+                height: height,
+                width: width,
+              ),
+              title: titleState.currentValue,
+              subtitle: descriptionState.currentValue,
+              selected: 0, //to make compatible with legacy code
+              targetAmount: targetAmountState.currentValue,
+              hashtags: hashtagState.currentValue);
+          setState(() {
+            _screens.add(postPreview);
+          });
+          _carouselController.nextPage(
+              duration: Duration(milliseconds: 300), curve: Curves.linear);
         }
       },
     );
