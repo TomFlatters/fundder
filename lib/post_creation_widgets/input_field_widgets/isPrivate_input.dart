@@ -10,4 +10,19 @@ class PrivateStatusStateManager {
   void updateValue(bool newPrivateStatus) {
     _isPrivate = newPrivateStatus;
   }
+
+  String _authorUsername = "";
+  /**This mechanism really has no business being here but in bit of a rush and 
+   * too messy to make everything proper at this moment. 
+   */
+
+  String get authorUsername => _authorUsername;
+
+  /**This mechanism really has no business being here but in bit of a rush and 
+   * too messy to make everything proper at this moment. 
+   */
+
+  void setUsername(String uname) {
+    _authorUsername = uname;
+  }
 }
