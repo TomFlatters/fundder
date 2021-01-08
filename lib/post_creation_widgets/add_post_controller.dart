@@ -50,75 +50,77 @@ class _AddPostState extends State<AddPost> {
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
-    return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("Create Fundder"),
-          leading: Container(
-              width: 100,
-              child: IconButton(
-                  icon: _currentScreen == 0
-                      ? Icon(Icons.close)
-                      : Icon(Icons.arrow_back),
-                  onPressed: _currentScreen == 0
-                      ? () {
-                          Navigator.of(context).pop(null);
-                        }
-                      : () {
-                          _carouselController.previousPage(
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.linear);
-                        })),
-          actions: [
-            (_currentScreen < 2) ? _createNextButton() : _createPreviewButton(),
-          ],
-        ),
-        body: MultiProvider(
-          providers: [
-            Provider<DescriptionInputStateManager>(
-              create: (_) => DescriptionInputStateManager(),
-            ),
-            Provider<TitleInputStateManager>(
-              create: (_) => TitleInputStateManager(),
-            ),
-            ChangeNotifierProvider<MediaStateManager>(
-                create: (_) => MediaStateManager()),
-            Provider<MoneyInputStateManager>(
-              create: (_) => MoneyInputStateManager(),
-            ),
-            ChangeNotifierProvider<CharitySelectionStateManager>(
-              create: (_) => CharitySelectionStateManager(),
-            ),
-            Provider<HashtagsStateManager>(
-              create: (_) => HashtagsStateManager(),
-            ),
-          ],
-          child: Builder(
-            builder: (context) => CarouselSlider(
-              carouselController: _carouselController,
-              items: [
-                FirstAddPostScreen(),
-                CharitySelectionScreen(),
-                HashtaggingScreen()
-              ],
-              options: CarouselOptions(
-                onPageChanged: (index, reason) {
-                  FocusScope.of(context).unfocus();
-                  if (mounted) {
-                    setState(() {
-                      _currentScreen = index;
-                    });
-                  }
-                },
-                enableInfiniteScroll: false,
-                height: height,
-                viewportFraction: 1.0,
-                enlargeCenterPage: false,
-                // autoPlay: false,
-              ),
-            ),
+    return MultiProvider(
+        //minimise this list in IDE for readability
+        providers: [
+          Provider<DescriptionInputStateManager>(
+            create: (_) => DescriptionInputStateManager(),
           ),
-        ));
+          Provider<TitleInputStateManager>(
+            create: (_) => TitleInputStateManager(),
+          ),
+          ChangeNotifierProvider<MediaStateManager>(
+              create: (_) => MediaStateManager()),
+          Provider<MoneyInputStateManager>(
+            create: (_) => MoneyInputStateManager(),
+          ),
+          ChangeNotifierProvider<CharitySelectionStateManager>(
+            create: (_) => CharitySelectionStateManager(),
+          ),
+          Provider<HashtagsStateManager>(
+            create: (_) => HashtagsStateManager(),
+          ),
+        ],
+        child: Builder(
+            builder: (context) => Scaffold(
+                  appBar: AppBar(
+                    centerTitle: true,
+                    title: Text("Create Fundder"),
+                    leading: Container(
+                        width: 100,
+                        child: IconButton(
+                            icon: _currentScreen == 0
+                                ? Icon(Icons.close)
+                                : Icon(Icons.arrow_back),
+                            onPressed: _currentScreen == 0
+                                ? () {
+                                    Navigator.of(context).pop(null);
+                                  }
+                                : () {
+                                    _carouselController.previousPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.linear);
+                                  })),
+                    actions: [
+                      (_currentScreen < 2)
+                          ? _createNextButton()
+                          : _createPreviewButton(context),
+                    ],
+                  ),
+                  body: CarouselSlider(
+                    carouselController: _carouselController,
+                    items: [
+                      FirstAddPostScreen(),
+                      CharitySelectionScreen(),
+                      HashtaggingScreen()
+                    ],
+                    options: CarouselOptions(
+                      onPageChanged: (index, reason) {
+                        FocusScope.of(context).unfocus();
+                        if (mounted) {
+                          setState(() {
+                            _currentScreen = index;
+                          });
+                        }
+                      },
+                      enableInfiniteScroll: false,
+                      height: height,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      // autoPlay: false,
+                    ),
+                  ),
+                )));
   }
 
   _createNextButton() {
@@ -132,12 +134,47 @@ class _AddPostState extends State<AddPost> {
     );
   }
 
-  _createPreviewButton() {
+  _createPreviewButton(context) {
+    final descriptionState =
+        Provider.of<DescriptionInputStateManager>(context, listen: false);
+    final titleState =
+        Provider.of<TitleInputStateManager>(context, listen: false);
+    final targetAmountState =
+        Provider.of<MoneyInputStateManager>(context, listen: false);
+    final mediaState = Provider.of<MediaStateManager>(context, listen: false);
+    final charityState =
+        Provider.of<CharitySelectionStateManager>(context, listen: false);
+    final hashtagState =
+        Provider.of<HashtagsStateManager>(context, listen: false);
+
+    List validityCheckers = [
+      descriptionState,
+      titleState,
+      targetAmountState,
+      mediaState,
+      charityState,
+      hashtagState
+    ];
     return FlatButton(
       child: Text("Preview",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
       onPressed: () {
-        print("Preview button pressed on AddPost");
+        //will leverage the validity checker of each state from the provider
+        //'listen' parameter will be set to false
+        //if everything is deemed valid then it'll go to postPreview
+
+        bool areInputsValid = true;
+        for (var state in validityCheckers) {
+          areInputsValid = state.isInputValid && areInputsValid;
+          if (!areInputsValid) {
+            state.createErrorDialog(context);
+            break;
+          }
+        }
+        if (areInputsValid) {
+          //all inputs are clearly valid. Execute code to move onto preview.
+          print("Can Move to Preview");
+        }
       },
     );
   }
