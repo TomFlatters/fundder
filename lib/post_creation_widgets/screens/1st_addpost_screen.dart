@@ -23,7 +23,7 @@ class FirstAddPostScreen extends A_CreationScreen {
         SizedBox(height: 10),
         Padding(
           padding: EdgeInsets.all(10.0),
-          child: TitleInputField().buildWidget(),
+          child: TitleInputBox(),
         ),
         SizedBox(
           height: 10,
