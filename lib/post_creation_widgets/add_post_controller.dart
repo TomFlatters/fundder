@@ -32,10 +32,10 @@ class AddPost extends StatefulWidget {
 }
 
 class _AddPostState extends State<AddPost> {
+  /**Keeps track of the index of the screens the carousel is currently displaying */
   int _currentScreen = 0;
   /**Number of screens in which the user can enter details about their post */
   final int noOfInputScreens = 3;
-
   /**Returns true if UI is displaying a preview of the post the user has made.
    * All valdiation checks will have been passed by this point.
    */
@@ -256,7 +256,7 @@ class _AddPostState extends State<AddPost> {
       child: Text("Post",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
       onPressed: () {
-        Navigator.of(context).pop(null);
+        //Navigator.of(context).pop(null);
         showDialog(
           context: context,
           builder: (_) => FutureProgressDialog(_uploadPost(context),
