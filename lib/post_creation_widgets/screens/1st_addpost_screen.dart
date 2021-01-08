@@ -19,7 +19,7 @@ class FirstAddPostScreen extends A_CreationScreen {
       shrinkWrap: true,
       children: [
         GreyGapRounded(),
-        MediaInputField().buildWidget(),
+        MediaUploadBox(),
         SizedBox(height: 10),
         Padding(
           padding: EdgeInsets.all(10.0),

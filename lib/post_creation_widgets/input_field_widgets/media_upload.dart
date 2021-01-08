@@ -5,92 +5,116 @@ import 'package:fundder/helper_classes.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/tile_widgets/image_view.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_interface.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 /**Widget handling valid video/image upload */
 
-class MediaInputField extends InputField {
-  bool _isValid = false;
-  bool get isInputValid {
-    return _isValid;
+// class MediaInputField extends InputField {
+//   bool _isValid = false;
+//   bool get isInputValid {
+//     return _isValid;
+//   }
+
+//   void _updateValidity(bool newValidity) {
+//     _isValid = newValidity;
+//     print("validity status of media input field is ${newValidity.toString()}");
+//   }
+
+//   StatefulWidget buildWidget() =>
+//       MediaUploadBox(updateValidityFunction: this._updateValidity);
+// }
+
+/**State manager for MediaUploadBox*/
+class MediaStateManager with ChangeNotifier {
+  PickedFile _imageFile = null;
+
+  PickedFile get imageFile {
+    return _imageFile;
   }
 
-  void _updateValidity(bool newValidity) {
-    _isValid = newValidity;
-    print("validity status of media input field is ${newValidity.toString()}");
+  void updateImageFile(PickedFile newImage) {
+    this._imageFile = newImage;
+    notifyListeners();
   }
 
-  StatefulWidget buildWidget() =>
-      MediaUploadBox(updateValidityFunction: this._updateValidity);
+  void removeImageFile() {
+    _imageFile = null;
+    notifyListeners();
+  }
+
+  bool get hasImage {
+    return _imageFile != null;
+  }
 }
 
+/**UI for uploading a video or a photo. A Provider providing 'MediaStateManager'
+ * must be above this widget in the widget tree.
+ */
 class MediaUploadBox extends StatefulWidget {
   /*Dependency injection constructor called after media is uploaded or removed. */
-  final Function updateValidityFunction;
-  MediaUploadBox({this.updateValidityFunction});
 
   @override
   _MediaUploadBoxState createState() => _MediaUploadBoxState();
 }
 
 class _MediaUploadBoxState extends State<MediaUploadBox> {
-  PickedFile _imageFile;
-  /**changes the input validity status of external loosely coupled class 
-   * whenever the input changes.
-   */
-  Function updateValidityFunction;
+  // PickedFile _imageFile;
+
   final picker = ImagePicker();
-  @override
-  initState() {
-    super.initState();
-    updateValidityFunction = widget.updateValidityFunction;
-  }
 
   @override
   Widget build(BuildContext context) {
     final height = (MediaQuery.of(context).size.height) * 2 / 5;
     final width = MediaQuery.of(context).size.width;
 
-    return (_imageFile == null)
-        ? FlatButton(
-            child: Container(
-                alignment: Alignment.center,
-                child: RichText(
-                    text: TextSpan(
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.white,
-                          fontFamily: 'Founders Grotesk',
-                        ),
-                        children: [
-                      TextSpan(
-                          text: 'Tap to add a video or photo for your Fundder ',
+    return Consumer<MediaStateManager>(builder: (_, state, __) {
+      return (!state.hasImage)
+          ? FlatButton(
+              child: Container(
+                  alignment: Alignment.center,
+                  child: RichText(
+                      text: TextSpan(
                           style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.white,
                             fontFamily: 'Founders Grotesk',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          )),
-                    ])),
-                constraints: BoxConstraints(
-                  minWidth: width,
-                  minHeight: height,
-                ),
-                decoration: BoxDecoration(
-                  color: HexColor('ff6b6c'),
-                )),
-            onPressed: () {
-              _changePic();
-            },
-          )
-        : FlatButton(
-            child:
-                ImageView(imageFile: _imageFile, height: height, width: width),
-            onPressed: () {
-              _changePic();
-            },
-          );
+                          ),
+                          children: [
+                        TextSpan(
+                            text:
+                                'Tap to add a video or photo for your Fundder ',
+                            style: TextStyle(
+                              fontFamily: 'Founders Grotesk',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            )),
+                      ])),
+                  constraints: BoxConstraints(
+                    minWidth: width,
+                    minHeight: height,
+                  ),
+                  decoration: BoxDecoration(
+                    color: HexColor('ff6b6c'),
+                  )),
+              onPressed: () {
+                _changePic(
+                    onAddingPic: state.updateImageFile,
+                    onDeletingPic: state.removeImageFile);
+              },
+            )
+          : FlatButton(
+              child: ImageView(
+                  imageFile: state.imageFile, height: height, width: width),
+              onPressed: () {
+                _changePic(
+                    onAddingPic: state.updateImageFile,
+                    onDeletingPic: state.removeImageFile);
+              },
+            );
+    });
   }
 
-  void _changePic() {
+  void _changePic({@required onAddingPic, @required onDeletingPic}) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -98,7 +122,8 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
             color: Color(0xFF737373),
             height: 350,
             child: Container(
-              child: _buildBottomNavigationMenu(context),
+              child: _buildBottomNavigationMenu(context,
+                  onAddingPic: onAddingPic, onDeletingPic: onDeletingPic),
               decoration: BoxDecoration(
                 color: Theme.of(context).canvasColor,
                 borderRadius: BorderRadius.only(
@@ -112,39 +137,31 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
   }
 
   // Helper functions for the image picker
-  _openGallery() async {
-    _imageFile = await picker.getImage(source: ImageSource.gallery);
+  _openGallery({@required onAddingPic}) async {
+    PickedFile _imageFile = await picker.getImage(source: ImageSource.gallery);
 
-    this.setState(() {
-      updateValidityFunction(_imageFile != null);
-    });
+    onAddingPic(_imageFile);
   }
 
-  _openCamera() async {
-    _imageFile = await picker.getImage(source: ImageSource.camera);
+  _openCamera({@required onAddingPic}) async {
+    PickedFile _imageFile = await picker.getImage(source: ImageSource.camera);
 
-    this.setState(() {
-      updateValidityFunction(_imageFile != null);
-    });
+    onAddingPic(_imageFile);
   }
 
-  _removePhoto() {
-    _imageFile = null;
-    ;
-
-    this.setState(() {
-      updateValidityFunction(_imageFile != null);
-    });
+  _removePhoto({@required onDeletingPic}) {
+    onDeletingPic();
   }
 
-  ListView _buildBottomNavigationMenu(context) {
+  ListView _buildBottomNavigationMenu(context,
+      {@required onAddingPic, @required onDeletingPic}) {
     return ListView(
       children: <Widget>[
         ListTile(
           leading: Icon(FontAwesome.trash_o),
           title: Text('Remove Current Photo'),
           onTap: () async {
-            _removePhoto();
+            _removePhoto(onDeletingPic: onDeletingPic);
           },
         ),
         /*ListTile(
@@ -156,14 +173,14 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
           leading: Icon(FontAwesome.camera),
           title: Text('Take Photo'),
           onTap: () {
-            _openCamera();
+            _openCamera(onAddingPic: onAddingPic);
           },
         ),
         ListTile(
           leading: Icon(FontAwesome.image),
           title: Text('Choose From Library'),
           onTap: () {
-            _openGallery();
+            _openGallery(onAddingPic: onAddingPic);
           },
         ),
       ],

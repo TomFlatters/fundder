@@ -4,6 +4,7 @@ import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/description_input.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/media_upload.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/title_input.dart';
 import 'package:fundder/post_creation_widgets/screens/1st_addpost_screen.dart';
 import 'package:fundder/post_creation_widgets/screens/charity_list_screen.dart';
@@ -76,7 +77,9 @@ class _AddPostState extends State<AddPost> {
             ),
             Provider<TitleInputStateManager>(
               create: (_) => TitleInputStateManager(),
-            )
+            ),
+            ChangeNotifierProvider<MediaStateManager>(
+                create: (_) => MediaStateManager()),
           ],
           child: Builder(
             builder: (context) => CarouselSlider(
