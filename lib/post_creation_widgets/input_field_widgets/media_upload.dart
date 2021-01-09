@@ -112,6 +112,7 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
                     minHeight: height,
                   ),
                   decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
                     color: HexColor('ff6b6c'),
                   )),
               onPressed: () {

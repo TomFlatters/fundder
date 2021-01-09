@@ -9,7 +9,8 @@ class Profile2 extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Press this in the top right corner to view more options.',
+          Text(
+              'Press the three dots in the top right corner to view more options.',
               textAlign: TextAlign.center,
               style: TextStyle(fontWeight: FontWeight.normal)),
           Expanded(

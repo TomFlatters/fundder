@@ -115,7 +115,7 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
             : Scaffold(
                 appBar: AppBar(
                   centerTitle: true,
-                  title: Text(postData.status.inCaps),
+                  title: Text(/*postData.status.inCaps*/ ""),
                   actions: <Widget>[
                     new IconButton(
                         icon: new Icon(Icons.close),
@@ -190,52 +190,36 @@ class _ViewPostState extends State<ViewPost> with RouteAware {
                                         height: 20,
                                       ),
                                       user != null
-                                          ? user.uid != postData.author ||
-                                                  postData.status != 'fund'
-                                              ? user.uid != postData.author
-                                                  ? EditFundderButton(
-                                                      text:
-                                                          'Message ${postData.authorUsername}',
-                                                      onPressed: () {
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder: (context) =>
-                                                                    ChatRoom(
-                                                                        postData
-                                                                            .author,
-                                                                        postData
-                                                                            .authorUsername)));
-                                                      })
-                                                  : Container()
-                                              : Column(children: [
-                                                  PrimaryFundderButton(
-                                                      text:
-                                                          'Complete Challenge',
-                                                      onPressed: () {
-                                                        willNeedUpdate = true;
-                                                        Navigator.pushNamed(
-                                                            context,
-                                                            '/post/' +
-                                                                postData.id +
-                                                                '/uploadProof');
-                                                      }),
-                                                  SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  SecondaryFundderButton(
-                                                    onPressed: () {
-                                                      willNeedUpdate = true;
-                                                      Navigator.pushNamed(
-                                                          context,
-                                                          '/post/' +
-                                                              postData.id +
-                                                              '/uploadProgress');
-                                                    },
-                                                    text: 'Upload Progress',
-                                                  )
-                                                ])
-                                          : Container(),
+                                          ? user.uid != postData.author
+                                              ? EditFundderButton(
+                                                  text:
+                                                      'Message ${postData.authorUsername}',
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                ChatRoom(
+                                                                    postData
+                                                                        .author,
+                                                                    postData
+                                                                        .authorUsername)));
+                                                  })
+                                              : Container()
+                                          : PrimaryFundderButton(
+                                              onPressed: () {
+                                                willNeedUpdate = true;
+                                                Navigator.pushNamed(
+                                                    context,
+                                                    '/post/' +
+                                                        postData.id +
+                                                        '/uploadProgress');
+                                              },
+                                              text: 'Upload Progress',
+                                            ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
                                     ],
                                   )))
                         ],
