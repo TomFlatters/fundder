@@ -18,6 +18,7 @@ class User {
   final bool fundTutorialSeen;
   final bool doTutorialSeen;
   final bool doneTutorialSeen;
+  final bool challengesTutorialSeen;
   final double amountDonated;
   final List<dynamic> likes;
   final String facebookId;
@@ -42,6 +43,7 @@ class User {
       this.fundTutorialSeen = false,
       this.doTutorialSeen = false,
       this.doneTutorialSeen = false,
+      this.challengesTutorialSeen = false,
       this.amountDonated = 1.0,
       this.likes,
       this.facebookId,

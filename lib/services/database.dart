@@ -190,6 +190,7 @@ class DatabaseService {
         verified: doc.data['verified'],
         profileTutorialSeen: doc.data['profileTutorialSeen'],
         fundTutorialSeen: doc.data['tutorialSeenV2'],
+        challengesTutorialSeen: doc.data['challengesTutorialSeen'],
         doTutorialSeen: doc.data['doTutorialSeen'],
         doneTutorialSeen: doc.data['doneTutorialSeen'],
         likes: doc.data['likes'],

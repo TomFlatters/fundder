@@ -20,6 +20,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'services/database.dart';
 import 'connection_listener.dart';
 import 'tutorial_screens/profile_tutorial.dart';
+import 'tutorial_screens/challenges_tutorials.dart';
 import 'models/user.dart';
 import 'shared/loading.dart';
 import 'auth_screens/terms_of_use.dart';
@@ -42,6 +43,7 @@ class _HomeState extends State<Home> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool unreadNotifs = false;
   bool checkedProfileTutorial = false;
+  bool checkedChallengesTutorial = false;
   bool havePresentedWelcome = false;
   bool loadingWelcome = false;
   bool userDocumentExists = false;
@@ -206,6 +208,35 @@ class _HomeState extends State<Home> {
     );
   }
 
+  void checkChallengesTutorial() async {
+    final FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
+    Firestore.instance
+        .collection("users")
+        .document(firebaseUser.uid)
+        .get()
+        .then((snapshot) {
+      if (snapshot != null) {
+        if (snapshot['challengesTutorialSeen'] != null) {
+          if (snapshot['challengesTutorialSeen'] != true) {
+            _showChallengesTutorial(context);
+          }
+        } else {
+          _showChallengesTutorial(context);
+        }
+      }
+    });
+  }
+
+  Future<void> _showChallengesTutorial(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return ChallengesTutorial();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final firebaseUser = Provider.of<User>(context);
@@ -332,6 +363,10 @@ class _HomeState extends State<Home> {
   void onTabTapped(int index) {
     if (index == 4 && checkedProfileTutorial == false) {
       checkProfileTutorial();
+      checkedProfileTutorial = true;
+    }
+    if (index == 1 && checkedChallengesTutorial == false) {
+      checkChallengesTutorial();
       checkedProfileTutorial = true;
     }
     if (index != 2) {

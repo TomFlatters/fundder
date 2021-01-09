@@ -7,6 +7,7 @@ import 'package:fundder/services/database.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
+import 'package:fundder/tutorial_screens/challenges_tutorials.dart';
 
 class ChallengeHub extends StatefulWidget {
   @override
@@ -27,7 +28,6 @@ class _ChallengeHubState extends State<ChallengeHub>
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
-    //_retrieveUser();
     super.initState();
   }
 
