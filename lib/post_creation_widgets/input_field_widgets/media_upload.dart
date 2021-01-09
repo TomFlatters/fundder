@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 
 import 'package:fundder/helper_classes.dart';
+import 'package:fundder/post_creation_widgets/aspect_ratio_video.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/tile_widgets/image_view.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_validity_interface.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 /**State manager for MediaUploadBox. Keeps track of two files: video or photo. 
  * At any one time, at least one of the two should be null.
@@ -69,22 +73,34 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
  * must be above this widget in the widget tree.
  */
 class MediaUploadBox extends StatefulWidget {
-  /*Dependency injection constructor called after media is uploaded or removed. */
-
   @override
   _MediaUploadBoxState createState() => _MediaUploadBoxState();
 }
 
 class _MediaUploadBoxState extends State<MediaUploadBox> {
-  // PickedFile _imageFile;
-
   final picker = ImagePicker();
+
+  /**Controller for the video player. Whenever the value of this changes (e.g.
+   * if the user removes the video), the old VideoPlayerController must be
+   * disposed using the dispose method. 
+   */
+  VideoPlayerController _videoController;
+  /**a Future that attempts to open the data of video controller */
+  Future<void> _initVideo;
+
+  @override
+  void dispose() {
+    if (_videoController != null) {
+      _videoController.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final height = (MediaQuery.of(context).size.height) * 2 / 5;
     final width = MediaQuery.of(context).size.width;
-
+    print("The video player null status is ${_videoController == null}");
     return Consumer<MediaStateManager>(builder: (_, state, __) {
       return (!state.isInputValid)
           ? FlatButton(
@@ -123,17 +139,36 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
                     onDeletingVideo: state.removeVideoFile);
               },
             )
-          : FlatButton(
-              child: ImageView(
-                  imageFile: state.imageFile, height: height, width: width),
-              onPressed: () {
-                _changePic(
-                    onAddingPic: state.updateImageFile,
-                    onDeletingPic: state.removeImageFile,
-                    onAddingVideo: state.updateVideoFile,
-                    onDeletingVideo: state.removeVideoFile);
-              },
-            );
+          : (state.hasVideo && _videoController != null)
+              ? FutureBuilder(
+                  future: _initVideo,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return AspectRatio(
+                        child: VideoPlayer(_videoController),
+                        aspectRatio: _videoController.value.aspectRatio,
+                      );
+                    } else {
+                      return Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ));
+                    }
+                  },
+                )
+              : FlatButton(
+                  child: ImageView(
+                      imageFile: state.imageFile, height: height, width: width),
+                  onPressed: () {
+                    _changePic(
+                        onAddingPic: state.updateImageFile,
+                        onDeletingPic: state.removeImageFile,
+                        onAddingVideo: state.updateVideoFile,
+                        onDeletingVideo: state.removeVideoFile);
+                  },
+                );
     });
   }
 
@@ -169,13 +204,11 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
   // Helper functions for the image picker
   _openGallery({@required onAddingPic}) async {
     PickedFile _imageFile = await picker.getImage(source: ImageSource.gallery);
-
     onAddingPic(_imageFile);
   }
 
   _openCamera({@required onAddingPic}) async {
     PickedFile _imageFile = await picker.getImage(source: ImageSource.camera);
-
     onAddingPic(_imageFile);
   }
 
@@ -194,7 +227,13 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
           leading: Icon(FontAwesome.trash_o),
           title: Text('Remove Current Media'),
           onTap: () async {
+            //essentially reset the state to have no video or photo
             onDeletingVideo();
+            //dispose of the _videoController
+            if (this._videoController != null) {
+              _videoController.dispose();
+              _videoController = null;
+            }
             _removePhoto(onDeletingPic: onDeletingPic);
           },
         ),
@@ -205,6 +244,12 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
             PickedFile videoFile =
                 await picker.getVideo(source: ImageSource.camera);
             onAddingVideo(videoFile);
+            setState(() {
+              if (_videoController == null) {
+                _videoController =
+                    VideoPlayerController.file(File(videoFile.path));
+              }
+            });
           },
         ),
         ListTile(
@@ -214,6 +259,16 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
             PickedFile videoFile =
                 await picker.getVideo(source: ImageSource.gallery);
             onAddingVideo(videoFile);
+            setState(() {
+              if (_videoController == null) {
+                _videoController =
+                    VideoPlayerController.file(File(videoFile.path));
+                _videoController.setVolume(1.0);
+                _videoController.setLooping(true);
+                _videoController.play();
+                _initVideo = _videoController.initialize();
+              }
+            });
           },
         ),
         ListTile(
