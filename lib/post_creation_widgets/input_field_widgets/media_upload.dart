@@ -40,6 +40,7 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
     notifyListeners();
   }
 
+/**Removes any video file stored in state. */
   void removeVideoFile() {
     _videoFile = null;
     notifyListeners();
@@ -112,12 +113,14 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
                   ),
                   decoration: BoxDecoration(
                     color: HexColor('ff6b6c'),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
                   )),
               onPressed: () {
                 _changePic(
                     onAddingPic: state.updateImageFile,
-                    onDeletingPic: state.removeImageFile);
+                    onDeletingPic: state.removeImageFile,
+                    onAddingVideo: state.updateVideoFile,
+                    onDeletingVideo: state.removeVideoFile);
               },
             )
           : FlatButton(
@@ -126,13 +129,19 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
               onPressed: () {
                 _changePic(
                     onAddingPic: state.updateImageFile,
-                    onDeletingPic: state.removeImageFile);
+                    onDeletingPic: state.removeImageFile,
+                    onAddingVideo: state.updateVideoFile,
+                    onDeletingVideo: state.removeVideoFile);
               },
             );
     });
   }
 
-  void _changePic({@required onAddingPic, @required onDeletingPic}) {
+  void _changePic(
+      {@required onAddingPic,
+      @required onDeletingPic,
+      @required onAddingVideo,
+      @required onDeletingVideo}) {
     showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -141,7 +150,10 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
             height: 350,
             child: Container(
               child: _buildBottomNavigationMenu(context,
-                  onAddingPic: onAddingPic, onDeletingPic: onDeletingPic),
+                  onAddingPic: onAddingPic,
+                  onDeletingPic: onDeletingPic,
+                  onAddingVideo: onAddingVideo,
+                  onDeletingVideo: onDeletingVideo),
               decoration: BoxDecoration(
                 color: Theme.of(context).canvasColor,
                 borderRadius: BorderRadius.only(
@@ -172,29 +184,36 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
   }
 
   ListView _buildBottomNavigationMenu(context,
-      {@required onAddingPic, @required onDeletingPic}) {
+      {@required onAddingPic,
+      @required onDeletingPic,
+      @required onAddingVideo,
+      @required onDeletingVideo}) {
     return ListView(
       children: <Widget>[
         ListTile(
           leading: Icon(FontAwesome.trash_o),
           title: Text('Remove Current Media'),
           onTap: () async {
-            //TODO: implement mechanism to remove video as well
+            onDeletingVideo();
             _removePhoto(onDeletingPic: onDeletingPic);
           },
         ),
         ListTile(
           leading: Icon(FontAwesome.video_camera),
           title: Text('Take Video'),
-          onTap: () {
-            // _onImageButtonPressed(ImageSource.camera);
+          onTap: () async {
+            PickedFile videoFile =
+                await picker.getVideo(source: ImageSource.camera);
+            onAddingVideo(videoFile);
           },
         ),
         ListTile(
           leading: Icon(FontAwesome.file_movie_o),
           title: Text('Choose Video From Library'),
-          onTap: () {
-            //_onImageButtonPressed(ImageSource.gallery);
+          onTap: () async {
+            PickedFile videoFile =
+                await picker.getVideo(source: ImageSource.gallery);
+            onAddingVideo(videoFile);
           },
         ),
         ListTile(
