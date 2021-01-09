@@ -50,8 +50,7 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
   bool get hasVideo => _videoFile != null;
 
   bool get isInputValid {
-    //TODO: amend implementation after adding support for videoing.
-    return hasImage;
+    return hasVideo || hasImage;
   }
 
   void createErrorDialog(context) {
