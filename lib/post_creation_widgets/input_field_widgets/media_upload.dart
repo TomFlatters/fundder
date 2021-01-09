@@ -8,7 +8,9 @@ import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_va
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-/**State manager for MediaUploadBox*/
+/**State manager for MediaUploadBox. Keeps track of two files: video or photo. 
+ * At any one time, at least one of the two should be null.
+*/
 class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
   PickedFile _imageFile = null;
   PickedFile _videoFile = null;
@@ -83,7 +85,7 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
     final width = MediaQuery.of(context).size.width;
 
     return Consumer<MediaStateManager>(builder: (_, state, __) {
-      return (!state.hasImage)
+      return (!state.isInputValid)
           ? FlatButton(
               child: Container(
                   alignment: Alignment.center,
@@ -110,6 +112,7 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
                   ),
                   decoration: BoxDecoration(
                     color: HexColor('ff6b6c'),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
                   )),
               onPressed: () {
                 _changePic(
