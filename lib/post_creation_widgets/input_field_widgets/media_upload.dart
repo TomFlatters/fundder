@@ -8,26 +8,12 @@ import 'package:fundder/post_creation_widgets/input_field_widgets/input_field_va
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-/**Widget handling valid video/image upload */
-
-// class MediaInputField extends InputField {
-//   bool _isValid = false;
-//   bool get isInputValid {
-//     return _isValid;
-//   }
-
-//   void _updateValidity(bool newValidity) {
-//     _isValid = newValidity;
-//     print("validity status of media input field is ${newValidity.toString()}");
-//   }
-
-//   StatefulWidget buildWidget() =>
-//       MediaUploadBox(updateValidityFunction: this._updateValidity);
-// }
-
 /**State manager for MediaUploadBox*/
 class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
   PickedFile _imageFile = null;
+  PickedFile _videoFile = null;
+
+  PickedFile get videoFile => _videoFile;
 
   PickedFile get imageFile {
     return _imageFile;
@@ -47,9 +33,21 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
     notifyListeners();
   }
 
+  void updateVideoFile(PickedFile newVideo) {
+    this._videoFile = newVideo;
+    notifyListeners();
+  }
+
+  void removeVideoFile() {
+    _videoFile = null;
+    notifyListeners();
+  }
+
   bool get hasImage {
     return _imageFile != null;
   }
+
+  bool get hasVideo => _videoFile != null;
 
   bool get isInputValid {
     //TODO: amend implementation after adding support for videoing.
@@ -177,16 +175,26 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
       children: <Widget>[
         ListTile(
           leading: Icon(FontAwesome.trash_o),
-          title: Text('Remove Current Photo'),
+          title: Text('Remove Current Media'),
           onTap: () async {
+            //TODO: implement mechanism to remove video as well
             _removePhoto(onDeletingPic: onDeletingPic);
           },
         ),
-        /*ListTile(
-          leading: Icon(FontAwesome5Brands.facebook_square),
-          title: Text('Import from Facebook'),
-          onTap: () {},
-        ),*/
+        ListTile(
+          leading: Icon(FontAwesome.video_camera),
+          title: Text('Take Video'),
+          onTap: () {
+            // _onImageButtonPressed(ImageSource.camera);
+          },
+        ),
+        ListTile(
+          leading: Icon(FontAwesome.file_movie_o),
+          title: Text('Choose Video From Library'),
+          onTap: () {
+            //_onImageButtonPressed(ImageSource.gallery);
+          },
+        ),
         ListTile(
           leading: Icon(FontAwesome.camera),
           title: Text('Take Photo'),
@@ -196,7 +204,7 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
         ),
         ListTile(
           leading: Icon(FontAwesome.image),
-          title: Text('Choose From Library'),
+          title: Text('Choose Image Library'),
           onTap: () {
             _openGallery(onAddingPic: onAddingPic);
           },
