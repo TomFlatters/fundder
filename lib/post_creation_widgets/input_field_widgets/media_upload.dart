@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
-
 import 'package:fundder/helper_classes.dart';
 import 'package:fundder/post_creation_widgets/aspect_ratio_video.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/tile_widgets/image_view.dart';
@@ -25,8 +23,42 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
    * disposed using the dispose method. 
    */
   VideoPlayerController _videoController;
-  VideoPlayerController get videoController => _videoController;
+
+  VideoPlayerController get videoController {
+    if (_videoController == null) {
+      final vc = makeVideoController();
+      return vc;
+    } else {
+      return this._videoController;
+    }
+  }
+
+  /**Creates a new video player Controller for the current video file in
+   * the state and sets it to the video controller of the state. Whenever the 
+   * stateful widget using this state is disposed of, 'removeVideoPlayer' must
+   * be called. 
+   * PRECONDITON:
+   * This should only be called when a video file exists in the state (i.e. this class)
+   */
+
+  VideoPlayerController makeVideoController() {
+    if (_videoController != null) {
+      removeVideoPlayer();
+    }
+    _videoController = VideoPlayerController.file(File(_videoFile.path));
+    return _videoController;
+  }
+
   PickedFile get videoFile => _videoFile;
+
+  void removeVideoPlayer() {
+    print("Removing current video player.");
+    if (this._videoController != null) {
+      final oldVideoController = this._videoController;
+      this._videoController = null;
+      oldVideoController.dispose();
+    }
+  }
 
   PickedFile get imageFile {
     return _imageFile;
@@ -46,24 +78,16 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
     notifyListeners();
   }
 
-/**Updates video and controller associated with that video */
+/**Updates video  associated with that video */
   void updateVideoFile(PickedFile newVideo) {
     this._videoFile = newVideo;
-    if (_videoController != null) {
-      final oldVideoController = _videoController;
-      oldVideoController.dispose();
-      _videoController = null;
-    }
-    _videoController = VideoPlayerController.file(File(newVideo.path));
     notifyListeners();
   }
 
 /**Removes any video file stored in state. */
   void removeVideoFile() {
     if (_videoFile != null && _videoController != null) {
-      final oldVideoController = _videoController;
-      oldVideoController.dispose();
-      _videoController = null;
+      removeVideoPlayer();
     }
     _videoFile = null;
     notifyListeners();
@@ -101,6 +125,13 @@ class MediaUploadBox extends StatefulWidget {
 
 class _MediaUploadBoxState extends State<MediaUploadBox> {
   final picker = ImagePicker();
+  Function _disposeMethod = () {};
+
+  @override
+  void dispose() {
+    _disposeMethod();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +139,9 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
     final width = MediaQuery.of(context).size.width;
 
     return Consumer<MediaStateManager>(builder: (_, state, __) {
+      //initialising now since this is the first point of access
+      // to the state.
+      this._disposeMethod = state.removeVideoPlayer;
       return (!state.isInputValid)
           ? FlatButton(
               child: Container(
