@@ -46,11 +46,17 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
       removeVideoPlayer();
     }
     _videoController = VideoPlayerController.file(File(_videoFile.path));
+    //while we have the chance we'll set the aspect ratio property of this
+    // video controller
+    setAspectRatio(_videoController.value.aspectRatio);
     return _videoController;
   }
 
   PickedFile get videoFile => _videoFile;
 
+/**Disposes of the current video controller held in the state and sets its value
+ * to null.
+ */
   void removeVideoPlayer() {
     print("Removing current video player.");
     if (this._videoController != null) {
@@ -68,6 +74,7 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
   double get aspectRatio => _aspectRatio;
   void setAspectRatio(double ratio) => _aspectRatio = ratio;
 
+/**Updates the image file held in the state newImage */
   void updateImageFile(PickedFile newImage) {
     this._imageFile = newImage;
     notifyListeners();
@@ -104,6 +111,8 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
 
   bool get isInputValid {
     return hasVideo || hasImage;
+    print("Does the state have an image?: $hasImage");
+    print("Does the state have a video?: $hasVideo");
   }
 
   void createErrorDialog(context) {
@@ -188,9 +197,8 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
                       state.videoController.setVolume(0);
                       state.videoController.setLooping(true);
                       return AspectRatio(
-                        child: VideoPlayer(state.videoController),
-                        aspectRatio: 1,
-                      );
+                          child: VideoPlayer(state.videoController),
+                          aspectRatio: state.videoController.value.aspectRatio);
                     } else {
                       return Container(
                           child: Loading(),
