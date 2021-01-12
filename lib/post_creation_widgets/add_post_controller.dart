@@ -184,8 +184,8 @@ class _AddPostState extends State<AddPost> {
       child: Text("Preview",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
       onPressed: () {
-        //will leverage the validity checker of each state from the provider
-        //'listen' parameter will be set to false
+        //will leverage the validity checker of each state from the provider.
+        //'listen' parameter will be set to false.
         //if everything is deemed valid then it'll go to postPreview
 
         bool areInputsValid = true;
