@@ -1,9 +1,11 @@
 import 'dart:io';
-
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
+import 'package:path/path.dart' as path;
 import 'package:fundder/post_creation_widgets/input_field_widgets/description_input.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/hashtag_input_field.dart';
 import 'package:fundder/post_creation_widgets/input_field_widgets/isPrivate_input.dart';
@@ -18,6 +20,8 @@ import 'package:fundder/services/database.dart';
 import 'package:fundder/services/hashtags.dart';
 import 'package:fundder/shared/loading.dart';
 import 'package:provider/provider.dart';
+import 'package:video_compress/video_compress.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import '../models/user.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'creation_tiles/post_preview.dart';
@@ -120,6 +124,7 @@ class _AddPostState extends State<AddPost> {
                         if (mounted) {
                           if (_inPreview) {
                             setState(() {
+                              //because you must be in the last screen by default to be in preview
                               _screens.removeLast();
                               _currentScreen = _screens.length - 1;
                             });
@@ -260,7 +265,8 @@ class _AddPostState extends State<AddPost> {
         showDialog(
           context: context,
           builder: (_) => FutureProgressDialog(_uploadPost(context),
-              message: Text("Uploading...")),
+              message: Text(
+                  "Uploading...If there's a video, it may take up to a few minutes to compress this video. ")),
         );
       },
     );
@@ -286,9 +292,32 @@ class _AddPostState extends State<AddPost> {
 
     final String fileLocation =
         user.uid + "/" + DateTime.now().microsecondsSinceEpoch.toString();
-    print("uploading image");
-    String downloadUrl = await DatabaseService(uid: user.uid)
-        .uploadImage(File(mediaState.imageFile.path), fileLocation);
+    String downloadUrl;
+    if (mediaState.hasVideo) {
+      mediaState.videoController.pause();
+      MediaInfo mediaInfo = await VideoCompress.compressVideo(
+        mediaState.videoFile.path,
+        frameRate: 20,
+        quality: VideoQuality.DefaultQuality,
+        deleteOrigin: true, // It's false by default
+      );
+      Uint8List image = await _loadThumbnail(File(mediaInfo.path));
+      final documentDirectory = await getApplicationDocumentsDirectory();
+      File file = File(path.join(documentDirectory.path, 'imagetest.png'));
+
+      file.writeAsBytesSync(image);
+      print('got file');
+      String thumbnailUrl = await DatabaseService(uid: user.uid)
+          .uploadImage(file, fileLocation + '_video_thumbnail');
+      print('image uploaded');
+      downloadUrl = await DatabaseService(uid: user.uid)
+          .uploadVideo(File(mediaInfo.path), fileLocation);
+    } else {
+      print("uploading image");
+      downloadUrl = await DatabaseService(uid: user.uid)
+          .uploadImage(File(mediaState.imageFile.path), fileLocation);
+    }
+
     print("uploading post now");
     DatabaseService(uid: user.uid)
         .uploadPost(new Post(
@@ -322,5 +351,11 @@ class _AddPostState extends State<AddPost> {
                           .substring(1, postId.toString().length - 1)),
               print("Upload complete...")
             }); //the substring is very important as postId.toString() is in brackets
+  }
+
+  Future<Uint8List> _loadThumbnail(File file) async {
+    final uint8list =
+        await VideoThumbnail.thumbnailData(video: file.path, quality: 3);
+    return uint8list;
   }
 }
