@@ -34,6 +34,8 @@ class _FeedWrapperState extends State<FeedWrapper> {
   bool initialLoadComplete = false;
   int limit = 5;
   Timestamp loadingTimestamp;
+  Timestamp loadingFundTimestamp;
+  Timestamp loadingDoneTimestamp;
   List<FeedView> postList;
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
@@ -60,6 +62,8 @@ class _FeedWrapperState extends State<FeedWrapper> {
   void _onRefresh() async {
     // monitor network fetch
     loadingTimestamp = Timestamp.now();
+    loadingFundTimestamp = Timestamp.now();
+    loadingDoneTimestamp = Timestamp.now();
     List<Post> futurePost;
     List<Post> futureFundPost;
     List<Post> futureDonePost;
@@ -73,10 +77,15 @@ class _FeedWrapperState extends State<FeedWrapper> {
       Random random = new Random();
       int noOfFundPosts = random.nextInt(2);
       int noOfDonePosts = random.nextInt(2) + 2;
+      if (noOfFundPosts == 0) {
+        noOfFundPosts = 1;
+      }
+      print('number of fund posts: ' + noOfFundPosts.toString());
+      print('number of done posts: ' + noOfDonePosts.toString());
       futureDonePost = await DatabaseService()
-          .refreshPosts('done', noOfDonePosts, loadingTimestamp);
+          .refreshPosts('done', noOfDonePosts, loadingDoneTimestamp);
       futureFundPost = await DatabaseService()
-          .refreshPosts('fund', noOfFundPosts, loadingTimestamp);
+          .refreshPosts('fund', noOfFundPosts, loadingFundTimestamp);
       futurePost = _mixLists(futureDonePost, futureFundPost);
     }
     postList = [
@@ -90,6 +99,16 @@ class _FeedWrapperState extends State<FeedWrapper> {
         print('postList' + postList.toString());
         loadingTimestamp = post.timestamp;
       }
+      if (futureFundPost.isEmpty == false) {
+        Post post = futureFundPost.last;
+        print('postList' + postList.toString());
+        loadingFundTimestamp = post.timestamp;
+      }
+      if (futureDonePost.isEmpty == false) {
+        Post post = futureDonePost.last;
+        print('postList' + postList.toString());
+        loadingDoneTimestamp = post.timestamp;
+      }
     }
     initialLoadComplete = true;
     if (mounted) setState(() {});
@@ -101,6 +120,8 @@ class _FeedWrapperState extends State<FeedWrapper> {
     // monitor network fetch
 
     List<Post> futurePost;
+    List<Post> futureFundPost;
+    List<Post> futureDonePost;
     if (widget.status == 'hashtag') {
       futurePost = await DatabaseService()
           .refreshHashtag(widget.identifier, limit, loadingTimestamp);
@@ -108,8 +129,17 @@ class _FeedWrapperState extends State<FeedWrapper> {
       futurePost = await DatabaseService()
           .refreshChallenge(widget.identifier, limit, loadingTimestamp);
     } else {
-      futurePost = await DatabaseService()
-          .refreshPosts(widget.status, limit, loadingTimestamp);
+      Random random = new Random();
+      int noOfFundPosts = random.nextInt(2);
+      int noOfDonePosts = random.nextInt(2) + 2;
+      if (noOfFundPosts == 0) {
+        noOfFundPosts = 1;
+      }
+      futureDonePost = await DatabaseService()
+          .refreshPosts('done', noOfDonePosts, loadingDoneTimestamp);
+      futureFundPost = await DatabaseService()
+          .refreshPosts('fund', noOfFundPosts, loadingFundTimestamp);
+      futurePost = _mixLists(futureDonePost, futureFundPost);
     }
     if (futurePost != null) {
       if (futurePost.isEmpty == false) {
@@ -119,6 +149,16 @@ class _FeedWrapperState extends State<FeedWrapper> {
         }, widget.status == 'hashtag' ? widget.identifier : null));
         Post post = futurePost.last;
         loadingTimestamp = post.timestamp;
+      }
+      if (futureFundPost.isEmpty == false) {
+        Post post = futureFundPost.last;
+        print('postList' + postList.toString());
+        loadingFundTimestamp = post.timestamp;
+      }
+      if (futureDonePost.isEmpty == false) {
+        Post post = futureDonePost.last;
+        print('postList' + postList.toString());
+        loadingDoneTimestamp = post.timestamp;
       }
     }
     if (mounted) setState(() {});
