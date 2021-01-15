@@ -17,6 +17,7 @@ import 'package:fundder/post_creation_widgets/input_field_widgets/which_charity_
 import 'package:fundder/post_creation_widgets/screens/charity_list_screen.dart';
 import 'package:fundder/post_creation_widgets/screens/hashtag_adding_screen.dart';
 import 'package:fundder/services/database.dart';
+import 'package:future_progress_dialog/future_progress_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import '../models/user.dart';
@@ -177,8 +178,6 @@ class _ChallengeFriendState extends State<ChallengeFriend> {
         Provider.of<CharitySelectionStateManager>(context, listen: false);
     final hashtagState =
         Provider.of<HashtagsStateManager>(context, listen: false);
-    final privateStatusState =
-        Provider.of<PrivateStatusStateManager>(context, listen: false);
 
     List validityCheckers = [
       descriptionState,
@@ -221,7 +220,76 @@ class _ChallengeFriendState extends State<ChallengeFriend> {
     return FlatButton(
       child: Text("Create",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (_) => FutureProgressDialog(makeChallenge(context),
+              message: Text("Creating this challenge...")),
+        );
+      },
     );
+  }
+
+/**Initates the challenge creation process */
+  Future makeChallenge(context) async {
+    User user = Provider.of<User>(context);
+    final mediaState = Provider.of<MediaStateManager>(context, listen: false);
+    final String fileLocation =
+        user.uid + "/" + DateTime.now().microsecondsSinceEpoch.toString();
+    var downloadUrl = await DatabaseService(uid: user.uid)
+        .uploadImage(File(mediaState.imageFile.path), fileLocation);
+    _shareThisChallenge(downloadUrl, context);
+  }
+
+  /**Uploads challenge and return its id */
+  Future<String> getChallengeDocId(downloadUrl, context) {
+    ChallengeService challengeService = ChallengeService();
+    final descriptionState =
+        Provider.of<DescriptionInputStateManager>(context, listen: false);
+    final titleState =
+        Provider.of<TitleInputStateManager>(context, listen: false);
+    final targetAmountState =
+        Provider.of<MoneyInputStateManager>(context, listen: false);
+    final mediaState = Provider.of<MediaStateManager>(context, listen: false);
+    final charityState =
+        Provider.of<CharitySelectionStateManager>(context, listen: false);
+    final hashtagState =
+        Provider.of<HashtagsStateManager>(context, listen: false);
+    final privateStatusState =
+        Provider.of<PrivateStatusStateManager>(context, listen: false);
+    final user = Provider.of<User>(context, listen: false);
+    return challengeService.uploadChallenge(
+        title: titleState.currentValue,
+        subtitle: descriptionState.currentValue,
+        author: user.uid,
+        authorUsername: privateStatusState.authorUsername,
+        charity: charityState.charityList[charityState.currentValue].id,
+        timestamp: Timestamp.now(),
+        targetAmount: targetAmountState.currentValue.toString(),
+        imageUrl: downloadUrl,
+        aspectRatio: 1, //as we're only uploading an image
+        hashtags: hashtagState.currentValue,
+        charityLogo: charityState.charityList[charityState.currentValue].image);
+  }
+
+/**Creates a link for the challenge as well as calling 
+ * getChallengeDocId to upload the challenge in the process
+ */
+
+  Future _shareThisChallenge(downloadUrl, context) async {
+    final privateStatusState =
+        Provider.of<PrivateStatusStateManager>(context, listen: false);
+    final descriptionState =
+        Provider.of<DescriptionInputStateManager>(context, listen: false);
+    ChallengeService challengeService = ChallengeService();
+    String challengeDocId = await getChallengeDocId(downloadUrl, context);
+    Uri shortUrl =
+        await challengeService.createChallengeLink(challengeDocId, downloadUrl);
+    Share.share(
+        '${privateStatusState.authorUsername} challenged you!\n ' +
+            shortUrl.toString(),
+        subject: descriptionState.currentValue);
+    Navigator.of(context).pop();
   }
 }
 
