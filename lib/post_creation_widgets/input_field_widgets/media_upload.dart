@@ -49,6 +49,7 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
     //while we have the chance we'll set the aspect ratio property of this
     // video controller
     setAspectRatio(_videoController.value.aspectRatio);
+    print("Aspect rato is ${videoController.value.aspectRatio}");
     return _videoController;
   }
 

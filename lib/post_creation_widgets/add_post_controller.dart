@@ -335,7 +335,7 @@ class _AddPostState extends State<AddPost> {
             targetAmount: targetAmountState.currentValue.toString(),
             imageUrl: downloadUrl,
             status: 'fund',
-            aspectRatio: mediaState.aspectRatio,
+            aspectRatio: mediaState.videoController.value.aspectRatio,
             hashtags: hashtagState.currentValue,
             charityLogo:
                 charityState.charityList[charityState.currentValue].image))
