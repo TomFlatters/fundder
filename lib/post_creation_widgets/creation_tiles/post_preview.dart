@@ -13,6 +13,7 @@ import 'package:video_player/video_player.dart';
 //Technically passing all these parameters to do with state is redundant now
 // but this has been kept as legacy to save time in getting version 3.0.0 out.
 class PostPreview extends StatefulWidget {
+  final bool isPreviewForChallenges;
   final Charity charity;
   final String authorUid;
   final String authorUsername;
@@ -23,7 +24,8 @@ class PostPreview extends StatefulWidget {
   final String targetAmount;
   final List<String> hashtags;
   PostPreview(
-      {this.charity,
+      {this.isPreviewForChallenges,
+      this.charity,
       this.authorUid,
       this.authorUsername,
       this.imageView,
@@ -69,9 +71,9 @@ class _PostPreviewState extends State<PostPreview> {
                 margin: EdgeInsets.only(bottom: 10),
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                 child: Text(
-                  widget.selected == 0
-                      ? 'This is what your post would look like:'
-                      : 'This is what your challenge, once somebody accepts it, would look like:',
+                  (widget.isPreviewForChallenges)
+                      ? 'This is what your challenge will look like:'
+                      : 'This is what your post would look like:',
                   style: TextStyle(
                     fontFamily: 'Founders Grotesk',
                     fontWeight: FontWeight.bold,
