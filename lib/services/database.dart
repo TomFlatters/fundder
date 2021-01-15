@@ -775,6 +775,7 @@ class DatabaseService {
   Future<List<DocumentSnapshot>> getChallengesForMe() async {
     QuerySnapshot challengesSnapshot = await challengesCollection
         .where('acceptedBy', arrayContains: this.uid)
+        .orderBy("timestamp", descending: true)
         .getDocuments();
     return challengesSnapshot.documents.map((DocumentSnapshot doc) {
       return doc;
@@ -784,6 +785,7 @@ class DatabaseService {
   Future<List<DocumentSnapshot>> getChallengesByMe() async {
     QuerySnapshot challengesSnapshot = await challengesCollection
         .where('author', isEqualTo: this.uid)
+        .orderBy("timestamp", descending: true)
         .getDocuments();
     return challengesSnapshot.documents.map((DocumentSnapshot doc) {
       return doc;

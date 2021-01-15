@@ -285,11 +285,19 @@ class _ChallengeFriendState extends State<ChallengeFriend> {
     String challengeDocId = await getChallengeDocId(downloadUrl, context);
     Uri shortUrl =
         await challengeService.createChallengeLink(challengeDocId, downloadUrl);
-    Share.share(
+    /*Share.share(
         '${privateStatusState.authorUsername} challenged you!\n ' +
             shortUrl.toString(),
         subject: descriptionState.currentValue);
-    Navigator.of(context).pop();
+    Navigator.of(context).pop();*/
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ShareLinkController(
+                  link: shortUrl,
+                  challengeId: challengeDocId,
+                  username: privateStatusState.authorUsername,
+                )));
   }
 }
 

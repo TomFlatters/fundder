@@ -8,6 +8,8 @@ import 'package:fundder/shared/loading.dart';
 import 'package:provider/provider.dart';
 import 'package:fundder/models/user.dart';
 import 'package:fundder/tutorial_screens/challenges_tutorials.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter/cupertino.dart';
 
 class ChallengeHub extends StatefulWidget {
   @override
@@ -17,6 +19,8 @@ class ChallengeHub extends StatefulWidget {
 class _ChallengeHubState extends State<ChallengeHub>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: true);
 
   @override
   void dispose() {
@@ -45,74 +49,88 @@ class _ChallengeHubState extends State<ChallengeHub>
           title: Text('Challenge Someone'),
           centerTitle: true,
         ),
-        body: ListView(
-          shrinkWrap: true,
-          children: [
-            SizedBox(
-              height: 20,
-            ),
-            PrimaryFundderButton(
-              text: 'Create challenge or competition',
-              onPressed: () {
-                Navigator.pushNamed(context, '/challengefriend');
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            TabBar(
-              tabs: [Tab(text: 'For me'), Tab(text: 'By me')],
-              controller: _tabController,
-            ),
-            [
-              FutureBuilder(
-                  future: DatabaseService(uid: user.uid).getChallengesForMe(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      List<DocumentSnapshot> challengesList = snapshot.data;
-                      if (challengesList.isEmpty == false) {
-                        print('challenges list: ' + challengesList.toString());
+        body: SmartRefresher(
+            enablePullDown: true,
+            header: WaterDropHeader(),
+            controller: _refreshController,
+            onRefresh: () {
+              setState(() {});
+              _refreshController.refreshCompleted();
+            },
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                SizedBox(
+                  height: 20,
+                ),
+                PrimaryFundderButton(
+                  text: 'Create challenge or competition',
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/challengefriend');
+                  },
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TabBar(
+                  tabs: [Tab(text: 'For me'), Tab(text: 'By me')],
+                  controller: _tabController,
+                ),
+                [
+                  FutureBuilder(
+                      future:
+                          DatabaseService(uid: user.uid).getChallengesForMe(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          List<DocumentSnapshot> challengesList = snapshot.data;
 
-                        return ChallengeHubTileView(
-                          challengesToShow: challengesList,
-                        );
-                      } else {
-                        return Center(
-                            child: Container(
-                                margin: EdgeInsets.all(40),
-                                child: Text(
-                                  'No challenges accepted. Accept a challenge from a friend for it to appear here. They will need to send you a link to the challenge.',
-                                  textAlign: TextAlign.center,
-                                )));
-                      }
-                    } else {
-                      return Loading();
-                    }
-                  }),
-              FutureBuilder(
-                  future: DatabaseService(uid: user.uid).getChallengesByMe(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      List<DocumentSnapshot> challengesList = snapshot.data;
-                      if (challengesList.isEmpty == false) {
-                        print('challenges list: ' + challengesList.toString());
+                          if (challengesList != null &&
+                              challengesList.isEmpty == false) {
+                            print('challenges list: ' +
+                                challengesList.toString());
 
-                        return ChallengeHubTileView(
-                          challengesToShow: challengesList,
-                        );
-                      } else {
-                        return Text(
-                            'No challenges created. Create a challenge for it to appear here.');
-                      }
-                    } else {
-                      return Loading();
-                    }
-                  }),
-            ][_tabController.index]
-          ],
-        ));
+                            return ChallengeHubTileView(
+                              challengesToShow: challengesList,
+                            );
+                          } else {
+                            return Center(
+                                child: Container(
+                                    margin: EdgeInsets.all(40),
+                                    child: Text(
+                                      'No challenges accepted. Accept a challenge from a friend for it to appear here. They will need to send you a link to the challenge.',
+                                      textAlign: TextAlign.center,
+                                    )));
+                          }
+                        } else {
+                          return Loading();
+                        }
+                      }),
+                  FutureBuilder(
+                      future:
+                          DatabaseService(uid: user.uid).getChallengesByMe(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          List<DocumentSnapshot> challengesList = snapshot.data;
+                          if (challengesList.isEmpty == false) {
+                            print('challenges list: ' +
+                                challengesList.toString());
+
+                            return ChallengeHubTileView(
+                              challengesToShow: challengesList,
+                            );
+                          } else {
+                            return Text(
+                                'No challenges created. Create a challenge for it to appear here.');
+                          }
+                        } else {
+                          return Loading();
+                        }
+                      }),
+                ][_tabController.index]
+              ],
+            )));
   }
 }
 

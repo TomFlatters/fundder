@@ -1,88 +1,94 @@
-import 'dart:core';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fundder/challenge_friend/challengeService.dart';
-import 'package:fundder/shared/loading.dart';
+import 'package:fundder/global_widgets/buttons.dart';
+import 'package:fundder/helper_classes.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'dart:io';
+import 'package:fundder/models/post.dart';
+import 'package:fundder/services/database.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:share/share.dart';
 
-class ShareScreen extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String author;
-  final String authorUsername;
-  final String charity;
-  final Timestamp timestamp;
-  final String targetAmount;
-  final String imageUrl;
-  final double aspectRatio;
-  final List hashtags;
-  final String charityLogo;
+class ShareLinkController extends StatefulWidget {
+  final Uri link;
+  final String challengeId;
+  final String username;
+  ShareLinkController({this.link, this.challengeId, this.username});
+  @override
+  _ShareLinkControllerState createState() => _ShareLinkControllerState();
+}
 
-  ShareScreen(
-      {@required this.title,
-      @required this.subtitle,
-      @required this.author,
-      @required this.authorUsername,
-      @required this.charity,
-      @required this.timestamp,
-      @required this.targetAmount,
-      @required this.imageUrl,
-      @required this.aspectRatio,
-      @required this.hashtags,
-      @required this.charityLogo});
+class _ShareLinkControllerState extends State<ShareLinkController> {
+  double opacity = 0.0;
+  Post post;
+
+  @override
+  void initState() {
+    super.initState();
+    changeOpacity();
+  }
+
+  changeOpacity() {
+    Future.delayed(Duration(milliseconds: 100), () {
+      setState(() {
+        opacity = 1;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: getChallengeDocId(),
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.hasData) {
-            String challengeDocId = snapshot.data;
-            return _mainBody(challengeDocId: challengeDocId);
-          } else {
-            return Loading();
-          }
-        });
-  }
-
-  Widget _mainBody({@required String challengeDocId = 'nirvana'}) {
-    return ListView(
-      children: [
-        Container(
-            color: Colors.grey[200],
-            child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10)),
-                  color: Colors.white,
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Challenge Created'),
+        actions: <Widget>[
+          new IconButton(
+              icon: new Icon(Icons.close),
+              onPressed: () {
+                Navigator.pushReplacementNamed(
+                    context, '/challenge/' + widget.challengeId);
+              })
+        ],
+        leading: new Container(),
+      ),
+      body: Center(
+        child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedOpacity(
+                  opacity: opacity,
+                  duration: Duration(seconds: 1),
+                  child: Icon(
+                    MdiIcons.partyPopper,
+                    size: 130,
+                    color: HexColor('ff6b6c'),
+                  ),
                 ),
-                margin: EdgeInsets.only(top: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Text(challengeDocId),
-                    )
-                  ],
-                )))
-      ],
+                SizedBox(height: 60),
+                Text(
+                    'Congratulations! Your challenge has been created. Share this link for your friends to accept',
+                    textAlign: TextAlign.center),
+                SizedBox(height: 40),
+                PrimaryFundderButton(
+                  onPressed: () {
+                    if (widget.link != null) {
+                      _showShare(context);
+                    }
+                  },
+                  text: 'Share Challenge',
+                ),
+                SizedBox(height: 100),
+              ],
+            )),
+      ),
     );
   }
 
-  Future<String> getChallengeDocId() {
-    ChallengeService challengeService = ChallengeService();
-    return challengeService.uploadChallenge(
-        title: title,
-        subtitle: subtitle,
-        author: author,
-        authorUsername: authorUsername,
-        charity: charity,
-        timestamp: timestamp,
-        targetAmount: targetAmount,
-        imageUrl: imageUrl,
-        aspectRatio: aspectRatio,
-        hashtags: hashtags,
-        charityLogo: charityLogo);
+  void _showShare(context) {
+    //File imageFile = await _fileFromImageUrl(post.imageUrl);
+    Share.share('${widget.username} challenged you!\n' + widget.link.toString(),
+        subject: 'Challenge is created');
   }
 }

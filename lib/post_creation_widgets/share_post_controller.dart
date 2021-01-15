@@ -5,7 +5,9 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'dart:io';
 import 'package:fundder/models/post.dart';
 import 'package:fundder/services/database.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:share/share.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
 class SharePostController extends StatefulWidget {
   final String postId;
@@ -32,7 +34,6 @@ class _SharePostControllerState extends State<SharePostController> {
   changeOpacity() {
     Future.delayed(Duration(milliseconds: 100), () {
       setState(() {
-        opacity = 1;
         changeOpacity();
       });
     });
@@ -64,7 +65,7 @@ class _SharePostControllerState extends State<SharePostController> {
                   opacity: opacity,
                   duration: Duration(seconds: 1),
                   child: Icon(
-                    Icons.crop_square,
+                    MdiIcons.partyPopper,
                     size: 130,
                     color: HexColor('ff6b6c'),
                   ),
@@ -140,7 +141,9 @@ class _SharePostControllerState extends State<SharePostController> {
           description: 'Help support this fundraiser!',
           imageUrl: post.videoThumbnail != null
               ? Uri.parse(post.videoThumbnail)
-              : post.imageUrl != null ? Uri.parse(post.imageUrl) : null),
+              : post.imageUrl != null
+                  ? Uri.parse(post.imageUrl)
+                  : null),
     );
 
     final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();

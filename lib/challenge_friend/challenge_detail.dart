@@ -9,6 +9,8 @@ import 'package:fundder/shared/loading.dart';
 import 'package:fundder/shared/helper_functions.dart';
 import 'package:fundder/routes/FadeTransition.dart';
 import 'package:fundder/profile_screens/user_loader.dart';
+import 'challengeService.dart';
+import 'package:share/share.dart';
 
 class ChallengeDetail extends StatefulWidget {
   final String challengeId;
@@ -178,6 +180,23 @@ class _ChallengeDetailState extends State<ChallengeDetail> {
                                       )),
                                   Padding(
                                     padding: EdgeInsets.all(20),
+                                  ),
+                                  PrimaryFundderButton(
+                                      text: 'Share link',
+                                      onPressed: () async {
+                                        ChallengeService challengeService =
+                                            ChallengeService();
+                                        Uri shortUrl = await challengeService
+                                            .createChallengeLink(
+                                                widget.challengeId,
+                                                snapshot.data['imageUrl']);
+                                        Share.share(
+                                            'You have been challenged!\n ' +
+                                                shortUrl.toString(),
+                                            subject: snapshot.data['title']);
+                                      }),
+                                  SizedBox(
+                                    height: 20,
                                   ),
                                   PrimaryFundderButton(
                                       text: hasAccepted
