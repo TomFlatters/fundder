@@ -124,6 +124,7 @@ class _PostPreviewState extends State<PostPreview> {
                     title: widget.title,
                     subtitle: widget.subtitle,
                     hashtags: widget.hashtags,
+                    charity: widget.charity.name,
                     moneyRaised: 0,
                     targetAmount:
                         widget.selected != 1 ? widget.targetAmount : '-1'),

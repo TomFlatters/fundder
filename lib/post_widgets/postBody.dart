@@ -47,7 +47,7 @@ class PostBody extends StatelessWidget {
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.all(10),
-            child: Text(postData.title,
+            child: Text(postData.title + ' for ' + postData.charity,
                 style: TextStyle(
                   fontWeight: FontWeight.bold, /*fontSize: 18*/
                 ))),
