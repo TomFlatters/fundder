@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/challenge_friend/challengeService.dart';
+import 'package:fundder/challenge_friend/screens/challenge_description.dart';
 import 'package:fundder/challenge_friend/share_link_Screen.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
@@ -55,9 +56,7 @@ class _ChallengeFriendState extends State<ChallengeFriend> {
   }
 
   List<Widget> _screens = [
-    Container(
-      child: Center(child: Text("Hello world!")),
-    ),
+    ChallengeDescription(),
     CharitySelectionScreen(),
     HashtaggingScreen()
   ];
@@ -94,7 +93,7 @@ class _ChallengeFriendState extends State<ChallengeFriend> {
             builder: (context) => Scaffold(
                   appBar: AppBar(
                     centerTitle: true,
-                    title: Text("Create Fundder"),
+                    title: Text("Create Challenge"),
                     leading: Container(
                         width: 100,
                         child: IconButton(
