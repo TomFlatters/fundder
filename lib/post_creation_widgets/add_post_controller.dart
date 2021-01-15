@@ -227,6 +227,7 @@ class _AddPostState extends State<AddPost> {
                       profilePic: value.data["profilePic"]);
 
                   return PostPreview(
+                      isPreviewForChallenges: false,
                       charity:
                           charityState.charityList[charityState.currentValue],
                       authorUid: user != null ? user.uid : '',
