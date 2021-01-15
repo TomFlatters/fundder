@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fundder/challenge_friend/challengeService.dart';
 import 'package:fundder/challenge_friend/screens/challenge_description.dart';
+import 'package:fundder/challenge_friend/screens/challenge_preview.dart';
 import 'package:fundder/challenge_friend/share_link_Screen.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
@@ -205,12 +206,22 @@ class _ChallengeFriendState extends State<ChallengeFriend> {
             break;
           }
         }
+        if (areInputsValid) {
+          setState(() {
+            _screens.add(ViewChallenge());
+          });
+          _carouselController.nextPage(
+              duration: Duration(milliseconds: 300), curve: Curves.linear);
+        }
       },
     );
   }
 
   _createUploadButton(context) {
-    print("Upload button for challenges pressed");
+    return FlatButton(
+      child: Text("Create",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+    );
   }
 }
 
