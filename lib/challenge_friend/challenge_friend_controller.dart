@@ -5,6 +5,15 @@ import 'package:fundder/challenge_friend/share_link_Screen.dart';
 import 'package:fundder/models/charity.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/choose_privacy.dart';
 import 'package:fundder/post_creation_widgets/creation_tiles/image_upload.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/description_input.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/hashtag_input_field.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/isPrivate_input.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/media_upload.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/money_input.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/title_input.dart';
+import 'package:fundder/post_creation_widgets/input_field_widgets/which_charity_input.dart';
+import 'package:fundder/post_creation_widgets/screens/charity_list_screen.dart';
+import 'package:fundder/post_creation_widgets/screens/hashtag_adding_screen.dart';
 import 'package:fundder/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
@@ -28,6 +37,185 @@ import 'creation_tiles/post_preview.dart';
 import 'creation_tiles/tile_widgets/image_view.dart';
 import 'package:fundder/global_widgets/dialogs.dart';
 
+class ChallengeFriend extends StatefulWidget {
+  @override
+  _ChallengeFriendState createState() => _ChallengeFriendState();
+}
+
+class _ChallengeFriendState extends State<ChallengeFriend> {
+  /**Keeps track of the index of the screens the carousel is currently displaying */
+  int _currentScreen = 0;
+  /**Number of screens in which the user can enter details about their post */
+  final int noOfInputScreens = 3;
+  /**Returns true if UI is displaying a preview of the post the user has made.
+   * All valdiation checks will have been passed by this point.
+   */
+  bool get _inPreview {
+    return (_currentScreen > noOfInputScreens - 1);
+  }
+
+  List<Widget> _screens = [
+    Container(
+      child: Center(child: Text("Hello world!")),
+    ),
+    CharitySelectionScreen(),
+    HashtaggingScreen()
+  ];
+
+  CarouselController _carouselController = CarouselController();
+  @override
+  Widget build(BuildContext context) {
+    final double height = MediaQuery.of(context).size.height;
+    return MultiProvider(
+        //minimise this list in IDE for readability
+        providers: [
+          Provider<DescriptionInputStateManager>(
+            create: (_) => DescriptionInputStateManager(),
+          ),
+          Provider<TitleInputStateManager>(
+            create: (_) => TitleInputStateManager(),
+          ),
+          ChangeNotifierProvider<MediaStateManager>(
+              create: (_) => MediaStateManager()),
+          Provider<MoneyInputStateManager>(
+            create: (_) => MoneyInputStateManager(),
+          ),
+          ChangeNotifierProvider<CharitySelectionStateManager>(
+            create: (_) => CharitySelectionStateManager(),
+          ),
+          Provider<HashtagsStateManager>(
+            create: (_) => HashtagsStateManager(),
+          ),
+          Provider<PrivateStatusStateManager>(
+            create: (_) => PrivateStatusStateManager(),
+          )
+        ],
+        child: Builder(
+            builder: (context) => Scaffold(
+                  appBar: AppBar(
+                    centerTitle: true,
+                    title: Text("Create Fundder"),
+                    leading: Container(
+                        width: 100,
+                        child: IconButton(
+                            icon: _currentScreen == 0
+                                ? Icon(Icons.close)
+                                : Icon(Icons.arrow_back),
+                            onPressed: _currentScreen == 0
+                                ? () {
+                                    Navigator.of(context).pop(null);
+                                  }
+                                : () {
+                                    _carouselController.previousPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.linear);
+                                    if (_inPreview) {
+                                      setState(() {
+                                        _screens.removeLast();
+                                      });
+                                    }
+                                  })),
+                    actions: [
+                      (_currentScreen < noOfInputScreens - 1)
+                          ? _createNextButton()
+                          : (!_inPreview)
+                              ? _createPreviewButton(context)
+                              : _createUploadButton(context),
+                    ],
+                  ),
+                  body: CarouselSlider(
+                    carouselController: _carouselController,
+                    items: _screens,
+                    options: CarouselOptions(
+                      onPageChanged: (index, reason) {
+                        FocusScope.of(context).unfocus();
+                        if (mounted) {
+                          if (_inPreview) {
+                            setState(() {
+                              //because you must be in the last screen by default to be in preview
+                              _screens.removeLast();
+                              _currentScreen = _screens.length - 1;
+                            });
+                          } else {
+                            setState(() {
+                              _currentScreen = index;
+                            });
+                          }
+                        }
+                      },
+                      enableInfiniteScroll: false,
+                      height: height,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      // autoPlay: false,
+                    ),
+                  ),
+                )));
+  }
+
+  _createNextButton() {
+    return FlatButton(
+      child: Text("Next",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+      onPressed: () {
+        _carouselController.nextPage(
+            duration: Duration(milliseconds: 300), curve: Curves.linear);
+      },
+    );
+  }
+
+  _createPreviewButton(context) {
+    print("preview button for challenges pressed");
+    final descriptionState =
+        Provider.of<DescriptionInputStateManager>(context, listen: false);
+    final titleState =
+        Provider.of<TitleInputStateManager>(context, listen: false);
+    final targetAmountState =
+        Provider.of<MoneyInputStateManager>(context, listen: false);
+    final mediaState = Provider.of<MediaStateManager>(context, listen: false);
+    final charityState =
+        Provider.of<CharitySelectionStateManager>(context, listen: false);
+    final hashtagState =
+        Provider.of<HashtagsStateManager>(context, listen: false);
+    final privateStatusState =
+        Provider.of<PrivateStatusStateManager>(context, listen: false);
+
+    List validityCheckers = [
+      descriptionState,
+      titleState,
+      targetAmountState,
+      mediaState,
+      charityState,
+      hashtagState
+    ];
+
+    return FlatButton(
+      //minimise for code readability
+      child: Text("Preview",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+      onPressed: () {
+        //will leverage the validity checker of each state from the provider.
+        //'listen' parameter will be set to false.
+        //if everything is deemed valid then it'll go to postPreview
+
+        bool areInputsValid = true;
+        for (var state in validityCheckers) {
+          areInputsValid = state.isInputValid && areInputsValid;
+          if (!areInputsValid) {
+            state.createErrorDialog(context);
+            break;
+          }
+        }
+      },
+    );
+  }
+
+  _createUploadButton(context) {
+    print("Upload button for challenges pressed");
+  }
+}
+
+/*
 class ChallengeFriend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -530,3 +718,5 @@ class _AddPostWithUserState extends State<AddPostWithUser> {
         charityLogo: charities[charity].image);
   }
 }
+
+*/
