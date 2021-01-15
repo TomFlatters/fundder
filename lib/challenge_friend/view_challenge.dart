@@ -94,14 +94,6 @@ class ViewChallenge extends StatelessWidget {
                   fontWeight: FontWeight.bold, /*fontSize: 18*/
                 ))),
         Container(
-            //subtitle
-            alignment: Alignment.centerLeft,
-            margin: EdgeInsets.all(10),
-            child: Text(challengeInfo["subtitle"],
-                style: TextStyle(
-                  fontWeight: FontWeight.normal, /*fontSize: 18*/
-                ))),
-        Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
             child: RichText(
