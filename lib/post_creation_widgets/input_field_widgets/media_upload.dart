@@ -46,9 +46,7 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
       removeVideoPlayer();
     }
     _videoController = VideoPlayerController.file(File(_videoFile.path));
-    //while we have the chance we'll set the aspect ratio property of this
-    // video controller
-    setAspectRatio(_videoController.value.aspectRatio);
+
     return _videoController;
   }
 
@@ -70,9 +68,12 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
     return _imageFile;
   }
 
-  double _aspectRatio;
+  double _aspectRatio = 1;
   double get aspectRatio => _aspectRatio;
-  void setAspectRatio(double ratio) => _aspectRatio = ratio;
+  void setAspectRatio(double ratio) {
+    print("The new aspect ratio is $ratio");
+    _aspectRatio = ratio;
+  }
 
 /**Updates the image file held in the state newImage */
   void updateImageFile(PickedFile newImage) {
@@ -194,6 +195,8 @@ class _MediaUploadBoxState extends State<MediaUploadBox> {
                   future: state.videoController.initialize(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
+                      state.setAspectRatio(
+                          state.videoController.value.aspectRatio);
                       state.videoController.play();
                       state.videoController.setVolume(0);
                       state.videoController.setLooping(true);
