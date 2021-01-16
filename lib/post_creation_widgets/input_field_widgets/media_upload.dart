@@ -93,10 +93,11 @@ class MediaStateManager with ChangeNotifier, InputFieldValidityChecker {
 
 /**Removes any video file stored in state. */
   void removeVideoFile() {
-    if (_videoFile != null && _videoController != null) {
+    _videoFile = null;
+    if (_videoController != null) {
       removeVideoPlayer();
     }
-    _videoFile = null;
+
     notifyListeners();
   }
 
